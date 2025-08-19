@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - es5-ext
+  - esbuild
+
+overrides:
+  esbuild@<=0.24.2: '>=0.25.0'
