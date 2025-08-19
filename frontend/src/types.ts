@@ -3,6 +3,10 @@ export interface SimulationParams {
   velocity: number;
   diffusivity: number;
   t_range: number;
+  distribution: string;
+  x_min: number;
+  x_max: number;
+  mesh_size: number;
 }
 
 export interface SolutionData {

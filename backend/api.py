@@ -122,3 +122,13 @@ async def get_status():
         "status": "ready",
         "active_connections": len(manager.active_connections)
     }
+
+@router.post("/api/initial")
+async def get_initial_conditions(params: dict):
+    """Get initial conditions frame for given parameters"""
+    try:
+        from solvers import get_initial_frame
+        frame_data = get_initial_frame(params)
+        return frame_data
+    except Exception as e:
+        return {"error": str(e)}

@@ -13,11 +13,35 @@ export default function App() {
     velocity: 1.0,
     diffusivity: 1.0,
     t_range: 5.0,
+    distribution: "gaussian",
+    x_min: -5.0,
+    x_max: 5.0,
+    mesh_size: 64,
   });
 
   const [currentFrame, setCurrentFrame] = useState<AnimationFrame | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
+
+  const fetchInitialConditions = async (params: SimulationParams) => {
+    console.log("Fetching initial conditions with params:", params);
+    try {
+      const response = await fetch("http://localhost:8000/api/initial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(params),
+      });
+      const data = await response.json();
+      console.log("Received initial conditions:", data);
+      setCurrentFrame(data);
+    } catch (error) {
+      console.error("Failed to fetch initial conditions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInitialConditions(params);
+  }, [params.distribution, params.x_min, params.x_max, params.mesh_size]);
 
   const connectWebSocket = useCallback(() => {
     const websocket = new WebSocket("ws://localhost:8000/ws/simulate");
@@ -30,7 +54,15 @@ export default function App() {
     websocket.onmessage = (event) => {
       const message: WebSocketMessage = JSON.parse(event.data);
 
-      if (message.type === "animation_frame" && message.data && 'time' in message.data) {
+      if (
+        message.type === "animation_frame" &&
+        message.data &&
+        "time" in message.data
+      ) {
+        console.log(
+          "Received animation frame at t =",
+          (message.data as AnimationFrame).time
+        );
         setCurrentFrame(message.data as AnimationFrame);
       } else if (message.type === "error") {
         console.error("Simulation error:", message.message);
@@ -53,16 +85,20 @@ export default function App() {
   }, [connectWebSocket]);
 
   const handleStart = () => {
+    console.log("Starting simulation with params:", params);
     if (ws && ws.readyState === WebSocket.OPEN) {
       setIsRunning(true);
-      ws.send(JSON.stringify({
-        type: "start",
-        params: params
-      }));
+      ws.send(
+        JSON.stringify({
+          type: "start",
+          params: params,
+        })
+      );
     }
   };
 
   const handleStop = () => {
+    console.log("Stopping simulation");
     if (ws && ws.readyState === WebSocket.OPEN) {
       setIsRunning(false);
       setCurrentFrame(null);
@@ -71,6 +107,7 @@ export default function App() {
   };
 
   const handlePause = () => {
+    console.log("Pausing simulation");
     if (ws && ws.readyState === WebSocket.OPEN) {
       setIsRunning(false);
       ws.send(JSON.stringify({ type: "pause" }));
@@ -80,8 +117,8 @@ export default function App() {
   return (
     <div className="h-screen flex">
       <div className="w-80">
-        <Controls 
-          params={params} 
+        <Controls
+          params={params}
           onChange={setParams}
           isRunning={isRunning}
           onStart={handleStart}
@@ -90,7 +127,11 @@ export default function App() {
         />
       </div>
       <div className="flex-1 relative">
-        <PlotComponent frame={currentFrame} isRunning={isRunning} />
+        <PlotComponent
+          frame={currentFrame}
+          isRunning={isRunning}
+          params={params}
+        />
       </div>
     </div>
   );

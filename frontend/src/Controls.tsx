@@ -64,6 +64,65 @@ export default function Controls({ params, onChange, isRunning, onStart, onStop,
             className="w-full"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Starting Distribution</label>
+          <select
+            value={params.distribution}
+            onChange={(e) => onChange({ ...params, distribution: e.target.value })}
+            className="w-full p-1 border border-gray-300 rounded text-sm"
+          >
+            <option value="gaussian">Gaussian</option>
+            <option value="step">Step Function</option>
+            <option value="delta">Delta Function</option>
+            <option value="sine">Sine Wave</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            x_min: {params.x_min.toFixed(1)}
+          </label>
+          <input
+            type="range"
+            min="-10"
+            max="0"
+            step="0.5"
+            value={params.x_min}
+            onChange={(e) => handleChange('x_min', parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            x_max: {params.x_max.toFixed(1)}
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="10"
+            step="0.5"
+            value={params.x_max}
+            onChange={(e) => handleChange('x_max', parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Mesh Size: {params.mesh_size}
+          </label>
+          <input
+            type="range"
+            min="32"
+            max="256"
+            step="16"
+            value={params.mesh_size}
+            onChange={(e) => handleChange('mesh_size', parseInt(e.target.value))}
+            className="w-full"
+          />
+        </div>
       </div>
 
       <div className="mt-6 space-y-2">
