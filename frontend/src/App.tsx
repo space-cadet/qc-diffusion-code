@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Controls from "./Controls";
 import PlotComponent from "./PlotComponent";
+import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import type {
   SimulationParams,
   AnimationFrame,
   WebSocketMessage,
+  SolutionData,
 } from "./types";
 
 export default function App() {
@@ -23,6 +25,10 @@ export default function App() {
   const [currentFrame, setCurrentFrame] = useState<AnimationFrame | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { initSolver, runAnimation, stop } = useWebGLSolver();
+
+  const isWebGL = params.solver_type === 'webgl';
 
   const fetchInitialConditions = async (params: SimulationParams) => {
     console.log("Fetching initial conditions with params:", params);
@@ -87,24 +93,32 @@ export default function App() {
 
   const handleStart = () => {
     console.log("Starting simulation with params:", params);
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      setIsRunning(true);
-      ws.send(
-        JSON.stringify({
-          type: "start",
-          params: params,
-        })
-      );
+    setIsRunning(true);
+    
+    if (isWebGL && canvasRef.current) {
+      initSolver(canvasRef.current, params);
+      runAnimation(params, (data: SolutionData) => {
+        setCurrentFrame({
+          time: data.time,
+          telegraph: { x: data.x, u: data.u },
+          diffusion: { x: data.x, u: data.u }
+        });
+      });
+    } else if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "start", params: params }));
     }
   };
 
   const handleStop = () => {
     console.log("Stopping simulation");
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      setIsRunning(false);
-      setCurrentFrame(null);
+    setIsRunning(false);
+    
+    if (isWebGL) {
+      stop();
+    } else if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "stop" }));
     }
+    setCurrentFrame(null);
   };
 
   const handlePause = () => {
@@ -144,6 +158,14 @@ export default function App() {
           isRunning={isRunning}
           params={params}
         />
+        {isWebGL && (
+          <canvas
+            ref={canvasRef}
+            width={params.mesh_size}
+            height={1}
+            style={{ display: 'none' }}
+          />
+        )}
       </div>
     </div>
   );

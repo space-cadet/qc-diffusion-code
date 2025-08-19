@@ -154,6 +154,34 @@ export default function Controls({ params, onChange, isRunning, onStart, onStop,
             className="w-full"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Solver Type</label>
+          <div className="flex gap-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="solver"
+                value="python"
+                checked={params.solver_type !== 'webgl'}
+                onChange={() => onChange({ ...params, solver_type: 'python' })}
+                className="mr-1"
+              />
+              Python
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="solver"
+                value="webgl"
+                checked={params.solver_type === 'webgl'}
+                onChange={() => onChange({ ...params, solver_type: 'webgl' })}
+                className="mr-1"
+              />
+              WebGL
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="mt-6 space-y-2">

@@ -8,6 +8,7 @@ export interface SimulationParams {
   x_min: number;
   x_max: number;
   mesh_size: number;
+  solver_type?: 'python' | 'webgl';
 }
 
 export interface SolutionData {
