@@ -35,7 +35,7 @@ export function RDShaderTop(type) {
   }
   let parts = [];
   parts[0] =
-    "precision highp float; precision highp sampler2D; varying vec2 textureCoords;";
+    "#version 300 es\nprecision highp float; precision highp sampler2D; in vec2 textureCoords;";
   parts[1] = "uniform sampler2D textureSource;";
   parts[2] = "uniform sampler2D textureSource1;";
   parts[3] = "uniform sampler2D textureSource2;";
@@ -52,8 +52,14 @@ export function RDShaderTop(type) {
     uniform float L_min;
     uniform float t;
     uniform float seed;
+    uniform float a;
+    uniform float k;
+    uniform float MINX;
+    uniform float MINY;
     uniform sampler2D imageSourceOne;
     uniform sampler2D imageSourceTwo;
+    
+    out vec4 fragColor;
 
     AUXILIARY_GLSL_FUNS
 
@@ -73,7 +79,7 @@ export function RDShaderTop(type) {
 
     void computeRHS(sampler2D textureSource, vec4 uvwqIn, vec4 uvwqLIn, vec4 uvwqRIn, vec4 uvwqTIn, vec4 uvwqBIn, vec4 uvwqLLIn, vec4 uvwqRRIn, vec4 uvwqTTIn, vec4 uvwqBBIn, out highp vec4 result) {
 
-        ivec2 texSize = textureSize(textureSource,0);
+        ivec2 texSize = textureSize(textureSource, 0);
         float step_x = 1.0 / float(texSize.x);
         float step_y = 1.0 / float(texSize.y);
         float x = textureCoords.x * L_x + MINX;
@@ -110,15 +116,15 @@ export function RDShaderTop(type) {
  */
 export function RDShaderMain(type) {
   let update = {};
-  update.FE = `uvwq = texture2D(textureSource, textureCoords);
-    uvwqL = texture2D(textureSource, textureCoordsL);
-    uvwqR = texture2D(textureSource, textureCoordsR);
-    uvwqT = texture2D(textureSource, textureCoordsT);
-    uvwqB = texture2D(textureSource, textureCoordsB);
-    uvwqLL = texture2D(textureSource, textureCoordsLL);
-    uvwqRR = texture2D(textureSource, textureCoordsRR);
-    uvwqTT = texture2D(textureSource, textureCoordsTT);
-    uvwqBB = texture2D(textureSource, textureCoordsBB);
+  update.FE = `uvwq = texture(textureSource, textureCoords);
+    uvwqL = texture(textureSource, textureCoordsL);
+    uvwqR = texture(textureSource, textureCoordsR);
+    uvwqT = texture(textureSource, textureCoordsT);
+    uvwqB = texture(textureSource, textureCoordsB);
+    uvwqLL = texture(textureSource, textureCoordsLL);
+    uvwqRR = texture(textureSource, textureCoordsRR);
+    uvwqTT = texture(textureSource, textureCoordsTT);
+    uvwqBB = texture(textureSource, textureCoordsBB);
     computeRHS(textureSource, uvwq, uvwqL, uvwqR, uvwqT, uvwqB, uvwqLL, uvwqRR, uvwqTT, uvwqBB, RHS);
     vec4 timescales = TIMESCALES;
     updated = dt * RHS / timescales + uvwq;`;
@@ -224,7 +230,7 @@ export function RDShaderMain(type) {
     `
   void main()
   {
-      ivec2 texSize = textureSize(textureSource,0);
+      ivec2 texSize = textureSize(textureSource, 0);
       float step_x = 1.0 / float(texSize.x);
       float step_y = 1.0 / float(texSize.y);
       float x = textureCoords.x * L_x + MINX;
@@ -721,7 +727,7 @@ export function RDShaderDirichletIndicatorFun() {
  */
 export function RDShaderBot() {
   return ` 
-    gl_FragColor = updated;
+    fragColor = updated;
 }`;
 }
 

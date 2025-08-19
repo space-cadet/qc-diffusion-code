@@ -1,6 +1,11 @@
 // auxiliary_GLSL_funs.js
 export function auxiliary_GLSL_funs() {
   return `const float pi = 3.141592653589793;
+  
+  float roundFloat(float x) {
+    return floor(x + 0.5);
+  }
+  
   float H(float VALUE) 
     {
         float RES = smoothstep(-0.01, 0.01, VALUE);
@@ -22,7 +27,7 @@ export function auxiliary_GLSL_funs() {
       if (x >= 0.0) {
           return pow(x,y);
       }
-      if (mod(round(y),2.0) == 0.0) {
+      if (mod(roundFloat(y),2.0) == 0.0) {
           return pow(-x,y);
       }
       return -pow(-x,y);

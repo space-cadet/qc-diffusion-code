@@ -7,9 +7,21 @@ import { genericVertexShader } from './generic_shaders.js';
 export class WebGLSolver {
   constructor(canvas) {
     this.canvas = canvas;
-    this.gl = canvas.getContext('webgl2');
+    this.gl = canvas.getContext('webgl2', {
+      powerPreference: 'high-performance',
+    });
+    
     if (!this.gl) {
       throw new Error('WebGL2 not supported');
+    }
+    
+    // Check and enable required extensions
+    const ext = this.gl.getExtension('EXT_color_buffer_float');
+    if (!ext) {
+      console.warn('EXT_color_buffer_float not supported - falling back to RGBA');
+      this.floatTextureSupported = false;
+    } else {
+      this.floatTextureSupported = true;
     }
     
     this.textures = [];
@@ -37,7 +49,13 @@ export class WebGLSolver {
     for (let i = 0; i < 2; i++) {
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+      
+      if (this.floatTextureSupported) {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+      } else {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      }
+      
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -53,6 +71,13 @@ export class WebGLSolver {
       const framebuffer = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.textures[i], 0);
+      
+      if (!this.floatTextureSupported) {
+        // For non-float textures, we need to clear to ensure proper rendering
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+      
       this.framebuffers.push(framebuffer);
     }
   }
@@ -88,7 +113,7 @@ export class WebGLSolver {
     return shader;
   }
 
-  step(dt, parameters) {
+  step(dt, parameters, xMin = -5, xMax = 5) {
     if (!this.initialized) {
       throw new Error('Solver not initialized');
     }
@@ -107,6 +132,13 @@ export class WebGLSolver {
     
     // Set uniforms
     gl.uniform1f(this.uniforms.dt, dt);
+    gl.uniform1f(this.uniforms.dx, (xMax - xMin) / this.width);
+    gl.uniform1f(this.uniforms.dy, (xMax - xMin) / this.height);
+    gl.uniform1f(this.uniforms.L_x, xMax - xMin);
+    gl.uniform1f(this.uniforms.L_y, xMax - xMin);
+    gl.uniform1f(this.uniforms.MINX, xMin);
+    gl.uniform1f(this.uniforms.MINY, xMin);
+    
     Object.keys(parameters).forEach(key => {
       if (this.uniforms[key] !== undefined) {
         gl.uniform1f(this.uniforms[key], parameters[key]);
@@ -157,13 +189,15 @@ export class WebGLSolver {
       float v = uvwq.g;
       float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
       
-      result = vec4(v, v*v*laplacian - 2.0*a*v, 0.0, 0.0);
-    `;
+      result = vec4(v, a*laplacian - 2.0*a*v, 0.0, 0.0);
+    }`;
     
-    return RDShaderTop("FE")
+    const result = RDShaderTop("FE")
       .replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs())
-      .replace("TIMESCALES", "vec4(1.0, 1.0, 1.0, 1.0)")
-      + equationCode + RDShaderMain("FE") + RDShaderBot();
+      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)")
+      + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
+      
+    return result;
   }
 
   generateDiffusionShader() {
@@ -172,12 +206,12 @@ export class WebGLSolver {
       float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
       
       result = vec4(k*laplacian, 0.0, 0.0, 0.0);
-    `;
+    }`;
     
     return RDShaderTop("FE")
       .replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs())
-      .replace("TIMESCALES", "vec4(1.0, 1.0, 1.0, 1.0)")
-      + equationCode + RDShaderMain("FE") + RDShaderBot();
+      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)")
+      + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
   }
 
   setupEquation(equationType, parameters) {
@@ -189,6 +223,11 @@ export class WebGLSolver {
     this.uniforms = {
       dt: this.gl.getUniformLocation(this.program, 'dt'),
       dx: this.gl.getUniformLocation(this.program, 'dx'),
+      dy: this.gl.getUniformLocation(this.program, 'dy'),
+      L_x: this.gl.getUniformLocation(this.program, 'L_x'),
+      L_y: this.gl.getUniformLocation(this.program, 'L_y'),
+      MINX: this.gl.getUniformLocation(this.program, 'MINX'),
+      MINY: this.gl.getUniformLocation(this.program, 'MINY'),
       textureSource: this.gl.getUniformLocation(this.program, 'textureSource')
     };
     
@@ -215,6 +254,10 @@ export class WebGLSolver {
           value = Math.exp(-((x) ** 2) / 0.5);
         } else if (distribution === 'step') {
           value = Math.abs(x) < 1 ? 1 : 0;
+        } else if (distribution === 'delta') {
+          value = Math.abs(x) < 0.1 ? 1 : 0;
+        } else if (distribution === 'sine') {
+          value = Math.sin(x * Math.PI * 2) * 0.5 + 0.5;
         }
         
         data[idx] = value;     // u
@@ -225,7 +268,16 @@ export class WebGLSolver {
     }
     
     gl.bindTexture(gl.TEXTURE_2D, this.textures[0]);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.RGBA, gl.FLOAT, data);
+    if (this.floatTextureSupported) {
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.RGBA, gl.FLOAT, data);
+    } else {
+      // Convert to Uint8Array for non-float textures
+      const uintData = new Uint8Array(data.length);
+      for (let i = 0; i < data.length; i++) {
+        uintData[i] = Math.min(255, Math.max(0, data[i] * 255));
+      }
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, uintData);
+    }
   }
 
   extractPlotData(xMin, xMax) {
