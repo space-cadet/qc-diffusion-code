@@ -8,9 +8,10 @@ interface ControlsProps {
   onStart: () => void;
   onStop: () => void;
   onPause: () => void;
+  onReset: () => void;
 }
 
-export default function Controls({ params, onChange, isRunning, onStart, onStop, onPause }: ControlsProps) {
+export default function Controls({ params, onChange, isRunning, onStart, onStop, onPause, onReset }: ControlsProps) {
   const handleChange = (key: keyof SimulationParams, value: number) => {
     onChange({ ...params, [key]: value });
   };
@@ -123,6 +124,36 @@ export default function Controls({ params, onChange, isRunning, onStart, onStop,
             className="w-full"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Total Time: {params.t_range.toFixed(1)}
+          </label>
+          <input
+            type="range"
+            min="0.5"
+            max="20"
+            step="0.5"
+            value={params.t_range}
+            onChange={(e) => handleChange('t_range', parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Time Step: {params.dt.toFixed(3)}
+          </label>
+          <input
+            type="range"
+            min="0.001"
+            max="0.1"
+            step="0.001"
+            value={params.dt}
+            onChange={(e) => handleChange('dt', parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
       </div>
 
       <div className="mt-6 space-y-2">
@@ -147,6 +178,12 @@ export default function Controls({ params, onChange, isRunning, onStart, onStop,
             className="px-3 py-1 bg-red-500 text-white rounded text-sm"
           >
             Stop
+          </button>
+          <button
+            onClick={onReset}
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
+          >
+            Reset
           </button>
         </div>
       </div>

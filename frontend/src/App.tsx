@@ -13,6 +13,7 @@ export default function App() {
     velocity: 1.0,
     diffusivity: 1.0,
     t_range: 5.0,
+    dt: 0.01,
     distribution: "gaussian",
     x_min: -5.0,
     x_max: 5.0,
@@ -59,10 +60,10 @@ export default function App() {
         message.data &&
         "time" in message.data
       ) {
-        console.log(
-          "Received animation frame at t =",
-          (message.data as AnimationFrame).time
-        );
+        // console.log(
+        //   "Received animation frame at t =",
+        //   (message.data as AnimationFrame).time
+        // );
         setCurrentFrame(message.data as AnimationFrame);
       } else if (message.type === "error") {
         console.error("Simulation error:", message.message);
@@ -114,6 +115,16 @@ export default function App() {
     }
   };
 
+  const handleReset = () => {
+    console.log("Resetting simulation");
+    setIsRunning(false);
+    setCurrentFrame(null);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "stop" }));
+    }
+    fetchInitialConditions(params);
+  };
+
   return (
     <div className="h-screen flex">
       <div className="w-80">
@@ -124,6 +135,7 @@ export default function App() {
           onStart={handleStart}
           onStop={handleStop}
           onPause={handlePause}
+          onReset={handleReset}
         />
       </div>
       <div className="flex-1 relative">

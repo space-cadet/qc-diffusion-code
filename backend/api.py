@@ -83,6 +83,8 @@ async def stream_simulation(websocket: WebSocket, params: dict):
             json.dumps(error_response),
             websocket
         )
+    finally:
+        import gc; gc.collect()
 
 @router.websocket("/ws/simulate")
 async def websocket_endpoint(websocket: WebSocket):

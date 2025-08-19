@@ -6,6 +6,10 @@ class TelegraphSolver:
         self.grid = pde.UnitGrid([grid_size], periodic=False)
         self.grid._axes_coords = [np.linspace(x_min, x_max, grid_size)]
         
+    def __del__(self):
+        if hasattr(self, 'grid'):
+            del self.grid
+        
     def _get_initial_condition(self, distribution):
         if distribution == "gaussian":
             return pde.ScalarField.from_expression(self.grid, "exp(-x**2)")
@@ -57,6 +61,10 @@ class DiffusionSolver:
     def __init__(self, grid_size=64, x_min=-5.0, x_max=5.0):
         self.grid = pde.UnitGrid([grid_size], periodic=False)
         self.grid._axes_coords = [np.linspace(x_min, x_max, grid_size)]
+        
+    def __del__(self):
+        if hasattr(self, 'grid'):
+            del self.grid
         
     def _get_initial_condition(self, distribution):
         if distribution == "gaussian":
@@ -114,12 +122,14 @@ def compare_solutions(params):
         collision_rate=params.get('collision_rate', 1.0),
         velocity=params.get('velocity', 1.0),
         t_range=params.get('t_range', 5.0),
+        dt=params.get('dt', 0.01),
         distribution=params.get('distribution', 'gaussian')
     )
     
     diffusion_result = diffusion.solve(
         diffusivity=params.get('diffusivity', 1.0),
         t_range=params.get('t_range', 5.0),
+        dt=params.get('dt', 0.01),
         distribution=params.get('distribution', 'gaussian')
     )
     
