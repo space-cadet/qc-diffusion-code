@@ -16,9 +16,20 @@ export interface SimulationResult {
   diffusion: SolutionData;
 }
 
+export interface FrameData {
+  x: number[];
+  u: number[];
+}
+
+export interface AnimationFrame {
+  time: number;
+  telegraph: FrameData;
+  diffusion: FrameData;
+}
+
 export interface WebSocketMessage {
-  type: 'simulation_result' | 'error';
-  data?: SimulationResult;
+  type: 'simulation_result' | 'animation_frame' | 'error';
+  data?: SimulationResult | AnimationFrame;
   message?: string;
 }
 

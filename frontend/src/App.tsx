@@ -3,7 +3,7 @@ import Controls from "./Controls";
 import PlotComponent from "./PlotComponent";
 import type {
   SimulationParams,
-  SimulationResult,
+  AnimationFrame,
   WebSocketMessage,
 } from "./types";
 
@@ -15,8 +15,8 @@ export default function App() {
     t_range: 5.0,
   });
 
-  const [data, setData] = useState<SimulationResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState<AnimationFrame | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const connectWebSocket = useCallback(() => {
@@ -30,18 +30,18 @@ export default function App() {
     websocket.onmessage = (event) => {
       const message: WebSocketMessage = JSON.parse(event.data);
 
-      if (message.type === "simulation_result" && message.data) {
-        setData(message.data);
-        setLoading(false);
+      if (message.type === "animation_frame" && message.data && 'time' in message.data) {
+        setCurrentFrame(message.data as AnimationFrame);
       } else if (message.type === "error") {
         console.error("Simulation error:", message.message);
-        setLoading(false);
+        setIsRunning(false);
       }
     };
 
     websocket.onclose = () => {
       console.log("WebSocket disconnected");
       setWs(null);
+      setIsRunning(false);
     };
 
     return websocket;
@@ -52,20 +52,45 @@ export default function App() {
     return () => websocket.close();
   }, [connectWebSocket]);
 
-  useEffect(() => {
+  const handleStart = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      setLoading(true);
-      ws.send(JSON.stringify(params));
+      setIsRunning(true);
+      ws.send(JSON.stringify({
+        type: "start",
+        params: params
+      }));
     }
-  }, [params, ws]);
+  };
+
+  const handleStop = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      setIsRunning(false);
+      setCurrentFrame(null);
+      ws.send(JSON.stringify({ type: "stop" }));
+    }
+  };
+
+  const handlePause = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      setIsRunning(false);
+      ws.send(JSON.stringify({ type: "pause" }));
+    }
+  };
 
   return (
     <div className="h-screen flex">
       <div className="w-80">
-        <Controls params={params} onChange={setParams} />
+        <Controls 
+          params={params} 
+          onChange={setParams}
+          isRunning={isRunning}
+          onStart={handleStart}
+          onStop={handleStop}
+          onPause={handlePause}
+        />
       </div>
       <div className="flex-1 relative">
-        <PlotComponent data={data} loading={loading} />
+        <PlotComponent frame={currentFrame} isRunning={isRunning} />
       </div>
     </div>
   );

@@ -4,9 +4,13 @@ import type { SimulationParams } from './types';
 interface ControlsProps {
   params: SimulationParams;
   onChange: (params: SimulationParams) => void;
+  isRunning: boolean;
+  onStart: () => void;
+  onStop: () => void;
+  onPause: () => void;
 }
 
-export default function Controls({ params, onChange }: ControlsProps) {
+export default function Controls({ params, onChange, isRunning, onStart, onStop, onPause }: ControlsProps) {
   const handleChange = (key: keyof SimulationParams, value: number) => {
     onChange({ ...params, [key]: value });
   };
@@ -59,6 +63,32 @@ export default function Controls({ params, onChange }: ControlsProps) {
             onChange={(e) => handleChange('diffusivity', parseFloat(e.target.value))}
             className="w-full"
           />
+        </div>
+      </div>
+
+      <div className="mt-6 space-y-2">
+        <h3 className="text-sm font-semibold">Simulation Control</h3>
+        <div className="flex gap-2">
+          <button
+            onClick={onStart}
+            disabled={isRunning}
+            className="px-3 py-1 bg-green-500 text-white rounded disabled:bg-gray-300 text-sm"
+          >
+            Start
+          </button>
+          <button
+            onClick={onPause}
+            disabled={!isRunning}
+            className="px-3 py-1 bg-yellow-500 text-white rounded disabled:bg-gray-300 text-sm"
+          >
+            Pause
+          </button>
+          <button
+            onClick={onStop}
+            className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+          >
+            Stop
+          </button>
         </div>
       </div>
     </div>

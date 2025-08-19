@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import Plotly from 'plotly.js';
-import type { SimulationResult, PlotData } from './types';
+import type { AnimationFrame, PlotData } from './types';
 
 interface PlotComponentProps {
-  data: SimulationResult | null;
-  loading: boolean;
+  frame: AnimationFrame | null;
+  isRunning: boolean;
 }
 
-export default function PlotComponent({ data, loading }: PlotComponentProps) {
+export default function PlotComponent({ frame: data, isRunning }: PlotComponentProps) {
   const plotRef = useRef<HTMLDivElement>(null);
   const plotInitialized = useRef(false);
 
@@ -17,12 +17,24 @@ export default function PlotComponent({ data, loading }: PlotComponentProps) {
 
     if (!plotInitialized.current) {
       // Initialize empty plot
-      const layout = {
+      const layout: Partial<Plotly.Layout> = {
         title: 'Telegraph vs Diffusion Equation Comparison',
-        xaxis: { title: 'Position (x)' },
-        yaxis: { title: 'Amplitude (u)' },
+        xaxis: { title: 'Position (x)', range: [-5, 5] },
+        yaxis: { title: 'Amplitude (u)', range: [-0.5, 1.2] },
         showlegend: true,
         height: 500,
+        annotations: [{
+          x: 0.02,
+          y: 0.98,
+          xref: 'paper' as const,
+          yref: 'paper' as const,
+          text: 't = 0.00',
+          showarrow: false,
+          font: { size: 14, color: '#333' },
+          bgcolor: 'rgba(255,255,255,0.8)',
+          bordercolor: '#ccc',
+          borderwidth: 1
+        }]
       };
 
       const config: Partial<Plotly.Config> = {
@@ -58,21 +70,35 @@ export default function PlotComponent({ data, loading }: PlotComponentProps) {
       line: { color: '#3b82f6' },
     };
 
-    Plotly.redraw(plotElement).then(() => {
-      Plotly.animate(plotElement, {
-        data: [telegraphTrace, diffusionTrace],
-      }, {
-        transition: { duration: 300 },
-        frame: { duration: 300 },
-      });
-    });
+    const layout: Partial<Plotly.Layout> = {
+      title: 'Telegraph vs Diffusion Equation Comparison',
+      xaxis: { title: 'Position (x)', range: [-5, 5] },
+      yaxis: { title: 'Amplitude (u)', range: [-0.5, 1.2] },
+      showlegend: true,
+      height: 500,
+      annotations: [{
+        x: 0.02,
+        y: 0.98,
+        xref: 'paper' as const,
+        yref: 'paper' as const,
+        text: `t = ${data.time.toFixed(2)}`,
+        showarrow: false,
+        font: { size: 14, color: '#333' },
+        bgcolor: 'rgba(255,255,255,0.8)',
+        bordercolor: '#ccc',
+        borderwidth: 1
+      }]
+    };
+
+    // Update plot data and time annotation
+    Plotly.react(plotElement, [telegraphTrace, diffusionTrace], layout);
   }, [data]);
 
   return (
     <div className="flex-1 p-4">
-      {loading && (
-        <div className="absolute top-4 right-4 bg-blue-100 text-blue-800 px-3 py-1 rounded">
-          Computing...
+      {isRunning && (
+        <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded">
+          Running...
         </div>
       )}
       <div ref={plotRef} className="w-full" />

@@ -22,14 +22,25 @@ class TelegraphSolver:
             'v_field': f'{velocity**2} * laplace(u) - {2*collision_rate} * v_field'
         })
         
-        # Solve
+        # Solve with time tracking
         initial_state = pde.FieldCollection([u_init, v_init], labels=['u', 'v_field'])
-        result = eq.solve(initial_state, t_range=t_range, dt=dt, tracker=None)
+        
+        # Store time evolution
+        times = []
+        solutions = []
+        
+        def store_solution(state, t):
+            times.append(t)
+            solutions.append(state['u'].data.copy())
+        
+        tracker = pde.trackers.CallbackTracker(store_solution, interval=dt*10)
+        result = eq.solve(initial_state, t_range=t_range, dt=dt, tracker=tracker)
         
         return {
             'x': self.grid.axes_coords[0],
-            'u': result['u'].data,
-            'time': t_range
+            'times': times,
+            'solutions': solutions,
+            'final_time': t_range
         }
 
 class DiffusionSolver:
@@ -48,13 +59,22 @@ class DiffusionSolver:
         # Define diffusion equation
         eq = pde.DiffusionPDE(diffusivity=diffusivity)
         
-        # Solve
-        result = eq.solve(u_init, t_range=t_range, dt=dt, tracker=None)
+        # Store time evolution
+        times = []
+        solutions = []
+        
+        def store_solution(state, t):
+            times.append(t)
+            solutions.append(state.data.copy())
+        
+        tracker = pde.trackers.CallbackTracker(store_solution, interval=dt*10)
+        result = eq.solve(u_init, t_range=t_range, dt=dt, tracker=tracker)
         
         return {
             'x': self.grid.axes_coords[0],
-            'u': result.data,
-            'time': t_range
+            'times': times,
+            'solutions': solutions,
+            'final_time': t_range
         }
 
 def compare_solutions(params):
