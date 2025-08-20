@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 09:29:55 IST_
+_Last Updated: 2025-08-20 09:53:16 IST_
 
 ## Active Tasks
 
@@ -15,9 +15,9 @@ _Last Updated: 2025-08-20 09:29:55 IST_
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 09:29:55 IST
-**Files**: `code/backend/`, `code/frontend/`, `memory-bank/implementation-details/`
-**Notes**: Backend-agnostic frontend completed, ready for multi-equation selection system
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 09:53:16 IST
+**Files**: `frontend/src/Controls.tsx`, `frontend/src/types.ts`, `frontend/src/hooks/useWebGLSolver.ts`
+**Notes**: Phase 4 completed - multi-equation selection system with organized UI, ready for Wheeler-DeWitt implementation
 
 ## Completed Tasks
 

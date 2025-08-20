@@ -215,9 +215,7 @@ export class WebGLSolver {
   }
 
   setupEquation(equationType, parameters) {
-    const shaderSource = equationType === 'telegraph' 
-      ? this.generateTelegraphShader() 
-      : this.generateDiffusionShader();
+    const shaderSource = this.getShaderForEquation(equationType);
     
     this.program = this.createProgram(shaderSource);
     this.uniforms = {
@@ -234,6 +232,17 @@ export class WebGLSolver {
     Object.keys(parameters).forEach(key => {
       this.uniforms[key] = this.gl.getUniformLocation(this.program, key);
     });
+  }
+
+  getShaderForEquation(equationType) {
+    switch (equationType) {
+      case 'telegraph':
+        return this.generateTelegraphShader();
+      case 'diffusion':
+        return this.generateDiffusionShader();
+      default:
+        throw new Error(`Unknown equation type: ${equationType}`);
+    }
   }
 
   getTexture() {

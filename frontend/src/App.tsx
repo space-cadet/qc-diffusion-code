@@ -7,7 +7,7 @@ import type {
   SimulationParams,
   AnimationFrame,
   WebSocketMessage,
-  SolutionData,
+  SimulationResult,
 } from "./types";
 
 export default function App() {
@@ -21,6 +21,7 @@ export default function App() {
     x_min: -5.0,
     x_max: 5.0,
     mesh_size: 64,
+    selectedEquations: ['telegraph', 'diffusion'],
   });
 
   const [currentFrame, setCurrentFrame] = useState<AnimationFrame | null>(null);
@@ -40,7 +41,7 @@ export default function App() {
 
   useEffect(() => {
     initializeConditions(params);
-  }, [params.distribution, params.x_min, params.x_max, params.mesh_size, initializeConditions]);
+  }, [params.distribution, params.x_min, params.x_max, params.mesh_size, params.selectedEquations, initializeConditions]);
 
   const connectWebSocket = useCallback(() => {
     if (!isWebGL) {
@@ -90,12 +91,8 @@ export default function App() {
     
     if (isWebGL && canvasRef.current) {
       initSolver(canvasRef.current, params);
-      runAnimation(params, (data: SolutionData) => {
-        setCurrentFrame({
-          time: data.time,
-          telegraph: { x: data.x, u: data.u },
-          diffusion: { x: data.x, u: data.u }
-        });
+      runAnimation(params, (data: SimulationResult & { time: number }) => {
+        setCurrentFrame(data);
       });
     } else if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "start", params: params }));

@@ -9,6 +9,7 @@ export interface SimulationParams {
   x_max: number;
   mesh_size: number;
   solver_type?: 'python' | 'webgl';
+  selectedEquations?: string[];
 }
 
 export interface SolutionData {
@@ -18,8 +19,7 @@ export interface SolutionData {
 }
 
 export interface SimulationResult {
-  telegraph: SolutionData;
-  diffusion: SolutionData;
+  [equationType: string]: SolutionData;
 }
 
 export interface FrameData {
@@ -29,8 +29,14 @@ export interface FrameData {
 
 export interface AnimationFrame {
   time: number;
-  telegraph: FrameData;
-  diffusion: FrameData;
+  [equationType: string]: FrameData | number;
+}
+
+export interface EquationMetadata {
+  name: string;
+  displayName: string;
+  color: string;
+  parameters: string[];
 }
 
 export interface WebSocketMessage {

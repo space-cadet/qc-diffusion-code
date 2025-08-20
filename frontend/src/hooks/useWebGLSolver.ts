@@ -1,23 +1,38 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebGLSolver } from '../webgl/webgl-solver';
-import type { SimulationParams, SolutionData } from '../types';
+import type { SimulationParams, SimulationResult } from '../types';
 
 export function useWebGLSolver() {
-  const solverRef = useRef<WebGLSolver | null>(null);
+  const solversRef = useRef<Map<string, WebGLSolver>>(new Map());
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
 
   const initSolver = useCallback((canvas: HTMLCanvasElement, params: SimulationParams) => {
     try {
-      const solver = new WebGLSolver(canvas);
-      solver.init(params.mesh_size, 1);
-      solver.setupEquation('telegraph', { 
-        a: params.collision_rate, 
-        v: params.velocity, 
-        k: params.diffusivity 
+      const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
+      const solvers = new Map<string, WebGLSolver>();
+      
+      selectedEquations.forEach(equationType => {
+        const solver = new WebGLSolver(canvas);
+        solver.init(params.mesh_size, 1);
+        
+        if (equationType === 'telegraph') {
+          solver.setupEquation('telegraph', { 
+            a: params.collision_rate, 
+            v: params.velocity, 
+            k: params.diffusivity 
+          });
+        } else if (equationType === 'diffusion') {
+          solver.setupEquation('diffusion', { 
+            k: params.diffusivity 
+          });
+        }
+        
+        solver.setInitialConditions(params.distribution, params.x_min, params.x_max);
+        solvers.set(equationType, solver);
       });
-      solver.setInitialConditions(params.distribution, params.x_min, params.x_max);
-      solverRef.current = solver;
+      
+      solversRef.current = solvers;
       canvasRef.current = canvas;
       return true;
     } catch (error) {
@@ -27,20 +42,28 @@ export function useWebGLSolver() {
   }, []);
 
   const step = useCallback((dt: number, params: SimulationParams) => {
-    if (!solverRef.current) return null;
+    if (solversRef.current.size === 0) return null;
     
-    solverRef.current.step(dt, {
-      a: params.collision_rate,
-      v: params.velocity,
-      k: params.diffusivity,
-      dx: (params.x_max - params.x_min) / params.mesh_size
+    const results: SimulationResult = {};
+    const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
+    
+    selectedEquations.forEach(equationType => {
+      const solver = solversRef.current.get(equationType);
+      if (solver) {
+        const stepParams = equationType === 'telegraph' 
+          ? { a: params.collision_rate, v: params.velocity, k: params.diffusivity, dx: (params.x_max - params.x_min) / params.mesh_size }
+          : { k: params.diffusivity, dx: (params.x_max - params.x_min) / params.mesh_size };
+        
+        solver.step(dt, stepParams);
+        results[equationType] = solver.extractPlotData(params.x_min, params.x_max);
+      }
     });
     
-    return solverRef.current.extractPlotData(params.x_min, params.x_max);
+    return results;
   }, []);
 
-  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SolutionData) => void) => {
-    if (!solverRef.current) return;
+  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SimulationResult & { time: number }) => void) => {
+    if (solversRef.current.size === 0) return;
 
     let time = 0;
     const animate = () => {

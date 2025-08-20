@@ -1,12 +1,33 @@
 import React, { useEffect, useRef } from "react";
 import Plotly from "plotly.js";
-import type { AnimationFrame, PlotData, SimulationParams } from "./types";
+import type { AnimationFrame, PlotData, SimulationParams, EquationMetadata } from "./types";
 
 interface PlotComponentProps {
   frame: AnimationFrame | null;
   isRunning: boolean;
   params: SimulationParams;
 }
+
+const equationMetadata: { [key: string]: EquationMetadata } = {
+  telegraph: {
+    name: "telegraph",
+    displayName: "Telegraph Equation",
+    color: "#ef4444",
+    parameters: ["collision_rate", "velocity"]
+  },
+  diffusion: {
+    name: "diffusion",
+    displayName: "Diffusion Equation", 
+    color: "#3b82f6",
+    parameters: ["diffusivity"]
+  },
+  "wheeler-dewitt": {
+    name: "wheeler-dewitt",
+    displayName: "Wheeler-DeWitt",
+    color: "#10b981",
+    parameters: []
+  }
+};
 
 export default function PlotComponent({
   frame: data,
@@ -15,15 +36,19 @@ export default function PlotComponent({
 }: PlotComponentProps) {
   const plotRef = useRef<HTMLDivElement>(null);
   const plotInitialized = useRef(false);
+  const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
 
   useEffect(() => {
     if (!plotRef.current) return;
     const plotElement = plotRef.current;
 
     if (!plotInitialized.current) {
-      // Initialize empty plot
+      const title = selectedEquations.length > 1 
+        ? `${selectedEquations.map(eq => equationMetadata[eq]?.displayName).join(' vs ')} Comparison`
+        : equationMetadata[selectedEquations[0]]?.displayName || "Equation Simulation";
+
       const layout: Partial<Plotly.Layout> = {
-        title: "Telegraph vs Diffusion Equation Comparison",
+        title,
         xaxis: { title: "Position (x)", range: [params.x_min, params.x_max] },
         yaxis: { title: "Amplitude (u)", range: [-0.5, 1.2] },
         showlegend: true,
@@ -56,32 +81,32 @@ export default function PlotComponent({
       Plotly.newPlot(plotElement, [], layout, config);
       plotInitialized.current = true;
     }
-  }, []);
+  }, [selectedEquations]);
 
   useEffect(() => {
     if (!plotRef.current || !data) return;
     const plotElement = plotRef.current;
 
-    const telegraphTrace: PlotData = {
-      x: data.telegraph.x,
-      y: data.telegraph.u,
-      type: "scatter",
-      mode: "lines",
-      name: "Telegraph Equation",
-      line: { color: "#ef4444" },
-    };
+    const traces: PlotData[] = selectedEquations.map(equationType => {
+      const frameData = data[equationType] as { x: number[], u: number[] };
+      const metadata = equationMetadata[equationType];
+      
+      return {
+        x: frameData.x,
+        y: frameData.u,
+        type: "scatter",
+        mode: "lines",
+        name: metadata.displayName,
+        line: { color: metadata.color },
+      };
+    });
 
-    const diffusionTrace: PlotData = {
-      x: data.diffusion.x,
-      y: data.diffusion.u,
-      type: "scatter",
-      mode: "lines",
-      name: "Diffusion Equation",
-      line: { color: "#3b82f6" },
-    };
+    const title = selectedEquations.length > 1 
+      ? `${selectedEquations.map(eq => equationMetadata[eq]?.displayName).join(' vs ')} Comparison`
+      : equationMetadata[selectedEquations[0]]?.displayName || "Equation Simulation";
 
     const layout: Partial<Plotly.Layout> = {
-      title: "Telegraph vs Diffusion Equation Comparison",
+      title,
       xaxis: { title: "Position (x)", range: [params.x_min, params.x_max] },
       yaxis: { title: "Amplitude (u)", range: [-0.5, 1.2] },
       showlegend: true,
@@ -92,7 +117,7 @@ export default function PlotComponent({
           y: 0.98,
           xref: "paper" as const,
           yref: "paper" as const,
-          text: `t = ${data.time.toFixed(2)}`,
+          text: `t = ${(data.time as number).toFixed(2)}`,
           showarrow: false,
           font: { size: 14, color: "#333" },
           bgcolor: "rgba(255,255,255,0.8)",
@@ -102,9 +127,8 @@ export default function PlotComponent({
       ],
     };
 
-    // Update plot data and time annotation
-    Plotly.react(plotElement, [telegraphTrace, diffusionTrace], layout);
-  }, [data]);
+    Plotly.react(plotElement, traces, layout);
+  }, [data, selectedEquations]);
 
   return (
     <div className="flex-1 p-4">
@@ -116,13 +140,16 @@ export default function PlotComponent({
       <div ref={plotRef} className="w-full" />
 
       <div className="mt-4 text-sm text-gray-600">
-        <p>
-          <strong>Telegraph Equation:</strong> ∂²u/∂t² + 2a∂u/∂t = v²∇²u (finite
-          velocity)
-        </p>
-        <p>
-          <strong>Diffusion Equation:</strong> ∂u/∂t = k∇²u (infinite velocity)
-        </p>
+        {selectedEquations.includes('telegraph') && (
+          <p>
+            <strong>Telegraph Equation:</strong> ∂²u/∂t² + 2a∂u/∂t = v²∇²u (finite velocity)
+          </p>
+        )}
+        {selectedEquations.includes('diffusion') && (
+          <p>
+            <strong>Diffusion Equation:</strong> ∂u/∂t = k∇²u (infinite velocity)
+          </p>
+        )}
       </div>
     </div>
   );

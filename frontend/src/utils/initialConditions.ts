@@ -45,6 +45,7 @@ function sineDistribution(x: number[], frequency: number = 1, amplitude: number 
  */
 export function generateInitialConditions(params: SimulationParams): AnimationFrame {
   const { distribution, x_min, x_max, mesh_size } = params;
+  const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
   
   // Generate mesh
   const x = generateMesh(x_min, x_max, mesh_size);
@@ -69,11 +70,13 @@ export function generateInitialConditions(params: SimulationParams): AnimationFr
       u = gaussianDistribution(x, 0, 1);
   }
   
-  return {
-    time: 0.0,
-    telegraph: { x, u: [...u] },
-    diffusion: { x, u: [...u] }
-  };
+  // Create result with only selected equations
+  const result: AnimationFrame = { time: 0.0 };
+  selectedEquations.forEach(equationType => {
+    result[equationType] = { x, u: [...u] };
+  });
+  
+  return result;
 }
 
 /**
