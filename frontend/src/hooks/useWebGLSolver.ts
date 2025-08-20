@@ -1,6 +1,21 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebGLSolver } from '../webgl/webgl-solver';
-import type { SimulationParams, SimulationResult } from '../types';
+import type { SimulationParams } from '../types';
+
+export interface WebGLPlotData {
+  x: number[];
+  u: number[];
+  w?: number[];
+}
+
+export type SimulationResult = {
+  [equationType: string]: {
+    x: number[];
+    u: number[];
+    w?: number[];
+    time: number;
+  };
+} & { time: number };
 
 export function useWebGLSolver() {
   const solversRef = useRef<Map<string, WebGLSolver>>(new Map());
@@ -43,7 +58,7 @@ export function useWebGLSolver() {
   const step = useCallback((dt: number, params: SimulationParams) => {
     if (solversRef.current.size === 0) return null;
     
-    const results: SimulationResult = {};
+    const results: SimulationResult = {} as SimulationResult;
     const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
     
     selectedEquations.forEach(equationType => {
@@ -54,14 +69,15 @@ export function useWebGLSolver() {
           : { k: params.diffusivity };
         
         solver.step(dt, stepParams);
-        results[equationType] = solver.extractPlotData(params.x_min, params.x_max);
+        const data = solver.extractPlotData(params.x_min, params.x_max) as WebGLPlotData;
+        results[equationType] = { x: data.x, u: data.u, w: data.w || [], time: 0 };
       }
     });
     
     return results;
   }, []);
 
-  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SimulationResult & { time: number }) => void) => {
+  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SimulationResult) => void) => {
     if (solversRef.current.size === 0) return;
 
     let time = 0;
@@ -69,7 +85,8 @@ export function useWebGLSolver() {
       if (time < params.t_range) {
         const data = step(params.dt, params);
         if (data) {
-          onFrame({ ...data, time });
+          const frameData = { ...data, time } as SimulationResult;
+          onFrame(frameData);
         }
         time += params.dt;
         animationRef.current = requestAnimationFrame(animate);

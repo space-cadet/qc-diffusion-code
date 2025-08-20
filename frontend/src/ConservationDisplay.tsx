@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ConservationQuantities } from '../utils/conservationMonitor';
+import type { ConservationQuantities } from './utils/conservationMonitor';
 
 interface ConservationDisplayProps {
   currentQuantities: ConservationQuantities | null;

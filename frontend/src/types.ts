@@ -13,14 +13,16 @@ export interface SimulationParams {
 }
 
 export interface SolutionData {
+  time: number;
   x: number[];
   u: number[];
-  time: number;
+  w?: number[];
+  [key: string]: any;
 }
 
-export interface SimulationResult {
+export type SimulationResult = {
   [equationType: string]: SolutionData;
-}
+} & { time: number };
 
 export interface FrameData {
   x: number[];
@@ -49,6 +51,7 @@ export interface WebSocketMessage {
 export interface PlotData {
   x: number[];
   y: number[];
+  w?: number[];
   type: 'scatter';
   mode: 'lines';
   name: string;

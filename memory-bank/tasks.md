@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 10:43:45 IST_
+_Last Updated: 2025-08-20 14:33:33 IST_
 
 ## Active Tasks
 
@@ -9,6 +9,7 @@ _Last Updated: 2025-08-20 10:43:45 IST_
 | --- | ----------------------------------------------------- | -------------- | -------- | ---------- | ------------ |
 | C1  | Numerical Simulations for QC-Diffusion Paper Concepts | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | C2  | VisualPDE GPU Solver Integration                      | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
+| C3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
 
 ## Task Details
 
@@ -18,6 +19,13 @@ _Last Updated: 2025-08-20 10:43:45 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 10:43:45 IST
 **Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/utils/conservationMonitor.ts`, `frontend/src/PlotComponent.tsx`
 **Notes**: Phase 5 completed - telegraph equation stability fixes and conservation monitoring system implemented
+
+### C3: GPU AMR Integration for PDE Solver
+
+**Description**: Implement GPU-based adaptive mesh refinement using gaming industry techniques (tessellation, displacement mapping, LOD)
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 14:33:33 IST
+**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/simulation_shaders.js`, `memory-bank/gpu-amr-integration.md`
+**Notes**: Research completed - tessellation-based approach identified as optimal solution
 
 ## Completed Tasks
 
