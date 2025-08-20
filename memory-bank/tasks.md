@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 14:33:33 IST_
+_Last Updated: 2025-08-20 23:44:20 IST_
 
 ## Active Tasks
 
@@ -27,8 +27,15 @@ _Last Updated: 2025-08-20 14:33:33 IST_
 **Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/simulation_shaders.js`, `memory-bank/gpu-amr-integration.md`
 **Notes**: Research completed - tessellation-based approach identified as optimal solution
 
+### C4: Fix Pause Button Functionality
+**Description**: Implement proper pause/resume functionality for simulation controls
+**Status**: ✅ COMPLETED **Last**: 2025-08-20 23:44:20 IST
+**Files**: `backend/api.py`, `frontend/src/App.tsx`, `frontend/src/PlotComponent.tsx`
+**Notes**: Fixed by Deepseek v3 + Claude 3.7 - backend state persistence and unified pause/resume logic
+
 ## Completed Tasks
 
 | ID  | Title                                      | Completed               |
 | --- | ------------------------------------------ | ----------------------- |
+| C4  | Fix Pause Button Functionality            | 2025-08-20 23:44:20 IST |
 | C0  | Code Subproject Memory Bank Initialization | 2025-08-20 08:42:01 IST |

@@ -1,5 +1,5 @@
-import React from 'react';
-import type { SimulationParams } from './types';
+import React from "react";
+import type { SimulationParams } from "./types";
 
 interface BottomControlsProps {
   params: SimulationParams;
@@ -11,14 +11,14 @@ interface BottomControlsProps {
   onReset: () => void;
 }
 
-export default function BottomControls({ 
-  params, 
-  onChange, 
-  isRunning, 
-  onStart, 
-  onStop, 
-  onPause, 
-  onReset 
+export default function BottomControls({
+  params,
+  onChange,
+  isRunning,
+  onStart,
+  onStop,
+  onPause,
+  onReset,
 }: BottomControlsProps) {
   return (
     <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
@@ -32,8 +32,8 @@ export default function BottomControls({
                 type="radio"
                 name="solver"
                 value="python"
-                checked={params.solver_type !== 'webgl'}
-                onChange={() => onChange({ ...params, solver_type: 'python' })}
+                checked={params.solver_type !== "webgl"}
+                onChange={() => onChange({ ...params, solver_type: "python" })}
                 className="mr-2"
               />
               <span className="text-sm">Python</span>
@@ -43,8 +43,8 @@ export default function BottomControls({
                 type="radio"
                 name="solver"
                 value="webgl"
-                checked={params.solver_type === 'webgl'}
-                onChange={() => onChange({ ...params, solver_type: 'webgl' })}
+                checked={params.solver_type === "webgl"}
+                onChange={() => onChange({ ...params, solver_type: "webgl" })}
                 className="mr-2"
               />
               <span className="text-sm">WebGL</span>
@@ -54,7 +54,9 @@ export default function BottomControls({
 
         {/* Simulation Control */}
         <div className="flex items-center gap-4">
-          <h3 className="text-sm font-semibold text-gray-700">Simulation Control</h3>
+          <h3 className="text-sm font-semibold text-gray-700">
+            Simulation Control
+          </h3>
           <div className="flex gap-2">
             <button
               onClick={onStart}
@@ -65,10 +67,9 @@ export default function BottomControls({
             </button>
             <button
               onClick={onPause}
-              disabled={!isRunning}
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-300 text-sm font-medium"
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm font-medium"
             >
-              Pause
+              {isRunning ? "Pause" : "Resume"}
             </button>
             <button
               onClick={onStop}

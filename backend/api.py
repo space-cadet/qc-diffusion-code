@@ -11,6 +11,7 @@ class ConnectionManager:
         self.active_connections: list[WebSocket] = []
         self.simulation_running = {}
         self.simulation_tasks = {}
+        self.params = {}
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -97,6 +98,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if message.get("type") == "start":
                 params = message.get("params", {})
                 manager.simulation_running[websocket] = True
+                manager.params[websocket] = params
                 
                 # Cancel existing simulation if running
                 if websocket in manager.simulation_tasks:
@@ -113,8 +115,26 @@ async def websocket_endpoint(websocket: WebSocket):
                     del manager.simulation_tasks[websocket]
                     
             elif message.get("type") == "pause":
-                manager.simulation_running[websocket] = False
+                if manager.simulation_running.get(websocket, False):
+                    # Pause simulation
+                    manager.simulation_running[websocket] = False
+                    if websocket in manager.simulation_tasks:
+                        manager.simulation_tasks[websocket].cancel()
+                else:
+                    # Resume simulation
+                    manager.simulation_running[websocket] = True
+                    task = asyncio.create_task(stream_simulation(websocket, manager.params[websocket]))
+                    manager.simulation_tasks[websocket] = task
                 
+                # Send confirmation
+                await manager.send_personal_message(
+                    json.dumps({
+                        "type": "pause_state",
+                        "data": {"isRunning": manager.simulation_running[websocket]}
+                    }),
+                    websocket
+                )
+                    
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 

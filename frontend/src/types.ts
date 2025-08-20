@@ -42,11 +42,11 @@ export interface EquationMetadata {
   parameters: string[];
 }
 
-export interface WebSocketMessage {
-  type: 'simulation_result' | 'animation_frame' | 'error';
-  data?: SimulationResult | AnimationFrame;
+export type WebSocketMessage = {
+  type: "animation_frame" | "simulation_result" | "error" | "pause_state";
+  data?: AnimationFrame | SimulationResult | { isRunning: boolean };
   message?: string;
-}
+};
 
 export interface PlotData {
   x: number[];

@@ -1,0 +1,44 @@
+# Node modules
+node_modules/
+
+# Build directories
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# Debug logs
+npm-debug.log*
+
+yarn-debug.log*
+yarn-error.log*
+
+# Local development files
+*.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# System Files
+.DS_Store
+Thumbs.db

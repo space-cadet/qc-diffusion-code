@@ -61,6 +61,8 @@ export default function App() {
           "time" in message.data
         ) {
           setCurrentFrame(message.data as AnimationFrame);
+        } else if (message.type === "pause_state" && message.data && typeof message.data === 'object' && 'isRunning' in message.data && typeof message.data.isRunning === 'boolean') {
+          setIsRunning(message.data.isRunning);
         } else if (message.type === "error") {
           console.error("Simulation error:", message.message);
           setIsRunning(false);
@@ -112,9 +114,21 @@ export default function App() {
   };
 
   const handlePause = () => {
-    console.log("Pausing simulation");
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      setIsRunning(false);
+    const newRunningState = !isRunning;
+    console.log(isRunning ? "Pausing simulation" : "Resuming simulation");
+    setIsRunning(newRunningState);
+    
+    if (isWebGL) {
+      if (newRunningState) {
+        // Resume WebGL animation
+        runAnimation(params, (data: SimulationResult & { time: number }) => {
+          setCurrentFrame(data);
+        });
+      } else {
+        // Pause WebGL animation
+        stop();
+      }
+    } else if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "pause" }));
     }
   };
