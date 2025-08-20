@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import Controls from "./Controls";
 import PlotComponent from "./PlotComponent";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
+import { generateInitialConditions } from "./utils/initialConditions";
 import type {
   SimulationParams,
   AnimationFrame,
@@ -30,66 +31,58 @@ export default function App() {
 
   const isWebGL = params.solver_type === 'webgl';
 
-  const fetchInitialConditions = async (params: SimulationParams) => {
-    console.log("Fetching initial conditions with params:", params);
-    try {
-      const response = await fetch("http://localhost:8000/api/initial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      const data = await response.json();
-      console.log("Received initial conditions:", data);
-      setCurrentFrame(data);
-    } catch (error) {
-      console.error("Failed to fetch initial conditions:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchInitialConditions(params);
-  }, [params.distribution, params.x_min, params.x_max, params.mesh_size]);
-
-  const connectWebSocket = useCallback(() => {
-    const websocket = new WebSocket("ws://localhost:8000/ws/simulate");
-
-    websocket.onopen = () => {
-      console.log("WebSocket connected");
-      setWs(websocket);
-    };
-
-    websocket.onmessage = (event) => {
-      const message: WebSocketMessage = JSON.parse(event.data);
-
-      if (
-        message.type === "animation_frame" &&
-        message.data &&
-        "time" in message.data
-      ) {
-        // console.log(
-        //   "Received animation frame at t =",
-        //   (message.data as AnimationFrame).time
-        // );
-        setCurrentFrame(message.data as AnimationFrame);
-      } else if (message.type === "error") {
-        console.error("Simulation error:", message.message);
-        setIsRunning(false);
-      }
-    };
-
-    websocket.onclose = () => {
-      console.log("WebSocket disconnected");
-      setWs(null);
-      setIsRunning(false);
-    };
-
-    return websocket;
+  const initializeConditions = useCallback((params: SimulationParams) => {
+    console.log("Generating initial conditions with params:", params);
+    const initialFrame = generateInitialConditions(params);
+    console.log("Generated initial conditions:", initialFrame);
+    setCurrentFrame(initialFrame);
   }, []);
 
   useEffect(() => {
-    const websocket = connectWebSocket();
-    return () => websocket.close();
-  }, [connectWebSocket]);
+    initializeConditions(params);
+  }, [params.distribution, params.x_min, params.x_max, params.mesh_size, initializeConditions]);
+
+  const connectWebSocket = useCallback(() => {
+    if (!isWebGL) {
+      const websocket = new WebSocket("ws://localhost:8000/ws/simulate");
+
+      websocket.onopen = () => {
+        console.log("WebSocket connected");
+        setWs(websocket);
+      };
+
+      websocket.onmessage = (event) => {
+        const message: WebSocketMessage = JSON.parse(event.data);
+
+        if (
+          message.type === "animation_frame" &&
+          message.data &&
+          "time" in message.data
+        ) {
+          setCurrentFrame(message.data as AnimationFrame);
+        } else if (message.type === "error") {
+          console.error("Simulation error:", message.message);
+          setIsRunning(false);
+        }
+      };
+
+      websocket.onclose = () => {
+        console.log("WebSocket disconnected");
+        setWs(null);
+        setIsRunning(false);
+      };
+
+      return websocket;
+    }
+    return null;
+  }, [isWebGL]);
+
+  useEffect(() => {
+    if (!isWebGL) {
+      const websocket = connectWebSocket();
+      return () => websocket?.close();
+    }
+  }, [connectWebSocket, isWebGL]);
 
   const handleStart = () => {
     console.log("Starting simulation with params:", params);
@@ -132,11 +125,14 @@ export default function App() {
   const handleReset = () => {
     console.log("Resetting simulation");
     setIsRunning(false);
-    setCurrentFrame(null);
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    
+    if (isWebGL) {
+      stop();
+    } else if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "stop" }));
     }
-    fetchInitialConditions(params);
+    
+    initializeConditions(params);
   };
 
   return (
