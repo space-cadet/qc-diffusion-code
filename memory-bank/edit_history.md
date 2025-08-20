@@ -1,9 +1,16 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 23:44:20 IST_
+_Last Updated: 2025-08-20 23:50:59 IST_
 
 ### 2025-08-20
+
+#### 23:50 - C5: Task creation for random walk derivation of telegraph equation
+- Created `tasks/C5.md` - Comprehensive task file with implementation phases and success criteria
+- Updated `tasks.md` - Added C5 to active tasks registry with dependency on C1
+- Updated `session_cache.md` - Changed focus task to C5, updated active task count to 4
+- Updated `sessions/2025-08-20-night.md` - Added C5 progress and implementation planning
+- Created `implementation-details/random-walks-diff-eq.md` - Technical implementation outline with 4-phase plan
 
 #### 23:44 - C4: COMPLETED - Pause button functionality fix by Deepseek v3 + Claude 3.7
 - Fixed `backend/api.py` - Added params storage, pause state toggle, and confirmation messages for proper resume functionality

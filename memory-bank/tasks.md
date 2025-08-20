@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 23:44:20 IST_
+_Last Updated: 2025-08-20 23:50:59 IST_
 
 ## Active Tasks
 
@@ -10,6 +10,7 @@ _Last Updated: 2025-08-20 23:44:20 IST_
 | C1  | Numerical Simulations for QC-Diffusion Paper Concepts | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | C2  | VisualPDE GPU Solver Integration                      | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | C3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
+| C5  | Random Walk Derivation of Telegraph Equation         | 🔄 IN PROGRESS | HIGH     | 2025-08-20 | C1           |
 
 ## Task Details
 
@@ -26,6 +27,12 @@ _Last Updated: 2025-08-20 23:44:20 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 14:33:33 IST
 **Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/simulation_shaders.js`, `memory-bank/gpu-amr-integration.md`
 **Notes**: Research completed - tessellation-based approach identified as optimal solution
+
+### C5: Random Walk Derivation of Telegraph Equation
+**Description**: Implement random walk simulation demonstrating convergence to telegraph equation in appropriate limits
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 23:50:59 IST
+**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `frontend/src/RandomWalkPage.tsx` (planned)
+**Notes**: New task to show stochastic origin of telegraph equation through discrete particle simulation
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

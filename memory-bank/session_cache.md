@@ -1,17 +1,17 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 23:44:20 IST_
+_Last Updated: 2025-08-20 23:50:59 IST_
 
 ## Current Session
 
 **Started**: 2025-08-20 23:30:00 IST
-**Focus Task**: C4
+**Focus Task**: C5
 **Session File**: `sessions/2025-08-20-night.md`
 
 ## Overview
 
-- Active: 3 | Paused: 0
+- Active: 4 | Paused: 0
 - Last Session: `sessions/2025-08-20-afternoon.md`
 - Current Period: night
 
@@ -22,6 +22,7 @@ _Last Updated: 2025-08-20 23:44:20 IST_
 - C2: WebGL GPU Solver - 🔄
 - C3: GPU AMR Integration - 🔄
 - C4: Fix Pause Button Functionality - ✅
+- C5: Random Walk Derivation - 🔄
 
 ## Active Tasks
 
@@ -54,6 +55,21 @@ _Last Updated: 2025-08-20 23:44:20 IST_
 4. ✅ Telegraph equation stability fixes and conservation monitoring
 5. ⬜ Wheeler-DeWitt equation implementations
 6. ⬜ Random walk and spin network models
+
+### C5: Random Walk Derivation of Telegraph Equation
+
+**Status:** 🔄 **Priority:** HIGH
+**Started:** 2025-08-20 **Last**: 2025-08-20 23:50:59 IST
+**Context**: New task to show stochastic origin of telegraph equation through discrete particle simulation
+**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `frontend/src/RandomWalkPage.tsx` (planned)
+**Progress**:
+
+1. 🔄 Create implementation outline document
+2. ⬜ Design discrete random walk simulation
+3. ⬜ Implement particle-based random walk
+4. ⬜ Show convergence to telegraph equation
+5. ⬜ Add interactive parameter controls
+6. ⬜ Demonstrate stochastic-deterministic connection
 
 ### C2: VisualPDE GPU Solver Integration
 
