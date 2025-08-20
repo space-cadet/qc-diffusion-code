@@ -1,7 +1,7 @@
 # VisualPDE GPU Solver Integration Plan
 
 _Created: 2025-08-19 23:18:35 IST_
-_Last Updated: 2025-08-20 09:53:16 IST_
+_Last Updated: 2025-08-20 10:43:45 IST_
 
 ## Objective
 
@@ -205,7 +205,59 @@ generateTelegraphShader(parameters) {
 - Organized UI with equation-centric parameter grouping
 - Extensible type system with metadata-driven rendering
 
-### Phase 5: Wheeler-DeWitt Implementation (NEXT)
+### Phase 5: Telegraph Equation Stability and Conservation Monitoring (✅ COMPLETED)
+
+**Goal**: Fix numerical instability in telegraph equation and implement conservation monitoring system
+
+**Completed Tasks**:
+
+1. ✅ **Telegraph Equation Physics Correction**:
+   - Fixed numerical instability in telegraph equation WebGL shader
+   - Corrected telegraph equation to proper first-order system: du/dt = w, dw/dt = v²∇²u - 2aw
+   - Added velocity parameter v to shader uniform declarations in `simulation_shaders.js`
+   - Resolved shader compilation errors with proper parameter handling
+
+2. ✅ **Enhanced WebGL Data Extraction**:
+   - Modified `extractPlotData()` to extract both u (red channel) and w (green channel) from texture
+   - Updated `FrameData` interface to include velocity field w for telegraph equation
+   - Enabled proper energy conservation calculations using actual velocity field
+
+3. ✅ **Conservation Monitoring System**:
+   - Created `ConservationMonitor` class with real-time quantity tracking
+   - Implemented mass conservation monitoring: ∫u dx (both equations)
+   - Implemented energy conservation for telegraph: E = ∫[½w² + ½v²(∂u/∂x)²]dx
+   - Added momentum conservation tracking: ∫w dx
+   - Created conservation error tracking with configurable tolerance thresholds
+
+4. ✅ **Conservation UI Integration**:
+   - Created `ConservationDisplay` component showing real-time conservation quantities
+   - Added stability indicator (green/red) based on conservation error thresholds
+   - Integrated conservation monitoring into `PlotComponent` with proper activation timing
+   - Enhanced layout prevents monitoring during initial condition setup
+
+5. ✅ **UI Layout Improvements**:
+   - Moved solver type and simulation controls below plot for better accessibility
+   - Created `BottomControls` component for unified control placement
+   - Reorganized `PlotComponent` to include controls directly below plot area
+   - Improved user workflow with simulation controls immediately accessible while viewing plot
+
+**Technical Achievements**:
+- Mathematically correct telegraph equation implementation with proper conservation laws
+- Real-time stability assessment through conservation quantity monitoring  
+- Enhanced WebGL solver with dual-field extraction (u and w components)
+- Improved UI accessibility with controls positioned for optimal workflow
+- Foundation for conservation-aware equation implementations
+
+**Files Modified** (~280 lines total):
+- `frontend/src/webgl/webgl-solver.js` - Fixed telegraph equation and added w field extraction
+- `frontend/src/webgl/simulation_shaders.js` - Added velocity parameter v to uniforms
+- `frontend/src/utils/conservationMonitor.ts` - Complete conservation monitoring system
+- `frontend/src/ConservationDisplay.tsx` - Conservation quantities UI component  
+- `frontend/src/BottomControls.tsx` - Simulation controls component
+- `frontend/src/PlotComponent.tsx` - Integrated conservation monitoring and layout reorganization
+- `frontend/src/types.ts` - Added velocity field w to FrameData interface
+
+### Phase 6: Wheeler-DeWitt Implementation (NEXT)
 
 **Goal**: Implement Wheeler-DeWitt equations as additional equation types in the flexible system
 
@@ -216,12 +268,12 @@ generateTelegraphShader(parameters) {
    // Bianchi I: ∂²Ψ/∂α² - B∂Ψ/∂α - ∇²Ψ = 0
    // Bianchi IX: Add potential -24π²e^(6α)R(α,β±)Ψ
    ```
-2. ⬜ Add to equation selection system
+2. ⬜ Add to equation selection system with conservation monitoring
 3. ⬜ Performance benchmarking vs py-pde
-4. ⬜ Error analysis and numerical stability testing
+4. ⬜ Error analysis and numerical stability testing with conservation checks
 5. ⬜ Advanced boundary condition handling
 
-### Phase 6: Production Optimization (FUTURE)
+### Phase 7: Production Optimization (FUTURE)
 
 **Goal**: Deployment-ready optimization and advanced features
 

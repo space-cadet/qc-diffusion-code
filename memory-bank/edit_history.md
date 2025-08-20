@@ -1,9 +1,24 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 09:29:55 IST_
+_Last Updated: 2025-08-20 10:43:45 IST_
 
 ### 2025-08-20
+
+#### 10:43 - C1: Telegraph equation stability fixes and conservation monitoring system
+
+- Fixed `frontend/src/webgl/webgl-solver.js` - Corrected telegraph equation to proper first-order system du/dt=w, dw/dt=v²∇²u-2aw and added w field extraction
+- Fixed `frontend/src/webgl/simulation_shaders.js` - Added velocity parameter v to shader uniform declarations
+- Created `frontend/src/utils/conservationMonitor.ts` - Conservation monitoring system with mass/energy tracking and error analysis
+- Created `frontend/src/ConservationDisplay.tsx` - Conservation quantities UI component with stability indicators
+- Created `frontend/src/BottomControls.tsx` - Simulation controls component positioned below plot
+- Updated `frontend/src/PlotComponent.tsx` - Integrated conservation monitoring and reorganized layout with controls below plot
+- Updated `frontend/src/types.ts` - Added velocity field w to FrameData interface for telegraph equation
+- Updated `tasks/C1.md` - Phase 5 completion with conservation monitoring and stability fixes
+- Updated `tasks.md` - Updated C1 status and progress notes
+- Updated `sessions/2025-08-20-morning.md` - Added Phase 5 progress and conservation monitoring implementation
+- Updated `session_cache.md` - Updated C1 progress with conservation monitoring completion
+- Updated `implementation-details/visual-pde-gpu-solver-plan.md` - Added Phase 5 details with conservation monitoring
 
 #### 09:29 - C1: Backend-agnostic frontend architecture implementation
 

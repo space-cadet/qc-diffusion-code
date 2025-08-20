@@ -138,11 +138,6 @@ export default function App() {
         <Controls
           params={params}
           onChange={setParams}
-          isRunning={isRunning}
-          onStart={handleStart}
-          onStop={handleStop}
-          onPause={handlePause}
-          onReset={handleReset}
         />
       </div>
       <div className="flex-1 relative">
@@ -150,6 +145,11 @@ export default function App() {
           frame={currentFrame}
           isRunning={isRunning}
           params={params}
+          onChange={setParams}
+          onStart={handleStart}
+          onStop={handleStop}
+          onPause={handlePause}
+          onReset={handleReset}
         />
         {isWebGL && (
           <canvas

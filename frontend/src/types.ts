@@ -25,6 +25,7 @@ export interface SimulationResult {
 export interface FrameData {
   x: number[];
   u: number[];
+  w?: number[]; // Velocity field for telegraph equation
 }
 
 export interface AnimationFrame {

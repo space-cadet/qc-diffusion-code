@@ -54,6 +54,7 @@ export function RDShaderTop(type) {
     uniform float seed;
     uniform float a;
     uniform float k;
+    uniform float v;
     uniform float MINX;
     uniform float MINY;
     uniform sampler2D imageSourceOne;

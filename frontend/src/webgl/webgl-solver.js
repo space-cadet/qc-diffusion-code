@@ -186,10 +186,13 @@ export class WebGLSolver {
   generateTelegraphShader() {
     const equationCode = `
       float u = uvwq.r;
-      float v = uvwq.g;
+      float w = uvwq.g;  // du/dt
       float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
       
-      result = vec4(v, a*laplacian - 2.0*a*v, 0.0, 0.0);
+      // Telegraph equation as first-order system:
+      // du/dt = w
+      // dw/dt = v²∇²u - 2aw
+      result = vec4(w, v*v*laplacian - 2.0*a*w, 0.0, 0.0);
     }`;
     
     const result = RDShaderTop("FE")
@@ -291,16 +294,17 @@ export class WebGLSolver {
 
   extractPlotData(xMin, xMax) {
     const pixels = this.readPixels();
-    const x = [], u = [];
+    const x = [], u = [], w = [];
     
     for (let j = 0; j < this.width; j++) {
       const xVal = xMin + (j / this.width) * (xMax - xMin);
       const idx = (Math.floor(this.height/2) * this.width + j) * 4;
       x.push(xVal);
-      u.push(pixels[idx]);
+      u.push(pixels[idx]);     // Red channel: u
+      w.push(pixels[idx + 1]); // Green channel: w = du/dt
     }
     
-    return { x, u };
+    return { x, u, w };
   }
 
   readPixels() {

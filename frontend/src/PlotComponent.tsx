@@ -1,11 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Plotly from "plotly.js";
+import { ConservationMonitor } from "./utils/conservationMonitor";
+import ConservationDisplay from "./ConservationDisplay";
 import type { AnimationFrame, PlotData, SimulationParams, EquationMetadata } from "./types";
 
 interface PlotComponentProps {
   frame: AnimationFrame | null;
   isRunning: boolean;
   params: SimulationParams;
+  onChange: (params: SimulationParams) => void;
+  onStart: () => void;
+  onStop: () => void;
+  onPause: () => void;
+  onReset: () => void;
 }
 
 const equationMetadata: { [key: string]: EquationMetadata } = {
@@ -33,9 +40,24 @@ export default function PlotComponent({
   frame: data,
   isRunning,
   params,
+  onChange,
+  onStart,
+  onStop,
+  onPause,
+  onReset,
 }: PlotComponentProps) {
   const plotRef = useRef<HTMLDivElement>(null);
   const plotInitialized = useRef(false);
+  const conservationMonitor = useRef(new ConservationMonitor());
+  const [conservationData, setConservationData] = useState<{
+    currentQuantities: any;
+    errors: any;
+    isStable: boolean;
+  }>({
+    currentQuantities: null,
+    errors: null,
+    isStable: true
+  });
   const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
 
   useEffect(() => {
@@ -87,9 +109,35 @@ export default function PlotComponent({
     if (!plotRef.current || !data) return;
     const plotElement = plotRef.current;
 
+    // Only update conservation monitoring during actual simulation (not initial conditions)
+    if (isRunning && data.time && (data.time as number) > 0) {
+      conservationMonitor.current.addFrame(data, params);
+      const currentQuantities = conservationMonitor.current.getCurrentQuantities();
+      const errors = conservationMonitor.current.getConservationErrors();
+      const isStable = conservationMonitor.current.isStable();
+      
+      setConservationData({
+        currentQuantities,
+        errors,
+        isStable
+      });
+    } else if (!isRunning && (!data.time || (data.time as number) === 0)) {
+      // Reset conservation data when not running and at initial conditions
+      setConservationData({
+        currentQuantities: null,
+        errors: { mass_telegraph_error: 0, mass_diffusion_error: 0, energy_telegraph_error: 0 },
+        isStable: true
+      });
+    }
+
     const traces: PlotData[] = selectedEquations.map(equationType => {
       const frameData = data[equationType] as { x: number[], u: number[] };
       const metadata = equationMetadata[equationType];
+      
+      // Skip if no data for this equation type
+      if (!frameData || !frameData.x || !frameData.u) {
+        return null;
+      }
       
       return {
         x: frameData.x,
@@ -99,7 +147,7 @@ export default function PlotComponent({
         name: metadata.displayName,
         line: { color: metadata.color },
       };
-    });
+    }).filter(trace => trace !== null) as PlotData[];
 
     const title = selectedEquations.length > 1 
       ? `${selectedEquations.map(eq => equationMetadata[eq]?.displayName).join(' vs ')} Comparison`
@@ -128,18 +176,18 @@ export default function PlotComponent({
     };
 
     Plotly.react(plotElement, traces, layout);
-  }, [data, selectedEquations]);
+  }, [data, selectedEquations, params]);
 
   return (
-    <div className="flex-1 p-4">
+    <div className="flex-1 p-4 flex flex-col">
       {isRunning && (
         <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded">
           Running...
         </div>
       )}
-      <div ref={plotRef} className="w-full" />
+      <div ref={plotRef} className="w-full flex-1" />
 
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-2 text-sm text-gray-600 mb-3">
         {selectedEquations.includes('telegraph') && (
           <p>
             <strong>Telegraph Equation:</strong> ∂²u/∂t² + 2a∂u/∂t = v²∇²u (finite velocity)
@@ -151,6 +199,88 @@ export default function PlotComponent({
           </p>
         )}
       </div>
+
+      {/* Bottom Controls */}
+      <div className="border-t border-gray-200 pt-3">
+        <div className="flex gap-6 items-center justify-center">
+          {/* Solver Type */}
+          <div className="flex items-center gap-4">
+            <h3 className="text-sm font-semibold text-gray-700">Solver Type</h3>
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="solver"
+                  value="python"
+                  checked={params.solver_type !== 'webgl'}
+                  onChange={() => onChange({ ...params, solver_type: 'python' })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Python</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="solver"
+                  value="webgl"
+                  checked={params.solver_type === 'webgl'}
+                  onChange={() => onChange({ ...params, solver_type: 'webgl' })}
+                  className="mr-2"
+                />
+                <span className="text-sm">WebGL</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Simulation Control */}
+          <div className="flex items-center gap-4">
+            <h3 className="text-sm font-semibold text-gray-700">Simulation Control</h3>
+            <div className="flex gap-2">
+              <button
+                onClick={onStart}
+                disabled={isRunning}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 text-sm font-medium"
+              >
+                Start
+              </button>
+              <button
+                onClick={onPause}
+                disabled={!isRunning}
+                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-300 text-sm font-medium"
+              >
+                Pause
+              </button>
+              <button
+                onClick={onStop}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-medium"
+              >
+                Stop
+              </button>
+              <button
+                onClick={() => {
+                  conservationMonitor.current.reset();
+                  setConservationData({
+                    currentQuantities: null,
+                    errors: { mass_telegraph_error: 0, mass_diffusion_error: 0, energy_telegraph_error: 0 },
+                    isStable: true
+                  });
+                  onReset();
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Conservation Quantities Display */}
+      <ConservationDisplay
+        currentQuantities={conservationData.currentQuantities}
+        errors={conservationData.errors}
+        isStable={conservationData.isStable}
+      />
     </div>
   );
 }

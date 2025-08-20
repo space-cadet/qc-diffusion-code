@@ -19,8 +19,7 @@ export function useWebGLSolver() {
         if (equationType === 'telegraph') {
           solver.setupEquation('telegraph', { 
             a: params.collision_rate, 
-            v: params.velocity, 
-            k: params.diffusivity 
+            v: params.velocity
           });
         } else if (equationType === 'diffusion') {
           solver.setupEquation('diffusion', { 
@@ -51,8 +50,8 @@ export function useWebGLSolver() {
       const solver = solversRef.current.get(equationType);
       if (solver) {
         const stepParams = equationType === 'telegraph' 
-          ? { a: params.collision_rate, v: params.velocity, k: params.diffusivity, dx: (params.x_max - params.x_min) / params.mesh_size }
-          : { k: params.diffusivity, dx: (params.x_max - params.x_min) / params.mesh_size };
+          ? { a: params.collision_rate, v: params.velocity }
+          : { k: params.diffusivity };
         
         solver.step(dt, stepParams);
         results[equationType] = solver.extractPlotData(params.x_min, params.x_max);
