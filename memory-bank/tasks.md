@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 08:26:27 IST_
+_Last Updated: 2025-08-21 09:10:30 IST_
 
 ## Active Tasks
 
@@ -13,14 +13,15 @@ _Last Updated: 2025-08-21 08:26:27 IST_
 | C5  | Random Walk Derivation of Telegraph Equation         | 🔄 IN PROGRESS | HIGH     | 2025-08-20 | C1           |
 | C5a | Random Walk Architecture Planning                     | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5           |
 | C5b | Random Walk UI Implementation                         | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5a          |
+| C5c | Random Walk Physics Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5a, C5b     |
 
 ## Task Details
 
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 08:26:27 IST
-**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/GridLayoutPage.tsx`
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 09:10:30 IST
+**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/RandomWalkSim.tsx`
 **Notes**: State persistence implemented with Zustand - tabs and parameters persist across browser refresh
 
 ### C3: GPU AMR Integration for PDE Solver
@@ -44,9 +45,15 @@ _Last Updated: 2025-08-21 08:26:27 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 08:26:27 IST
-**Files**: `frontend/src/GridLayoutPage.tsx`, `frontend/src/stores/appStore.ts`
-**Notes**: Enhanced with title-bar dragging restriction and state persistence - panels only draggable by title bars
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 09:10:30 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`
+**Notes**: Enhanced with tsParticles integration and continuous particle count slider
+
+### C5c: Random Walk Physics Implementation
+**Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 09:10:30 IST
+**Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/config/tsParticlesConfig.ts`
+**Notes**: Framework created with tsParticles integration - ready for CTRW physics implementation
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

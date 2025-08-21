@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import Controls from "./Controls";
 import PlotComponent from "./PlotComponent";
 import RandomWalkPage from "./RandomWalkPage";
-import GridLayoutPage from "./GridLayoutPage";
+import RandomWalkSim from "./RandomWalkSim";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
@@ -163,14 +163,14 @@ export default function App() {
             Random Walk
           </button>
           <button
-            onClick={() => setActiveTab('gridlayout')}
+            onClick={() => setActiveTab('randomwalksim')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'gridlayout'
+              activeTab === 'randomwalksim'
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            Grid Layout
+            Random Walk Sim
           </button>
         </nav>
       </div>
@@ -209,7 +209,7 @@ export default function App() {
         ) : activeTab === 'randomwalk' ? (
           <RandomWalkPage />
         ) : (
-          <GridLayoutPage />
+          <RandomWalkSim />
         )}
       </div>
     </div>

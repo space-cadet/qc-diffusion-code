@@ -1,9 +1,25 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 08:26:27 IST_
+_Last Updated: 2025-08-21 09:10:30 IST_
 
 ### 2025-08-21
+
+#### 09:10 - C5c: Random Walk Physics Framework and tsParticles Integration
+- Created `frontend/src/physics/PhysicsRandomWalk.ts` - Main CTRW physics engine placeholder with method stubs
+- Created `frontend/src/physics/types/Particle.ts` - Particle and CollisionEvent interfaces for physics simulation
+- Created `frontend/src/physics/types/CollisionEvent.ts` - Step and CollisionEvent type definitions
+- Created `frontend/src/physics/types/DensityField.ts` - Density calculation and scaling parameter interfaces
+- Created `frontend/src/physics/utils/DensityCalculator.ts` - Spatial binning utility class placeholder
+- Created `frontend/src/config/tsParticlesConfig.ts` - Particle visualization configuration with random walk settings
+- Renamed `frontend/src/GridLayoutPage.tsx` to `frontend/src/RandomWalkSim.tsx` - Enhanced with tsParticles integration and physics framework
+- Updated `frontend/src/App.tsx` - Changed navigation from GridLayoutPage to RandomWalkSim component
+- Updated `memory-bank/tasks/C1.md` - Updated file references from GridLayoutPage to RandomWalkSim
+- Updated `memory-bank/tasks/C5c.md` - Added framework completion progress and file references
+- Updated `memory-bank/tasks.md` - Added C5c to active tasks and updated task details
+- Updated `memory-bank/sessions/2025-08-21-morning.md` - Extended session with C5c physics framework progress
+- Updated `memory-bank/session_cache.md` - Updated focus task to C5c, added C5c to task registry and active tasks
+- Created `memory-bank/implementation-details/random-walk-engine-plan.md` - Comprehensive implementation plan for CTRW physics engine
 
 #### 08:26 - C1, C5b: State Persistence and DND Enhancement
 - Created `frontend/src/stores/appStore.ts` - Zustand store with localStorage persistence for app-wide state management

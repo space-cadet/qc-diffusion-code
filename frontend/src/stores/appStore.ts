@@ -10,10 +10,10 @@ interface GridLayoutParams {
 }
 
 interface AppState {
-  activeTab: 'simulation' | 'randomwalk' | 'gridlayout'
+  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim'
   simulationParams: SimulationParams
   gridLayoutParams: GridLayoutParams
-  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout') => void
+  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: GridLayoutParams) => void
 }

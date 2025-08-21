@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
+  - '@tsparticles/engine'
   - es5-ext
   - esbuild
 

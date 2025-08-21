@@ -1,15 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
+import { Particles, initParticlesEngine } from "@tsparticles/react";
+import type { IParticlesProps } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
+import type { Container, Engine } from "@tsparticles/engine";
 import { useAppStore } from "./stores/appStore";
+import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
+import type { Particle } from "./physics/types/Particle";
+import { DensityCalculator } from "./physics/utils/DensityCalculator";
+import { getRandomWalkConfig } from "./config/tsParticlesConfig";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-export default function GridLayoutPage() {
+// RandomWalkSimulator class for physics integration
+class RandomWalkSimulator {
+  private physics: PhysicsRandomWalk;
+  private particles: Particle[];
+  private densityCalculator: DensityCalculator;
+  private time: number;
+  private animationId: number | null;
+
+  constructor(params: { collisionRate: number; jumpLength: number; velocity: number; particleCount: number }) {
+    this.physics = new PhysicsRandomWalk(params);
+    this.particles = [];
+    this.densityCalculator = new DensityCalculator();
+    this.time = 0;
+    this.animationId = null;
+    this.initializeParticles(params.particleCount);
+  }
+
+  private initializeParticles(count: number): void {
+    // TODO: Initialize particle array
+    this.particles = [];
+  }
+
+  step(): void {
+    // TODO: Update physics for all particles
+    // TODO: Sync with tsParticles
+    this.time += 0.016; // 60fps
+  }
+
+  start(): void {
+    // TODO: Start animation loop
+  }
+
+  pause(): void {
+    // TODO: Pause animation loop
+  }
+
+  reset(): void {
+    // TODO: Reset simulation state
+    this.time = 0;
+  }
+
+  getDensityField() {
+    // TODO: Return current density field for telegraph comparison
+    return this.densityCalculator.calculateDensity(this.particles);
+  }
+
+  updateParameters(params: { collisionRate: number; jumpLength: number; velocity: number; particleCount: number }) {
+    // TODO: Update physics parameters
+  }
+}
+
+export default function RandomWalkSim() {
   // Get parameters from Zustand store (persistent)
   const { gridLayoutParams, setGridLayoutParams } = useAppStore();
+  
+  // Physics simulation ref
+  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+  const tsParticlesContainerRef = useRef<any>(null);
   
   // Keep layout and runtime state local (non-persistent)
   const [layouts, setLayouts] = useState<Layout[]>([
@@ -28,25 +91,77 @@ export default function GridLayoutPage() {
     status: 'Stopped',
   });
 
+  // Initialize physics simulator
+  useEffect(() => {
+    simulatorRef.current = new RandomWalkSimulator({
+      collisionRate: gridLayoutParams.collisionRate,
+      jumpLength: gridLayoutParams.jumpLength,
+      velocity: gridLayoutParams.velocity,
+      particleCount: gridLayoutParams.particles,
+    });
+  }, []);
+
+  // Update physics parameters when store changes
+  useEffect(() => {
+    if (simulatorRef.current) {
+      simulatorRef.current.updateParameters({
+        collisionRate: gridLayoutParams.collisionRate,
+        jumpLength: gridLayoutParams.jumpLength,
+        velocity: gridLayoutParams.velocity,
+        particleCount: gridLayoutParams.particles,
+      });
+    }
+  }, [gridLayoutParams]);
+
   const onLayoutChange = (layout: Layout[]) => {
     setLayouts(layout);
   };
 
   const handleStart = () => {
-    setSimulationState(prev => ({ ...prev, isRunning: true, status: 'Running' }));
+    if (simulatorRef.current) {
+      simulatorRef.current.start();
+      setSimulationState(prev => ({ ...prev, isRunning: true, status: 'Running' }));
+    }
   };
 
   const handlePause = () => {
-    setSimulationState(prev => ({ 
-      ...prev, 
-      isRunning: !prev.isRunning, 
-      status: prev.isRunning ? 'Paused' : 'Running' 
-    }));
+    if (simulatorRef.current) {
+      if (simulationState.isRunning) {
+        simulatorRef.current.pause();
+      } else {
+        simulatorRef.current.start();
+      }
+      setSimulationState(prev => ({ 
+        ...prev, 
+        isRunning: !prev.isRunning, 
+        status: prev.isRunning ? 'Paused' : 'Running' 
+      }));
+    }
   };
 
   const handleReset = () => {
-    setSimulationState({ isRunning: false, time: 0, collisions: 0, status: 'Stopped' });
+    if (simulatorRef.current) {
+      simulatorRef.current.reset();
+      setSimulationState({ isRunning: false, time: 0, collisions: 0, status: 'Stopped' });
+    }
   };
+
+  // tsParticles initialization and integration
+  useEffect(() => {
+    const initEngine = async () => {
+      await initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+      });
+    };
+    initEngine();
+  }, []);
+
+  const particlesLoaded = useCallback(async (container?: Container) => {
+    if (container) {
+      tsParticlesContainerRef.current = container;
+      console.log("tsParticles container loaded:", container);
+    }
+  }, []);
 
   const ParameterPanel = () => (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
@@ -56,17 +171,20 @@ export default function GridLayoutPage() {
         {/* Particle Count */}
         <div>
           <label className="block text-sm font-medium mb-2">Particles:</label>
-          <select 
+          <input
+            type="range"
+            min="50"
+            max="2000"
+            step="1"
             value={gridLayoutParams.particles}
             onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, particles: parseInt(e.target.value) })}
-            className="w-full p-2 border rounded"
-          >
-            <option value={100}>100</option>
-            <option value={500}>500</option>
-            <option value={1000}>1000</option>
-            <option value={2000}>2000</option>
-            <option value={5000}>5000</option>
-          </select>
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-gray-500">
+            <span>50</span>
+            <span className="font-medium">{gridLayoutParams.particles}</span>
+            <span>2000</span>
+          </div>
         </div>
 
         {/* Collision Rate */}
@@ -194,11 +312,15 @@ export default function GridLayoutPage() {
   const ParticleCanvas = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Particle Canvas</h3>
-      <div className="h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <div className="text-4xl mb-2">•••</div>
-          <div>Live particle simulation</div>
-          <div className="text-sm mt-2">Particles: {gridLayoutParams.particles}</div>
+      <div className="h-full border rounded-lg relative overflow-hidden">
+        <Particles
+          id="randomWalkParticles"
+          options={getRandomWalkConfig(gridLayoutParams.particles)}
+          particlesLoaded={particlesLoaded}
+          className="w-full h-full"
+        />
+        <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+          Particles: {gridLayoutParams.particles} | Status: {simulationState.status}
         </div>
       </div>
     </div>
