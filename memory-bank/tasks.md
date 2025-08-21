@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 11:35:44 IST_
+_Last Updated: 2025-08-21 17:42:55 IST_
 
 ## Active Tasks
 
@@ -12,7 +12,7 @@ _Last Updated: 2025-08-21 11:35:44 IST_
 | C3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
 | C5  | Random Walk Derivation of Telegraph Equation         | 🔄 IN PROGRESS | HIGH     | 2025-08-20 | C1           |
 | C5a | Random Walk Architecture Planning                     | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5           |
-| C5b | Random Walk UI Implementation                         | ✅ COMPLETED   | HIGH     | 2025-08-21 | C5a          |
+| C5b | Random Walk UI Implementation                         | 🔄 REFACTORING | HIGH     | 2025-08-21 | C5a          |
 | C5c | Random Walk Physics Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5a, C5b     |
 
 ## Task Details
@@ -45,9 +45,9 @@ _Last Updated: 2025-08-21 11:35:44 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-21 10:29:12 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`
-**Notes**: Completed with dual mode support, graph parameters, and Sigma.js visualization
+**Status**: 🔄 REFACTORING **Last**: 2025-08-21 17:42:55 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/types/simulation.ts`
+**Notes**: Component extraction completed - main file reduced 20%, performance issue with ts-particles reinitialization identified
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence

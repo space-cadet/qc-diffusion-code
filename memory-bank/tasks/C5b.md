@@ -1,13 +1,13 @@
 # C5b: Random Walk UI Implementation
 *Created: 2025-08-21 07:52:44 IST*
-*Last Updated: 2025-08-21 10:29:12 IST*
+*Last Updated: 2025-08-21 17:42:55 IST*
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
-**Status**: ✅ COMPLETED
+**Status**: 🔄 REFACTORING
 **Priority**: HIGH
 **Started**: 2025-08-21 07:52:44 IST
-**Last Active**: 2025-08-21 10:29:12 IST
+**Last Active**: 2025-08-21 17:42:55 IST
 **Dependencies**: C5a
 
 ## Completion Criteria
@@ -73,8 +73,20 @@ This task implements the complete UI framework for the random walk simulation ba
 - **State Persistence**: Grid layout parameters now persist across browser refresh via Zustand store
 - **Improved UX**: Users can interact with controls without accidentally moving panels
 
+**Refactoring Progress (2025-08-21 Evening)**:
+- ✅ **Component Extraction**: Extracted 6 components from 450-line RandomWalkSim.tsx
+- ✅ **ParticleCanvas Integration**: Replaced inline component with imported ParticleCanvas
+- ✅ **RandomWalkSimulator Class**: Moved to separate physics/RandomWalkSimulator.ts file
+- ✅ **Type Definitions**: Created types/simulation.ts for SimulationState interface
+- ✅ **Build Fixes**: Resolved TypeScript interface mismatches and import errors
+- 🔄 **Performance Issue**: ts-particles reinitializes on every parameter change (needs fix)
+- ✅ **File Size Reduction**: Main file reduced from 450+ lines to ~360 lines (20% smaller)
+
+**Current Issue**:
+- ts-particles system reinitializes whenever any parameter changes instead of only on particle count/reset
+- This causes performance degradation and visual disruption
+
 **Next Steps**:
-- Integrate CTRW physics engine from C5a architecture planning
-- Implement tsParticles for real-time particle visualization
-- Connect telegraph equation solver for density comparison
+- Fix ts-particles reinitialization issue
+- Continue component extraction for remaining large components
 - Add panel collapse/expand functionality for better workspace management

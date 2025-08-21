@@ -3,114 +3,34 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-  Component,
 } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
-import { Particles, initParticlesEngine } from "@tsparticles/react";
-import type { IParticlesProps } from "@tsparticles/react";
+import { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import type { Container, Engine } from "@tsparticles/engine";
-import { SigmaContainer, useRegisterEvents, useSigma } from "@react-sigma/core";
-import Graph from "graphology";
+import type { Container } from "@tsparticles/engine";
 import { useAppStore } from "./stores/appStore";
-
-// Define node and edge attribute types
-interface NodeAttributes {
-  label?: string;
-  x?: number;
-  y?: number;
-  size?: number;
-  color?: string;
-}
-
-interface EdgeAttributes {
-  size?: number;
-  color?: string;
-}
+import { ParameterPanel } from "./components/ParameterPanel";
+import { DensityComparison } from "./components/DensityComparison";
+import { HistoryPanel } from "./components/HistoryPanel";
+import { ReplayControls } from "./components/ReplayControls";
+import { ExportPanel } from "./components/ExportPanel";
+import { ParticleCanvas } from "./components/ParticleCanvas";
 import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
-import type { Particle } from "./physics/types";
-import { ParticleManager } from "./physics/ParticleManager";
+import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import {
   getRandomWalkConfig,
-  setParticleManager,
   updateParticlesWithCTRW,
 } from "./config/tsParticlesConfig";
+import type { SimulationState } from "./types/simulation";
 
 // CSS imports
-import "./styles/sigma.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-// RandomWalkSimulator class for physics integration
-class RandomWalkSimulator {
-  private physics: PhysicsRandomWalk;
-  private particleManager: ParticleManager;
-  private time: number;
-  private animationId: number | null;
 
-  constructor(params: {
-    collisionRate: number;
-    jumpLength: number;
-    velocity: number;
-    particleCount: number;
-  }) {
-    this.physics = new PhysicsRandomWalk(params);
-    this.particleManager = new ParticleManager(this.physics);
-    this.time = 0;
-    this.animationId = null;
-
-    // Set particle manager for tsParticles integration
-    setParticleManager(this.particleManager);
-  }
-
-  step(): void {
-    this.time += 0.016; // 60fps
-  }
-
-  start(): void {
-    if (!this.animationId) {
-      const animate = () => {
-        this.step();
-        this.animationId = requestAnimationFrame(animate);
-      };
-      this.animationId = requestAnimationFrame(animate);
-    }
-  }
-
-  pause(): void {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-  }
-
-  reset(): void {
-    this.pause();
-    this.time = 0;
-  }
-
-  getDensityField() {
-    return this.particleManager.getDensityData();
-  }
-
-  getCollisionStats() {
-    return this.particleManager.getCollisionStats();
-  }
-
-  updateParameters(params: {
-    collisionRate: number;
-    jumpLength: number;
-    velocity: number;
-    particleCount: number;
-  }) {
-    this.physics = new PhysicsRandomWalk(params);
-    this.particleManager.updatePhysicsEngine(this.physics);
-    setParticleManager(this.particleManager);
-  }
-}
 
 export default function RandomWalkSim() {
   // Get parameters from Zustand store (persistent)
@@ -130,7 +50,7 @@ export default function RandomWalkSim() {
     { i: "export", x: 8, y: 16, w: 4, h: 3, minW: 4, minH: 2 },
   ]);
 
-  const [simulationState, setSimulationState] = useState({
+  const [simulationState, setSimulationState] = useState<SimulationState>({
     isRunning: false,
     time: 0,
     collisions: 0,
@@ -166,112 +86,7 @@ export default function RandomWalkSim() {
     gridLayoutParams.graphSize,
   ]);
 
-  // Graph visualization component
-  const GraphVisualization = () => {
-    const sigma = useSigma();
-    const registerEvents = useRegisterEvents();
 
-    useEffect(() => {
-      if (graphPhysicsRef.current) {
-        const physicsGraph = graphPhysicsRef.current.getGraph();
-        const nodes = physicsGraph.getNodes();
-        const edges = physicsGraph.getEdges();
-
-        // Create a new graphology graph
-        const graph = new Graph<NodeAttributes, EdgeAttributes>();
-
-        // Add nodes with positions based on graph type
-        const graphType = gridLayoutParams.graphType;
-        const graphSize = gridLayoutParams.graphSize;
-
-        nodes.forEach((node: { id: string }, index: number) => {
-          let x = 0;
-          let y = 0;
-
-          // Position nodes based on graph type
-          switch (graphType) {
-            case "lattice1D":
-              // Linear layout for 1D lattice
-              x = (index - nodes.length / 2) * 30;
-              y = 0;
-              break;
-
-            case "lattice2D":
-              // Grid layout for 2D lattice
-              const size = graphSize;
-              const row = Math.floor(index / size);
-              const col = index % size;
-              // Only place nodes within the grid bounds
-              x = (col - size / 2) * 30;
-              y = (row - size / 2) * 30;
-              // Skip this node if outside grid bounds by moving it far away
-              if (row >= size || col >= size) {
-                x = 10000; // Move far away
-                y = 10000;
-              }
-              break;
-
-            case "path":
-              // Path layout in a line
-              x = (index - nodes.length / 2) * 20;
-              y = 0;
-              break;
-
-            case "complete":
-              // Circular layout for complete graph
-              const angle = (index / nodes.length) * 2 * Math.PI;
-              const radius = Math.min(200, nodes.length * 5);
-              x = Math.cos(angle) * radius;
-              y = Math.sin(angle) * radius;
-              break;
-
-            default:
-              // Default circular layout
-              const defaultAngle = (index / nodes.length) * 2 * Math.PI;
-              x = Math.cos(defaultAngle) * 150;
-              y = Math.sin(defaultAngle) * 150;
-          }
-
-          graph.addNode(node.id, {
-            label: node.id,
-            x,
-            y,
-            size: 8,
-            color: "#3b82f6",
-          });
-        });
-
-        // Add edges
-        edges.forEach(
-          (edge: { id: string; sourceId: string; targetId: string }) => {
-            try {
-              graph.addEdge(edge.sourceId, edge.targetId, {
-                size: 2,
-                color: gridLayoutParams.showEdgeWeights ? "#f59e0b" : "#94a3b8",
-              });
-            } catch (error) {
-              console.warn("Could not add edge:", error);
-            }
-          }
-        );
-
-        // Set the graph to sigma
-        sigma.setGraph(graph);
-
-        // Register events
-        registerEvents({
-          clickNode: (event) => console.log("Node clicked:", event.node),
-          clickEdge: (event) => console.log("Edge clicked:", event.edge),
-        });
-      }
-
-      return () => {
-        // Cleanup if needed
-      };
-    }, [sigma, registerEvents, gridLayoutParams]);
-
-    return null;
-  };
 
   // Update physics parameters when store changes
   useEffect(() => {
@@ -280,7 +95,10 @@ export default function RandomWalkSim() {
         collisionRate: gridLayoutParams.collisionRate,
         jumpLength: gridLayoutParams.jumpLength,
         velocity: gridLayoutParams.velocity,
-        particleCount: gridLayoutParams.particles,
+        simulationType: gridLayoutParams.simulationType,
+        graphType: gridLayoutParams.graphType,
+        graphSize: gridLayoutParams.graphSize,
+        particleCount: gridLayoutParams.particles
       });
     }
   }, [gridLayoutParams]);
@@ -290,41 +108,31 @@ export default function RandomWalkSim() {
   };
 
   const handleStart = () => {
-    if (simulatorRef.current) {
-      simulatorRef.current.start();
-      setSimulationState((prev) => ({
-        ...prev,
-        isRunning: true,
-        status: "Running",
-      }));
-    }
+    setSimulationState((prev) => ({
+      ...prev,
+      isRunning: true,
+      status: "Running",
+    }));
   };
 
   const handlePause = () => {
-    if (simulatorRef.current) {
-      if (simulationState.isRunning) {
-        simulatorRef.current.pause();
-      } else {
-        simulatorRef.current.start();
-      }
-      setSimulationState((prev) => ({
-        ...prev,
-        isRunning: !prev.isRunning,
-        status: prev.isRunning ? "Paused" : "Running",
-      }));
-    }
+    setSimulationState((prev) => ({
+      ...prev,
+      isRunning: !prev.isRunning,
+      status: prev.isRunning ? "Paused" : "Running",
+    }));
   };
 
   const handleReset = () => {
     if (simulatorRef.current) {
-      simulatorRef.current.reset();
-      setSimulationState({
-        isRunning: false,
-        time: 0,
-        collisions: 0,
-        status: "Stopped",
-      });
+      simulatorRef.current.reset(); // Only reset time counter
     }
+    setSimulationState({
+      isRunning: false,
+      time: 0,
+      collisions: 0,
+      status: "Stopped",
+    });
   };
 
   // tsParticles initialization and integration
@@ -337,650 +145,34 @@ export default function RandomWalkSim() {
     initEngine();
   }, []);
 
-  const particlesLoaded = useCallback(async (container?: Container) => {
-    if (container) {
-      tsParticlesContainerRef.current = container;
+  const particlesLoaded = useCallback(
+    async (container?: Container) => {
+      if (container) {
+        tsParticlesContainerRef.current = container;
 
-      // Start CTRW physics updates
-      const updateLoop = () => {
-        updateParticlesWithCTRW(container);
+        // Start CTRW physics updates
+        const updateLoop = () => {
+          if (simulationState.isRunning && gridLayoutParams.showAnimation) {
+            updateParticlesWithCTRW(container, gridLayoutParams.showAnimation);
+            if (simulatorRef.current) {
+              simulatorRef.current.step(0.016);
+            }
+          }
+          requestAnimationFrame(updateLoop);
+        };
         requestAnimationFrame(updateLoop);
-      };
-      requestAnimationFrame(updateLoop);
 
-      console.log("tsParticles container loaded with CTRW physics");
-    }
-  }, []);
-
-  const ParameterPanel = () => (
-    <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
-      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
-        Parameters
-      </h3>
-
-      <div className="space-y-6">
-        {/* Simulation Type */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Simulation Type:
-          </label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="continuum"
-                checked={gridLayoutParams.simulationType === "continuum"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    simulationType: e.target.value as "continuum" | "graph",
-                  })
-                }
-                className="mr-2"
-              />
-              Continuum
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="graph"
-                checked={gridLayoutParams.simulationType === "graph"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    simulationType: e.target.value as "continuum" | "graph",
-                  })
-                }
-                className="mr-2"
-              />
-              Graph
-            </label>
-          </div>
-        </div>
-
-        {/* Graph Parameters (only show when graph is selected) */}
-        {gridLayoutParams.simulationType === "graph" && (
-          <div className="border rounded p-3 bg-gray-50">
-            <h4 className="font-medium mb-2">Graph Parameters</h4>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm mb-1">Graph Type:</label>
-                <select
-                  value={gridLayoutParams.graphType}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      graphType: e.target.value as any,
-                    })
-                  }
-                  className="w-full border rounded px-2 py-1 text-sm"
-                >
-                  <option value="lattice1D">1D Chain</option>
-                  <option value="lattice2D">2D Lattice</option>
-                  <option value="path">Path Graph</option>
-                  <option value="complete">Complete Graph</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Size:</label>
-                <input
-                  type="range"
-                  min="5"
-                  max="50"
-                  value={gridLayoutParams.graphSize}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      graphSize: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>5</span>
-                  <span className="font-medium">
-                    {gridLayoutParams.graphSize}
-                  </span>
-                  <span>50</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={gridLayoutParams.isPeriodic}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        isPeriodic: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  Periodic Boundaries
-                </label>
-                <label className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={gridLayoutParams.showEdgeWeights}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        showEdgeWeights: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  Show Edge Weights
-                </label>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* Particle Count */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Particles:</label>
-          <input
-            type="range"
-            min="50"
-            max="2000"
-            step="1"
-            value={gridLayoutParams.particles}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                particles: parseInt(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>50</span>
-            <span className="font-medium">{gridLayoutParams.particles}</span>
-            <span>2000</span>
-          </div>
-        </div>
-
-        {/* Collision Rate */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            λ (Collision Rate):
-          </label>
-          <input
-            type="range"
-            min="0.1"
-            max="10.0"
-            step="0.1"
-            value={gridLayoutParams.collisionRate}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                collisionRate: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.1</span>
-            <span className="font-medium">
-              {gridLayoutParams.collisionRate}
-            </span>
-            <span>10.0</span>
-          </div>
-        </div>
-
-        {/* Jump Length */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            a (Jump Length):
-          </label>
-          <input
-            type="range"
-            min="0.01"
-            max="1.0"
-            step="0.01"
-            value={gridLayoutParams.jumpLength}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                jumpLength: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.01</span>
-            <span className="font-medium">{gridLayoutParams.jumpLength}</span>
-            <span>1.0</span>
-          </div>
-        </div>
-
-        {/* Velocity */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            v (Velocity):
-          </label>
-          <input
-            type="range"
-            min="0.1"
-            max="5.0"
-            step="0.1"
-            value={gridLayoutParams.velocity}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                velocity: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.1</span>
-            <span className="font-medium">{gridLayoutParams.velocity}</span>
-            <span>5.0</span>
-          </div>
-        </div>
-
-        {/* Control Buttons */}
-        <div className="border-t pt-4 space-y-2">
-          <div className="flex gap-2">
-            <button
-              onClick={handleStart}
-              disabled={simulationState.isRunning}
-              className="flex-1 px-3 py-2 bg-green-500 text-white rounded disabled:bg-gray-300"
-            >
-              ▶️ Start
-            </button>
-            <button
-              onClick={handlePause}
-              className="flex-1 px-3 py-2 bg-yellow-500 text-white rounded"
-            >
-              {simulationState.isRunning ? "⏸️ Pause" : "▶️ Resume"}
-            </button>
-          </div>
-          <button
-            onClick={handleReset}
-            className="w-full px-3 py-2 bg-red-500 text-white rounded"
-          >
-            🔄 Reset
-          </button>
-        </div>
-
-        {/* Status Display */}
-        <div className="border-t pt-4 space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>Status:</span>
-            <span
-              className={`font-medium ${
-                simulationState.status === "Running"
-                  ? "text-green-600"
-                  : simulationState.status === "Paused"
-                  ? "text-yellow-600"
-                  : "text-gray-600"
-              }`}
-            >
-              ● {simulationState.status}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Time:</span>
-            <span>{simulationState.time.toFixed(1)}s</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Collisions:</span>
-            <span>{simulationState.collisions.toLocaleString()}</span>
-          </div>
-        </div>
-
-        {/* Derived Parameters */}
-        <div className="border-t pt-4 space-y-1 text-xs text-gray-600">
-          <div className="flex justify-between">
-            <span>D (Diffusion):</span>
-            <span>
-              {(
-                gridLayoutParams.velocity ** 2 /
-                (2 * gridLayoutParams.collisionRate)
-              ).toFixed(3)}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Mean Free Path:</span>
-            <span>
-              {(
-                gridLayoutParams.velocity / gridLayoutParams.collisionRate
-              ).toFixed(3)}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Mean Wait Time:</span>
-            <span>{(1 / gridLayoutParams.collisionRate).toFixed(3)}s</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        console.log("tsParticles container loaded with CTRW physics");
+      }
+    },
+    []
   );
 
-  const ParticleCanvas = () => (
-    <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
-        {gridLayoutParams.simulationType === "continuum"
-          ? "Particle Canvas"
-          : "Graph Visualization"}
-      </h3>
-      <div className="h-full border rounded-lg relative overflow-hidden">
-        {gridLayoutParams.simulationType === "continuum" ? (
-          <>
-            <Particles
-              id="randomWalkParticles"
-              options={getRandomWalkConfig(gridLayoutParams.particles)}
-              particlesLoaded={particlesLoaded}
-              className="w-full h-full"
-            />
-            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Particles: {gridLayoutParams.particles} | Status:{" "}
-              {simulationState.status}
-            </div>
-          </>
-        ) : (
-          <div className="w-full h-full relative" id="sigma-container">
-            <SigmaContainer
-              style={{ height: "100%", width: "100%" }}
-              settings={{
-                renderLabels: true,
-                defaultNodeColor: "#3b82f6",
-                defaultEdgeColor: "#94a3b8",
-                labelSize: 12,
-                labelWeight: "bold",
-              }}
-            >
-              <GraphVisualization />
-            </SigmaContainer>
-            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Graph: {gridLayoutParams.graphType} | Nodes:{" "}
-              {graphPhysicsRef.current?.getAvailableNodes().length || 0}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 
-  const DensityComparison = () => (
-    <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
-        Density Comparison
-      </h3>
-      <div className="h-full border rounded-lg bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <div className="text-2xl mb-2">📈</div>
-          <div>ρ(x,t) Random Walk vs Telegraph Equation</div>
-          <div className="text-sm mt-2 flex gap-4 justify-center">
-            <span>Convergence Error: 0.023</span>
-            <span>D_eff: 0.89</span>
-            <span>v_eff: 1.02</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
-  const HistoryPanel = () => (
-    <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
-      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
-        📖 Simulation History
-      </h3>
 
-      {/* History table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-2">Time Range</th>
-              <th className="text-left p-2">Parameters</th>
-              <th className="text-left p-2">Actions</th>
-              <th className="text-left p-2">Preview</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b bg-blue-50">
-              <td className="p-2">
-                <div className="flex items-center gap-2">
-                  ⏰ 0.0s - 5.2s
-                  <span className="text-xs bg-green-200 px-1 rounded">
-                    ● Current
-                  </span>
-                </div>
-              </td>
-              <td className="p-2 text-xs">
-                λ=2.5, a=0.1
-                <br />
-                v=1.0, N=1000
-              </td>
-              <td className="p-2">
-                <div className="flex gap-1">
-                  <button className="text-xs bg-blue-100 px-2 py-1 rounded">
-                    👁️
-                  </button>
-                  <button className="text-xs bg-green-100 px-2 py-1 rounded">
-                    📊
-                  </button>
-                  <button className="text-xs bg-red-100 px-2 py-1 rounded">
-                    🗑️
-                  </button>
-                </div>
-              </td>
-              <td className="p-2">
-                <div className="w-16 h-8 border text-center text-xs flex items-center justify-center">
-                  ╱╲
-                  <br />
-                  ╱__╲
-                </div>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="p-2">
-                <div className="flex items-center gap-2">
-                  ⏰ 5.2s - 12.8s
-                  <span className="text-xs bg-gray-200 px-1 rounded">
-                    ○ Saved
-                  </span>
-                </div>
-              </td>
-              <td className="p-2 text-xs">
-                λ=3.0, a=0.1
-                <br />
-                v=1.2, N=1000
-              </td>
-              <td className="p-2">
-                <div className="flex gap-1">
-                  <button className="text-xs bg-blue-100 px-2 py-1 rounded">
-                    👁️
-                  </button>
-                  <button className="text-xs bg-green-100 px-2 py-1 rounded">
-                    📊
-                  </button>
-                  <button className="text-xs bg-red-100 px-2 py-1 rounded">
-                    🗑️
-                  </button>
-                </div>
-              </td>
-              <td className="p-2">
-                <div className="w-16 h-8 border text-center text-xs flex items-center justify-center">
-                  ╱╲
-                  <br />
-                  ╱__╲
-                </div>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="p-2">
-                <div className="flex items-center gap-2">
-                  ⏰ 0.0s - 8.1s
-                  <span className="text-xs bg-gray-200 px-1 rounded">
-                    ○ Saved
-                  </span>
-                </div>
-              </td>
-              <td className="p-2 text-xs">
-                λ=1.5, a=0.2
-                <br />
-                v=0.8, N=500
-              </td>
-              <td className="p-2">
-                <div className="flex gap-1">
-                  <button className="text-xs bg-blue-100 px-2 py-1 rounded">
-                    👁️
-                  </button>
-                  <button className="text-xs bg-green-100 px-2 py-1 rounded">
-                    📊
-                  </button>
-                  <button className="text-xs bg-red-100 px-2 py-1 rounded">
-                    🗑️
-                  </button>
-                </div>
-              </td>
-              <td className="p-2">
-                <div className="w-16 h-8 border text-center text-xs flex items-center justify-center">
-                  ╱╲
-                  <br />
-                  ╱__╲
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
 
-  const ReplayControls = () => (
-    <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
-        🔄 Replay Controls
-      </h3>
 
-      <div className="space-y-4">
-        <div className="text-sm">
-          <strong>Selected Run:</strong> ⏰ 5.2s - 12.8s (λ=3.0, a=0.1, v=1.2)
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button className="px-3 py-1 bg-gray-100 rounded">⏮️</button>
-          <button className="px-3 py-1 bg-gray-100 rounded">⏪</button>
-          <button className="px-3 py-1 bg-blue-500 text-white rounded">
-            ▶️
-          </button>
-          <button className="px-3 py-1 bg-gray-100 rounded">⏸️</button>
-          <button className="px-3 py-1 bg-gray-100 rounded">⏩</button>
-          <button className="px-3 py-1 bg-gray-100 rounded">⏭️</button>
-
-          <select className="ml-4 px-2 py-1 border rounded text-sm">
-            <option>1x</option>
-            <option>0.5x</option>
-            <option>2x</option>
-            <option>5x</option>
-          </select>
-
-          <span className="ml-4 text-sm">Time: 7.4s / 12.8s</span>
-        </div>
-
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full"
-            style={{ width: "58%" }}
-          ></div>
-        </div>
-
-        <div className="flex gap-4 text-sm">
-          <label className="flex items-center gap-1">
-            <input type="checkbox" />
-            🔄 Loop
-          </label>
-          <label className="flex items-center gap-1">
-            <input type="checkbox" />
-            📊 Show Metrics
-          </label>
-          <label className="flex items-center gap-1">
-            <input type="checkbox" />
-            ⚖️ Compare Mode
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-
-  const ExportPanel = () => (
-    <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
-        📊 Data Export
-      </h3>
-
-      <div className="space-y-4 text-sm">
-        <div>
-          <label className="block mb-1">Export Format:</label>
-          <div className="flex gap-2">
-            <button className="px-2 py-1 bg-blue-500 text-white rounded text-xs">
-              CSV
-            </button>
-            <button className="px-2 py-1 bg-gray-100 rounded text-xs">
-              JSON
-            </button>
-            <button className="px-2 py-1 bg-gray-100 rounded text-xs">
-              HDF5
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-2">Data to Export:</label>
-          <div className="space-y-1 text-xs">
-            <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
-              Particle positions
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
-              Density field ρ(x,t)
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
-              Velocity field u(x,t)
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
-              Collision events
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
-              Parameters & metadata
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="checkbox" />
-              Individual trajectories
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-1">Time Range:</label>
-          <select className="w-full px-2 py-1 border rounded text-xs">
-            <option>Full Run</option>
-            <option>Custom: 2.0s - 8.5s</option>
-          </select>
-        </div>
-
-        <div className="flex gap-2">
-          <button className="px-3 py-1 bg-green-500 text-white rounded text-xs">
-            📥 Download
-          </button>
-          <button className="px-2 py-1 bg-gray-100 rounded text-xs">📋</button>
-          <button className="px-2 py-1 bg-gray-100 rounded text-xs">🔗</button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -1000,30 +192,75 @@ export default function RandomWalkSim() {
           layout={layouts}
           onLayoutChange={onLayoutChange}
           cols={12}
-          rowHeight={60}
+          rowHeight={50}
           isDraggable={true}
           isResizable={true}
           margin={[10, 10]}
           containerPadding={[0, 0]}
           draggableHandle=".drag-handle"
         >
-          <div key="parameters" className="bg-gray-100">
-            <ParameterPanel />
+          {/* Parameters Panel */}
+          <div key="parameters">
+            <ParameterPanel
+              simulatorRef={simulatorRef}
+              gridLayoutParams={gridLayoutParams}
+              setGridLayoutParams={setGridLayoutParams}
+              simulationState={simulationState}
+              setSimulationState={setSimulationState}
+              handleStart={handleStart}
+              handlePause={handlePause}
+              handleReset={handleReset}
+            />
           </div>
-          <div key="canvas" className="bg-gray-100">
-            <ParticleCanvas />
+
+          {/* Canvas Panel */}
+          <div key="canvas">
+            <ParticleCanvas
+              gridLayoutParams={gridLayoutParams}
+              simulationState={simulationState}
+              tsParticlesContainerRef={tsParticlesContainerRef}
+              particlesLoaded={particlesLoaded}
+              graphPhysicsRef={graphPhysicsRef}
+            />
           </div>
-          <div key="density" className="bg-gray-100">
-            <DensityComparison />
+
+          {/* Density Panel */}
+          <div key="density">
+            <DensityComparison
+              simulatorRef={simulatorRef}
+              gridLayoutParams={gridLayoutParams}
+            />
           </div>
-          <div key="history" className="bg-gray-100">
-            <HistoryPanel />
+
+          {/* History Panel */}
+          <div key="history">
+            <HistoryPanel simulationState={simulationState} />
           </div>
-          <div key="replay" className="bg-gray-100">
-            <ReplayControls />
+
+          {/* Replay Panel */}
+          <div key="replay">
+            <ReplayControls
+              simulationState={simulationState}
+              selectedRun={{
+                startTime: 5.2,
+                endTime: 12.8,
+                parameters: {
+                  collisionRate: 3.0,
+                  jumpLength: 0.1,
+                  velocity: 1.2
+                }
+              }}
+            />
           </div>
-          <div key="export" className="bg-gray-100">
-            <ExportPanel />
+
+          {/* Export Panel */}
+          <div key="export">
+            <ExportPanel
+              simulationState={simulationState}
+              onExport={(format) => console.log(`Exporting in ${format} format`)}
+              onCopy={() => console.log('Copying data')}
+              onShare={() => console.log('Sharing data')}
+            />
           </div>
         </ReactGridLayout>
       </div>

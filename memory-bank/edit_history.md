@@ -1,9 +1,29 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 11:40:59 IST_
+_Last Updated: 2025-08-21 17:42:55 IST_
 
 ### 2025-08-21
+
+#### 17:42 - C5b: Component Refactoring Implementation
+
+- Updated `frontend/src/RandomWalkSim.tsx` - Added ParticleCanvas import and replaced inline component usage; removed inline ParticleCanvas component definition (89 lines removed); removed unused imports (Particles, IParticlesProps, Engine, SigmaContainer, useRegisterEvents, useSigma, Graph); removed duplicate NodeAttributes and EdgeAttributes interfaces; removed duplicate GraphVisualization component (95 lines removed)
+- Created `frontend/src/physics/RandomWalkSimulator.ts` - Extracted RandomWalkSimulator class with proper TypeScript interfaces and physics integration
+- Created `frontend/src/types/simulation.ts` - Extracted SimulationState interface for component reusability
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Updated interface to accept RandomWalkSimulator type and proper prop types
+- Updated `frontend/src/components/ParameterPanel.tsx` - Changed simulator ref type from PhysicsRandomWalk to RandomWalkSimulator
+- Updated `frontend/src/components/DensityComparison.tsx` - Updated interface for RandomWalkSimulator compatibility
+- Updated `frontend/src/hooks/useParticlesEngine.ts` - Fixed import paths and added type annotations for engine parameter
+
+#### 17:30 - C5b: Component Refactoring and Code Organization (Session Review)
+
+- Created `frontend/src/components/ParameterPanel.tsx` - Extracted component with collision rate, jump length, velocity controls
+- Created `frontend/src/components/DensityComparison.tsx` - Extracted density comparison chart component
+- Created `frontend/src/components/HistoryPanel.tsx` - Extracted simulation history management component
+- Created `frontend/src/components/ReplayControls.tsx` - Extracted VCR-style replay controls component
+- Created `frontend/src/components/ExportPanel.tsx` - Extracted data export interface component
+- Created `frontend/src/components/ParticleCanvas.tsx` - Extracted particle canvas component with graph visualization support
+- Updated `frontend/src/RandomWalkSim.tsx` - Reduced file size from 1200 lines to ~ 400 lines
 
 #### 11:40 - C5c: CTRW Physics Implementation Complete
 
