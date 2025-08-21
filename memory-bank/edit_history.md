@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 07:14:04 IST_
+_Last Updated: 2025-08-21 08:26:27 IST_
 
 ### 2025-08-21
+
+#### 08:26 - C1, C5b: State Persistence and DND Enhancement
+- Created `frontend/src/stores/appStore.ts` - Zustand store with localStorage persistence for app-wide state management
+- Updated `frontend/src/App.tsx` - Replaced useState with Zustand store for activeTab and simulationParams
+- Updated `frontend/src/GridLayoutPage.tsx` - Connected to Zustand store for gridLayoutParams and implemented title-bar dragging restriction
+- Updated `memory-bank/tasks/C1.md` - Added Phase 6 completion with state persistence implementation
+- Updated `memory-bank/tasks/C5b.md` - Updated progress with dragging restriction and state persistence features
+- Updated `memory-bank/tasks.md` - Updated C1 and C5b task descriptions and timestamps
+- Updated `memory-bank/session_cache.md` - Updated session focus and active task progress
+- Updated `memory-bank/sessions/2025-08-21-morning.md` - Extended session with state persistence implementation
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Updated implementation status and phase completion
 
 #### 07:52 - C5b: Random Walk UI Implementation Complete
 - Created `frontend/src/GridLayoutPage.tsx` - Complete grid layout with 6 panels and parameter controls

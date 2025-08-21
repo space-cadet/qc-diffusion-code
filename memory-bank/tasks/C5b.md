@@ -1,6 +1,6 @@
 # C5b: Random Walk UI Implementation
 *Created: 2025-08-21 07:52:44 IST*
-*Last Updated: 2025-08-21 07:52:44 IST*
+*Last Updated: 2025-08-21 08:26:27 IST*
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -18,6 +18,8 @@
 - ✅ Integrate simulation history panel with action buttons
 - ✅ Add replay controls with VCR-style interface
 - ✅ Implement data export panel with format selection
+- ✅ Restrict dragging to title bars only using draggableHandle
+- ✅ Add state persistence for grid layout parameters with Zustand
 - ⬜ Connect parameter controls to CTRW physics engine
 - ⬜ Implement particle visualization with tsParticles
 - ⬜ Add real-time density calculation and telegraph comparison
@@ -43,10 +45,13 @@
 9. ✅ Created density comparison chart placeholder
 10. ✅ Integrated existing history, replay, and export panels from specification
 11. ✅ Added third tab "Grid Layout" to main navigation
-12. 🔄 Ready for physics engine integration
-13. ⬜ Implement tsParticles integration for particle visualization
-14. ⬜ Connect real-time simulation controls to physics calculations
-15. ⬜ Add panel collapse/expand functionality
+12. ✅ Implemented title-bar only dragging with draggableHandle=".drag-handle"
+13. ✅ Added state persistence using Zustand store for gridLayoutParams
+14. ✅ Connected grid layout parameters to central app state management
+15. 🔄 Ready for physics engine integration
+16. ⬜ Implement tsParticles integration for particle visualization
+17. ⬜ Connect real-time simulation controls to physics calculations
+18. ⬜ Add panel collapse/expand functionality
 
 ## Context
 This task implements the complete UI framework for the random walk simulation based on the detailed specification in random-walk-ui-interface.md. The react-grid-layout provides draggable, resizable panels matching the ASCII layout designs. All parameter controls are functional with proper state management, ready for physics engine integration.
@@ -62,6 +67,11 @@ This task implements the complete UI framework for the random walk simulation ba
 - Simulation control buttons with proper state-dependent behavior
 - Status display with color-coded simulation states
 - Placeholder areas ready for particle rendering and density charts
+
+**Recent Enhancements (2025-08-21)**:
+- **Title-bar Dragging**: Panels now only draggable by title bars using draggableHandle=".drag-handle"
+- **State Persistence**: Grid layout parameters now persist across browser refresh via Zustand store
+- **Improved UX**: Users can interact with controls without accidentally moving panels
 
 **Next Steps**:
 - Integrate CTRW physics engine from C5a architecture planning

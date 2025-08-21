@@ -1,12 +1,12 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 07:14:04 IST_
+_Last Updated: 2025-08-21 08:26:27 IST_
 
 ## Current Session
 
-**Started**: 2025-08-21 07:14:04 IST
-**Focus Task**: C5a
+**Started**: 2025-08-21 08:26:27 IST
+**Focus Task**: C1, C5b
 **Session File**: `sessions/2025-08-21-morning.md`
 
 ## Overview
@@ -46,17 +46,18 @@ _Last Updated: 2025-08-21 07:14:04 IST_
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-19 **Last**: 2025-08-20 10:43:45 IST
-**Context**: Phase 5 completed - telegraph equation stability fixes and conservation monitoring
-**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/utils/conservationMonitor.ts`, `frontend/src/PlotComponent.tsx`
+**Started:** 2025-08-19 **Last**: 2025-08-21 08:26:27 IST
+**Context**: Phase 6 completed - application-wide state persistence with Zustand
+**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/GridLayoutPage.tsx`
 **Progress**:
 
 1. ✅ Telegraph vs diffusion comparison with controls
 2. ✅ Backend-agnostic frontend architecture
 3. ✅ Multi-equation selection system with organized UI
 4. ✅ Telegraph equation stability fixes and conservation monitoring
-5. ⬜ Wheeler-DeWitt equation implementations
-6. ⬜ Random walk and spin network models
+5. ✅ Application-wide state persistence with Zustand
+6. ⬜ Wheeler-DeWitt equation implementations
+7. ⬜ Random walk and spin network models
 
 ### C5: Random Walk Derivation of Telegraph Equation
 
@@ -94,9 +95,9 @@ _Last Updated: 2025-08-21 07:14:04 IST_
 ### C5b: Random Walk UI Implementation
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-21 **Last**: 2025-08-21 07:52:44 IST
-**Context**: Complete UI framework implemented with react-grid-layout and functional parameter controls
-**Files**: `frontend/src/GridLayoutPage.tsx`, `frontend/src/App.tsx`, `memory-bank/tasks/C5b.md`
+**Started:** 2025-08-21 **Last**: 2025-08-21 08:26:27 IST
+**Context**: Enhanced with title-bar dragging restriction and state persistence integration
+**Files**: `frontend/src/GridLayoutPage.tsx`, `frontend/src/stores/appStore.ts`, `memory-bank/tasks/C5b.md`
 **Progress**:
 
 1. ✅ Create GridLayoutPage with react-grid-layout framework
@@ -106,10 +107,12 @@ _Last Updated: 2025-08-21 07:14:04 IST_
 5. ✅ Integrate simulation history panel with action buttons
 6. ✅ Add replay controls with VCR-style interface
 7. ✅ Implement data export panel with format selection
-8. 🔄 Connect parameter controls to CTRW physics engine
-9. ⬜ Implement particle visualization with tsParticles
-10. ⬜ Add real-time density calculation and telegraph comparison
-11. ⬜ Connect history management with state persistence
+8. ✅ Restrict dragging to title bars only using draggableHandle=".drag-handle"
+9. ✅ Add state persistence for grid layout parameters with Zustand
+10. 🔄 Connect parameter controls to CTRW physics engine
+11. ⬜ Implement particle visualization with tsParticles
+12. ⬜ Add real-time density calculation and telegraph comparison
+13. ⬜ Connect history management with state persistence
 
 ### C2: VisualPDE GPU Solver Integration
 

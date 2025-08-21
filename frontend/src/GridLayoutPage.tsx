@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
+import { useAppStore } from "./stores/appStore";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
 const ReactGridLayout = WidthProvider(RGL);
 
 export default function GridLayoutPage() {
+  // Get parameters from Zustand store (persistent)
+  const { gridLayoutParams, setGridLayoutParams } = useAppStore();
+  
+  // Keep layout and runtime state local (non-persistent)
   const [layouts, setLayouts] = useState<Layout[]>([
     { i: "parameters", x: 0, y: 0, w: 3, h: 8, minW: 3, minH: 6 },
     { i: "canvas", x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 },
@@ -15,13 +20,6 @@ export default function GridLayoutPage() {
     { i: "replay", x: 0, y: 16, w: 8, h: 3, minW: 6, minH: 2 },
     { i: "export", x: 8, y: 16, w: 4, h: 3, minW: 4, minH: 2 },
   ]);
-
-  const [simulationParams, setSimulationParams] = useState({
-    particles: 1000,
-    collisionRate: 2.5,
-    jumpLength: 0.1,
-    velocity: 1.0,
-  });
 
   const [simulationState, setSimulationState] = useState({
     isRunning: false,
@@ -52,15 +50,15 @@ export default function GridLayoutPage() {
 
   const ParameterPanel = () => (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
-      <h3 className="text-lg font-semibold mb-4">Parameters</h3>
+      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Parameters</h3>
       
       <div className="space-y-6">
         {/* Particle Count */}
         <div>
           <label className="block text-sm font-medium mb-2">Particles:</label>
           <select 
-            value={simulationParams.particles}
-            onChange={(e) => setSimulationParams(prev => ({ ...prev, particles: parseInt(e.target.value) }))}
+            value={gridLayoutParams.particles}
+            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, particles: parseInt(e.target.value) })}
             className="w-full p-2 border rounded"
           >
             <option value={100}>100</option>
@@ -79,13 +77,13 @@ export default function GridLayoutPage() {
             min="0.1"
             max="10.0"
             step="0.1"
-            value={simulationParams.collisionRate}
-            onChange={(e) => setSimulationParams(prev => ({ ...prev, collisionRate: parseFloat(e.target.value) }))}
+            value={gridLayoutParams.collisionRate}
+            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, collisionRate: parseFloat(e.target.value) })}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-500">
             <span>0.1</span>
-            <span className="font-medium">{simulationParams.collisionRate}</span>
+            <span className="font-medium">{gridLayoutParams.collisionRate}</span>
             <span>10.0</span>
           </div>
         </div>
@@ -98,13 +96,13 @@ export default function GridLayoutPage() {
             min="0.01"
             max="1.0"
             step="0.01"
-            value={simulationParams.jumpLength}
-            onChange={(e) => setSimulationParams(prev => ({ ...prev, jumpLength: parseFloat(e.target.value) }))}
+            value={gridLayoutParams.jumpLength}
+            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, jumpLength: parseFloat(e.target.value) })}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-500">
             <span>0.01</span>
-            <span className="font-medium">{simulationParams.jumpLength}</span>
+            <span className="font-medium">{gridLayoutParams.jumpLength}</span>
             <span>1.0</span>
           </div>
         </div>
@@ -117,13 +115,13 @@ export default function GridLayoutPage() {
             min="0.1"
             max="5.0"
             step="0.1"
-            value={simulationParams.velocity}
-            onChange={(e) => setSimulationParams(prev => ({ ...prev, velocity: parseFloat(e.target.value) }))}
+            value={gridLayoutParams.velocity}
+            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, velocity: parseFloat(e.target.value) })}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-500">
             <span>0.1</span>
-            <span className="font-medium">{simulationParams.velocity}</span>
+            <span className="font-medium">{gridLayoutParams.velocity}</span>
             <span>5.0</span>
           </div>
         </div>
@@ -178,15 +176,15 @@ export default function GridLayoutPage() {
         <div className="border-t pt-4 space-y-1 text-xs text-gray-600">
           <div className="flex justify-between">
             <span>D (Diffusion):</span>
-            <span>{(simulationParams.velocity ** 2 / (2 * simulationParams.collisionRate)).toFixed(3)}</span>
+            <span>{(gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate)).toFixed(3)}</span>
           </div>
           <div className="flex justify-between">
             <span>Mean Free Path:</span>
-            <span>{(simulationParams.velocity / simulationParams.collisionRate).toFixed(3)}</span>
+            <span>{(gridLayoutParams.velocity / gridLayoutParams.collisionRate).toFixed(3)}</span>
           </div>
           <div className="flex justify-between">
             <span>Mean Wait Time:</span>
-            <span>{(1 / simulationParams.collisionRate).toFixed(3)}s</span>
+            <span>{(1 / gridLayoutParams.collisionRate).toFixed(3)}s</span>
           </div>
         </div>
       </div>
@@ -195,12 +193,12 @@ export default function GridLayoutPage() {
 
   const ParticleCanvas = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="text-lg font-semibold mb-4">Particle Canvas</h3>
+      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Particle Canvas</h3>
       <div className="h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
         <div className="text-center text-gray-500">
           <div className="text-4xl mb-2">•••</div>
           <div>Live particle simulation</div>
-          <div className="text-sm mt-2">Particles: {simulationParams.particles}</div>
+          <div className="text-sm mt-2">Particles: {gridLayoutParams.particles}</div>
         </div>
       </div>
     </div>
@@ -208,7 +206,7 @@ export default function GridLayoutPage() {
 
   const DensityComparison = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="text-lg font-semibold mb-4">Density Comparison</h3>
+      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Density Comparison</h3>
       <div className="h-full border rounded-lg bg-gray-50 flex items-center justify-center">
         <div className="text-center text-gray-500">
           <div className="text-2xl mb-2">📈</div>
@@ -225,7 +223,7 @@ export default function GridLayoutPage() {
 
   const HistoryPanel = () => (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
+      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
         📖 Simulation History
       </h3>
       
@@ -321,7 +319,7 @@ export default function GridLayoutPage() {
 
   const ReplayControls = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
+      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
         🔄 Replay Controls
       </h3>
       
@@ -372,7 +370,7 @@ export default function GridLayoutPage() {
 
   const ExportPanel = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="text-lg font-semibold mb-4 flex items-center">
+      <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
         📊 Data Export
       </h3>
       
@@ -451,6 +449,7 @@ export default function GridLayoutPage() {
           isResizable={true}
           margin={[10, 10]}
           containerPadding={[0, 0]}
+          draggableHandle=".drag-handle"
         >
           <div key="parameters" className="bg-gray-100">
             <ParameterPanel />

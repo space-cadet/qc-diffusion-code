@@ -5,27 +5,15 @@ import RandomWalkPage from "./RandomWalkPage";
 import GridLayoutPage from "./GridLayoutPage";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
+import { useAppStore } from "./stores/appStore";
 import type {
-  SimulationParams,
   AnimationFrame,
   WebSocketMessage,
   SimulationResult,
 } from "./types";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'simulation' | 'randomwalk' | 'gridlayout'>('simulation');
-  const [params, setParams] = useState<SimulationParams>({
-    collision_rate: 1.0,
-    velocity: 1.0,
-    diffusivity: 1.0,
-    t_range: 5.0,
-    dt: 0.01,
-    distribution: "gaussian",
-    x_min: -5.0,
-    x_max: 5.0,
-    mesh_size: 64,
-    selectedEquations: ['telegraph', 'diffusion'],
-  });
+  const { activeTab, simulationParams, setActiveTab, setSimulationParams } = useAppStore();
 
   const [currentFrame, setCurrentFrame] = useState<AnimationFrame | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -33,9 +21,9 @@ export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { initSolver, runAnimation, stop } = useWebGLSolver();
 
-  const isWebGL = params.solver_type === 'webgl';
+  const isWebGL = simulationParams.solver_type === 'webgl';
 
-  const initializeConditions = useCallback((params: SimulationParams) => {
+  const initializeConditions = useCallback((params: typeof simulationParams) => {
     console.log("Generating initial conditions with params:", params);
     const initialFrame = generateInitialConditions(params);
     console.log("Generated initial conditions:", initialFrame);
@@ -43,8 +31,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    initializeConditions(params);
-  }, [params.distribution, params.x_min, params.x_max, params.mesh_size, params.selectedEquations, initializeConditions]);
+    initializeConditions(simulationParams);
+  }, [simulationParams.distribution, simulationParams.x_min, simulationParams.x_max, simulationParams.mesh_size, simulationParams.selectedEquations, initializeConditions]);
 
   const connectWebSocket = useCallback(() => {
     if (!isWebGL) {
@@ -91,16 +79,16 @@ export default function App() {
   }, [connectWebSocket, isWebGL]);
 
   const handleStart = () => {
-    console.log("Starting simulation with params:", params);
+    console.log("Starting simulation with params:", simulationParams);
     setIsRunning(true);
     
     if (isWebGL && canvasRef.current) {
-      initSolver(canvasRef.current, params);
-      runAnimation(params, (data: SimulationResult & { time: number }) => {
+      initSolver(canvasRef.current, simulationParams);
+      runAnimation(simulationParams, (data: SimulationResult & { time: number }) => {
         setCurrentFrame(data);
       });
     } else if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "start", params: params }));
+      ws.send(JSON.stringify({ type: "start", params: simulationParams }));
     }
   };
 
@@ -124,7 +112,7 @@ export default function App() {
     if (isWebGL) {
       if (newRunningState) {
         // Resume WebGL animation
-        runAnimation(params, (data: SimulationResult & { time: number }) => {
+        runAnimation(simulationParams, (data: SimulationResult & { time: number }) => {
           setCurrentFrame(data);
         });
       } else {
@@ -146,7 +134,7 @@ export default function App() {
       ws.send(JSON.stringify({ type: "stop" }));
     }
     
-    initializeConditions(params);
+    initializeConditions(simulationParams);
   };
 
   return (
@@ -193,16 +181,16 @@ export default function App() {
           <div className="h-full flex">
             <div className="w-80">
               <Controls
-                params={params}
-                onChange={setParams}
+                params={simulationParams}
+                onChange={setSimulationParams}
               />
             </div>
             <div className="flex-1 relative">
               <PlotComponent
                 frame={currentFrame}
                 isRunning={isRunning}
-                params={params}
-                onChange={setParams}
+                params={simulationParams}
+                onChange={setSimulationParams}
                 onStart={handleStart}
                 onStop={handleStop}
                 onPause={handlePause}
@@ -211,7 +199,7 @@ export default function App() {
               {isWebGL && (
                 <canvas
                   ref={canvasRef}
-                  width={params.mesh_size}
+                  width={simulationParams.mesh_size}
                   height={1}
                   style={{ display: 'none' }}
                 />

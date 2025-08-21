@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 07:14:04 IST_
+_Last Updated: 2025-08-21 08:26:27 IST_
 
 ## Active Tasks
 
@@ -19,9 +19,9 @@ _Last Updated: 2025-08-21 07:14:04 IST_
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 10:43:45 IST
-**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/utils/conservationMonitor.ts`, `frontend/src/PlotComponent.tsx`
-**Notes**: Phase 5 completed - telegraph equation stability fixes and conservation monitoring system implemented
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 08:26:27 IST
+**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/GridLayoutPage.tsx`
+**Notes**: State persistence implemented with Zustand - tabs and parameters persist across browser refresh
 
 ### C3: GPU AMR Integration for PDE Solver
 
@@ -44,9 +44,9 @@ _Last Updated: 2025-08-21 07:14:04 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 07:52:44 IST
-**Files**: `frontend/src/GridLayoutPage.tsx`, `frontend/src/App.tsx`
-**Notes**: Grid layout with 6 panels implemented - parameter controls, canvas, density comparison, history management
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 08:26:27 IST
+**Files**: `frontend/src/GridLayoutPage.tsx`, `frontend/src/stores/appStore.ts`
+**Notes**: Enhanced with title-bar dragging restriction and state persistence - panels only draggable by title bars
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls
