@@ -33,22 +33,44 @@ export class PhysicsRandomWalk {
   }
 
   generateStep(particle: Particle): Step {
-    // TODO: Implement CTRW step generation
-    // TODO: Generate collision time using exponential distribution
-    // TODO: Update particle position and handle collision
+    const currentTime = Date.now() / 1000; // Convert to seconds
+    const collision = this.handleCollision(particle);
+    
+    // Calculate position change based on velocity and time step
+    const timeStep = Math.min(collision.waitTime, 0.01); // Max 10ms steps
+    const deltaX = particle.velocity.vx * timeStep;
+    const deltaY = particle.velocity.vy * timeStep;
     
     return {
-      deltaX: 0,
-      deltaV: 0,
-      collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: 0 },
-      timestamp: 0
+      deltaX,
+      deltaY,
+      collision,
+      timestamp: currentTime,
+      particleId: particle.id
     };
   }
 
   updateParticle(particle: Particle): void {
-    // TODO: Update particle state using CTRW dynamics
-    // TODO: Apply collision mechanism
-    // TODO: Update position and velocity
+    const step = this.generateStep(particle);
+    
+    // Update position
+    particle.position.x += step.deltaX;
+    particle.position.y += step.deltaY || 0;
+    
+    // Handle collision if occurred
+    if (step.collision.occurred) {
+      particle.velocity.vx = step.collision.newVelocity?.vx || particle.velocity.vx;
+      particle.velocity.vy = step.collision.newVelocity?.vy || particle.velocity.vy;
+      particle.lastCollisionTime = step.collision.timestamp;
+      particle.nextCollisionTime = step.collision.timestamp + step.collision.waitTime;
+      particle.collisionCount++;
+    }
+    
+    // Record trajectory
+    particle.trajectory.push({
+      position: { x: particle.position.x, y: particle.position.y },
+      timestamp: step.timestamp
+    });
   }
 
   calculateDensity(particles: Particle[]): DensityField {
@@ -63,33 +85,54 @@ export class PhysicsRandomWalk {
   }
 
   getScalingLimits(): ScalingParams {
-    // TODO: Return current scaling parameters
     return {
       tau: this.meanWaitTime,
       a: this.jumpLength,
       D: this.diffusionConstant,
       v: this.velocity,
-      gamma: this.collisionRate
+      gamma: this.collisionRate,
+      scalingRegime: this.velocity > this.jumpLength * this.collisionRate ? 'ballistic' : 'diffusive'
     };
   }
 
   private generateCollisionTime(): number {
-    // TODO: Implement exponential random generation
-    // return -Math.log(Math.random()) / this.collisionRate;
-    return 0;
+    // Exponential distribution with rate λ (collisionRate)
+    return -Math.log(Math.random()) / this.collisionRate;
   }
 
   private handleCollision(particle: Particle): CollisionEvent {
-    // TODO: Implement collision mechanism
-    // TODO: Randomize direction
-    // TODO: Update collision history
+    const currentTime = Date.now() / 1000;
+    const waitTime = this.generateCollisionTime();
+    
+    // Check if collision should occur based on timing
+    const shouldCollide = currentTime >= particle.nextCollisionTime;
+    
+    if (!shouldCollide) {
+      return {
+        occurred: false,
+        newDirection: 0,
+        waitTime: waitTime,
+        energyChange: 0,
+        timestamp: currentTime
+      };
+    }
+    
+    // Generate random direction (isotropic scattering)
+    const newDirection = Math.random() * 2 * Math.PI;
+    const speed = Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2);
     
     return {
-      occurred: false,
-      newDirection: 0,
-      waitTime: 0,
-      energyChange: 0,
-      timestamp: 0
+      occurred: true,
+      newDirection,
+      waitTime,
+      energyChange: 0, // Elastic collisions
+      timestamp: currentTime,
+      position: { ...particle.position },
+      oldVelocity: { ...particle.velocity },
+      newVelocity: {
+        vx: speed * Math.cos(newDirection),
+        vy: speed * Math.sin(newDirection)
+      }
     };
   }
 

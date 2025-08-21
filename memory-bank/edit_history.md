@@ -1,11 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 10:29:12 IST_
+_Last Updated: 2025-08-21 11:40:59 IST_
 
 ### 2025-08-21
 
+#### 11:40 - C5c: CTRW Physics Implementation Complete
+
+- Updated `frontend/src/RandomWalkSim.tsx` - Major refactor with ParticleManager integration, animation loop implementation, collision stats
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Added ParticleManager bridge, updateParticlesWithCTRW function, disabled default motion
+- Updated `frontend/src/physics/PhysicsRandomWalk.ts` - Implemented complete CTRW mechanics with exponential collision timing, particle updates
+- Created `frontend/src/physics/ParticleManager.ts` - Bridge class managing tsParticles integration with CTRW physics
+- Created `frontend/src/physics/types.ts` - Comprehensive TypeScript definitions for physics system
+
 #### 10:29 - C5c: Graph-Core Integration and Dual Mode Support Complete
+
 - Updated `frontend/package.json` - Added @spin-network/graph-core package dependency
 - Updated `frontend/src/physics/PhysicsRandomWalk.ts` - Added graph-core integration with simulation type parameter and graph creation methods
 - Updated `frontend/src/RandomWalkSim.tsx` - Added simulation type radio buttons, graph parameter controls, and Sigma.js graph visualization
@@ -19,6 +28,7 @@ _Last Updated: 2025-08-21 10:29:12 IST_
 - Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Updated implementation phases with dual mode completion
 
 #### 09:10 - C5c: Random Walk Physics Framework and tsParticles Integration
+
 - Created `frontend/src/physics/PhysicsRandomWalk.ts` - Main CTRW physics engine placeholder with method stubs
 - Created `frontend/src/physics/types/Particle.ts` - Particle and CollisionEvent interfaces for physics simulation
 - Created `frontend/src/physics/types/CollisionEvent.ts` - Step and CollisionEvent type definitions
@@ -35,6 +45,7 @@ _Last Updated: 2025-08-21 10:29:12 IST_
 - Created `memory-bank/implementation-details/random-walk-engine-plan.md` - Comprehensive implementation plan for CTRW physics engine
 
 #### 08:26 - C1, C5b: State Persistence and DND Enhancement
+
 - Created `frontend/src/stores/appStore.ts` - Zustand store with localStorage persistence for app-wide state management
 - Updated `frontend/src/App.tsx` - Replaced useState with Zustand store for activeTab and simulationParams
 - Updated `frontend/src/GridLayoutPage.tsx` - Connected to Zustand store for gridLayoutParams and implemented title-bar dragging restriction
@@ -46,6 +57,7 @@ _Last Updated: 2025-08-21 10:29:12 IST_
 - Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Updated implementation status and phase completion
 
 #### 07:52 - C5b: Random Walk UI Implementation Complete
+
 - Created `frontend/src/GridLayoutPage.tsx` - Complete grid layout with 6 panels and parameter controls
 - Updated `frontend/src/App.tsx` - Added third tab navigation for grid layout page
 - Created `memory-bank/tasks/C5b.md` - New task file for UI implementation tracking

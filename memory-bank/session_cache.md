@@ -1,7 +1,7 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 10:29:12 IST_
+_Last Updated: 2025-08-21 11:35:44 IST_
 
 ## Current Session
 
@@ -120,9 +120,9 @@ _Last Updated: 2025-08-21 10:29:12 IST_
 ### C5c: Random Walk Physics Implementation
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-21 **Last**: 2025-08-21 10:29:12 IST
-**Context**: Graph-core integration completed - dual mode physics framework ready for CTRW implementation
-**Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/config/tsParticlesConfig.ts`, `memory-bank/tasks/C5c.md`
+**Started:** 2025-08-21 **Last**: 2025-08-21 11:35:44 IST
+**Context**: CTRW physics implementation completed - ParticleManager bridges tsParticles with custom physics, collision mechanics implemented with exponential timing
+**Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/types.ts`, `memory-bank/tasks/C5c.md`
 **Progress**:
 
 1. ✅ Create physics file structure with placeholder classes
@@ -133,12 +133,13 @@ _Last Updated: 2025-08-21 10:29:12 IST_
 6. ✅ Implement graph creation methods for lattice1D, lattice2D, path, complete graphs
 7. ✅ Add graph visualization integration with Sigma.js
 8. ✅ Connect dual physics framework to UI parameter controls
-9. 🔄 Implement CTRW collision mechanism with Poisson process
-10. ⬜ Create particle state management system for both modes
-11. ⬜ Add exponential waiting time generation for collisions
-12. ⬜ Implement density profile calculation for telegraph comparison
-13. ⬜ Replace tsParticles default motion with CTRW physics
-14. ⬜ Implement simulation history recording and replay functionality
+9. ✅ Implement CTRW collision mechanism with Poisson process
+10. ✅ Create particle state management system with ParticleManager class
+11. ✅ Add exponential waiting time generation for collisions
+12. ✅ Replace tsParticles default motion with CTRW physics via updateParticlesWithCTRW
+13. ✅ Create comprehensive TypeScript type definitions for physics system
+14. 🔄 Implement density profile calculation for telegraph comparison
+15. ⬜ Implement simulation history recording and replay functionality
 
 ### C2: VisualPDE GPU Solver Integration
 

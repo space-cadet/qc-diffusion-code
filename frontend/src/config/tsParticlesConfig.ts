@@ -1,4 +1,32 @@
 import type { ISourceOptions } from "@tsparticles/engine";
+import type { ParticleManager } from "../physics/ParticleManager";
+
+let particleManager: ParticleManager | null = null;
+
+export const setParticleManager = (manager: ParticleManager) => {
+  particleManager = manager;
+};
+
+// Custom update function called from container
+export const updateParticlesWithCTRW = (container: any) => {
+  if (!particleManager || !container.particles) return;
+
+  // Check different possible particle array properties
+  const particles =
+    container.particles.array ||
+    container.particles._array ||
+    container.particles;
+
+  if (particles && particles.forEach) {
+    particles.forEach((particle: any) => {
+      particleManager!.updateParticle(particle);
+    });
+  } else if (particles && particles.length) {
+    for (let i = 0; i < particles.length; i++) {
+      particleManager!.updateParticle(particles[i]);
+    }
+  }
+};
 
 export const randomWalkParticlesConfig: ISourceOptions = {
   background: {
@@ -15,7 +43,7 @@ export const randomWalkParticlesConfig: ISourceOptions = {
       onHover: {
         enable: false,
       },
-      resize: {}
+      resize: {},
     },
   },
   particles: {
@@ -26,14 +54,13 @@ export const randomWalkParticlesConfig: ISourceOptions = {
       enable: false,
     },
     move: {
-      direction: "none",
       enable: true,
+      direction: "none",
       outModes: {
         default: "bounce",
       },
-      random: true,
-      speed: 1,
-      straight: false,
+      speed: 0, // Will be overridden by CTRW physics
+      straight: true,
     },
     number: {
       density: {
@@ -50,14 +77,6 @@ export const randomWalkParticlesConfig: ISourceOptions = {
     size: {
       value: { min: 2, max: 4 },
     },
-    bounce: {
-      horizontal: {
-        value: 1,
-      },
-      vertical: {
-        value: 1,
-      },
-    },
   },
   detectRetina: true,
   motion: {
@@ -69,7 +88,9 @@ export const randomWalkParticlesConfig: ISourceOptions = {
   },
 };
 
-export const getRandomWalkConfig = (particleCount: number = 100): ISourceOptions => {
+export const getRandomWalkConfig = (
+  particleCount: number = 100
+): ISourceOptions => {
   return {
     ...randomWalkParticlesConfig,
     particles: {
