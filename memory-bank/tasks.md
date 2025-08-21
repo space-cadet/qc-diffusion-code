@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 00:34:14 IST_
+_Last Updated: 2025-08-21 07:14:04 IST_
 
 ## Active Tasks
 
@@ -37,9 +37,9 @@ _Last Updated: 2025-08-21 00:34:14 IST_
 
 ### C5a: Random Walk Architecture Planning
 **Description**: Plan and design the architecture for random walk physics simulation with collision mechanisms
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 00:34:14 IST
-**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `memory-bank/tasks/C5a.md`
-**Notes**: Research completed on existing implementations - CTRW framework identified as optimal approach
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 07:14:04 IST
+**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `memory-bank/implementation-details/random-walk-ui-interface.md`, `memory-bank/tasks/C5a.md`
+**Notes**: UI interface designed with dnd-kit framework - ready for implementation planning
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls
