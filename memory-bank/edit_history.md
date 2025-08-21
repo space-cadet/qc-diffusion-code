@@ -1,9 +1,22 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 09:10:30 IST_
+_Last Updated: 2025-08-21 10:29:12 IST_
 
 ### 2025-08-21
+
+#### 10:29 - C5c: Graph-Core Integration and Dual Mode Support Complete
+- Updated `frontend/package.json` - Added @spin-network/graph-core package dependency
+- Updated `frontend/src/physics/PhysicsRandomWalk.ts` - Added graph-core integration with simulation type parameter and graph creation methods
+- Updated `frontend/src/RandomWalkSim.tsx` - Added simulation type radio buttons, graph parameter controls, and Sigma.js graph visualization
+- Updated `frontend/src/stores/appStore.ts` - Added graph parameters (simulationType, graphType, graphSize, isPeriodic, showEdgeWeights)
+- Updated `memory-bank/tasks/C5c.md` - Updated completion criteria and progress with graph integration milestones
+- Updated `memory-bank/tasks/C5b.md` - Marked as COMPLETED with dual mode support completion
+- Updated `memory-bank/tasks/C1.md` - Updated with random walk interface completion and dual mode framework
+- Updated `memory-bank/tasks.md` - Updated C5b to completed status and updated task details with graph integration notes
+- Updated `memory-bank/session_cache.md` - Updated task statuses, progress tracking, and active task counts
+- Updated `memory-bank/sessions/2025-08-21-morning.md` - Added graph-core integration session extension with technical achievements
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Updated implementation phases with dual mode completion
 
 #### 09:10 - C5c: Random Walk Physics Framework and tsParticles Integration
 - Created `frontend/src/physics/PhysicsRandomWalk.ts` - Main CTRW physics engine placeholder with method stubs

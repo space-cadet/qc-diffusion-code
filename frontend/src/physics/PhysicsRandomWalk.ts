@@ -1,6 +1,10 @@
 import type { Particle, CollisionEvent, Step, DensityField, ScalingParams } from './types';
+import type { IGraph, IGraphNode } from '@spin-network/graph-core';
+import { lattice1D, lattice2D, path, complete } from '@spin-network/graph-core';
 
 export class PhysicsRandomWalk {
+  private graph: IGraph;
+  private simulationType: 'continuum' | 'graph';
   private collisionRate: number;  // λ (Poisson process rate)
   private jumpLength: number;     // a (lattice spacing)
   private velocity: number;       // v = a/⟨τ⟩
@@ -11,12 +15,21 @@ export class PhysicsRandomWalk {
     collisionRate: number;
     jumpLength: number;
     velocity?: number;
+    simulationType?: 'continuum' | 'graph';
+    graphType?: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
+    graphSize?: number | { width: number; height: number };
   }) {
     this.collisionRate = params.collisionRate;
     this.jumpLength = params.jumpLength;
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
     this.diffusionConstant = this.velocity * this.velocity / (2 * this.collisionRate);
     this.meanWaitTime = 1 / this.collisionRate;
+    this.simulationType = params.simulationType || 'continuum';
+    
+    // Initialize graph only for graph mode
+    if (this.simulationType === 'graph') {
+      this.graph = this.createGraph(params.graphType || 'lattice1D', params.graphSize || 10);
+    }
   }
 
   generateStep(particle: Particle): Step {
@@ -78,5 +91,33 @@ export class PhysicsRandomWalk {
       energyChange: 0,
       timestamp: 0
     };
+  }
+
+  private createGraph(type: string, size: number | { width: number; height: number }): IGraph {
+    switch (type) {
+      case 'lattice1D':
+        return lattice1D(typeof size === 'number' ? size : 10);
+      case 'lattice2D':
+        const sizeNum = typeof size === 'number' ? size : 10;
+        return lattice2D(sizeNum, sizeNum);
+      case 'path':
+        return path(typeof size === 'number' ? size : 10);
+      case 'complete':
+        return complete(typeof size === 'number' ? size : 10);
+      default:
+        return lattice1D(10);
+    }
+  }
+
+  getAvailableNodes(): readonly IGraphNode[] {
+    return this.graph.getNodes();
+  }
+
+  getNeighbors(nodeId: string): readonly IGraphNode[] {
+    return this.graph.getAdjacentNodes(nodeId);
+  }
+
+  getGraph(): IGraph {
+    return this.graph;
   }
 }

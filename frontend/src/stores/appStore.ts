@@ -7,6 +7,11 @@ interface GridLayoutParams {
   collisionRate: number
   jumpLength: number
   velocity: number
+  simulationType: 'continuum' | 'graph'
+  graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete'
+  graphSize: number
+  isPeriodic: boolean
+  showEdgeWeights: boolean
 }
 
 interface AppState {
@@ -39,6 +44,11 @@ export const useAppStore = create<AppState>()(
         collisionRate: 2.5,
         jumpLength: 0.1,
         velocity: 1.0,
+        simulationType: 'continuum',
+        graphType: 'lattice1D',
+        graphSize: 20,
+        isPeriodic: false,
+        showEdgeWeights: false,
       },
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),

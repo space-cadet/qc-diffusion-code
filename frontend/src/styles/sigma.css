@@ -1,0 +1,62 @@
+/* Custom Sigma Graph Visualization Styles */
+.sigma-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sigma-mouse {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.sigma-scene, .sigma-layers, .sigma-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sigma-layers {
+  pointer-events: none;
+}
+
+.sigma-controls {
+  z-index: 20;
+  pointer-events: none;
+}
+
+.sigma-controls .control {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.sigma-node {
+  cursor: pointer;
+}
+
+.sigma-edge {
+  cursor: pointer;
+}
+
+.sigma-hover {
+  z-index: 1;
+}
+
+.sigma-tooltip {
+  position: absolute;
+  z-index: 99;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

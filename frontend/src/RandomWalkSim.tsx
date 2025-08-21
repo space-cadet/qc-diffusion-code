@@ -1,15 +1,34 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, Component } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import { Particles, initParticlesEngine } from "@tsparticles/react";
 import type { IParticlesProps } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import type { Container, Engine } from "@tsparticles/engine";
+import { SigmaContainer, useRegisterEvents, useSigma } from "@react-sigma/core";
+import Graph from "graphology";
 import { useAppStore } from "./stores/appStore";
+
+// Define node and edge attribute types
+interface NodeAttributes {
+  label?: string;
+  x?: number;
+  y?: number;
+  size?: number;
+  color?: string;
+}
+
+interface EdgeAttributes {
+  size?: number;
+  color?: string;
+}
 import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import type { Particle } from "./physics/types/Particle";
 import { DensityCalculator } from "./physics/utils/DensityCalculator";
 import { getRandomWalkConfig } from "./config/tsParticlesConfig";
+
+// CSS imports
+import "./styles/sigma.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
@@ -91,6 +110,9 @@ export default function RandomWalkSim() {
     status: 'Stopped',
   });
 
+  // Graph physics reference
+  const graphPhysicsRef = useRef<PhysicsRandomWalk | null>(null);
+
   // Initialize physics simulator
   useEffect(() => {
     simulatorRef.current = new RandomWalkSimulator({
@@ -99,7 +121,124 @@ export default function RandomWalkSim() {
       velocity: gridLayoutParams.velocity,
       particleCount: gridLayoutParams.particles,
     });
-  }, []);
+
+    // Initialize graph physics when in graph mode
+    if (gridLayoutParams.simulationType === 'graph') {
+      graphPhysicsRef.current = new PhysicsRandomWalk({
+        collisionRate: gridLayoutParams.collisionRate,
+        jumpLength: gridLayoutParams.jumpLength,
+        velocity: gridLayoutParams.velocity,
+        simulationType: 'graph',
+        graphType: gridLayoutParams.graphType,
+        graphSize: gridLayoutParams.graphSize,
+      });
+    }
+  }, [gridLayoutParams.simulationType, gridLayoutParams.graphType, gridLayoutParams.graphSize]);
+
+  // Graph visualization component
+  const GraphVisualization = () => {
+    const sigma = useSigma();
+    const registerEvents = useRegisterEvents();
+    
+    useEffect(() => {
+      if (graphPhysicsRef.current) {
+        const physicsGraph = graphPhysicsRef.current.getGraph();
+        const nodes = physicsGraph.getNodes();
+        const edges = physicsGraph.getEdges();
+        
+        // Create a new graphology graph
+        const graph = new Graph<NodeAttributes, EdgeAttributes>();
+        
+        // Add nodes with positions based on graph type
+        const graphType = gridLayoutParams.graphType;
+        const graphSize = gridLayoutParams.graphSize;
+        
+        nodes.forEach((node: { id: string }, index: number) => {
+          let x = 0;
+          let y = 0;
+          
+          // Position nodes based on graph type
+          switch (graphType) {
+            case 'lattice1D':
+              // Linear layout for 1D lattice
+              x = (index - nodes.length / 2) * 30;
+              y = 0;
+              break;
+              
+            case 'lattice2D':
+              // Grid layout for 2D lattice
+              const size = graphSize;
+              const row = Math.floor(index / size);
+              const col = index % size;
+              // Only place nodes within the grid bounds
+              x = (col - size / 2) * 30;
+              y = (row - size / 2) * 30;
+              // Skip this node if outside grid bounds by moving it far away
+              if (row >= size || col >= size) {
+                x = 10000; // Move far away
+                y = 10000;
+              }
+              break;
+              
+            case 'path':
+              // Path layout in a line
+              x = (index - nodes.length / 2) * 20;
+              y = 0;
+              break;
+              
+            case 'complete':
+              // Circular layout for complete graph
+              const angle = (index / nodes.length) * 2 * Math.PI;
+              const radius = Math.min(200, nodes.length * 5);
+              x = Math.cos(angle) * radius;
+              y = Math.sin(angle) * radius;
+              break;
+              
+            default:
+              // Default circular layout
+              const defaultAngle = (index / nodes.length) * 2 * Math.PI;
+              x = Math.cos(defaultAngle) * 150;
+              y = Math.sin(defaultAngle) * 150;
+          }
+          
+          graph.addNode(node.id, {
+            label: node.id,
+            x,
+            y,
+            size: 8,
+            color: '#3b82f6',
+          });
+        });
+        
+        // Add edges
+        edges.forEach((edge: { id: string, sourceId: string, targetId: string }) => {
+          try {
+            graph.addEdge(edge.sourceId, edge.targetId, {
+              size: 2,
+              color: gridLayoutParams.showEdgeWeights ? '#f59e0b' : '#94a3b8',
+            });
+          } catch (error) {
+            console.warn('Could not add edge:', error);
+          }
+        });
+        
+        // Set the graph to sigma
+        sigma.setGraph(graph);
+        
+        // Register events
+        registerEvents({
+          clickNode: (event) => console.log('Node clicked:', event.node),
+          clickEdge: (event) => console.log('Edge clicked:', event.edge),
+        });
+      }
+      
+      return () => {
+        // Cleanup if needed
+      };
+    }, [sigma, registerEvents, gridLayoutParams]);
+
+    return null;
+  };
 
   // Update physics parameters when store changes
   useEffect(() => {
@@ -168,6 +307,92 @@ export default function RandomWalkSim() {
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Parameters</h3>
       
       <div className="space-y-6">
+        {/* Simulation Type */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Simulation Type:</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="simulationType"
+                value="continuum"
+                checked={gridLayoutParams.simulationType === 'continuum'}
+                onChange={(e) => setGridLayoutParams({...gridLayoutParams, simulationType: e.target.value as 'continuum' | 'graph'})}
+                className="mr-2"
+              />
+              Continuum
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="simulationType"
+                value="graph"
+                checked={gridLayoutParams.simulationType === 'graph'}
+                onChange={(e) => setGridLayoutParams({...gridLayoutParams, simulationType: e.target.value as 'continuum' | 'graph'})}
+                className="mr-2"
+              />
+              Graph
+            </label>
+          </div>
+        </div>
+
+        {/* Graph Parameters (only show when graph is selected) */}
+        {gridLayoutParams.simulationType === 'graph' && (
+          <div className="border rounded p-3 bg-gray-50">
+            <h4 className="font-medium mb-2">Graph Parameters</h4>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm mb-1">Graph Type:</label>
+                <select
+                  value={gridLayoutParams.graphType}
+                  onChange={(e) => setGridLayoutParams({...gridLayoutParams, graphType: e.target.value as any})}
+                  className="w-full border rounded px-2 py-1 text-sm"
+                >
+                  <option value="lattice1D">1D Chain</option>
+                  <option value="lattice2D">2D Lattice</option>
+                  <option value="path">Path Graph</option>
+                  <option value="complete">Complete Graph</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Size:</label>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  value={gridLayoutParams.graphSize}
+                  onChange={(e) => setGridLayoutParams({...gridLayoutParams, graphSize: parseInt(e.target.value)})}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>5</span>
+                  <span className="font-medium">{gridLayoutParams.graphSize}</span>
+                  <span>50</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center text-sm">
+                  <input
+                    type="checkbox"
+                    checked={gridLayoutParams.isPeriodic}
+                    onChange={(e) => setGridLayoutParams({...gridLayoutParams, isPeriodic: e.target.checked})}
+                    className="mr-2"
+                  />
+                  Periodic Boundaries
+                </label>
+                <label className="flex items-center text-sm">
+                  <input
+                    type="checkbox"
+                    checked={gridLayoutParams.showEdgeWeights}
+                    onChange={(e) => setGridLayoutParams({...gridLayoutParams, showEdgeWeights: e.target.checked})}
+                    className="mr-2"
+                  />
+                  Show Edge Weights
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Particle Count */}
         <div>
           <label className="block text-sm font-medium mb-2">Particles:</label>
@@ -311,17 +536,40 @@ export default function RandomWalkSim() {
 
   const ParticleCanvas = () => (
     <div className="bg-white border rounded-lg p-4 h-full">
-      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">Particle Canvas</h3>
+      <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
+        {gridLayoutParams.simulationType === 'continuum' ? 'Particle Canvas' : 'Graph Visualization'}
+      </h3>
       <div className="h-full border rounded-lg relative overflow-hidden">
-        <Particles
-          id="randomWalkParticles"
-          options={getRandomWalkConfig(gridLayoutParams.particles)}
-          particlesLoaded={particlesLoaded}
-          className="w-full h-full"
-        />
-        <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-          Particles: {gridLayoutParams.particles} | Status: {simulationState.status}
-        </div>
+        {gridLayoutParams.simulationType === 'continuum' ? (
+          <>
+            <Particles
+              id="randomWalkParticles"
+              options={getRandomWalkConfig(gridLayoutParams.particles)}
+              particlesLoaded={particlesLoaded}
+              className="w-full h-full"
+            />
+            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+              Particles: {gridLayoutParams.particles} | Status: {simulationState.status}
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full relative" id="sigma-container">
+            <SigmaContainer 
+              style={{ height: "100%", width: "100%" }}
+              settings={{
+                renderLabels: true,
+                defaultNodeColor: "#3b82f6",
+                defaultEdgeColor: "#94a3b8",
+                labelSize: 12,
+                labelWeight: "bold"
+              }}>
+              <GraphVisualization />
+            </SigmaContainer>
+            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+              Graph: {gridLayoutParams.graphType} | Nodes: {graphPhysicsRef.current?.getAvailableNodes().length || 0}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
