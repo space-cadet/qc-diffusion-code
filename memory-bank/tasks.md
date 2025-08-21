@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 23:50:59 IST_
+_Last Updated: 2025-08-21 00:34:14 IST_
 
 ## Active Tasks
 
@@ -11,6 +11,7 @@ _Last Updated: 2025-08-20 23:50:59 IST_
 | C2  | VisualPDE GPU Solver Integration                      | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | C3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
 | C5  | Random Walk Derivation of Telegraph Equation         | 🔄 IN PROGRESS | HIGH     | 2025-08-20 | C1           |
+| C5a | Random Walk Architecture Planning                     | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5           |
 
 ## Task Details
 
@@ -33,6 +34,12 @@ _Last Updated: 2025-08-20 23:50:59 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-20 23:50:59 IST
 **Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `frontend/src/RandomWalkPage.tsx` (planned)
 **Notes**: New task to show stochastic origin of telegraph equation through discrete particle simulation
+
+### C5a: Random Walk Architecture Planning
+**Description**: Plan and design the architecture for random walk physics simulation with collision mechanisms
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 00:34:14 IST
+**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `memory-bank/tasks/C5a.md`
+**Notes**: Research completed on existing implementations - CTRW framework identified as optimal approach
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

@@ -1,19 +1,19 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-20 23:50:59 IST_
+_Last Updated: 2025-08-21 00:34:14 IST_
 
 ## Current Session
 
 **Started**: 2025-08-20 23:30:00 IST
-**Focus Task**: C5
+**Focus Task**: C5a
 **Session File**: `sessions/2025-08-20-night.md`
 
 ## Overview
 
-- Active: 4 | Paused: 0
+- Active: 5 | Paused: 0
 - Last Session: `sessions/2025-08-20-afternoon.md`
-- Current Period: night
+- Current Period: night (continuing past midnight)
 
 ## Task Registry
 
@@ -23,6 +23,7 @@ _Last Updated: 2025-08-20 23:50:59 IST_
 - C3: GPU AMR Integration - 🔄
 - C4: Fix Pause Button Functionality - ✅
 - C5: Random Walk Derivation - 🔄
+- C5a: Random Walk Architecture Planning - 🔄
 
 ## Active Tasks
 
@@ -64,12 +65,29 @@ _Last Updated: 2025-08-20 23:50:59 IST_
 **Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `frontend/src/RandomWalkPage.tsx` (planned)
 **Progress**:
 
-1. 🔄 Create implementation outline document
-2. ⬜ Design discrete random walk simulation
+1. ✅ Create implementation outline document
+2. 🔄 Design discrete random walk simulation (Architecture planning - C5a)
 3. ⬜ Implement particle-based random walk
 4. ⬜ Show convergence to telegraph equation
 5. ⬜ Add interactive parameter controls
 6. ⬜ Demonstrate stochastic-deterministic connection
+
+### C5a: Random Walk Architecture Planning
+
+**Status:** 🔄 **Priority:** HIGH
+**Started:** 2025-08-21 **Last**: 2025-08-21 00:34:14 IST
+**Context**: Research and design phase for random walk physics simulation architecture
+**Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `memory-bank/tasks/C5a.md`
+**Progress**:
+
+1. ✅ Research existing random walk implementations and collision mechanisms
+2. ✅ Analyze npm packages vs academic frameworks
+3. ✅ Define CTRW-based physics architecture  
+4. ✅ Create comparative analysis tables
+5. 🔄 Design TypeScript class structure for PhysicsRandomWalk
+6. ⬜ Plan integration strategy with tsParticles
+7. ⬜ Define parameter control interface
+8. ⬜ Create implementation roadmap with phases
 
 ### C2: VisualPDE GPU Solver Integration
 

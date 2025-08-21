@@ -6,6 +6,136 @@
 
 This document outlines the implementation steps for demonstrating how the telegraph equation emerges from discrete random walk processes in the appropriate continuum limits.
 
+## Component Architecture
+
+```mermaid
+graph TD
+    A[RandomWalkPage.tsx] --> B[RandomWalkSimulation.tsx]
+    A --> C[ParameterControls.tsx]
+    A --> D[DensityComparison.tsx]
+    
+    B --> E[ParticleRenderer.tsx]
+    B --> F[useRandomWalk.ts]
+    
+    F --> G[randomWalkSolver.ts]
+    F --> H[momentCalculations.ts]
+    
+    C --> I[Parameter State]
+    I --> F
+    
+    D --> J[Telegraph Solver from C1]
+    D --> K[Density Data from B]
+    
+    E --> L[Canvas/WebGL Rendering]
+    
+    G --> M[Particle System]
+    G --> N[Jump Dynamics]
+    G --> O[Collision Mechanism]
+    
+    H --> P[Density Field]
+    H --> Q[Moment Analysis]
+    H --> R[Convergence Metrics]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style F fill:#fff3e0
+    style G fill:#e8f5e8
+```
+
+## Random Walk Class Structure
+
+```mermaid
+classDiagram
+    class PhysicsRandomWalk {
+        -timeStep: number
+        -jumpLength: number
+        -collisionRate: number
+        -diffusionConstant: number
+        -velocity: number
+        -walkType: string
+        -rng: RandomGenerator
+        -collisionMechanism: CollisionMechanism
+        +constructor(params)
+        +generateStep(particle): Step
+        +updateParticle(particle): void
+        +calculateDensity(particles): DensityField
+        +getScalingLimits(): ScalingParams
+    }
+    
+    class CollisionMechanism {
+        -rate: number
+        -type: string
+        +shouldCollide(particle, dt): boolean
+        +handleCollision(particle): CollisionEvent
+        +calculateWaitTime(): number
+        +randomizeDirection(): number
+    }
+    
+    class CollisionEvent {
+        +occurred: boolean
+        +newDirection: number
+        +waitTime: number
+        +energyChange: number
+    }
+    
+    class Particle {
+        +id: number
+        +position: number
+        +velocity: number
+        +direction: number
+        +lastCollisionTime: number
+        +timeSinceCollision: number
+        +trajectory: number[]
+        +collisionHistory: CollisionEvent[]
+    }
+    
+    class Step {
+        +deltaX: number
+        +deltaV: number
+        +collision: CollisionEvent
+        +timestamp: number
+    }
+    
+    class DensityField {
+        +x: number[]
+        +rho: number[]
+        +u: number[]
+        +moments: Moments
+        +collisionRate: number[]
+    }
+    
+    class ScalingParams {
+        +tau: number
+        +a: number
+        +D: number
+        +v: number
+        +gamma: number
+    }
+    
+    class RandomWalkSimulator {
+        -physics: PhysicsRandomWalk
+        -particles: Particle[]
+        -time: number
+        +step(): void
+        +getDensity(): DensityField
+        +getMoments(): Moments
+        +getCollisionStats(): CollisionStats
+        +reset(): void
+    }
+    
+    PhysicsRandomWalk --> CollisionMechanism
+    PhysicsRandomWalk --> Step
+    PhysicsRandomWalk --> DensityField
+    PhysicsRandomWalk --> ScalingParams
+    CollisionMechanism --> CollisionEvent
+    RandomWalkSimulator --> PhysicsRandomWalk
+    RandomWalkSimulator --> Particle
+    Particle --> Step
+    Particle --> CollisionEvent
+    Step --> CollisionEvent
+    DensityField --> ScalingParams
+```
+
 ## Mathematical Background
 
 ### Random Walk Model
@@ -167,9 +297,125 @@ frontend/src/
 5. **Performance**: Smooth real-time simulation for N ≤ 10,000 particles
 6. **Integration**: Seamless integration with existing C1 telegraph equation solver
 
+## Existing Random Walk Implementations Analysis
+
+### Available npm Packages Evaluation
+
+| Package | Stars/Downloads | Physics Control | Collision Support | Telegraph Equation | Verdict |
+|---------|----------------|-----------------|-------------------|-------------------|---------|
+| `random-walk` | 5/week | ❌ Basic volatility only | ❌ | ❌ | Too basic |
+| `random` | 217 projects | ⚠️ Distribution control | ❌ | ❌ | General purpose |
+| `series-generator` | Low usage | ⚠️ Gaussian walks | ❌ | ❌ | Limited scope |
+| `random-js` | 314 projects | ✅ Full distribution control | ❌ | ❌ | Good foundation |
+
+**Conclusion**: No existing npm packages provide the physics parameters needed (collision rate, velocity, diffusion constant, telegraph equation support).
+
+### Academic Implementation Frameworks
+
+| Framework | Language | Physics Completeness | Collision Mechanism | Implementation Quality |
+|-----------|----------|---------------------|-------------------|----------------------|
+| **CTRW (Montroll-Weiss)** | Theory | ✅ Complete | ✅ Poisson process | ✅ Rigorous foundation |
+| **Kac's Monte Carlo** | Python | ✅ Telegraph equation | ✅ Collision dynamics | ✅ Validated implementation |
+| **celltrackR** | R | ✅ Biological walks | ✅ Turning events | ✅ Production ready |
+| **SiddharthP96/RandomWalks** | MATLAB | ⚠️ Various types | ⚠️ Limited collision | ⚠️ Educational |
+
+### Best Collision Mechanisms Found
+
+#### 1. Continuous Time Random Walk (CTRW) - MOST PROMISING
+
+**Mathematical Foundation (Montroll-Weiss 1965):**
+- **Waiting times**: τ ~ Exponential(λ) for telegraph equation
+- **Jump lengths**: Fixed step size δ
+- **Collision rate**: λ (Poisson process parameter)
+- **Velocity**: v = δ/⟨τ⟩
+- **Diffusion coefficient**: D = v²/(2λ)
+
+**Algorithm:**
+```
+1. Initialize: particle position, velocity, direction
+2. Sample waiting time: τ ~ Exponential(λ)
+3. Move: position += velocity * τ
+4. Collision event: randomize direction
+5. Repeat from step 2
+```
+
+#### 2. Telegraph Process (Royal Society Interface)
+
+**Key Features:**
+- Fixed velocity v between collisions
+- Collision rate λ (Poisson process)
+- Direction persistence until collision
+- Natural scaling to telegraph equation
+
+**Implementation Details:**
+- Probability of turning: r = λτ for time step τ
+- Direction change: ±1 with equal probability
+- Mean free path: ⟨distance⟩ = v/λ
+
+#### 3. Kac's Monte Carlo Method (Zhang et al. 2018)
+
+**Implementation**: `bolongz/MC_Telegraph_Equations` (Python)
+- Direct Monte Carlo simulation of telegraph equation
+- Particle-based approach with collision dynamics
+- Validated against analytical solutions
+- Multiple algorithms for different scenarios
+
+### Physics Parameter Comparison
+
+| Parameter | CTRW Framework | Telegraph Process | Kac's Method | Our Needs |
+|-----------|---------------|------------------|--------------|-----------|
+| Collision Rate (γ) | ✅ λ parameter | ✅ λ parameter | ✅ Built-in | ✅ Required |
+| Velocity (v) | ✅ δ/⟨τ⟩ | ✅ Fixed v | ✅ Implicit | ✅ Required |
+| Diffusion (D) | ✅ v²/(2λ) | ✅ v²/(2λ) | ✅ Derived | ✅ Required |
+| Jump Length (a) | ✅ δ parameter | ✅ δ parameter | ✅ Implicit | ✅ Required |
+| Time Step (τ) | ✅ Exponential(λ) | ✅ Fixed/random | ✅ Monte Carlo | ✅ Required |
+| Scaling Control | ✅ Full control | ✅ Full control | ⚠️ Limited | ✅ Required |
+
+### Recommended Implementation Strategy
+
+**Approach**: Build custom CTRW-based implementation using physics principles
+
+**Why not use existing packages:**
+1. **npm packages lack physics parameters**
+2. **Academic implementations are research-specific**
+3. **Need integration with React/tsParticles ecosystem**
+4. **Require real-time parameter control for education**
+
+**Implementation Plan:**
+```typescript
+class PhysicsRandomWalk {
+  // Core CTRW parameters
+  private collisionRate: number;    // λ (Poisson process rate)
+  private jumpLength: number;       // a (lattice spacing)
+  private velocity: number;         // v = a/⟨τ⟩
+  
+  // Derived parameters
+  private diffusionConstant: number; // D = v²/(2λ)
+  private meanWaitTime: number;      // ⟨τ⟩ = 1/λ
+  
+  // Collision mechanism (CTRW approach)
+  generateCollisionTime(): number {
+    return -Math.log(Math.random()) / this.collisionRate; // Exponential(λ)
+  }
+  
+  handleCollision(particle: Particle): void {
+    particle.direction *= -1; // or random ±1
+    particle.lastCollisionTime = currentTime;
+  }
+}
+```
+
+**Integration with tsParticles:**
+- Use tsParticles for rendering and visual effects
+- Custom physics layer for random walk simulation
+- Real-time parameter controls for educational exploration
+- Density calculation and telegraph equation comparison
+
 ## Future Extensions
 
 1. **2D random walks**: Extension to 2D lattices and anisotropic diffusion
 2. **Non-uniform collisions**: Spatially varying collision rates
 3. **Memory effects**: Non-Markovian random walks and fractional derivatives
 4. **Quantum connections**: Bridge to quantum mechanical diffusion processes
+5. **Advanced collision models**: Velocity-dependent collision rates, boundary effects
+6. **Anomalous diffusion**: Power-law waiting times and Lévy flights
