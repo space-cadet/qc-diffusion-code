@@ -8,8 +8,16 @@ export const setParticleManager = (manager: ParticleManager) => {
 };
 
 // Custom update function called from container
-export const updateParticlesWithCTRW = (container: any) => {
-  if (!particleManager || !container.particles) return;
+export const updateParticlesWithCTRW = (container: any, showAnimation: boolean = true) => {
+  if (!particleManager || !container.particles) {
+    console.log('⚠️ updateParticlesWithCTRW: Missing particleManager or container.particles');
+    return;
+  }
+  
+  if (!showAnimation) {
+    console.log('⏸️ updateParticlesWithCTRW: Animation disabled, skipping updates');
+    return;
+  }
 
   // Check different possible particle array properties
   const particles =
@@ -91,6 +99,7 @@ export const randomWalkParticlesConfig: ISourceOptions = {
 export const getRandomWalkConfig = (
   particleCount: number = 100
 ): ISourceOptions => {
+  console.log('⚙️ getRandomWalkConfig: Generating config for', particleCount, 'particles');
   return {
     ...randomWalkParticlesConfig,
     particles: {
@@ -98,6 +107,10 @@ export const getRandomWalkConfig = (
       number: {
         ...randomWalkParticlesConfig.particles?.number,
         value: particleCount,
+      },
+      move: {
+        ...randomWalkParticlesConfig.particles?.move,
+        enable: true, // Always enable movement, animation control handled in update loop
       },
     },
   };

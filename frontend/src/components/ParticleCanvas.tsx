@@ -152,6 +152,17 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
   particlesLoaded,
   graphPhysicsRef,
 }) => {
+  console.log('🏗️ ParticleCanvas: Component rendering/re-rendering');
+
+  // Memoize particle options to prevent reinitialization
+  const particleOptions = React.useMemo(() => {
+    console.log('🔧 ParticleCanvas: Creating new particle options with count:', gridLayoutParams.particles);
+    return getRandomWalkConfig(gridLayoutParams.particles);
+  }, [gridLayoutParams.particles]);
+
+  // Memoize the particlesLoaded callback to prevent Particles component remounting
+  const stableParticlesLoaded = React.useCallback(particlesLoaded, []);
+
   return (
     <div className="bg-white border rounded-lg p-4 h-full">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
@@ -164,11 +175,8 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
           <>
             <Particles
               id="randomWalkParticles"
-              options={getRandomWalkConfig(
-                gridLayoutParams.particles,
-                gridLayoutParams.showAnimation
-              )}
-              particlesLoaded={particlesLoaded}
+              options={particleOptions}
+              particlesLoaded={stableParticlesLoaded}
               className="w-full h-full"
             />
             <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">

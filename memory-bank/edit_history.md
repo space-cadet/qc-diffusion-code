@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 17:42:55 IST_
+_Last Updated: 2025-08-21 21:00:24 IST_
 
 ### 2025-08-21
+
+#### 21:00 - C5b: Animation Toggle Debugging
+
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Added console logging for component re-rendering, memoized particle options and particlesLoaded callback
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Added logging for animation state changes, updateParticlesWithCTRW function, and getRandomWalkConfig calls
+- Updated `frontend/src/RandomWalkSim.tsx` - Added comprehensive logging for state changes, simulation state updates, and particle container initialization
+- Created `frontend/src/types/simulationTypes.ts`
+- Created `frontend/src/types/spin-network.d.ts`
+- Updated `src/physics/PhysicsRandomWalk.ts`
+- Updated `src/stores/appStore.ts`
+- Updated `src/config/tsParticlesConfig.ts`
 
 #### 17:42 - C5b: Component Refactoring Implementation
 

@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-21 10:29:12 IST*
+*Last Updated: 2025-08-21 21:00:24 IST*
 
 ## Overview
 
@@ -375,8 +375,22 @@ The UI framework is complete with dual mode support for both continuum and graph
 - ✅ **Arbitrary Graph Support**: Integration with @spin-network/graph-core package
 - ✅ **Physics Framework Ready**: PhysicsRandomWalk class supports both simulation modes
 
+### Component Refactoring (2025-08-21 Evening Session)
+- ✅ **Component Extraction**: Separated ParticleCanvas, ParameterPanel, and other UI components
+- ✅ **Code Organization**: Reduced main file size by 20% through proper separation of concerns
+- ✅ **TypeScript Improvements**: Better interface definitions and type safety
+- 🔄 **Performance Issues Identified**: Animation toggle causes particle reinitialization instead of position freezing
+
+### Current Technical Issues (2025-08-21 Late Evening)
+- **Animation Toggle Bug**: showAnimation parameter causes complete tsParticles reinitialization
+- **Root Cause**: Component remounting due to prop changes beyond particle count
+- **Impact**: Particles reset positions instead of freezing when animation is disabled
+- **Status**: Partial fixes applied with memoization, requires deeper investigation
+
 ### Ready for Next Phase
-CTRW physics implementation with graph neighbor selection and collision mechanisms.
+1. Complete animation toggle fix for particle position preservation
+2. CTRW physics implementation with graph neighbor selection and collision mechanisms
+3. Performance optimization for parameter changes
 
 ## Success Criteria
 

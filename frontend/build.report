@@ -1,0 +1,13 @@
+
+> qc-diffusion-frontend@0.0.0 build /Volumes/Data/owncloud/root/research/articles/qc-diffusion/code/frontend
+> tsc -b && vite build
+
+src/RandomWalkSim.tsx(206,15): error TS2322: Type 'MutableRefObject<RandomWalkSimulator | null>' is not assignable to type 'RefObject<PhysicsRandomWalk>'.
+  Types of property 'current' are incompatible.
+    Type 'RandomWalkSimulator | null' is not assignable to type 'PhysicsRandomWalk | null'.
+      Type 'RandomWalkSimulator' is missing the following properties from type 'PhysicsRandomWalk': graph, simulationType, collisionRate, jumpLength, and 13 more.
+src/RandomWalkSim.tsx(231,15): error TS2322: Type 'MutableRefObject<RandomWalkSimulator | null>' is not assignable to type 'RefObject<PhysicsRandomWalk>'.
+  Types of property 'current' are incompatible.
+    Type 'RandomWalkSimulator | null' is not assignable to type 'PhysicsRandomWalk | null'.
+      Type 'RandomWalkSimulator' is missing the following properties from type 'PhysicsRandomWalk': graph, simulationType, collisionRate, jumpLength, and 13 more.
+ ELIFECYCLE  Command failed with exit code 2.

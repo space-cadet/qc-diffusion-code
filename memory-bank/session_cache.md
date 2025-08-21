@@ -1,13 +1,14 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 17:42:55 IST_
+_Last Updated: 2025-08-21 21:00:24 IST_
 
 ## Current Session
 
 **Started**: 2025-08-21 17:30:00 IST
 **Focus Task**: C5b
 **Session File**: `sessions/2025-08-21-evening.md`
+**Updated**: 2025-08-21 21:00:24 IST
 
 ## Overview
 
@@ -96,9 +97,9 @@ _Last Updated: 2025-08-21 17:42:55 IST_
 ### C5b: Random Walk UI Implementation
 
 **Status:** 🔄 **Priority:** HIGH  
-**Started:** 2025-08-21 **Last**: 2025-08-21 17:42:55 IST
-**Context**: REFACTORING - Component extraction completed, performance issues identified with ts-particles
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/types/simulation.ts`
+**Started:** 2025-08-21 **Last**: 2025-08-21 21:00:24 IST
+**Context**: DEBUGGING - Animation toggle causes particle reinitialization instead of position freezing
+**Files**: `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/RandomWalkSim.tsx`
 **Progress**:
 
 1. ✅ Create GridLayoutPage with react-grid-layout framework (renamed to RandomWalkSim)

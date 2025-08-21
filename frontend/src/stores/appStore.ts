@@ -12,6 +12,7 @@ interface GridLayoutParams {
   graphSize: number
   isPeriodic: boolean
   showEdgeWeights: boolean
+  showAnimation: boolean
 }
 
 interface AppState {
@@ -49,6 +50,7 @@ export const useAppStore = create<AppState>()(
         graphSize: 20,
         isPeriodic: false,
         showEdgeWeights: false,
+        showAnimation: true,
       },
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),

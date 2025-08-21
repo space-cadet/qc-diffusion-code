@@ -1,13 +1,13 @@
 # C5b: Random Walk UI Implementation
 *Created: 2025-08-21 07:52:44 IST*
-*Last Updated: 2025-08-21 17:42:55 IST*
+*Last Updated: 2025-08-21 21:00:24 IST*
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
-**Status**: 🔄 REFACTORING
+**Status**: 🔄 DEBUGGING
 **Priority**: HIGH
 **Started**: 2025-08-21 07:52:44 IST
-**Last Active**: 2025-08-21 17:42:55 IST
+**Last Active**: 2025-08-21 21:00:24 IST
 **Dependencies**: C5a
 
 ## Completion Criteria
@@ -82,11 +82,19 @@ This task implements the complete UI framework for the random walk simulation ba
 - 🔄 **Performance Issue**: ts-particles reinitializes on every parameter change (needs fix)
 - ✅ **File Size Reduction**: Main file reduced from 450+ lines to ~360 lines (20% smaller)
 
-**Current Issue**:
-- ts-particles system reinitializes whenever any parameter changes instead of only on particle count/reset
-- This causes performance degradation and visual disruption
+**Animation Toggle Issue (2025-08-21 Evening)**:
+- 🔄 **Issue Identified**: showAnimation toggle causes complete particle reinitialization instead of freezing positions
+- 🔄 **Root Cause**: Particles component remounting due to changing props rather than animation loop control
+- 🔄 **Partial Fix Applied**: Memoized particle options and callback to prevent unnecessary remounting
+- ⚠️ **Still Debugging**: Particle positions still reset on animation toggle - requires further investigation
+
+**Current Technical Debt**:
+- Animation toggle doesn't preserve particle positions as expected
+- ts-particles reinitialization on state changes needs complete resolution
+- Performance optimization needed for real-time parameter updates
 
 **Next Steps**:
-- Fix ts-particles reinitialization issue
+- Complete fix for animation toggle particle preservation
+- Optimize tsParticles integration to prevent unnecessary reinitializations
 - Continue component extraction for remaining large components
 - Add panel collapse/expand functionality for better workspace management

@@ -60,6 +60,21 @@ export default function RandomWalkSim() {
   // Graph physics reference
   const graphPhysicsRef = useRef<PhysicsRandomWalk | null>(null);
 
+  // Refs to track current values for animation loop
+  const simulationStateRef = useRef(simulationState);
+  const gridLayoutParamsRef = useRef(gridLayoutParams);
+
+  // Update refs when state changes
+  useEffect(() => {
+    console.log('🔄 SimulationState updated:', simulationState.status, 'isRunning:', simulationState.isRunning);
+    simulationStateRef.current = simulationState;
+  }, [simulationState]);
+
+  useEffect(() => {
+    console.log('🔄 GridLayoutParams updated - showAnimation:', gridLayoutParams.showAnimation, 'particles:', gridLayoutParams.particles);
+    gridLayoutParamsRef.current = gridLayoutParams;
+  }, [gridLayoutParams]);
+
   // Initialize physics simulator
   useEffect(() => {
     simulatorRef.current = new RandomWalkSimulator({
@@ -148,12 +163,14 @@ export default function RandomWalkSim() {
   const particlesLoaded = useCallback(
     async (container?: Container) => {
       if (container) {
+        console.log('🚀 particlesLoaded: Container initialized with', container.particles?.count || 0, 'particles');
         tsParticlesContainerRef.current = container;
 
         // Start CTRW physics updates
         const updateLoop = () => {
-          if (simulationState.isRunning && gridLayoutParams.showAnimation) {
-            updateParticlesWithCTRW(container, gridLayoutParams.showAnimation);
+          // Use current ref values instead of closure values
+          if (simulationStateRef.current.isRunning && gridLayoutParamsRef.current.showAnimation) {
+            updateParticlesWithCTRW(container, gridLayoutParamsRef.current.showAnimation);
             if (simulatorRef.current) {
               simulatorRef.current.step(0.016);
             }
@@ -162,7 +179,9 @@ export default function RandomWalkSim() {
         };
         requestAnimationFrame(updateLoop);
 
-        console.log("tsParticles container loaded with CTRW physics");
+        console.log("✅ tsParticles container loaded with CTRW physics");
+      } else {
+        console.log('❌ particlesLoaded: Container is undefined');
       }
     },
     []

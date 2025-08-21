@@ -1,6 +1,17 @@
-import type { Particle, CollisionEvent, Step, DensityField, ScalingParams } from './types';
+import type { Particle, CollisionEvent, Step, ScalingParams } from './types';
 import type { IGraph, IGraphNode } from '@spin-network/graph-core';
 import { lattice1D, lattice2D, path, complete } from '@spin-network/graph-core';
+
+export interface DensityField {
+  error: number;
+  effectiveDiffusion: number;
+  effectiveVelocity: number;
+  x: number[];
+  rho: number[];
+  u: number[];
+  moments: { mean: number, variance: number, skewness: number, kurtosis: number };
+  collisionRate: number[];
+}
 
 export class PhysicsRandomWalk {
   private graph: IGraph;
@@ -19,6 +30,7 @@ export class PhysicsRandomWalk {
     graphType?: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
     graphSize?: number | { width: number; height: number };
   }) {
+    this.graph = lattice1D(1); // Default empty graph
     this.collisionRate = params.collisionRate;
     this.jumpLength = params.jumpLength;
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
@@ -26,7 +38,6 @@ export class PhysicsRandomWalk {
     this.meanWaitTime = 1 / this.collisionRate;
     this.simulationType = params.simulationType || 'continuum';
     
-    // Initialize graph only for graph mode
     if (this.simulationType === 'graph') {
       this.graph = this.createGraph(params.graphType || 'lattice1D', params.graphSize || 10);
     }
@@ -76,6 +87,9 @@ export class PhysicsRandomWalk {
   calculateDensity(particles: Particle[]): DensityField {
     // TODO: Interface with DensityCalculator
     return {
+      error: 0,
+      effectiveDiffusion: 0,
+      effectiveVelocity: 0,
       x: [],
       rho: [],
       u: [],
@@ -162,5 +176,39 @@ export class PhysicsRandomWalk {
 
   getGraph(): IGraph {
     return this.graph;
+  }
+
+  updateParameters(params: {
+    collisionRate: number;
+    jumpLength: number;
+    velocity?: number;
+    simulationType?: 'continuum' | 'graph';
+    graphType?: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
+    graphSize?: number;
+    particleCount?: number;
+  }) {
+    this.collisionRate = params.collisionRate;
+    this.jumpLength = params.jumpLength;
+    this.velocity = params.velocity || params.jumpLength * params.collisionRate;
+    this.diffusionConstant = this.velocity * this.velocity / (2 * this.collisionRate);
+    this.meanWaitTime = 1 / this.collisionRate;
+    this.simulationType = params.simulationType || 'continuum';
+    
+    if (this.simulationType === 'graph') {
+      this.graph = this.createGraph(params.graphType || 'lattice1D', params.graphSize || 10);
+    }
+  }
+
+  reset() {
+    // Reset particles and graph state
+  }
+
+  step(dt: number) {
+    // Update particles and graph state by time step dt
+  }
+
+  getDensityField(): DensityField {
+    // Calculate and return density field
+    return {} as DensityField;
   }
 }
