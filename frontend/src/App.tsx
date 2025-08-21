@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Controls from "./Controls";
 import PlotComponent from "./PlotComponent";
+import RandomWalkPage from "./RandomWalkPage";
+import GridLayoutPage from "./GridLayoutPage";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import type {
@@ -11,6 +13,7 @@ import type {
 } from "./types";
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<'simulation' | 'randomwalk' | 'gridlayout'>('simulation');
   const [params, setParams] = useState<SimulationParams>({
     collision_rate: 1.0,
     velocity: 1.0,
@@ -147,31 +150,78 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen flex">
-      <div className="w-80">
-        <Controls
-          params={params}
-          onChange={setParams}
-        />
+    <div className="h-screen flex flex-col">
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="flex space-x-8 px-4">
+          <button
+            onClick={() => setActiveTab('simulation')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'simulation'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            PDE Simulation
+          </button>
+          <button
+            onClick={() => setActiveTab('randomwalk')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'randomwalk'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Random Walk
+          </button>
+          <button
+            onClick={() => setActiveTab('gridlayout')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'gridlayout'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Grid Layout
+          </button>
+        </nav>
       </div>
-      <div className="flex-1 relative">
-        <PlotComponent
-          frame={currentFrame}
-          isRunning={isRunning}
-          params={params}
-          onChange={setParams}
-          onStart={handleStart}
-          onStop={handleStop}
-          onPause={handlePause}
-          onReset={handleReset}
-        />
-        {isWebGL && (
-          <canvas
-            ref={canvasRef}
-            width={params.mesh_size}
-            height={1}
-            style={{ display: 'none' }}
-          />
+
+      {/* Content */}
+      <div className="flex-1">
+        {activeTab === 'simulation' ? (
+          <div className="h-full flex">
+            <div className="w-80">
+              <Controls
+                params={params}
+                onChange={setParams}
+              />
+            </div>
+            <div className="flex-1 relative">
+              <PlotComponent
+                frame={currentFrame}
+                isRunning={isRunning}
+                params={params}
+                onChange={setParams}
+                onStart={handleStart}
+                onStop={handleStop}
+                onPause={handlePause}
+                onReset={handleReset}
+              />
+              {isWebGL && (
+                <canvas
+                  ref={canvasRef}
+                  width={params.mesh_size}
+                  height={1}
+                  style={{ display: 'none' }}
+                />
+              )}
+            </div>
+          </div>
+        ) : activeTab === 'randomwalk' ? (
+          <RandomWalkPage />
+        ) : (
+          <GridLayoutPage />
         )}
       </div>
     </div>
