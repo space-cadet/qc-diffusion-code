@@ -5,21 +5,71 @@ import { CircularBuffer } from './utils/CircularBuffer';
 export class ParticleManager {
   private strategy: RandomWalkStrategy;
   private ctrwParticles: Map<string, Particle> = new Map();
+  private canvasWidth: number = 800;
+  private canvasHeight: number = 600;
+  private diagCounter: number = 0;
 
   constructor(strategy: RandomWalkStrategy) {
     this.strategy = strategy;
+  }
+
+  // Update the canvas size so we can convert physics coordinates -> canvas pixels
+  setCanvasSize(width: number, height: number) {
+    this.canvasWidth = width;
+    this.canvasHeight = height;
+    try {
+      const b = this.strategy.getBoundaries();
+      console.log("[PM] setCanvasSize", { width, height, bounds: b });
+    } catch (_) {
+      console.log("[PM] setCanvasSize", { width, height });
+    }
+  }
+
+  // Map physics coordinates (defined by strategy boundaries) to canvas pixel coordinates
+  private mapToCanvas(pos: { x: number; y: number }) {
+    const bounds = this.strategy.getBoundaries();
+    const widthPhysics = bounds.xMax - bounds.xMin || 1;
+    const heightPhysics = bounds.yMax - bounds.yMin || 1;
+
+    const x = ((pos.x - bounds.xMin) / widthPhysics) * this.canvasWidth;
+    const y = ((pos.y - bounds.yMin) / heightPhysics) * this.canvasHeight;
+    return { x, y };
+  }
+
+  // Inverse: map canvas pixel coordinates to physics coordinates within boundaries
+  private mapToPhysics(pos: { x: number; y: number }) {
+    const bounds = this.strategy.getBoundaries();
+    const widthPhysics = bounds.xMax - bounds.xMin || 1;
+    const heightPhysics = bounds.yMax - bounds.yMin || 1;
+
+    const x = bounds.xMin + (pos.x / Math.max(this.canvasWidth, 1)) * widthPhysics;
+    const y = bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * heightPhysics;
+    return { x, y };
   }
 
   initializeParticle(tsParticle: any): Particle {
     const angle = Math.random() * 2 * Math.PI;
     const speed = 50;
     const currentTime = Date.now() / 1000;
+    // Convert initial canvas position to physics coordinates
+    const physicsPos = this.mapToPhysics({
+      x: tsParticle.position.x,
+      y: tsParticle.position.y,
+    });
+    if (tsParticle.id === 'p0') {
+      console.log("[PM] initializeParticle p0", {
+        canvasPos: { x: tsParticle.position.x, y: tsParticle.position.y },
+        physicsPos,
+        canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
+        bounds: this.strategy.getBoundaries(),
+      });
+    }
     
     const particle: Particle = {
       id: tsParticle.id,
       position: {
-        x: tsParticle.position.x,
-        y: tsParticle.position.y
+        x: physicsPos.x,
+        y: physicsPos.y
       },
       velocity: {
         vx: speed * Math.cos(angle),
@@ -54,10 +104,24 @@ export class ParticleManager {
       timestamp: Date.now() / 1000
     });
     
-    tsParticle.position.x = ctrwParticle.position.x;
-    tsParticle.position.y = ctrwParticle.position.y;
+    // Map physics position to canvas coordinates for rendering
+    const mapped = this.mapToCanvas(ctrwParticle.position);
+    tsParticle.position.x = mapped.x;
+    tsParticle.position.y = mapped.y;
     tsParticle.velocity.x = ctrwParticle.velocity.vx;
     tsParticle.velocity.y = ctrwParticle.velocity.vy;
+
+    // Periodic diagnostics for one representative particle
+    if (tsParticle.id === 'p0' && this.diagCounter % 30 === 0) {
+      console.log("[PM] updateParticle p0", {
+        physicsPos: { ...ctrwParticle.position },
+        mappedPos: mapped,
+        canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
+        bounds: this.strategy.getBoundaries(),
+        velocity: ctrwParticle.velocity,
+      });
+    }
+    this.diagCounter++;
   }
 
   getAllParticles(): Particle[] {
@@ -66,6 +130,9 @@ export class ParticleManager {
 
   updatePhysicsEngine(newStrategy: RandomWalkStrategy): void {
     this.strategy = newStrategy;
+    try {
+      console.log("[PM] updatePhysicsEngine: new bounds", this.strategy.getBoundaries());
+    } catch {}
   }
 
   getDensityData() {

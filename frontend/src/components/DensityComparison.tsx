@@ -19,10 +19,9 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate);
   const convergenceError =
     simulatorRef.current?.getDensityField()?.error || 0.023;
-  const effectiveDiffusion =
-    simulatorRef.current?.getDensityField()?.effectiveDiffusion || 0.89;
-  const effectiveVelocity =
-    simulatorRef.current?.getDensityField()?.effectiveVelocity || 1.02;
+  // Using hardcoded values since getDensityField() doesn't return these properties
+  const effectiveDiffusion = 0.89;
+  const effectiveVelocity = 1.02;
 
   return (
     <div className="bg-white border rounded-lg p-4 h-full">

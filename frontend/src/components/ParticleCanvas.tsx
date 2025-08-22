@@ -43,6 +43,7 @@ interface ParticleCanvasProps {
   tsParticlesContainerRef: React.RefObject<Container>;
   particlesLoaded: (container: Container) => void;
   graphPhysicsRef: React.RefObject<PhysicsRandomWalk>;
+  boundaryRect?: { x: number; y: number; w: number; h: number };
 }
 
 // Graph visualization subcomponent
@@ -147,11 +148,13 @@ const ParticleCanvasComponent: React.FC<{
   simulationStatus: string;
   particlesLoaded: (container: Container) => void;
   tsParticlesContainerRef: React.RefObject<Container>;
+  boundaryRect?: { x: number; y: number; w: number; h: number };
 }> = ({
   gridLayoutParams,
   simulationStatus,
   particlesLoaded,
   tsParticlesContainerRef,
+  boundaryRect,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isEngineReady, setIsEngineReady] = useState(false);
@@ -295,6 +298,20 @@ const ParticleCanvasComponent: React.FC<{
         className="w-full h-full"
         style={{ display: isEngineReady ? "block" : "none" }}
       />
+      {boundaryRect && (
+        <div
+          style={{
+            position: "absolute",
+            left: boundaryRect.x,
+            top: boundaryRect.y,
+            width: boundaryRect.w,
+            height: boundaryRect.h,
+            border: "2px dashed #f59e0b",
+            pointerEvents: "none",
+            boxSizing: "border-box",
+          }}
+        />
+      )}
       {!isEngineReady && (
         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
           <p className="text-gray-500">Initializing particle engine...</p>
@@ -313,6 +330,7 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
   tsParticlesContainerRef,
   particlesLoaded,
   graphPhysicsRef,
+  boundaryRect,
 }) => {
   console.log("ParticleCanvas: Component rendering/re-rendering");
 
@@ -330,6 +348,7 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
             simulationStatus={simulationStatus}
             particlesLoaded={particlesLoaded}
             tsParticlesContainerRef={tsParticlesContainerRef}
+            boundaryRect={boundaryRect}
           />
         ) : (
           <div className="w-full h-full relative min-h-0" id="sigma-container">

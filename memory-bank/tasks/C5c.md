@@ -1,13 +1,13 @@
 # C5c: Random Walk Physics Implementation
 *Created: 2025-08-21 08:36:41 IST*
-*Last Updated: 2025-08-22 19:20:42 IST*
+*Last Updated: 2025-08-22 21:11:18 IST*
 
 **Description**: Implement CTRW (Continuous Time Random Walk) physics engine with collision mechanisms, particle simulation, and real-time telegraph equation convergence demonstration
 
 **Status**: 🔄 IN PROGRESS
 **Priority**: HIGH
 **Started**: 2025-08-21 08:36:41 IST
-**Last Active**: 2025-08-22 19:20:42 IST
+**Last Active**: 2025-08-22 21:11:18 IST
 **Dependencies**: C5a, C5b
 
 ## Completion Criteria
@@ -27,7 +27,7 @@
 - ✅ Add comprehensive testing framework with Jest
 - ✅ Add strategy selection and boundary condition UI controls
 - ✅ Implement strategy-agnostic boundary condition system
-- 🔄 Fix coordinate system alignment for boundary conditions
+- ✅ Fix coordinate system alignment for boundary conditions
 - ⬜ Implement simulation history recording and replay functionality
 - ⬜ Add data export for density profiles and particle trajectories
 - ⬜ Demonstrate convergence to telegraph equation in appropriate limits
@@ -60,7 +60,7 @@
 14. ✅ Add strategy selection UI controls (CTRW, Simple, Lévy, Fractional)
 15. ✅ Add boundary condition UI controls (Periodic, Reflective, Absorbing)
 16. ✅ Implement strategy-agnostic boundary condition architecture
-17. 🔄 Fix coordinate system alignment between physics space and canvas rendering
+17. ✅ Fix coordinate system alignment between physics space and canvas rendering - GPT5 implementation
 18. 🔄 Implement density profile calculation and telegraph comparison
 19. ⬜ Add simulation history and replay functionality
 16. ⬜ Implement data export for scientific analysis
@@ -68,6 +68,13 @@
 
 ## Context
 This task implements the actual physics simulation engine for random walk demonstration, building on the architecture planning from C5a and UI framework from C5b. The goal is to create an educational tool showing how discrete particle collisions converge to the macroscopic telegraph equation.
+
+**Coordinate System Alignment Fix (GPT5 Implementation)**:
+- Added coordinate transformation functions mapToCanvas() and mapToPhysics() in ParticleManager
+- Physics calculations stay in physics space (-200 to +200), particles render in mapped canvas coordinates
+- Canvas size propagation to ParticleManager via setCanvasSize() method
+- Boundary visualization overlay with dashed orange border showing physics boundaries
+- Proper scaling and translation between physics space and canvas pixel coordinates
 
 **Physics Implementation Requirements**:
 - CTRW framework with collision rate λ and jump length a

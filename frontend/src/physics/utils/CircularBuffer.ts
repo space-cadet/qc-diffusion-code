@@ -4,7 +4,10 @@ export class CircularBuffer<T> {
   private tail: number = 0;
   private size: number = 0;
 
-  constructor(private capacity: number) {
+  private capacity: number;
+  
+  constructor(capacity: number) {
+    this.capacity = capacity;
     this.buffer = new Array<T>(capacity);
   }
 

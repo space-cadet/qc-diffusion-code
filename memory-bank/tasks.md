@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-22 19:20:42 IST_
+_Last Updated: 2025-08-22 21:11:18 IST_
 
 ## Active Tasks
 
@@ -53,9 +53,9 @@ _Last Updated: 2025-08-22 19:20:42 IST_
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-22 19:20:42 IST
-**Files**: `frontend/src/physics/strategies/CTRWStrategy.ts`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/utils/boundaryUtils.ts`
-**Notes**: Strategy-agnostic boundary conditions implemented - UI controls added for strategy selection and boundary types, coordinate system alignment needs fixing
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-22 21:11:18 IST
+**Files**: `frontend/src/physics/ParticleManager.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ParticleCanvas.tsx`
+**Notes**: Coordinate system alignment completed by GPT5 - physics space to canvas mapping with boundary visualization
 
 ### C6: Random Walk Physics Engine Redesign
 **Description**: Redesign physics engine to fix state persistence issues during parameter updates

@@ -30,6 +30,7 @@ export default function RandomWalkSim() {
   // Physics simulation ref
   const simulatorRef = useRef<RandomWalkSimulator | null>(null);
   const tsParticlesContainerRef = useRef<any>(null);
+  const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
   // Keep layout and runtime state local (non-persistent)
   const [layouts, setLayouts] = useState<Layout[]>([
@@ -83,6 +84,34 @@ export default function RandomWalkSim() {
     // Connect particle manager to tsParticles
     if (simulatorRef.current) {
       setParticleManager(simulatorRef.current.getParticleManager());
+      // If a container already exists, propagate canvas size and update overlay rect
+      if (tsParticlesContainerRef.current) {
+        const container = tsParticlesContainerRef.current;
+        const pm = simulatorRef.current.getParticleManager();
+        const w = container.canvas.size.width;
+        const h = container.canvas.size.height;
+        (pm as any).setCanvasSize?.(w, h);
+        const bounds = (pm as any).getBoundaries?.();
+        if (bounds) {
+          const widthPhysics = Math.max(bounds.xMax - bounds.xMin, 1);
+          const heightPhysics = Math.max(bounds.yMax - bounds.yMin, 1);
+          const x = ((bounds.xMin - bounds.xMin) / widthPhysics) * w;
+          const y = ((bounds.yMin - bounds.yMin) / heightPhysics) * h;
+          const rectW = (widthPhysics / widthPhysics) * w;
+          const rectH = (heightPhysics / heightPhysics) * h;
+          setBoundaryRect({ x, y, w: rectW, h: rectH });
+          console.log("[RWS] simulator init", {
+            canvas: { w, h },
+            params: {
+              particles: gridLayoutParams.particles,
+              strategy: gridLayoutParams.strategy,
+              boundaryCondition: gridLayoutParams.boundaryCondition,
+            },
+            bounds,
+            overlay: { x, y, w: rectW, h: rectH },
+          });
+        }
+      }
     }
 
     // Initialize graph physics when in graph mode
@@ -203,6 +232,10 @@ export default function RandomWalkSim() {
       // Re-connect particle manager
       setParticleManager(simulatorRef.current.getParticleManager());
 
+      // Ensure ParticleManager uses the current canvas size for mapping
+      const pm = simulatorRef.current.getParticleManager();
+      (pm as any).setCanvasSize?.(canvasWidth, canvasHeight);
+
       // Clear existing particles
       const beforeClear = container.particles.count;
       container.particles.clear();
@@ -213,48 +246,21 @@ export default function RandomWalkSim() {
         afterClear,
       });
 
-      // Get physics particles after reset
-      const physicsParticles = simulatorRef.current
-        .getParticleManager()
-        .getAllParticles();
-
-      console.log("handleInitialize: physics particles", {
-        count: physicsParticles.length,
-        firstParticle: physicsParticles[0]
-          ? {
-              id: physicsParticles[0].id,
-              x: physicsParticles[0].position.x,
-              y: physicsParticles[0].position.y,
-            }
-          : null,
-      });
-
-      // Add particles with physics positions
-      physicsParticles.forEach((physicsParticle, index) => {
-        // Convert physics space (-200,200) to canvas space
-        const x = (physicsParticle.position.x + 200) * (canvasWidth / 400);
-        const y = (physicsParticle.position.y + 200) * (canvasHeight / 400);
-
-        if (index < 3) {
-          console.log(`handleInitialize: adding particle ${index}`, {
-            physicsX: physicsParticle.position.x,
-            physicsY: physicsParticle.position.y,
-            canvasX: x,
-            canvasY: y,
-          });
+      // Seed tsParticles directly in canvas space; ParticleManager will map to physics on init
+      const targetCount = gridLayoutParams.particles;
+      for (let i = 0; i < targetCount; i++) {
+        const x = Math.random() * canvasWidth;
+        const y = Math.random() * canvasHeight;
+        if (i < 3) {
+          console.log(`handleInitialize: adding particle ${i}`, { x, y });
         }
-
-        container.particles.addParticle({
-          x,
-          y,
-          color: "#3b82f6",
-        });
-      });
+        container.particles.addParticle({ x, y, color: "#3b82f6" });
+      }
 
       const finalCount = container.particles.count;
       console.log("handleInitialize: after adding", {
         finalCount,
-        expectedCount: physicsParticles.length,
+        expectedCount: targetCount,
       });
 
       // Trigger a redraw without reloading options (avoid refresh which clears manual particles)
@@ -264,7 +270,7 @@ export default function RandomWalkSim() {
       const afterRedraw = container.particles.count;
       console.log("handleInitialize: AFTER REDRAW count", { afterRedraw });
 
-      console.log(`Initialized ${physicsParticles.length} particles`);
+      console.log(`Initialized ${gridLayoutParams.particles} particles`);
     } else {
       console.log("handleInitialize: FAILED - missing refs", {
         hasSimulator: !!simulatorRef.current,
@@ -301,6 +307,29 @@ export default function RandomWalkSim() {
     // Connect particle manager on container load
     if (simulatorRef.current) {
       setParticleManager(simulatorRef.current.getParticleManager());
+      // Provide canvas size to particle manager for coordinate mapping
+      const pm = simulatorRef.current.getParticleManager();
+      const w = container.canvas.size.width;
+      const h = container.canvas.size.height;
+      // setCanvasSize is optional-safe in case of older builds
+      (pm as any).setCanvasSize?.(w, h);
+
+      // Compute boundary rectangle in canvas pixels from physics bounds
+      const bounds = (pm as any).getBoundaries?.();
+      if (bounds) {
+        const widthPhysics = Math.max(bounds.xMax - bounds.xMin, 1);
+        const heightPhysics = Math.max(bounds.yMax - bounds.yMin, 1);
+        const x = ((bounds.xMin - bounds.xMin) / widthPhysics) * w; // typically 0
+        const y = ((bounds.yMin - bounds.yMin) / heightPhysics) * h; // typically 0
+        const rectW = (widthPhysics / widthPhysics) * w; // typically w
+        const rectH = (heightPhysics / heightPhysics) * h; // typically h
+        setBoundaryRect({ x, y, w: rectW, h: rectH });
+        console.log("[RWS] particlesLoaded", {
+          canvas: { w, h },
+          bounds,
+          overlay: { x, y, w: rectW, h: rectH },
+        });
+      }
     }
 
     // Start CTRW physics updates
@@ -378,6 +407,7 @@ export default function RandomWalkSim() {
               tsParticlesContainerRef={tsParticlesContainerRef}
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
+              boundaryRect={boundaryRect || undefined}
             />
           </div>
 

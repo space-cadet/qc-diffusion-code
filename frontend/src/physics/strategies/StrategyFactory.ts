@@ -1,4 +1,4 @@
-import { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import { CTRWStrategy } from './CTRWStrategy';
 
 export type StrategyType = 'CTRW' | 'Brownian';

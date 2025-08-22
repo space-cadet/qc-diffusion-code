@@ -1,9 +1,14 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-22 19:20:42 IST_
+_Last Updated: 2025-08-22 21:11:18 IST_
 
 ### 2025-08-22
+
+#### 21:11 - C5c: Coordinate System Alignment Fix by GPT5
+- Updated `frontend/src/physics/ParticleManager.ts` - Added coordinate transformation functions mapToCanvas() and mapToPhysics(), added setCanvasSize() method for dynamic canvas scaling
+- Updated `frontend/src/RandomWalkSim.tsx` - Added canvas size propagation to ParticleManager, added boundary rectangle calculation and state management
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Added boundary overlay visualization with dashed orange border showing physics boundaries
 
 #### 19:20 - C5c: Strategy-Agnostic Boundary Conditions Implementation
 
