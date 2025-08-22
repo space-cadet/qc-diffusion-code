@@ -1,10 +1,23 @@
+import { CircularBuffer } from '../utils/CircularBuffer';
+
+export interface TrajectoryPoint {
+  position: { x: number; y: number };
+  timestamp: number;
+}
+
 export interface Particle {
-  id: number;
-  position: number;
-  velocity: number;
-  direction: number;
+  id: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: {
+    vx: number;
+    vy: number;
+  };
   lastCollisionTime: number;
-  timeSinceCollision: number;
-  trajectory: number[];
-  collisionHistory: any[]; // Avoid circular import
+  nextCollisionTime: number;
+  collisionCount: number;
+  trajectory: CircularBuffer<TrajectoryPoint>;
+  isActive: boolean;
 }

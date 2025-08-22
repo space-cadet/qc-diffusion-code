@@ -10,12 +10,12 @@ export const setParticleManager = (manager: ParticleManager) => {
 // Custom update function called from container
 export const updateParticlesWithCTRW = (container: any, showAnimation: boolean = true) => {
   if (!particleManager || !container.particles) {
-    console.log('⚠️ updateParticlesWithCTRW: Missing particleManager or container.particles');
+    console.log('updateParticlesWithCTRW: Missing particleManager or container.particles');
     return;
   }
   
   if (!showAnimation) {
-    console.log('⏸️ updateParticlesWithCTRW: Animation disabled, skipping updates');
+    console.log('updateParticlesWithCTRW: Animation disabled, skipping updates');
     return;
   }
 
@@ -62,13 +62,13 @@ export const randomWalkParticlesConfig: ISourceOptions = {
       enable: false,
     },
     move: {
-      enable: true,
+      enable: false,
       direction: "none",
       outModes: {
         default: "bounce",
       },
-      speed: 0, // Will be overridden by CTRW physics
-      straight: true,
+      speed: 0,
+      straight: false,
     },
     number: {
       density: {
@@ -99,7 +99,7 @@ export const randomWalkParticlesConfig: ISourceOptions = {
 export const getRandomWalkConfig = (
   particleCount: number = 100
 ): ISourceOptions => {
-  console.log('⚙️ getRandomWalkConfig: Generating config for', particleCount, 'particles');
+  console.log('getRandomWalkConfig: Generating config for', particleCount, 'particles');
   return {
     ...randomWalkParticlesConfig,
     particles: {
@@ -110,7 +110,7 @@ export const getRandomWalkConfig = (
       },
       move: {
         ...randomWalkParticlesConfig.particles?.move,
-        enable: true, // Always enable movement, animation control handled in update loop
+        enable: false, // Disable default movement - only CTRW physics controls particles
       },
     },
   };

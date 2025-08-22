@@ -43,7 +43,7 @@ interface SimulationState {
 
 interface ParticleCanvasProps {
   gridLayoutParams: GridLayoutParams;
-  simulationState: SimulationState;
+  simulationStatus: string;
   tsParticlesContainerRef: React.RefObject<Container>;
   particlesLoaded: (container?: Container) => Promise<void>;
   graphPhysicsRef: React.RefObject<PhysicsRandomWalk>;
@@ -147,20 +147,25 @@ const GraphVisualization: React.FC<{
 
 export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
   gridLayoutParams,
-  simulationState,
+  simulationStatus,
   tsParticlesContainerRef,
   particlesLoaded,
   graphPhysicsRef,
 }) => {
-  console.log('🏗️ ParticleCanvas: Component rendering/re-rendering');
+  console.log('ParticleCanvas: Component rendering/re-rendering');
+
+  // Extract only the props that should cause particle re-initialization
+  const particleKey = React.useMemo(() => {
+    return `${gridLayoutParams.particles}-${gridLayoutParams.simulationType}`;
+  }, [gridLayoutParams.particles, gridLayoutParams.simulationType]);
 
   // Memoize particle options to prevent reinitialization
   const particleOptions = React.useMemo(() => {
-    console.log('🔧 ParticleCanvas: Creating new particle options with count:', gridLayoutParams.particles);
+    console.log('ParticleCanvas: Creating new particle options with count:', gridLayoutParams.particles);
     return getRandomWalkConfig(gridLayoutParams.particles);
   }, [gridLayoutParams.particles]);
 
-  // Memoize the particlesLoaded callback to prevent Particles component remounting
+  // Memoize the particlesLoaded callback - keep it stable to prevent particle re-initialization
   const stableParticlesLoaded = React.useCallback(particlesLoaded, []);
 
   return (
@@ -174,6 +179,7 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
         {gridLayoutParams.simulationType === "continuum" ? (
           <>
             <Particles
+              key={particleKey}
               id="randomWalkParticles"
               options={particleOptions}
               particlesLoaded={stableParticlesLoaded}
@@ -181,19 +187,20 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
             />
             <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
               Particles: {gridLayoutParams.particles} | Status:{" "}
-              {simulationState.status}
+              {simulationStatus}
             </div>
           </>
         ) : (
-          <div className="w-full h-full relative" id="sigma-container">
+          <div className="w-full h-full relative min-h-0" id="sigma-container">
             <SigmaContainer
-              style={{ height: "100%", width: "100%" }}
+              style={{ height: "100%", width: "100%", minHeight: "200px" }}
               settings={{
                 renderLabels: true,
                 defaultNodeColor: "#3b82f6",
                 defaultEdgeColor: "#94a3b8",
                 labelSize: 12,
                 labelWeight: "bold",
+                allowInvalidContainer: true,
               }}
             >
               <GraphVisualization

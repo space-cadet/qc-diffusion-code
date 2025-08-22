@@ -1,12 +1,13 @@
-import type { Particle } from '../physics/types';
-import type { PhysicsRandomWalk } from '../physics/PhysicsRandomWalk';
+import type { Particle, TrajectoryPoint } from './types/Particle';
+import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
+import { CircularBuffer } from './utils/CircularBuffer';
 
 export class ParticleManager {
-  private physicsEngine: PhysicsRandomWalk;
+  private strategy: RandomWalkStrategy;
   private ctrwParticles: Map<string, Particle> = new Map();
 
-  constructor(physicsEngine: PhysicsRandomWalk) {
-    this.physicsEngine = physicsEngine;
+  constructor(strategy: RandomWalkStrategy) {
+    this.strategy = strategy;
   }
 
   initializeParticle(tsParticle: any): Particle {
@@ -27,7 +28,7 @@ export class ParticleManager {
       lastCollisionTime: currentTime,
       nextCollisionTime: currentTime + Math.random() * 0.5,
       collisionCount: 0,
-      trajectory: [],
+      trajectory: new CircularBuffer<TrajectoryPoint>(100),
       isActive: true
     };
     
@@ -45,7 +46,13 @@ export class ParticleManager {
       ctrwParticle = this.initializeParticle(tsParticle);
     }
 
-    this.physicsEngine.updateParticle(ctrwParticle);
+    this.strategy.updateParticle(ctrwParticle);
+    
+    // Update trajectory
+    ctrwParticle.trajectory.push({
+      position: { x: ctrwParticle.position.x, y: ctrwParticle.position.y },
+      timestamp: Date.now() / 1000
+    });
     
     tsParticle.position.x = ctrwParticle.position.x;
     tsParticle.position.y = ctrwParticle.position.y;
@@ -57,13 +64,21 @@ export class ParticleManager {
     return Array.from(this.ctrwParticles.values());
   }
 
-  updatePhysicsEngine(newEngine: PhysicsRandomWalk): void {
-    this.physicsEngine = newEngine;
+  updatePhysicsEngine(newStrategy: RandomWalkStrategy): void {
+    this.strategy = newStrategy;
   }
 
   getDensityData() {
-    const particles = this.getAllParticles();
-    return this.physicsEngine.calculateDensity(particles);
+    return {
+      error: 0,
+      effectiveDiffusion: 0,
+      effectiveVelocity: 0,
+      x: [],
+      rho: [],
+      u: [],
+      moments: { mean: 0, variance: 0, skewness: 0, kurtosis: 0 },
+      collisionRate: []
+    };
   }
 
   getCollisionStats() {

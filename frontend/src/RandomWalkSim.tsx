@@ -21,6 +21,7 @@ import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import {
   getRandomWalkConfig,
   updateParticlesWithCTRW,
+  setParticleManager,
 } from "./config/tsParticlesConfig";
 import type { SimulationState } from "./types/simulation";
 
@@ -29,8 +30,6 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
 const ReactGridLayout = WidthProvider(RGL);
-
-
 
 export default function RandomWalkSim() {
   // Get parameters from Zustand store (persistent)
@@ -66,12 +65,10 @@ export default function RandomWalkSim() {
 
   // Update refs when state changes
   useEffect(() => {
-    console.log('🔄 SimulationState updated:', simulationState.status, 'isRunning:', simulationState.isRunning);
     simulationStateRef.current = simulationState;
   }, [simulationState]);
 
   useEffect(() => {
-    console.log('🔄 GridLayoutParams updated - showAnimation:', gridLayoutParams.showAnimation, 'particles:', gridLayoutParams.particles);
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
 
@@ -83,6 +80,11 @@ export default function RandomWalkSim() {
       velocity: gridLayoutParams.velocity,
       particleCount: gridLayoutParams.particles,
     });
+
+    // Connect particle manager to tsParticles
+    if (simulatorRef.current) {
+      setParticleManager(simulatorRef.current.getParticleManager());
+    }
 
     // Initialize graph physics when in graph mode
     if (gridLayoutParams.simulationType === "graph") {
@@ -101,8 +103,6 @@ export default function RandomWalkSim() {
     gridLayoutParams.graphSize,
   ]);
 
-
-
   // Update physics parameters when store changes
   useEffect(() => {
     if (simulatorRef.current) {
@@ -115,6 +115,9 @@ export default function RandomWalkSim() {
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles
       });
+      
+      // Re-connect particle manager after parameter updates
+      setParticleManager(simulatorRef.current.getParticleManager());
     }
   }, [gridLayoutParams]);
 
@@ -140,7 +143,7 @@ export default function RandomWalkSim() {
 
   const handleReset = () => {
     if (simulatorRef.current) {
-      simulatorRef.current.reset(); // Only reset time counter
+      simulatorRef.current.reset();
     }
     setSimulationState({
       isRunning: false,
@@ -163,35 +166,31 @@ export default function RandomWalkSim() {
   const particlesLoaded = useCallback(
     async (container?: Container) => {
       if (container) {
-        console.log('🚀 particlesLoaded: Container initialized with', container.particles?.count || 0, 'particles');
         tsParticlesContainerRef.current = container;
+
+        // Connect particle manager on container load
+        if (simulatorRef.current) {
+          setParticleManager(simulatorRef.current.getParticleManager());
+        }
 
         // Start CTRW physics updates
         const updateLoop = () => {
-          // Use current ref values instead of closure values
-          if (simulationStateRef.current.isRunning && gridLayoutParamsRef.current.showAnimation) {
+          // Always update particle display positions when animation is enabled
+          if (gridLayoutParamsRef.current.showAnimation) {
             updateParticlesWithCTRW(container, gridLayoutParamsRef.current.showAnimation);
-            if (simulatorRef.current) {
+            
+            // Only advance physics simulation time when running
+            if (simulationStateRef.current.isRunning && simulatorRef.current) {
               simulatorRef.current.step(0.016);
             }
           }
           requestAnimationFrame(updateLoop);
         };
         requestAnimationFrame(updateLoop);
-
-        console.log("✅ tsParticles container loaded with CTRW physics");
-      } else {
-        console.log('❌ particlesLoaded: Container is undefined');
       }
     },
     []
   );
-
-
-
-
-
-
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -236,7 +235,7 @@ export default function RandomWalkSim() {
           <div key="canvas">
             <ParticleCanvas
               gridLayoutParams={gridLayoutParams}
-              simulationState={simulationState}
+              simulationStatus={simulationState.status}
               tsParticlesContainerRef={tsParticlesContainerRef}
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
