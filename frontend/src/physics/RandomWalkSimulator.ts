@@ -31,10 +31,17 @@ export class RandomWalkSimulator {
   }
 
   private initializeParticles(): void {
+    // Clear existing particles
+    this.particleManager.clearAllParticles();
+    
+    // Create new particles with random positions
     for (let i = 0; i < this.particleCount; i++) {
       const tsParticle = {
         id: `p${i}`,
-        position: { x: 0, y: 0 },
+        position: { 
+          x: (Math.random() - 0.5) * 400, // Random position in -200 to 200 range
+          y: (Math.random() - 0.5) * 400 
+        },
         velocity: { x: 0, y: 0 }
       };
       this.particleManager.initializeParticle(tsParticle);
@@ -67,6 +74,12 @@ export class RandomWalkSimulator {
     
     this.strategy = newStrategy;
     this.particleManager.updatePhysicsEngine(newStrategy);
+    
+    // Update particle count if changed
+    if (this.particleCount !== params.particleCount) {
+      this.particleCount = params.particleCount;
+      this.initializeParticles(); // Re-initialize with new count
+    }
   }
 
   getDensityField() {

@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
@@ -110,9 +105,9 @@ export default function RandomWalkSim() {
         simulationType: gridLayoutParams.simulationType,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
-        particleCount: gridLayoutParams.particles
+        particleCount: gridLayoutParams.particles,
       });
-      
+
       // Re-connect particle manager after parameter updates
       setParticleManager(simulatorRef.current.getParticleManager());
     }
@@ -150,40 +145,177 @@ export default function RandomWalkSim() {
     });
   };
 
+  const handleInitialize = () => {
+    console.log("handleInitialize: START");
 
+    // Stop any running simulation
+    setSimulationState((prev) => ({
+      ...prev,
+      isRunning: false,
+      status: "Initialized",
+    }));
 
-  const particlesLoaded = useCallback(
-    (container: Container) => {
-      console.log('particlesLoaded: container check passed', {
-        hasSimulator: !!simulatorRef.current,
-        particleManager: simulatorRef.current?.getParticleManager(),
-        containerParticles: !!container.particles
+    console.log("handleInitialize: checking refs", {
+      hasSimulator: !!simulatorRef.current,
+      hasContainer: !!tsParticlesContainerRef.current,
+    });
+
+    // Reinitialize the physics simulator with current parameters
+    if (simulatorRef.current && tsParticlesContainerRef.current) {
+      const container = tsParticlesContainerRef.current;
+      const canvasWidth = container.canvas.size.width;
+      const canvasHeight = container.canvas.size.height;
+
+      console.log("handleInitialize: container info", {
+        canvasWidth,
+        canvasHeight,
+        containerType: typeof container,
+        particlesAPI: !!container.particles,
       });
-      
-      tsParticlesContainerRef.current = container;
 
-      // Connect particle manager on container load
+      // Update physics parameters
+      simulatorRef.current.updateParameters({
+        collisionRate: gridLayoutParams.collisionRate,
+        jumpLength: gridLayoutParams.jumpLength,
+        velocity: gridLayoutParams.velocity,
+        particleCount: gridLayoutParams.particles,
+        simulationType: gridLayoutParams.simulationType,
+        graphType: gridLayoutParams.graphType,
+        graphSize: gridLayoutParams.graphSize,
+      });
+
+      // Reset physics state
+      simulatorRef.current.reset();
+
+      // Re-connect particle manager
+      setParticleManager(simulatorRef.current.getParticleManager());
+
+      // Clear existing particles
+      const beforeClear = container.particles.count;
+      container.particles.clear();
+      const afterClear = container.particles.count;
+
+      console.log("handleInitialize: particle clear", {
+        beforeClear,
+        afterClear,
+      });
+
+      // Get physics particles after reset
+      const physicsParticles = simulatorRef.current
+        .getParticleManager()
+        .getAllParticles();
+
+      console.log("handleInitialize: physics particles", {
+        count: physicsParticles.length,
+        firstParticle: physicsParticles[0]
+          ? {
+              id: physicsParticles[0].id,
+              x: physicsParticles[0].position.x,
+              y: physicsParticles[0].position.y,
+            }
+          : null,
+      });
+
+      // Add particles with physics positions
+      physicsParticles.forEach((physicsParticle, index) => {
+        // Convert physics space (-200,200) to canvas space
+        const x = (physicsParticle.position.x + 200) * (canvasWidth / 400);
+        const y = (physicsParticle.position.y + 200) * (canvasHeight / 400);
+
+        if (index < 3) {
+          console.log(`handleInitialize: adding particle ${index}`, {
+            physicsX: physicsParticle.position.x,
+            physicsY: physicsParticle.position.y,
+            canvasX: x,
+            canvasY: y,
+          });
+        }
+
+        container.particles.addParticle({
+          x,
+          y,
+          color: "#3b82f6",
+        });
+      });
+
+      const finalCount = container.particles.count;
+      console.log("handleInitialize: after adding", {
+        finalCount,
+        expectedCount: physicsParticles.length,
+      });
+
+      // Trigger a redraw without reloading options (avoid refresh which clears manual particles)
+      const beforeRedraw = container.particles.count;
+      console.log("handleInitialize: BEFORE REDRAW count", { beforeRedraw });
+      (container as any).draw?.(false);
+      const afterRedraw = container.particles.count;
+      console.log("handleInitialize: AFTER REDRAW count", { afterRedraw });
+
+      console.log(`Initialized ${physicsParticles.length} particles`);
+    } else {
+      console.log("handleInitialize: FAILED - missing refs", {
+        hasSimulator: !!simulatorRef.current,
+        hasContainer: !!tsParticlesContainerRef.current,
+      });
+    }
+
+    // Reset simulation state
+    setSimulationState({
+      isRunning: false,
+      time: 0,
+      collisions: 0,
+      status: "Initialized",
+    });
+
+    console.log("Physics engine initialized with parameters:", {
+      particles: gridLayoutParams.particles,
+      collisionRate: gridLayoutParams.collisionRate,
+      jumpLength: gridLayoutParams.jumpLength,
+      velocity: gridLayoutParams.velocity,
+      simulationType: gridLayoutParams.simulationType,
+    });
+  };
+
+  const particlesLoaded = useCallback((container: Container) => {
+    console.log("particlesLoaded: container check passed", {
+      hasSimulator: !!simulatorRef.current,
+      particleManager: simulatorRef.current?.getParticleManager(),
+      containerParticles: !!container.particles,
+    });
+
+    tsParticlesContainerRef.current = container;
+
+    // Connect particle manager on container load
+    if (simulatorRef.current) {
+      setParticleManager(simulatorRef.current.getParticleManager());
+    }
+
+    // Start CTRW physics updates
+    const updateLoop = () => {
+      const isRunning = simulationStateRef.current.isRunning;
+      const showAnim = gridLayoutParamsRef.current.showAnimation;
+
       if (simulatorRef.current) {
-        setParticleManager(simulatorRef.current.getParticleManager());
-      }
+        // Always advance physics when running, regardless of animation toggle
+        if (isRunning) {
+          simulatorRef.current.step(0.016);
+        }
 
-      // Start CTRW physics updates
-      const updateLoop = () => {
-        // Always update particle display positions when animation is enabled
-        if (gridLayoutParamsRef.current.showAnimation && simulatorRef.current) {
-          updateParticlesWithCTRW(container, gridLayoutParamsRef.current.showAnimation);
-          
-          // Only advance physics simulation time when running
-          if (simulationStateRef.current.isRunning) {
-            simulatorRef.current.step(0.016);
+        // Render only if animation is enabled
+        if (showAnim) {
+          if (isRunning) {
+            updateParticlesWithCTRW(container, true);
+          } else {
+            // Paused: redraw current frame without updating positions
+            (container as any).draw?.(false);
           }
         }
-        requestAnimationFrame(updateLoop);
-      };
+      }
+
       requestAnimationFrame(updateLoop);
-    },
-    []
-  );
+    };
+    requestAnimationFrame(updateLoop);
+  }, []);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -221,6 +353,7 @@ export default function RandomWalkSim() {
               handleStart={handleStart}
               handlePause={handlePause}
               handleReset={handleReset}
+              handleInitialize={handleInitialize}
             />
           </div>
 
@@ -258,8 +391,8 @@ export default function RandomWalkSim() {
                 parameters: {
                   collisionRate: 3.0,
                   jumpLength: 0.1,
-                  velocity: 1.2
-                }
+                  velocity: 1.2,
+                },
               }}
             />
           </div>
@@ -268,9 +401,11 @@ export default function RandomWalkSim() {
           <div key="export">
             <ExportPanel
               simulationState={simulationState}
-              onExport={(format) => console.log(`Exporting in ${format} format`)}
-              onCopy={() => console.log('Copying data')}
-              onShare={() => console.log('Sharing data')}
+              onExport={(format) =>
+                console.log(`Exporting in ${format} format`)
+              }
+              onCopy={() => console.log("Copying data")}
+              onShare={() => console.log("Sharing data")}
             />
           </div>
         </ReactGridLayout>

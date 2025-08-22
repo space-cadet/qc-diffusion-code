@@ -2,12 +2,7 @@ import React from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 
-interface SimulationState {
-  isRunning: boolean;
-  time: number;
-  collisions: number;
-  status: "Running" | "Paused" | "Stopped";
-}
+import type { SimulationState } from '../types/simulation';
 
 interface GridLayoutParams {
   simulationType: "continuum" | "graph";
@@ -31,6 +26,7 @@ interface ParameterPanelProps {
   handleStart: () => void;
   handlePause: () => void;
   handleReset: () => void;
+  handleInitialize: () => void;
 }
 
 export const ParameterPanel = ({
@@ -42,6 +38,7 @@ export const ParameterPanel = ({
   handleStart,
   handlePause,
   handleReset,
+  handleInitialize,
 }: ParameterPanelProps) => {
   return (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
@@ -294,6 +291,12 @@ export const ParameterPanel = ({
 
         {/* Control Buttons */}
         <div className="border-t pt-4 space-y-2">
+          <button
+            onClick={handleInitialize}
+            className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            🎯 Initialize
+          </button>
           <div className="flex gap-2">
             <button
               onClick={handleStart}

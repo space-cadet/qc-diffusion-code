@@ -8,6 +8,8 @@ interface GridLayoutParams {
   jumpLength: number
   velocity: number
   simulationType: 'continuum' | 'graph'
+  strategy: 'ctrw' | 'simple' | 'levy' | 'fractional'
+  boundaryCondition: 'periodic' | 'reflective' | 'absorbing'
   graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete'
   graphSize: number
   isPeriodic: boolean
@@ -46,6 +48,8 @@ export const useAppStore = create<AppState>()(
         jumpLength: 0.1,
         velocity: 1.0,
         simulationType: 'continuum',
+        strategy: 'ctrw',
+        boundaryCondition: 'periodic',
         graphType: 'lattice1D',
         graphSize: 20,
         isPeriodic: false,

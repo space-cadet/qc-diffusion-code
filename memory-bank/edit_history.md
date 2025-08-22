@@ -1,11 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-22 10:57:25 IST_
+_Last Updated: 2025-08-22 18:38:55 IST_
 
 ### 2025-08-22
 
+#### 18:38 - C5b: COMPLETED - Particle Display and Animation Loop Fixes
+
+- Updated `frontend/src/RandomWalkSim.tsx` - Fixed particle display by replacing container.refresh() with container.draw(false) in handleInitialize and updateLoop; decoupled physics stepping from rendering for proper pause control
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Replaced destructive container.refresh() with container.draw(false) in updateParticlesWithCTRW function
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Removed updateParticlesWithCTRW import and replaced internal animation loop with render-only container.draw(false) calls
+
 #### 12:26 - C6a: COMPLETED - Rewrite ts-particles Component Using Low-Level API
+
 - Refactored `frontend/src/components/ParticleCanvas.tsx` - Complete rewrite with low-level tsParticles API and manual container management
 - Updated `frontend/src/config/tsParticlesConfig.ts` - Replaced high-level config with low-level engine functions and direct particle control
 - Updated `frontend/src/RandomWalkSim.tsx` - Removed high-level API imports and updated particle loading callback

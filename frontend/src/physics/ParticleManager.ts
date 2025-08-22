@@ -81,6 +81,10 @@ export class ParticleManager {
     };
   }
 
+  clearAllParticles(): void {
+    this.ctrwParticles.clear();
+  }
+
   getCollisionStats() {
     const particles = this.getAllParticles();
     const totalCollisions = particles.reduce((sum, p) => sum + p.collisionCount, 0);

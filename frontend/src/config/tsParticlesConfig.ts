@@ -5,6 +5,7 @@ import type { ParticleManager } from "../physics/ParticleManager";
 
 let particleManager: ParticleManager | null = null;
 let engine: Engine | null = null;
+let _diagFrameCounter = 0; // throttle diagnostics
 
 export const setParticleManager = (manager: ParticleManager) => {
   particleManager = manager;
@@ -70,14 +71,14 @@ export const createParticleContainer = async (
 
   // Clear any default particles and create our own
   container.particles.clear();
-  
+
   // Create particles manually
   for (let i = 0; i < particleCount; i++) {
     const particle = container.particles.addParticle({
       x: Math.random() * container.canvas.size.width,
       y: Math.random() * container.canvas.size.height,
     });
-    
+
     if (particle) {
       // Disable any built-in movement
       particle.velocity.x = 0;
@@ -89,33 +90,65 @@ export const createParticleContainer = async (
 };
 
 // Update particles with physics simulation data
-export const updateParticlesWithCTRW = (container: Container, showAnimation: boolean = true) => {
+export const updateParticlesWithCTRW = (
+  container: Container,
+  showAnimation: boolean = true
+) => {
   if (!particleManager || !showAnimation) {
     return;
   }
 
   // Access the particles array properly
   const particlesContainer = container.particles;
-  
+
   // Try different ways to access the particles array
   let particles: Particle[] | null = null;
-  
-  if ((particlesContainer as any).array && Array.isArray((particlesContainer as any).array)) {
+  let accessPath: string | null = null;
+
+  if (
+    (particlesContainer as any).array &&
+    Array.isArray((particlesContainer as any).array)
+  ) {
     particles = (particlesContainer as any).array;
-  } else if ((particlesContainer as any)._array && Array.isArray((particlesContainer as any)._array)) {
+    accessPath = "array";
+  } else if (
+    (particlesContainer as any)._array &&
+    Array.isArray((particlesContainer as any)._array)
+  ) {
     particles = (particlesContainer as any)._array;
+    accessPath = "_array";
   }
 
   if (particles) {
     for (let i = 0; i < particles.length; i++) {
       particleManager!.updateParticle(particles[i]);
     }
+    if (_diagFrameCounter % 60 === 0) {
+      console.log("updateParticlesWithCTRW: updated particles", {
+        count: particles.length,
+        accessPath,
+        containerCount: container.particles.count,
+      });
+    }
   } else {
-    console.warn('Could not find particles array in container');
+    console.warn("Could not find particles array in container");
   }
-  
-  // Trigger a refresh to render the changes
-  container.refresh();
+
+  // Trigger a redraw to render the changes without resetting particles
+  const beforeRedraw = container.particles.count;
+  if (_diagFrameCounter % 60 === 0) {
+    // console.log("updateParticlesWithCTRW: BEFORE REDRAW count", {
+    //   beforeRedraw,
+    // });
+  }
+  (container as any).draw?.(false);
+  const afterRedraw = container.particles.count;
+  if (_diagFrameCounter % 60 === 0) {
+    // console.log("updateParticlesWithCTRW: AFTER REDRAW count", {
+    //   afterRedraw,
+    // });
+  }
+  _diagFrameCounter++;
 };
 
 // Clean shutdown

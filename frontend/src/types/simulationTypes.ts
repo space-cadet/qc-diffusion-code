@@ -2,7 +2,7 @@ export interface SimulationState {
   isRunning: boolean;
   time: number;
   collisions: number;
-  status: 'Running' | 'Paused' | 'Stopped';
+  status: 'Running' | 'Paused' | 'Stopped' | 'Initialized';
 }
 
 export interface GridLayoutParams {
