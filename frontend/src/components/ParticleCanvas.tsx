@@ -1,12 +1,15 @@
-import React from "react";
-import { Particles } from "@tsparticles/react";
-import { useAppStore } from "../stores/appStore";
-import { getRandomWalkConfig } from "../config/tsParticlesConfig";
+import React, { useRef, useEffect, useState } from "react";
 import { SigmaContainer } from "@react-sigma/core";
 import Graph from "graphology";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import type { Container } from "@tsparticles/engine";
 import type { PhysicsRandomWalk } from "../physics/PhysicsRandomWalk";
+import {
+  initializeEngine,
+  createParticleContainer,
+  updateParticlesWithCTRW,
+  destroyContainer,
+} from "../config/tsParticlesConfig";
 
 interface NodeAttributes {
   label?: string;
@@ -45,7 +48,7 @@ interface ParticleCanvasProps {
   gridLayoutParams: GridLayoutParams;
   simulationStatus: string;
   tsParticlesContainerRef: React.RefObject<Container>;
-  particlesLoaded: (container?: Container) => Promise<void>;
+  particlesLoaded: (container: Container) => void;
   graphPhysicsRef: React.RefObject<PhysicsRandomWalk>;
 }
 
@@ -145,6 +148,134 @@ const GraphVisualization: React.FC<{
   return null;
 };
 
+// Particle Canvas component with low-level tsParticles control
+const ParticleCanvasComponent: React.FC<{
+  gridLayoutParams: GridLayoutParams;
+  simulationStatus: string;
+  particlesLoaded: (container: Container) => void;
+  tsParticlesContainerRef: React.RefObject<Container>;
+}> = ({ gridLayoutParams, simulationStatus, particlesLoaded, tsParticlesContainerRef }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isEngineReady, setIsEngineReady] = useState(false);
+  const [container, setContainer] = useState<Container | null>(null);
+  const animationFrameRef = useRef<number>();
+
+  // Initialize engine on mount
+  useEffect(() => {
+    const setupEngine = async () => {
+      try {
+        await initializeEngine();
+        setIsEngineReady(true);
+      } catch (error) {
+        console.error("Failed to initialize tsParticles engine:", error);
+      }
+    };
+    setupEngine();
+  }, []);
+
+  // Create container when canvas and engine are ready
+  useEffect(() => {
+    if (!isEngineReady || !canvasRef.current || container) {
+      return;
+    }
+
+    const setupContainer = async () => {
+      try {
+        const newContainer = await createParticleContainer(
+          canvasRef.current!,
+          gridLayoutParams.particles
+        );
+        
+        setContainer(newContainer);
+        if (tsParticlesContainerRef && typeof tsParticlesContainerRef === 'object') {
+          (tsParticlesContainerRef as React.MutableRefObject<Container>).current = newContainer;
+        }
+        
+        // Notify parent that container is ready
+        particlesLoaded(newContainer);
+        
+        console.log("tsParticles container created with", gridLayoutParams.particles, "particles");
+      } catch (error) {
+        console.error("Failed to create tsParticles container:", error);
+      }
+    };
+
+    setupContainer();
+  }, [isEngineReady, gridLayoutParams.particles, particlesLoaded, tsParticlesContainerRef]);
+
+  // Handle particle count changes
+  useEffect(() => {
+    if (!container) return;
+
+    const currentCount = container.particles.count;
+    const targetCount = gridLayoutParams.particles;
+
+    if (currentCount !== targetCount) {
+      // Clear and recreate particles
+      container.particles.clear();
+      
+      for (let i = 0; i < targetCount; i++) {
+        container.particles.addParticle({
+          x: Math.random() * container.canvas.size.width,
+          y: Math.random() * container.canvas.size.height,
+        });
+      }
+      
+      console.log(`Updated particle count from ${currentCount} to ${targetCount}`);
+    }
+  }, [container, gridLayoutParams.particles]);
+
+  // Custom animation loop
+  useEffect(() => {
+    if (!container || !gridLayoutParams.showAnimation) {
+      return;
+    }
+
+    const animate = () => {
+      updateParticlesWithCTRW(container, gridLayoutParams.showAnimation);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [container, gridLayoutParams.showAnimation]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (container) {
+        destroyContainer(container);
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [container]);
+
+  return (
+    <>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{ display: isEngineReady ? 'block' : 'none' }}
+      />
+      {!isEngineReady && (
+        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+          <p className="text-gray-500">Initializing particle engine...</p>
+        </div>
+      )}
+      <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+        Particles: {gridLayoutParams.particles} | Status: {simulationStatus}
+      </div>
+    </>
+  );
+};
+
 export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
   gridLayoutParams,
   simulationStatus,
@@ -153,20 +284,6 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
   graphPhysicsRef,
 }) => {
   console.log('ParticleCanvas: Component rendering/re-rendering');
-
-  // Extract only the props that should cause particle re-initialization
-  const particleKey = React.useMemo(() => {
-    return `${gridLayoutParams.particles}-${gridLayoutParams.simulationType}`;
-  }, [gridLayoutParams.particles, gridLayoutParams.simulationType]);
-
-  // Memoize particle options to prevent reinitialization
-  const particleOptions = React.useMemo(() => {
-    console.log('ParticleCanvas: Creating new particle options with count:', gridLayoutParams.particles);
-    return getRandomWalkConfig(gridLayoutParams.particles);
-  }, [gridLayoutParams.particles]);
-
-  // Memoize the particlesLoaded callback - keep it stable to prevent particle re-initialization
-  const stableParticlesLoaded = React.useCallback(particlesLoaded, []);
 
   return (
     <div className="bg-white border rounded-lg p-4 h-full">
@@ -177,19 +294,12 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
       </h3>
       <div className="h-full border rounded-lg relative overflow-hidden">
         {gridLayoutParams.simulationType === "continuum" ? (
-          <>
-            <Particles
-              key={particleKey}
-              id="randomWalkParticles"
-              options={particleOptions}
-              particlesLoaded={stableParticlesLoaded}
-              className="w-full h-full"
-            />
-            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Particles: {gridLayoutParams.particles} | Status:{" "}
-              {simulationStatus}
-            </div>
-          </>
+          <ParticleCanvasComponent
+            gridLayoutParams={gridLayoutParams}
+            simulationStatus={simulationStatus}
+            particlesLoaded={particlesLoaded}
+            tsParticlesContainerRef={tsParticlesContainerRef}
+          />
         ) : (
           <div className="w-full h-full relative min-h-0" id="sigma-container">
             <SigmaContainer

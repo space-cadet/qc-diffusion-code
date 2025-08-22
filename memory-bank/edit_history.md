@@ -5,6 +5,14 @@ _Last Updated: 2025-08-22 10:57:25 IST_
 
 ### 2025-08-22
 
+#### 12:26 - C6a: COMPLETED - Rewrite ts-particles Component Using Low-Level API
+- Refactored `frontend/src/components/ParticleCanvas.tsx` - Complete rewrite with low-level tsParticles API and manual container management
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Replaced high-level config with low-level engine functions and direct particle control
+- Updated `frontend/src/RandomWalkSim.tsx` - Removed high-level API imports and updated particle loading callback
+- Removed `frontend/src/hooks/useParticlesEngine.ts` - Moved to backup, replaced with direct engine initialization
+- Fixed particle iterator error by properly accessing container.particles.array
+- Eliminated animation conflicts between ts-particles built-in movement and physics simulation
+
 #### 10:57 - C6: COMPLETED - Strategy Pattern Physics Engine Implementation
 
 - Updated `memory-bank/tasks/C6.md` - Marked task as completed with implementation details

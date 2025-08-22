@@ -1,117 +1,124 @@
-import type { ISourceOptions } from "@tsparticles/engine";
+import { tsParticles } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
+import type { Container, Engine, Particle } from "@tsparticles/engine";
 import type { ParticleManager } from "../physics/ParticleManager";
 
 let particleManager: ParticleManager | null = null;
+let engine: Engine | null = null;
 
 export const setParticleManager = (manager: ParticleManager) => {
   particleManager = manager;
 };
 
-// Custom update function called from container
-export const updateParticlesWithCTRW = (container: any, showAnimation: boolean = true) => {
-  if (!particleManager || !container.particles) {
-    console.log('updateParticlesWithCTRW: Missing particleManager or container.particles');
-    return;
+// Initialize the engine with slim bundle
+export const initializeEngine = async (): Promise<Engine> => {
+  if (!engine) {
+    engine = tsParticles;
+    await loadSlim(engine);
   }
+  return engine;
+};
+
+// Create a container with manual control
+export const createParticleContainer = async (
+  canvasElement: HTMLCanvasElement,
+  particleCount: number
+): Promise<Container> => {
+  if (!engine) {
+    throw new Error("Engine not initialized");
+  }
+
+  const container = await engine.load({
+    id: "manual-particles",
+    element: canvasElement,
+    options: {
+      background: {
+        color: "#f8f9fa",
+      },
+      particles: {
+        number: {
+          value: 0, // Start with 0, we'll add manually
+        },
+        color: {
+          value: "#3b82f6",
+        },
+        shape: {
+          type: "circle",
+        },
+        size: {
+          value: 3,
+        },
+        move: {
+          enable: false, // Completely disable built-in movement
+        },
+        opacity: {
+          value: 0.8,
+        },
+      },
+      detectRetina: true,
+      motion: {
+        disable: true,
+      },
+      pauseOnBlur: false,
+      pauseOnOutsideViewport: false,
+    },
+  });
+
+  if (!container) {
+    throw new Error("Failed to create container");
+  }
+
+  // Clear any default particles and create our own
+  container.particles.clear();
   
-  if (!showAnimation) {
-    console.log('updateParticlesWithCTRW: Animation disabled, skipping updates');
+  // Create particles manually
+  for (let i = 0; i < particleCount; i++) {
+    const particle = container.particles.addParticle({
+      x: Math.random() * container.canvas.size.width,
+      y: Math.random() * container.canvas.size.height,
+    });
+    
+    if (particle) {
+      // Disable any built-in movement
+      particle.velocity.x = 0;
+      particle.velocity.y = 0;
+    }
+  }
+
+  return container;
+};
+
+// Update particles with physics simulation data
+export const updateParticlesWithCTRW = (container: Container, showAnimation: boolean = true) => {
+  if (!particleManager || !showAnimation) {
     return;
   }
 
-  // Check different possible particle array properties
-  const particles =
-    container.particles.array ||
-    container.particles._array ||
-    container.particles;
+  // Access the particles array properly
+  const particlesContainer = container.particles;
+  
+  // Try different ways to access the particles array
+  let particles: Particle[] | null = null;
+  
+  if ((particlesContainer as any).array && Array.isArray((particlesContainer as any).array)) {
+    particles = (particlesContainer as any).array;
+  } else if ((particlesContainer as any)._array && Array.isArray((particlesContainer as any)._array)) {
+    particles = (particlesContainer as any)._array;
+  }
 
-  if (particles && particles.forEach) {
-    particles.forEach((particle: any) => {
-      particleManager!.updateParticle(particle);
-    });
-  } else if (particles && particles.length) {
+  if (particles) {
     for (let i = 0; i < particles.length; i++) {
       particleManager!.updateParticle(particles[i]);
     }
+  } else {
+    console.warn('Could not find particles array in container');
   }
+  
+  // Trigger a refresh to render the changes
+  container.refresh();
 };
 
-export const randomWalkParticlesConfig: ISourceOptions = {
-  background: {
-    color: {
-      value: "#f8f9fa",
-    },
-  },
-  fpsLimit: 60,
-  interactivity: {
-    events: {
-      onClick: {
-        enable: false,
-      },
-      onHover: {
-        enable: false,
-      },
-      resize: {},
-    },
-  },
-  particles: {
-    color: {
-      value: "#3b82f6",
-    },
-    links: {
-      enable: false,
-    },
-    move: {
-      enable: false,
-      direction: "none",
-      outModes: {
-        default: "bounce",
-      },
-      speed: 0,
-      straight: false,
-    },
-    number: {
-      density: {
-        enable: false,
-      },
-      value: 100,
-    },
-    opacity: {
-      value: 0.8,
-    },
-    shape: {
-      type: "circle",
-    },
-    size: {
-      value: { min: 2, max: 4 },
-    },
-  },
-  detectRetina: true,
-  motion: {
-    disable: false,
-    reduce: {
-      factor: 4,
-      value: true,
-    },
-  },
-};
-
-export const getRandomWalkConfig = (
-  particleCount: number = 100
-): ISourceOptions => {
-  console.log('getRandomWalkConfig: Generating config for', particleCount, 'particles');
-  return {
-    ...randomWalkParticlesConfig,
-    particles: {
-      ...randomWalkParticlesConfig.particles,
-      number: {
-        ...randomWalkParticlesConfig.particles?.number,
-        value: particleCount,
-      },
-      move: {
-        ...randomWalkParticlesConfig.particles?.move,
-        enable: false, // Disable default movement - only CTRW physics controls particles
-      },
-    },
-  };
+// Clean shutdown
+export const destroyContainer = (container: Container) => {
+  container.destroy();
 };

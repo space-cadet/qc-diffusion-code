@@ -6,8 +6,6 @@ import React, {
 } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
-import { initParticlesEngine } from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
 import type { Container } from "@tsparticles/engine";
 import { useAppStore } from "./stores/appStore";
 import { ParameterPanel } from "./components/ParameterPanel";
@@ -19,7 +17,6 @@ import { ParticleCanvas } from "./components/ParticleCanvas";
 import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import {
-  getRandomWalkConfig,
   updateParticlesWithCTRW,
   setParticleManager,
 } from "./config/tsParticlesConfig";
@@ -153,41 +150,37 @@ export default function RandomWalkSim() {
     });
   };
 
-  // tsParticles initialization and integration
-  useEffect(() => {
-    const initEngine = async () => {
-      await initParticlesEngine(async (engine) => {
-        await loadSlim(engine);
-      });
-    };
-    initEngine();
-  }, []);
+
 
   const particlesLoaded = useCallback(
-    async (container?: Container) => {
-      if (container) {
-        tsParticlesContainerRef.current = container;
+    (container: Container) => {
+      console.log('particlesLoaded: container check passed', {
+        hasSimulator: !!simulatorRef.current,
+        particleManager: simulatorRef.current?.getParticleManager(),
+        containerParticles: !!container.particles
+      });
+      
+      tsParticlesContainerRef.current = container;
 
-        // Connect particle manager on container load
-        if (simulatorRef.current) {
-          setParticleManager(simulatorRef.current.getParticleManager());
-        }
-
-        // Start CTRW physics updates
-        const updateLoop = () => {
-          // Always update particle display positions when animation is enabled
-          if (gridLayoutParamsRef.current.showAnimation) {
-            updateParticlesWithCTRW(container, gridLayoutParamsRef.current.showAnimation);
-            
-            // Only advance physics simulation time when running
-            if (simulationStateRef.current.isRunning && simulatorRef.current) {
-              simulatorRef.current.step(0.016);
-            }
-          }
-          requestAnimationFrame(updateLoop);
-        };
-        requestAnimationFrame(updateLoop);
+      // Connect particle manager on container load
+      if (simulatorRef.current) {
+        setParticleManager(simulatorRef.current.getParticleManager());
       }
+
+      // Start CTRW physics updates
+      const updateLoop = () => {
+        // Always update particle display positions when animation is enabled
+        if (gridLayoutParamsRef.current.showAnimation && simulatorRef.current) {
+          updateParticlesWithCTRW(container, gridLayoutParamsRef.current.showAnimation);
+          
+          // Only advance physics simulation time when running
+          if (simulationStateRef.current.isRunning) {
+            simulatorRef.current.step(0.016);
+          }
+        }
+        requestAnimationFrame(updateLoop);
+      };
+      requestAnimationFrame(updateLoop);
     },
     []
   );
