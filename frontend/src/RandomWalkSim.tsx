@@ -9,8 +9,10 @@ import { HistoryPanel } from "./components/HistoryPanel";
 import { ReplayControls } from "./components/ReplayControls";
 import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvas } from "./components/ParticleCanvas";
+import { ObservablesPanel } from "./components/ObservablesPanel";
 import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
+import { ParticleCountObservable } from "./physics/observables/ParticleCountObservable";
 import {
   updateParticlesWithCTRW,
   setParticleManager,
@@ -36,7 +38,8 @@ export default function RandomWalkSim() {
   const [layouts, setLayouts] = useState<Layout[]>([
     { i: "parameters", x: 0, y: 0, w: 3, h: 8, minW: 3, minH: 6 },
     { i: "canvas", x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 },
-    { i: "density", x: 0, y: 8, w: 12, h: 4, minW: 8, minH: 3 },
+    { i: "observables", x: 0, y: 8, w: 4, h: 4, minW: 3, minH: 3 },
+    { i: "density", x: 4, y: 8, w: 8, h: 4, minW: 8, minH: 3 },
     { i: "history", x: 0, y: 12, w: 12, h: 4, minW: 6, minH: 2 },
     { i: "replay", x: 0, y: 16, w: 8, h: 3, minW: 6, minH: 2 },
     { i: "export", x: 8, y: 16, w: 4, h: 3, minW: 4, minH: 2 },
@@ -174,6 +177,11 @@ export default function RandomWalkSim() {
   const handleReset = () => {
     if (simulatorRef.current) {
       simulatorRef.current.reset();
+      // Reset all registered observables
+      const observableManager = (simulatorRef.current as any).observableManager;
+      if (observableManager) {
+        observableManager.reset();
+      }
     }
     setSimulationState({
       isRunning: false,
@@ -408,6 +416,15 @@ export default function RandomWalkSim() {
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
               boundaryRect={boundaryRect || undefined}
+            />
+          </div>
+
+          {/* Observables Panel */}
+          <div key="observables">
+            <ObservablesPanel
+              simulatorRef={simulatorRef}
+              isRunning={simulationState.isRunning}
+              simulationStatus={simulationState.status}
             />
           </div>
 

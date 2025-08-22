@@ -2,6 +2,8 @@ import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
 import type { BoundaryConfig } from './types/BoundaryConfig';
 import { ParticleManager } from './ParticleManager';
 import { CTRWStrategy } from './strategies/CTRWStrategy';
+import { ObservableManager } from './ObservableManager';
+import type { Observable } from './interfaces/Observable';
 
 interface SimulatorParams {
   collisionRate: number;
@@ -22,6 +24,7 @@ export class RandomWalkSimulator {
   private strategy: RandomWalkStrategy;
   private particleCount: number;
   private time: number = 0;
+  private observableManager: ObservableManager;
 
   constructor(params: SimulatorParams) {
     const boundaryConfig = this.createBoundaryConfig(params);
@@ -35,6 +38,7 @@ export class RandomWalkSimulator {
     
     this.particleManager = new ParticleManager(this.strategy);
     this.particleCount = params.particleCount;
+    this.observableManager = new ObservableManager();
     this.initializeParticles();
   }
 
@@ -76,6 +80,9 @@ export class RandomWalkSimulator {
         velocity: { x: particle.velocity.vx, y: particle.velocity.vy }
       });
     });
+    
+    // Update observable snapshot after physics step
+    this.observableManager.updateSnapshot(particles, this.time);
   }
 
   reset(): void {
@@ -135,5 +142,18 @@ export class RandomWalkSimulator {
 
   getParticleManager(): ParticleManager {
     return this.particleManager;
+  }
+
+  // Observable management methods
+  registerObservable(observable: Observable): void {
+    this.observableManager.register(observable);
+  }
+
+  unregisterObservable(id: string): void {
+    this.observableManager.unregister(id);
+  }
+
+  getObservableData(id: string): any {
+    return this.observableManager.getResult(id);
   }
 }

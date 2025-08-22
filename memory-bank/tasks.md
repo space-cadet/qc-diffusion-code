@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-22 21:11:18 IST_
+_Last Updated: 2025-08-22 22:35:47 IST_
 
 ## Active Tasks
 
@@ -16,6 +16,7 @@ _Last Updated: 2025-08-22 21:11:18 IST_
 | C5c | Random Walk Physics Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5a, C5b     |
 | C6  | Random Walk Physics Engine Redesign                  | ✅ COMPLETED   | HIGH     | 2025-08-22 | C5c          |
 | C6a | Rewrite ts-particles Component Using Low-Level API   | ✅ COMPLETED   | HIGH     | 2025-08-22 | C5b, C6      |
+| C7  | Observer Design and Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-22 | C5c          |
 
 ## Task Details
 
@@ -68,6 +69,12 @@ _Last Updated: 2025-08-22 21:11:18 IST_
 **Status**: ✅ COMPLETED **Last**: 2025-08-22 12:04:06 IST
 **Files**: `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/RandomWalkSim.tsx`
 **Notes**: Low-level API implementation completed - eliminated animation interference, physics timing needs connection
+
+### C7: Observer Design and Implementation
+**Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum) with temporal consistency
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-22 22:35:47 IST
+**Files**: `frontend/src/physics/ObservableManager.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/ParticleCountObservable.ts`
+**Notes**: Core infrastructure complete with collapsible UI panel - ParticleCountObservable working, simulation control integration needs fixes
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls
