@@ -1,4 +1,5 @@
 import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
+import type { BoundaryConfig } from './types/BoundaryConfig';
 import { ParticleManager } from './ParticleManager';
 import { CTRWStrategy } from './strategies/CTRWStrategy';
 
@@ -10,6 +11,10 @@ interface SimulatorParams {
   simulationType?: string;
   graphType?: string;
   graphSize?: number;
+  strategy?: string;
+  boundaryCondition?: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
 export class RandomWalkSimulator {
@@ -19,15 +24,28 @@ export class RandomWalkSimulator {
   private time: number = 0;
 
   constructor(params: SimulatorParams) {
+    const boundaryConfig = this.createBoundaryConfig(params);
+    
     this.strategy = new CTRWStrategy({
       collisionRate: params.collisionRate,
       jumpLength: params.jumpLength,
-      velocity: params.velocity
+      velocity: params.velocity,
+      boundaryConfig
     });
     
     this.particleManager = new ParticleManager(this.strategy);
     this.particleCount = params.particleCount;
     this.initializeParticles();
+  }
+
+  private createBoundaryConfig(params: SimulatorParams): BoundaryConfig {
+    return {
+      type: (params.boundaryCondition || 'periodic') as 'periodic' | 'reflective' | 'absorbing',
+      xMin: -200,
+      xMax: 200,
+      yMin: -200,
+      yMax: 200
+    };
   }
 
   private initializeParticles(): void {
@@ -66,10 +84,13 @@ export class RandomWalkSimulator {
   }
 
   updateParameters(params: SimulatorParams): void {
+    const boundaryConfig = this.createBoundaryConfig(params);
+    
     const newStrategy = new CTRWStrategy({
       collisionRate: params.collisionRate,
       jumpLength: params.jumpLength,
-      velocity: params.velocity
+      velocity: params.velocity,
+      boundaryConfig
     });
     
     this.strategy = newStrategy;

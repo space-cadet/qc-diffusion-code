@@ -1,13 +1,13 @@
 # C5c: Random Walk Physics Implementation
 *Created: 2025-08-21 08:36:41 IST*
-*Last Updated: 2025-08-22 10:57:25 IST*
+*Last Updated: 2025-08-22 19:20:42 IST*
 
 **Description**: Implement CTRW (Continuous Time Random Walk) physics engine with collision mechanisms, particle simulation, and real-time telegraph equation convergence demonstration
 
 **Status**: 🔄 IN PROGRESS
 **Priority**: HIGH
 **Started**: 2025-08-21 08:36:41 IST
-**Last Active**: 2025-08-22 10:57:25 IST
+**Last Active**: 2025-08-22 19:20:42 IST
 **Dependencies**: C5a, C5b
 
 ## Completion Criteria
@@ -25,6 +25,9 @@
 - ✅ Connect physics engine to UI parameter controls
 - ✅ Implement modular physics architecture with Strategy pattern
 - ✅ Add comprehensive testing framework with Jest
+- ✅ Add strategy selection and boundary condition UI controls
+- ✅ Implement strategy-agnostic boundary condition system
+- 🔄 Fix coordinate system alignment for boundary conditions
 - ⬜ Implement simulation history recording and replay functionality
 - ⬜ Add data export for density profiles and particle trajectories
 - ⬜ Demonstrate convergence to telegraph equation in appropriate limits
@@ -54,8 +57,12 @@
 11. ✅ Create particle state management system with ParticleManager class
 12. ✅ Add exponential waiting time generation for collisions
 13. ✅ Connect CTRW physics engine to replace default tsParticles motion via updateParticlesWithCTRW
-14. 🔄 Implement density profile calculation and telegraph comparison
-15. ⬜ Add simulation history and replay functionality
+14. ✅ Add strategy selection UI controls (CTRW, Simple, Lévy, Fractional)
+15. ✅ Add boundary condition UI controls (Periodic, Reflective, Absorbing)
+16. ✅ Implement strategy-agnostic boundary condition architecture
+17. 🔄 Fix coordinate system alignment between physics space and canvas rendering
+18. 🔄 Implement density profile calculation and telegraph comparison
+19. ⬜ Add simulation history and replay functionality
 16. ⬜ Implement data export for scientific analysis
 17. ⬜ Optimize performance for educational demonstrations
 

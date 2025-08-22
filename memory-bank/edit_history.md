@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-22 18:38:55 IST_
+_Last Updated: 2025-08-22 19:20:42 IST_
 
 ### 2025-08-22
+
+#### 19:20 - C5c: Strategy-Agnostic Boundary Conditions Implementation
+
+- Updated `frontend/src/stores/appStore.ts` - Added strategy and boundaryCondition fields to GridLayoutParams interface and default values
+- Updated `frontend/src/components/ParameterPanel.tsx` - Added strategy selection UI controls (CTRW, Simple, Lévy, Fractional) and boundary condition controls (Periodic, Reflective, Absorbing)
+- Created `frontend/src/physics/types/BoundaryConfig.ts` - Boundary type definitions with BoundaryType, BoundaryConfig interface, and result types
+- Created `frontend/src/physics/utils/boundaryUtils.ts` - Strategy-agnostic boundary functions for periodic, reflective, and absorbing boundaries
+- Updated `frontend/src/physics/interfaces/RandomWalkStrategy.ts` - Added setBoundaries and getBoundaries methods to strategy interface
+- Updated `frontend/src/physics/strategies/CTRWStrategy.ts` - Added boundary config property, constructor parameter, and boundary application logic in updateParticle method
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added strategy and boundary parameters to SimulatorParams, boundary config creation, and parameter passing
+- Updated `frontend/src/RandomWalkSim.tsx` - Added strategy and boundary condition parameters to simulator initialization and parameter updates
 
 #### 18:38 - C5b: COMPLETED - Particle Display and Animation Loop Fixes
 

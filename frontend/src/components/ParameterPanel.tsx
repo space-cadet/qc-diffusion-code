@@ -6,6 +6,8 @@ import type { SimulationState } from '../types/simulation';
 
 interface GridLayoutParams {
   simulationType: "continuum" | "graph";
+  strategy: "ctrw" | "simple" | "levy" | "fractional";
+  boundaryCondition: "periodic" | "reflective" | "absorbing";
   showAnimation: boolean;
   graphType: "lattice1D" | "lattice2D" | "path" | "complete";
   graphSize: number;
@@ -84,6 +86,136 @@ export const ParameterPanel = ({
                 className="mr-2"
               />
               Graph
+            </label>
+          </div>
+        </div>
+
+        {/* Random Walk Strategy */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Random Walk Strategy:
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="strategy"
+                value="ctrw"
+                checked={gridLayoutParams.strategy === "ctrw"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                  })
+                }
+                className="mr-2"
+              />
+              CTRW (Continuous Time Random Walk)
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="strategy"
+                value="simple"
+                checked={gridLayoutParams.strategy === "simple"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                  })
+                }
+                className="mr-2"
+              />
+              Simple Random Walk
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="strategy"
+                value="levy"
+                checked={gridLayoutParams.strategy === "levy"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                  })
+                }
+                className="mr-2"
+              />
+              Lévy Flight
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="strategy"
+                value="fractional"
+                checked={gridLayoutParams.strategy === "fractional"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                  })
+                }
+                className="mr-2"
+              />
+              Fractional Brownian Motion
+            </label>
+          </div>
+        </div>
+
+        {/* Boundary Conditions */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Boundary Conditions:
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="boundaryCondition"
+                value="periodic"
+                checked={gridLayoutParams.boundaryCondition === "periodic"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                  })
+                }
+                className="mr-2"
+              />
+              Periodic (wrap around)
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="boundaryCondition"
+                value="reflective"
+                checked={gridLayoutParams.boundaryCondition === "reflective"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                  })
+                }
+                className="mr-2"
+              />
+              Reflective (bounce back)
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="boundaryCondition"
+                value="absorbing"
+                checked={gridLayoutParams.boundaryCondition === "absorbing"}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                  })
+                }
+                className="mr-2"
+              />
+              Absorbing (particles disappear)
             </label>
           </div>
         </div>

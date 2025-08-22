@@ -1,7 +1,7 @@
 # Random Walk Engine Implementation Plan
 
 _Created: 2025-08-21 09:10:30 IST_
-_Last Updated: 2025-08-21 11:37:53 IST_
+_Last Updated: 2025-08-22 19:20:42 IST_
 
 ## Overview
 
@@ -253,7 +253,8 @@ useEffect(() => {
 
 **Phase 1** ✅ COMPLETED: CTRW collision mechanism with exponential timing
 **Phase 2** ✅ COMPLETED: tsParticles integration via ParticleManager and updateParticlesWithCTRW
-**Phase 3** 🔄 IN PROGRESS: Density calculation and telegraph comparison
+**Phase 2.5** ✅ COMPLETED: Strategy selection and boundary condition system
+**Phase 3** 🔄 IN PROGRESS: Density calculation and telegraph comparison (coordinate system fix needed)
 **Phase 4** (Next session): Polish, optimization, and educational refinements
 
 ## Implementation Status Update (2025-08-21 11:40:59 IST)
@@ -267,12 +268,39 @@ useEffect(() => {
 - ✅ updateParticlesWithCTRW function replacing default motion
 - ✅ Comprehensive TypeScript type definitions
 
+### Phase 2.5: Strategy Selection and Boundary Conditions - COMPLETED (2025-08-22 19:20:42 IST)
+
+**UI Controls Added:**
+- Strategy selection: CTRW, Simple Random Walk, Lévy Flight, Fractional Brownian Motion
+- Boundary conditions: Periodic (wrap around), Reflective (bounce back), Absorbing (particles disappear)
+
+**Architecture Implementation:**
+- Strategy-agnostic boundary system with centralized utilities
+- Boundary configuration interface with physics space coordinates
+- Parameter flow from UI → RandomWalkSimulator → CTRWStrategy
+
+**Files Created:**
+- `frontend/src/physics/types/BoundaryConfig.ts` - Boundary type definitions
+- `frontend/src/physics/utils/boundaryUtils.ts` - Strategy-agnostic boundary functions
+
+**Files Modified:**
+- `frontend/src/stores/appStore.ts` - Added strategy and boundaryCondition fields
+- `frontend/src/components/ParameterPanel.tsx` - Added UI controls
+- `frontend/src/physics/strategies/CTRWStrategy.ts` - Boundary application logic
+- `frontend/src/physics/RandomWalkSimulator.ts` - Boundary config and parameter flow
+- `frontend/src/RandomWalkSim.tsx` - Parameter passing integration
+
+**Known Issue:** Coordinate system alignment between physics space (-200,200) and canvas space causing particles to be constrained to corner.
+
 ### Current Implementation Achievements
 
 - Complete CTRW physics engine with Poisson collision process
 - Particle state management with trajectory recording
 - Real-time parameter updates without simulation restart
 - Dual mode support (continuum/graph) with Sigma.js visualization
+- Strategy selection UI with 4 random walk algorithms
+- Boundary condition system with 3 behavior types
+- Strategy-agnostic boundary architecture for extensibility
 
 ## Documentation Requirements
 

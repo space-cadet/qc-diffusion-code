@@ -66,11 +66,18 @@ export default function RandomWalkSim() {
 
   // Initialize physics simulator
   useEffect(() => {
+    const canvasWidth = tsParticlesContainerRef.current?.canvas?.size?.width || 800;
+    const canvasHeight = tsParticlesContainerRef.current?.canvas?.size?.height || 600;
+    
     simulatorRef.current = new RandomWalkSimulator({
       collisionRate: gridLayoutParams.collisionRate,
       jumpLength: gridLayoutParams.jumpLength,
       velocity: gridLayoutParams.velocity,
       particleCount: gridLayoutParams.particles,
+      strategy: gridLayoutParams.strategy,
+      boundaryCondition: gridLayoutParams.boundaryCondition,
+      canvasWidth,
+      canvasHeight,
     });
 
     // Connect particle manager to tsParticles
@@ -91,6 +98,8 @@ export default function RandomWalkSim() {
     }
   }, [
     gridLayoutParams.simulationType,
+    gridLayoutParams.strategy,
+    gridLayoutParams.boundaryCondition,
     gridLayoutParams.graphType,
     gridLayoutParams.graphSize,
   ]);
@@ -180,8 +189,12 @@ export default function RandomWalkSim() {
         velocity: gridLayoutParams.velocity,
         particleCount: gridLayoutParams.particles,
         simulationType: gridLayoutParams.simulationType,
+        strategy: gridLayoutParams.strategy,
+        boundaryCondition: gridLayoutParams.boundaryCondition,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
+        canvasWidth: container.canvas.size.width,
+        canvasHeight: container.canvas.size.height,
       });
 
       // Reset physics state
