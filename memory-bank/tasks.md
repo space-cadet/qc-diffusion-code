@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 21:00:24 IST_
+_Last Updated: 2025-08-22 08:54:17 IST_
 
 ## Active Tasks
 
@@ -14,6 +14,7 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 | C5a | Random Walk Architecture Planning                     | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5           |
 | C5b | Random Walk UI Implementation                         | 🔄 DEBUGGING   | HIGH     | 2025-08-21 | C5a          |
 | C5c | Random Walk Physics Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5a, C5b     |
+| C6  | Random Walk Physics Engine Redesign                  | 🔄 IN PROGRESS | HIGH     | 2025-08-22 | C5c          |
 
 ## Task Details
 
@@ -54,6 +55,12 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 11:35:44 IST
 **Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/types.ts`
 **Notes**: CTRW physics implementation completed - ParticleManager bridges tsParticles with custom physics, collision mechanics implemented with exponential timing
+
+### C6: Random Walk Physics Engine Redesign
+**Description**: Redesign physics engine to fix state persistence issues during parameter updates
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-22 08:54:17 IST
+**Files**: `memory-bank/implementation-details/random-walk-class-redesign.md`, `frontend/src/physics/PhysicsRandomWalk.ts`
+**Notes**: Strategy pattern approach recommended over inheritance hierarchy - comprehensive redesign plan completed
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

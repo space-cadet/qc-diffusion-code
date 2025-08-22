@@ -1,19 +1,19 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-21 21:00:24 IST_
+_Last Updated: 2025-08-22 08:54:17 IST_
 
 ## Current Session
 
-**Started**: 2025-08-21 17:30:00 IST
-**Focus Task**: C5b
-**Session File**: `sessions/2025-08-21-evening.md`
-**Updated**: 2025-08-21 21:00:24 IST
+**Started**: 2025-08-22 08:07:05 IST
+**Focus Task**: C6
+**Session File**: `sessions/2025-08-22-morning.md`
+**Updated**: 2025-08-22 08:54:17 IST
 
 ## Overview
 
-- Active: 6 | Paused: 0 | Completed: 1
-- Last Session: `sessions/2025-08-20-night.md`
+- Active: 7 | Paused: 0 | Completed: 1
+- Last Session: `sessions/2025-08-21-evening.md`
 - Current Period: morning
 
 ## Task Registry
@@ -27,6 +27,7 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 - C5a: Random Walk Architecture Planning - 🔄
 - C5b: Random Walk UI Implementation - 🔄
 - C5c: Random Walk Physics Implementation - 🔄
+- C6: Random Walk Physics Engine Redesign - 🔄
 
 ## Active Tasks
 
@@ -121,9 +122,9 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 ### C5c: Random Walk Physics Implementation
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-21 **Last**: 2025-08-21 11:35:44 IST
-**Context**: CTRW physics implementation completed - ParticleManager bridges tsParticles with custom physics, collision mechanics implemented with exponential timing
-**Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/types.ts`, `memory-bank/tasks/C5c.md`
+**Started:** 2025-08-21 **Last**: 2025-08-22 08:15:22 IST
+**Context**: Design analysis completed - identified state persistence issues and created comprehensive redesign plan with abstract hierarchy
+**Files**: `frontend/src/physics/PhysicsRandomWalk.ts`, `frontend/src/physics/ParticleManager.ts`, `memory-bank/implementation-details/random-walk-class-redesign.md`
 **Progress**:
 
 1. ✅ Create physics file structure with placeholder classes
@@ -139,8 +140,26 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 11. ✅ Add exponential waiting time generation for collisions
 12. ✅ Replace tsParticles default motion with CTRW physics via updateParticlesWithCTRW
 13. ✅ Create comprehensive TypeScript type definitions for physics system
-14. 🔄 Implement density profile calculation for telegraph comparison
-15. ⬜ Implement simulation history recording and replay functionality
+14. ✅ Analyze current class design and identify architectural issues
+15. ✅ Create comprehensive redesign plan with abstract hierarchy and particle system refactor
+16. 🔄 Choose final design pattern approach (hierarchy vs Strategy pattern)
+17. ⬜ Implement chosen approach to fix state persistence issues
+18. ⬜ Implement density profile calculation for telegraph comparison
+19. ⬜ Implement simulation history recording and replay functionality
+
+### C6: Random Walk Physics Engine Redesign
+**Status:** 🔄 **Priority:** HIGH
+**Started:** 2025-08-22 **Last**: 2025-08-22 08:54:17 IST
+**Context**: Strategy pattern approach recommended over inheritance hierarchy for state persistence fix
+**Files**: `memory-bank/implementation-details/random-walk-class-redesign.md`, `frontend/src/physics/PhysicsRandomWalk.ts`
+**Progress**:
+1. ✅ Analyze current design issues and architectural problems
+2. ✅ Create comprehensive redesign plan comparing inheritance vs Strategy pattern
+3. ✅ Document unified particle interface approach
+4. 🔄 Choose final implementation approach (Strategy pattern recommended)
+5. ⬜ Implement Strategy pattern refactor
+6. ⬜ Test parameter updates preserve state
+7. ⬜ Verify animation toggle works correctly
 
 ### C2: VisualPDE GPU Solver Integration
 
@@ -151,8 +170,8 @@ _Last Updated: 2025-08-21 21:00:24 IST_
 
 ## Session History (Last 5)
 
-1. `sessions/2025-08-21-evening.md` - RandomWalkSim component refactoring and code organization
-2. `sessions/2025-08-21-morning.md` - Random walk UI interface design with dnd-kit framework selection
-3. `sessions/2025-08-20-night.md` - Random walk architecture planning and CTRW research
-4. `sessions/2025-08-20-afternoon.md` - GPU AMR integration research and tessellation approach design
-5. `sessions/2025-08-20-morning.md` - Memory bank initialization and task migration
+1. `sessions/2025-08-22-morning.md` - Random walk physics engine design analysis and comprehensive redesign planning
+2. `sessions/2025-08-21-evening.md` - RandomWalkSim component refactoring and code organization
+3. `sessions/2025-08-21-morning.md` - Random walk UI interface design with dnd-kit framework selection
+4. `sessions/2025-08-20-night.md` - Random walk architecture planning and CTRW research
+5. `sessions/2025-08-20-afternoon.md` - GPU AMR integration research and tessellation approach design

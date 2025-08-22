@@ -150,6 +150,141 @@ graph TD
     style E fill:#ffebee
 ```
 
+# Actual Random Walk Class Structure
+
+```mermaid
+classDiagram
+    class PhysicsRandomWalk {
+        -graph: IGraph
+        -simulationType: string
+        -collisionRate: number
+        -jumpLength: number
+        -velocity: number
+        -diffusionConstant: number
+        -meanWaitTime: number
+        +constructor(params)
+        +generateStep(particle): Step
+        +updateParticle(particle): void
+        +calculateDensity(particles): DensityField
+        +getScalingLimits(): ScalingParams
+        +updateParameters(params): void
+        +reset(): void
+        +step(dt): void
+        +getDensityField(): DensityField
+        -generateCollisionTime(): number
+        -handleCollision(particle): CollisionEvent
+        -createGraph(type, size): IGraph
+        +getAvailableNodes(): IGraphNode[]
+        +getNeighbors(nodeId): IGraphNode[]
+        +getGraph(): IGraph
+    }
+
+    class RandomWalkSimulator {
+        -physics: PhysicsRandomWalk
+        -particles: Particle[]
+        -time: number
+        +constructor(params)
+        +step(dt): void
+        +reset(): void
+        +updateParameters(params): void
+    }
+
+    class Particle {
+        +id: number
+        +position: Position
+        +velocity: Velocity
+        +lastCollisionTime: number
+        +nextCollisionTime: number
+        +collisionCount: number
+        +trajectory: TrajectoryPoint[]
+    }
+
+    class CollisionEvent {
+        +occurred: boolean
+        +newDirection: number
+        +waitTime: number
+        +energyChange: number
+        +timestamp: number
+        +position: Position
+        +oldVelocity: Velocity
+        +newVelocity: Velocity
+    }
+
+    class Step {
+        +deltaX: number
+        +deltaY: number
+        +collision: CollisionEvent
+        +timestamp: number
+        +particleId: number
+    }
+
+    class DensityField {
+        +error: number
+        +effectiveDiffusion: number
+        +effectiveVelocity: number
+        +x: number[]
+        +rho: number[]
+        +u: number[]
+        +moments: Moments
+        +collisionRate: number[]
+    }
+
+    class ScalingParams {
+        +tau: number
+        +a: number
+        +D: number
+        +v: number
+        +gamma: number
+        +scalingRegime: string
+    }
+
+    class Moments {
+        +mean: number
+        +variance: number
+        +skewness: number
+        +kurtosis: number
+    }
+
+    class TrajectoryPoint {
+        +position: Position
+        +timestamp: number
+    }
+
+    class Position {
+        +x: number
+        +y: number
+    }
+
+    class Velocity {
+        +vx: number
+        +vy: number
+    }
+
+    class IGraph {
+        <<interface>>
+        +getNodes(): IGraphNode[]
+        +getAdjacentNodes(nodeId): IGraphNode[]
+    }
+
+    class IGraphNode {
+        <<interface>>
+        +id: string
+    }
+
+    PhysicsRandomWalk --> IGraph
+    PhysicsRandomWalk --> Step
+    PhysicsRandomWalk --> DensityField
+    PhysicsRandomWalk --> ScalingParams
+    PhysicsRandomWalk --> CollisionEvent
+    RandomWalkSimulator --> PhysicsRandomWalk
+    RandomWalkSimulator --> Particle
+    Step --> CollisionEvent
+    DensityField --> Moments
+    Particle --> TrajectoryPoint
+    CollisionEvent --> Particle
+    IGraph --> IGraphNode
+```
+
 **Updated Architecture Notes**:
 
 **tsParticles Handles**:
@@ -306,6 +441,7 @@ As τ → 0, a → 0, with constraints:
    - Track particle positions over time
 
 3. **Visualization**
+
    - Real-time particle position scatter plot
    - Density histogram showing particle distribution evolution
    - Individual particle trajectory traces
@@ -324,6 +460,7 @@ As τ → 0, a → 0, with constraints:
    - Show how velocity field evolves with density
 
 3. **Conservation Laws**
+
    - Verify particle number conservation
    - Show momentum conservation with collisions
 
@@ -342,6 +479,7 @@ As τ → 0, a → 0, with constraints:
    - **Hyperbolic limit**: a → 0 faster than τ → 0 gives wave equation
 
 3. **Convergence Verification**
+
    - Compare random walk density evolution with telegraph equation solution
    - Show convergence as τ → 0 with proper scaling
    - Error analysis and convergence rates
@@ -363,6 +501,7 @@ As τ → 0, a → 0, with constraints:
    - **Phase space**: (position, velocity) distribution
 
 3. **Real-time Analysis**
+
    - Calculate moments: ⟨x⟩, ⟨x²⟩, ⟨v⟩, ⟨v²⟩
    - Show how telegraph equation coefficients emerge
    - Display convergence metrics and scaling relationships
