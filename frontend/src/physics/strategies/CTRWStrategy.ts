@@ -158,4 +158,12 @@ export class CTRWStrategy implements RandomWalkStrategy {
       meanWaitTime: this.meanWaitTime
     };
   }
+
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number } {
+    return {
+      collisionRate: this.collisionRate,
+      velocity: this.velocity,
+      jumpLength: this.jumpLength
+    };
+  }
 }

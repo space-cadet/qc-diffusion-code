@@ -9,4 +9,5 @@ export interface RandomWalkStrategy {
   getPhysicsParameters(): Record<string, number>;
   setBoundaries(config: BoundaryConfig): void;
   getBoundaries(): BoundaryConfig;
+  getParameters?(): { collisionRate: number; velocity: number; jumpLength: number };
 }

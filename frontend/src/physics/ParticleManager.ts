@@ -1,10 +1,10 @@
-import type { Particle, TrajectoryPoint } from './types/Particle';
-import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
-import { CircularBuffer } from './utils/CircularBuffer';
+import type { Particle, TrajectoryPoint } from "./types/Particle";
+import type { RandomWalkStrategy } from "./interfaces/RandomWalkStrategy";
+import { CircularBuffer } from "./utils/CircularBuffer";
 
 export class ParticleManager {
   private strategy: RandomWalkStrategy;
-  private ctrwParticles: Map<string, Particle> = new Map();
+  private particles: Map<string, Particle> = new Map();
   private canvasWidth: number = 800;
   private canvasHeight: number = 600;
   private diagCounter: number = 0;
@@ -42,8 +42,10 @@ export class ParticleManager {
     const widthPhysics = bounds.xMax - bounds.xMin || 1;
     const heightPhysics = bounds.yMax - bounds.yMin || 1;
 
-    const x = bounds.xMin + (pos.x / Math.max(this.canvasWidth, 1)) * widthPhysics;
-    const y = bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * heightPhysics;
+    const x =
+      bounds.xMin + (pos.x / Math.max(this.canvasWidth, 1)) * widthPhysics;
+    const y =
+      bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * heightPhysics;
     return { x, y };
   }
 
@@ -56,7 +58,7 @@ export class ParticleManager {
       x: tsParticle.position.x,
       y: tsParticle.position.y,
     });
-    if (tsParticle.id === 'p0') {
+    if (tsParticle.id === "p0") {
       console.log("[PM] initializeParticle p0", {
         canvasPos: { x: tsParticle.position.x, y: tsParticle.position.y },
         physicsPos,
@@ -64,74 +66,77 @@ export class ParticleManager {
         bounds: this.strategy.getBoundaries(),
       });
     }
-    
+
     const particle: Particle = {
       id: tsParticle.id,
       position: {
         x: physicsPos.x,
-        y: physicsPos.y
+        y: physicsPos.y,
       },
       velocity: {
         vx: speed * Math.cos(angle),
-        vy: speed * Math.sin(angle)
+        vy: speed * Math.sin(angle),
       },
       lastCollisionTime: currentTime,
       nextCollisionTime: currentTime + Math.random() * 0.5,
       collisionCount: 0,
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
-      isActive: true
+      isActive: true,
     };
-    
+
     tsParticle.velocity.x = particle.velocity.vx;
     tsParticle.velocity.y = particle.velocity.vy;
-    
-    this.ctrwParticles.set(particle.id, particle);
+
+    this.particles.set(particle.id, particle);
     return particle;
   }
 
   updateParticle(tsParticle: any): void {
-    let ctrwParticle = this.ctrwParticles.get(tsParticle.id);
-    
-    if (!ctrwParticle) {
-      ctrwParticle = this.initializeParticle(tsParticle);
+    let particle = this.particles.get(tsParticle.id);
+
+    if (!particle) {
+      particle = this.initializeParticle(tsParticle);
     }
 
-    this.strategy.updateParticle(ctrwParticle);
-    
+    this.strategy.updateParticle(particle);
+
     // Update trajectory
-    ctrwParticle.trajectory.push({
-      position: { x: ctrwParticle.position.x, y: ctrwParticle.position.y },
-      timestamp: Date.now() / 1000
+    particle.trajectory.push({
+      position: { x: particle.position.x, y: particle.position.y },
+      timestamp: Date.now() / 1000,
     });
-    
+
     // Map physics position to canvas coordinates for rendering
-    const mapped = this.mapToCanvas(ctrwParticle.position);
+    const mapped = this.mapToCanvas(particle.position);
     tsParticle.position.x = mapped.x;
     tsParticle.position.y = mapped.y;
-    tsParticle.velocity.x = ctrwParticle.velocity.vx;
-    tsParticle.velocity.y = ctrwParticle.velocity.vy;
+    tsParticle.velocity.x = particle.velocity.vx;
+    tsParticle.velocity.y = particle.velocity.vy;
 
     // Periodic diagnostics for one representative particle
-    if (tsParticle.id === 'p0' && this.diagCounter % 30 === 0) {
+    if (tsParticle.id === "p0" && this.diagCounter % 30 === 0) {
       console.log("[PM] updateParticle p0", {
-        physicsPos: { ...ctrwParticle.position },
+        physicsPos: { ...particle.position },
         mappedPos: mapped,
         canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
         bounds: this.strategy.getBoundaries(),
-        velocity: ctrwParticle.velocity,
+        velocity: particle.velocity,
       });
     }
     this.diagCounter++;
   }
 
   getAllParticles(): Particle[] {
-    return Array.from(this.ctrwParticles.values());
+    return Array.from(this.particles.values());
   }
 
   updatePhysicsEngine(newStrategy: RandomWalkStrategy): void {
     this.strategy = newStrategy;
     try {
-      console.log("[PM] updatePhysicsEngine: new bounds", this.strategy.getBoundaries());
+      console.log(
+        "[PM] updatePhysicsEngine: new bounds",
+        this.strategy.getBoundaries()
+      );
     } catch {}
   }
 
@@ -144,23 +149,27 @@ export class ParticleManager {
       rho: [],
       u: [],
       moments: { mean: 0, variance: 0, skewness: 0, kurtosis: 0 },
-      collisionRate: []
+      collisionRate: [],
     };
   }
 
   clearAllParticles(): void {
-    this.ctrwParticles.clear();
+    this.particles.clear();
   }
 
   getCollisionStats() {
     const particles = this.getAllParticles();
-    const totalCollisions = particles.reduce((sum, p) => sum + p.collisionCount, 0);
-    const avgCollisions = particles.length > 0 ? totalCollisions / particles.length : 0;
-    
+    const totalCollisions = particles.reduce(
+      (sum, p) => sum + p.collisionCount,
+      0
+    );
+    const avgCollisions =
+      particles.length > 0 ? totalCollisions / particles.length : 0;
+
     return {
       totalCollisions,
       avgCollisions,
-      activeParticles: particles.filter(p => p.isActive).length
+      activeParticles: particles.filter((p) => p.isActive).length,
     };
   }
 }
