@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-23 17:05:57 IST_
+_Last Updated: 2025-08-23 17:46:03 IST_
 
 ## Active Tasks
 
@@ -18,6 +18,7 @@ _Last Updated: 2025-08-23 17:05:57 IST_
 | C6a | Rewrite ts-particles Component Using Low-Level API   | ✅ COMPLETED   | HIGH     | 2025-08-22 | C5b, C6      |
 | C7  | Observer Design and Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-22 | C5c          |
 | C8  | Density Profile Calculation Implementation            | ✅ COMPLETED   | HIGH     | 2025-08-23 | C5c, C7      |
+| C9  | Standalone Repository Setup and Vercel Deployment    | 🔄 IN PROGRESS | HIGH     | 2025-08-23 | C1, C5b, C7, C8 |
 
 ## Task Details
 
@@ -82,6 +83,12 @@ _Last Updated: 2025-08-23 17:05:57 IST_
 **Status**: ✅ COMPLETED **Last**: 2025-08-23 17:05:57 IST
 **Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/hooks/useDensityVisualization.ts`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/physics/ParticleManager.ts`
 **Notes**: Coordinate system clustering issue fixed by GPT5 - corrected physics-canvas coordinate mapping, proper density calculation now shows uniform distribution instead of corner artifacts
+
+### C9: Standalone Repository Setup and Vercel Deployment
+**Description**: Extract code subproject to standalone repository and deploy to Vercel with proper monorepo configuration
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-23 17:46:03 IST
+**Files**: `vercel.json`, `frontend/package.json`, `packages/graph-core/`, `packages/graph-ui/`
+**Notes**: Repository extracted using git subtree, packages copied locally, Vercel config updated - pnpm lockfile sync issues remain
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

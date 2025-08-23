@@ -1,9 +1,16 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-23 17:05:57 IST_
+_Last Updated: 2025-08-23 17:46:03 IST_
 
 ### 2025-08-23
+
+#### 17:46 - C9: Memory Bank Updates for Standalone Repository
+- Created `memory-bank/tasks/C9.md` - New task for standalone repository setup and Vercel deployment
+- Updated `memory-bank/tasks.md` - Added C9 to active tasks registry and task details section
+- Updated `memory-bank/session_cache.md` - Changed focus task to C9, updated active task count and registry
+- Updated `memory-bank/sessions/2025-08-23-evening.md` - Added repository extraction progress and current deployment issues
+- Created `memory-bank/implementation-details/vercel-deployment-plan.md` - Comprehensive deployment strategy and troubleshooting guide
 
 #### 17:05 - C5b, C8: Grid Layout Persistence + Distribution System + Coordinate System Fixes
 - Updated `frontend/src/stores/appStore.ts` - Claude added randomWalkSimLayouts state and persistence for React Grid Layout panel positions/sizes
