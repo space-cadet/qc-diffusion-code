@@ -26,7 +26,7 @@ export class ParticleManager {
   }
 
   // Map physics coordinates (defined by strategy boundaries) to canvas pixel coordinates
-  private mapToCanvas(pos: { x: number; y: number }) {
+  public mapToCanvas(pos: { x: number; y: number }): { x: number; y: number } {
     const bounds = this.strategy.getBoundaries();
     const widthPhysics = bounds.xMax - bounds.xMin || 1;
     const heightPhysics = bounds.yMax - bounds.yMin || 1;

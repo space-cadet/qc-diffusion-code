@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-23 00:35:57 IST_
+_Last Updated: 2025-08-23 17:05:57 IST_
 
 ## Active Tasks
 
@@ -49,9 +49,9 @@ _Last Updated: 2025-08-23 00:35:57 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-22 18:34:25 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`
-**Notes**: Fixed particle display and animation loop issues - replaced destructive container.refresh() with container.draw(false), decoupled physics stepping from rendering, proper pause/resume functionality implemented
+**Status**: ✅ COMPLETED **Last**: 2025-08-23 17:05:57 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/components/ParameterPanel.tsx`
+**Notes**: Grid layout persistence added by Claude, distribution controls implemented by GPT5, visualization sync fixed by Claude 3.5 - comprehensive particle distribution system with 5 types (uniform, gaussian, ring, stripe, grid)
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
@@ -79,9 +79,9 @@ _Last Updated: 2025-08-23 00:35:57 IST_
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification
-**Status**: ✅ COMPLETED **Last**: 2025-08-23 00:35:57 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/hooks/useDensityVisualization.ts`, `frontend/src/components/DensityComparison.tsx`
-**Notes**: 2D density visualization implemented with real-time heatmap display and telegraph equation verification metrics
+**Status**: ✅ COMPLETED **Last**: 2025-08-23 17:05:57 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/hooks/useDensityVisualization.ts`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/physics/ParticleManager.ts`
+**Notes**: Coordinate system clustering issue fixed by GPT5 - corrected physics-canvas coordinate mapping, proper density calculation now shows uniform distribution instead of corner artifacts
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

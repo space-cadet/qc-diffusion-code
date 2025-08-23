@@ -17,6 +17,16 @@ interface SimulatorParams {
   boundaryCondition?: string;
   canvasWidth?: number;
   canvasHeight?: number;
+  // Initial distribution controls (canvas space)
+  initialDistType?: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  distSigmaX?: number;
+  distSigmaY?: number;
+  distR0?: number;
+  distDR?: number;
+  distThickness?: number;
+  distNx?: number;
+  distNy?: number;
+  distJitter?: number;
 }
 
 export class RandomWalkSimulator {
@@ -25,6 +35,17 @@ export class RandomWalkSimulator {
   private particleCount: number;
   private time: number = 0;
   private observableManager: ObservableManager;
+  private canvasWidth: number = 800;
+  private canvasHeight: number = 600;
+  private initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' = 'uniform';
+  private distSigmaX: number = 80;
+  private distSigmaY: number = 80;
+  private distR0: number = 150;
+  private distDR: number = 20;
+  private distThickness: number = 40;
+  private distNx: number = 20;
+  private distNy: number = 15;
+  private distJitter: number = 4;
   private densityHistory: Array<{
     time: number;
     density: number[][];
@@ -44,6 +65,23 @@ export class RandomWalkSimulator {
     this.particleManager = new ParticleManager(this.strategy);
     this.particleCount = params.particleCount;
     this.observableManager = new ObservableManager();
+    // Ensure ParticleManager knows canvas size before seeding particles,
+    // so that mapToPhysics() during initialization uses correct dimensions.
+    if (params.canvasWidth && params.canvasHeight) {
+      this.canvasWidth = params.canvasWidth;
+      this.canvasHeight = params.canvasHeight;
+      this.particleManager.setCanvasSize(this.canvasWidth, this.canvasHeight);
+    }
+    // Store distribution params
+    if (params.initialDistType) this.initialDistType = params.initialDistType;
+    if (params.distSigmaX !== undefined) this.distSigmaX = params.distSigmaX;
+    if (params.distSigmaY !== undefined) this.distSigmaY = params.distSigmaY;
+    if (params.distR0 !== undefined) this.distR0 = params.distR0;
+    if (params.distDR !== undefined) this.distDR = params.distDR;
+    if (params.distThickness !== undefined) this.distThickness = params.distThickness;
+    if (params.distNx !== undefined) this.distNx = params.distNx;
+    if (params.distNy !== undefined) this.distNy = params.distNy;
+    if (params.distJitter !== undefined) this.distJitter = params.distJitter;
     this.initializeParticles();
   }
 
@@ -57,19 +95,73 @@ export class RandomWalkSimulator {
     };
   }
 
+  private sampleCanvasPosition(i: number): { x: number; y: number } {
+    const cx = this.canvasWidth / 2;
+    const cy = this.canvasHeight / 2;
+    switch (this.initialDistType) {
+      case 'gaussian': {
+        // Box-Muller
+        const bm = () => {
+          let u = 0, v = 0;
+          while (u === 0) u = Math.random();
+          while (v === 0) v = Math.random();
+          return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        };
+        const x = cx + bm() * this.distSigmaX;
+        const y = cy + bm() * this.distSigmaY;
+        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
+      }
+      case 'ring': {
+        const r0 = this.distR0;
+        const dr = this.distDR;
+        const r = r0 + (Math.random() - 0.5) * 2 * dr;
+        const theta = Math.random() * 2 * Math.PI;
+        const x = cx + r * Math.cos(theta);
+        const y = cy + r * Math.sin(theta);
+        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
+      }
+      case 'stripe': {
+        // vertical stripe centered at cx
+        const half = this.distThickness / 2;
+        const x = cx + (Math.random() * 2 - 1) * half;
+        const y = Math.random() * this.canvasHeight;
+        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y };
+      }
+      case 'grid': {
+        const nx = Math.max(1, this.distNx);
+        const ny = Math.max(1, this.distNy);
+        const gx = i % nx;
+        const gy = Math.floor(i / nx) % ny;
+        const cellW = this.canvasWidth / nx;
+        const cellH = this.canvasHeight / ny;
+        const jitterX = (Math.random() * 2 - 1) * this.distJitter;
+        const jitterY = (Math.random() * 2 - 1) * this.distJitter;
+        const x = (gx + 0.5) * cellW + jitterX;
+        const y = (gy + 0.5) * cellH + jitterY;
+        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
+      }
+      case 'uniform':
+      default:
+        return { x: Math.random() * this.canvasWidth, y: Math.random() * this.canvasHeight };
+    }
+  }
+
   private initializeParticles(): void {
     // Clear existing particles
     this.particleManager.clearAllParticles();
     
     // Create new particles with random positions
+    // IMPORTANT: pass positions in CANVAS coordinates here.
+    // ParticleManager.initializeParticle() converts canvas -> physics via mapToPhysics().
     for (let i = 0; i < this.particleCount; i++) {
+      const pos = this.sampleCanvasPosition(i);
       const tsParticle = {
         id: `p${i}`,
-        position: { 
-          x: (Math.random() - 0.5) * 400, // Random position in -200 to 200 range
-          y: (Math.random() - 0.5) * 400 
+        position: {
+          x: pos.x,
+          y: pos.y,
         },
-        velocity: { x: 0, y: 0 }
+        velocity: { x: 0, y: 0 },
       };
       this.particleManager.initializeParticle(tsParticle);
     }
@@ -107,6 +199,22 @@ export class RandomWalkSimulator {
     
     this.strategy = newStrategy;
     this.particleManager.updatePhysicsEngine(newStrategy);
+    // Update canvas size if provided so future initializations/mappings are correct
+    if (params.canvasWidth && params.canvasHeight) {
+      this.canvasWidth = params.canvasWidth;
+      this.canvasHeight = params.canvasHeight;
+      this.particleManager.setCanvasSize(this.canvasWidth, this.canvasHeight);
+    }
+    // Update distribution params
+    if (params.initialDistType) this.initialDistType = params.initialDistType;
+    if (params.distSigmaX !== undefined) this.distSigmaX = params.distSigmaX;
+    if (params.distSigmaY !== undefined) this.distSigmaY = params.distSigmaY;
+    if (params.distR0 !== undefined) this.distR0 = params.distR0;
+    if (params.distDR !== undefined) this.distDR = params.distDR;
+    if (params.distThickness !== undefined) this.distThickness = params.distThickness;
+    if (params.distNx !== undefined) this.distNx = params.distNx;
+    if (params.distNy !== undefined) this.distNy = params.distNy;
+    if (params.distJitter !== undefined) this.distJitter = params.distJitter;
     
     // Update particle count if changed
     if (this.particleCount !== params.particleCount) {

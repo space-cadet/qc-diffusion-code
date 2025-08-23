@@ -27,23 +27,14 @@ const ReactGridLayout = WidthProvider(RGL);
 
 export default function RandomWalkSim() {
   // Get parameters from Zustand store (persistent)
-  const { gridLayoutParams, setGridLayoutParams } = useAppStore();
+  const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts } = useAppStore();
 
   // Physics simulation ref
   const simulatorRef = useRef<RandomWalkSimulator | null>(null);
   const tsParticlesContainerRef = useRef<any>(null);
   const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
-  // Keep layout and runtime state local (non-persistent)
-  const [layouts, setLayouts] = useState<Layout[]>([
-    { i: "parameters", x: 0, y: 0, w: 3, h: 8, minW: 3, minH: 6 },
-    { i: "canvas", x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 },
-    { i: "observables", x: 0, y: 8, w: 4, h: 4, minW: 3, minH: 3 },
-    { i: "density", x: 4, y: 8, w: 8, h: 4, minW: 8, minH: 3 },
-    { i: "history", x: 0, y: 12, w: 12, h: 4, minW: 6, minH: 2 },
-    { i: "replay", x: 0, y: 16, w: 8, h: 3, minW: 6, minH: 2 },
-    { i: "export", x: 8, y: 16, w: 4, h: 3, minW: 4, minH: 2 },
-  ]);
+  // Runtime state (non-persistent)
 
   const [simulationState, setSimulationState] = useState<SimulationState>({
     isRunning: false,
@@ -82,6 +73,16 @@ export default function RandomWalkSim() {
       boundaryCondition: gridLayoutParams.boundaryCondition,
       canvasWidth,
       canvasHeight,
+      // initial distribution wiring
+      initialDistType: gridLayoutParams.initialDistType,
+      distSigmaX: gridLayoutParams.distSigmaX,
+      distSigmaY: gridLayoutParams.distSigmaY,
+      distR0: gridLayoutParams.distR0,
+      distDR: gridLayoutParams.distDR,
+      distThickness: gridLayoutParams.distThickness,
+      distNx: gridLayoutParams.distNx,
+      distNy: gridLayoutParams.distNy,
+      distJitter: gridLayoutParams.distJitter,
     });
 
     // Connect particle manager to tsParticles
@@ -147,6 +148,16 @@ export default function RandomWalkSim() {
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles,
+        // pass through distribution params as they change
+        initialDistType: gridLayoutParams.initialDistType,
+        distSigmaX: gridLayoutParams.distSigmaX,
+        distSigmaY: gridLayoutParams.distSigmaY,
+        distR0: gridLayoutParams.distR0,
+        distDR: gridLayoutParams.distDR,
+        distThickness: gridLayoutParams.distThickness,
+        distNx: gridLayoutParams.distNx,
+        distNy: gridLayoutParams.distNy,
+        distJitter: gridLayoutParams.distJitter,
       });
 
       // Re-connect particle manager after parameter updates
@@ -155,7 +166,7 @@ export default function RandomWalkSim() {
   }, [gridLayoutParams]);
 
   const onLayoutChange = (layout: Layout[]) => {
-    setLayouts(layout);
+    setRandomWalkSimLayouts(layout);
   };
 
   const handleStart = () => {
@@ -232,44 +243,37 @@ export default function RandomWalkSim() {
         graphSize: gridLayoutParams.graphSize,
         canvasWidth: container.canvas.size.width,
         canvasHeight: container.canvas.size.height,
+        // ensure distribution used for reseeding
+        initialDistType: gridLayoutParams.initialDistType,
+        distSigmaX: gridLayoutParams.distSigmaX,
+        distSigmaY: gridLayoutParams.distSigmaY,
+        distR0: gridLayoutParams.distR0,
+        distDR: gridLayoutParams.distDR,
+        distThickness: gridLayoutParams.distThickness,
+        distNx: gridLayoutParams.distNx,
+        distNy: gridLayoutParams.distNy,
+        distJitter: gridLayoutParams.distJitter,
       });
-
-      // Reset physics state
-      simulatorRef.current.reset();
-
-      // Re-connect particle manager
-      setParticleManager(simulatorRef.current.getParticleManager());
-
-      // Ensure ParticleManager uses the current canvas size for mapping
-      const pm = simulatorRef.current.getParticleManager();
-      (pm as any).setCanvasSize?.(canvasWidth, canvasHeight);
 
       // Clear existing particles
-      const beforeClear = container.particles.count;
       container.particles.clear();
-      const afterClear = container.particles.count;
-
-      console.log("handleInitialize: particle clear", {
-        beforeClear,
-        afterClear,
-      });
-
-      // Seed tsParticles directly in canvas space; ParticleManager will map to physics on init
-      const targetCount = gridLayoutParams.particles;
-      for (let i = 0; i < targetCount; i++) {
-        const x = Math.random() * canvasWidth;
-        const y = Math.random() * canvasHeight;
-        if (i < 3) {
-          console.log(`handleInitialize: adding particle ${i}`, { x, y });
-        }
-        container.particles.addParticle({ x, y, color: "#3b82f6" });
+      
+      // Reset physics state and get fresh distribution
+      simulatorRef.current.reset();
+      
+      // Re-connect particle manager and ensure canvas size
+      const pm = simulatorRef.current.getParticleManager();
+      setParticleManager(pm);
+      pm.setCanvasSize(canvasWidth, canvasHeight);
+      
+      // Get particles from simulator's distribution
+      const particles = pm.getAllParticles();
+      
+      // Add to tsParticles in canvas coordinates
+      for (const p of particles) {
+        const canvasPos = pm.mapToCanvas(p.position);
+        container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y, color: "#3b82f6" });
       }
-
-      const finalCount = container.particles.count;
-      console.log("handleInitialize: after adding", {
-        finalCount,
-        expectedCount: targetCount,
-      });
 
       // Trigger a redraw without reloading options (avoid refresh which clears manual particles)
       const beforeRedraw = container.particles.count;
@@ -382,7 +386,7 @@ export default function RandomWalkSim() {
       <div className="flex-1 p-4">
         <ReactGridLayout
           className="layout"
-          layout={layouts}
+          layout={randomWalkSimLayouts}
           onLayoutChange={onLayoutChange}
           cols={12}
           rowHeight={50}

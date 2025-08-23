@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-22 18:41:31 IST_
+_Last Updated: 2025-08-23 17:05:57 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -83,6 +83,15 @@ This task implements the complete UI framework for the random walk simulation ba
 - **Title-bar Dragging**: Panels now only draggable by title bars using draggableHandle=".drag-handle"
 - **State Persistence**: Grid layout parameters now persist across browser refresh via Zustand store
 - **Improved UX**: Users can interact with controls without accidentally moving panels
+
+**Major Update (2025-08-23)**:
+
+- ✅ **Grid Layout Persistence**: Claude fixed React Grid Layout panel positions/sizes not persisting between page reloads by adding randomWalkSimLayouts state to Zustand store
+- ✅ **Initial Distribution System**: GPT5 implemented comprehensive particle distribution controls with 5 distribution types (uniform, gaussian, ring, stripe, grid) including all parameters
+- ✅ **Distribution UI**: GPT5 added conditional rendering of distribution controls for continuum mode only, with proper parameter inputs for each distribution type
+- ✅ **Coordinate System Fix**: GPT5 fixed density profile clustering issue by correcting coordinate mapping between physics (-200,200) and canvas (0,canvasWidth) spaces
+- ✅ **Visualization Sync**: Claude 3.5 fixed final synchronization issue ensuring initial particle visualization matches selected distribution immediately after initialization
+- ✅ **Distribution Sampling**: GPT5 implemented sophisticated samplers including Box-Muller transform for Gaussian, polar coordinates for rings, grid positioning with jitter
 
 **Refactoring Progress (2025-08-21 Evening)**:
 

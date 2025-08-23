@@ -1,9 +1,16 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-23 00:35:57 IST_
+_Last Updated: 2025-08-23 17:05:57 IST_
 
 ### 2025-08-23
+
+#### 17:05 - C5b, C8: Grid Layout Persistence + Distribution System + Coordinate System Fixes
+- Updated `frontend/src/stores/appStore.ts` - Claude added randomWalkSimLayouts state and persistence for React Grid Layout panel positions/sizes
+- Updated `frontend/src/RandomWalkSim.tsx` - Claude integrated persisted layouts from Zustand store replacing local state
+- Updated `frontend/src/components/ParameterPanel.tsx` - GPT5 added distribution controls UI with 5 types (uniform, gaussian, ring, stripe, grid) and conditional rendering for continuum mode only
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - GPT5 extended SimulatorParams interface with distribution fields, implemented sampleCanvasPosition() with Box-Muller transform and sophisticated sampling algorithms, fixed coordinate initialization from physics to canvas coordinates
+- Updated `frontend/src/physics/ParticleManager.ts` - GPT5 made mapToCanvas() method public for visualization synchronization
 
 #### 00:35 - C8: Density Profile Calculation Implementation
 - Added `frontend/src/physics/RandomWalkSimulator.ts` - getDensityProfile2D method with 2D spatial binning, recordDensitySnapshot for history tracking, analyzeWaveFrontSpeed for telegraph equation verification

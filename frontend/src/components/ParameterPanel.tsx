@@ -17,6 +17,16 @@ interface GridLayoutParams {
   collisionRate: number;
   jumpLength: number;
   velocity: number;
+  // Initial distribution controls (mirror store)
+  initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  distSigmaX: number;
+  distSigmaY: number;
+  distR0: number;
+  distDR: number;
+  distThickness: number;
+  distNx: number;
+  distNy: number;
+  distJitter: number;
 }
 
 interface ParameterPanelProps {
@@ -88,6 +98,168 @@ export const ParameterPanel = ({
               Graph
             </label>
           </div>
+
+        {/* Initial Distribution (only for Continuum) */}
+        {gridLayoutParams.simulationType === "continuum" && (
+        <div className="border rounded p-3 bg-gray-50">
+          <h4 className="font-medium mb-2">Initial Distribution</h4>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm mb-1">Type:</label>
+              <select
+                value={gridLayoutParams.initialDistType}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    initialDistType: e.target.value as GridLayoutParams['initialDistType'],
+                  })
+                }
+                className="w-full border rounded px-2 py-1 text-sm"
+              >
+                <option value="uniform">Uniform</option>
+                <option value="gaussian">Gaussian</option>
+                <option value="ring">Ring / Annulus</option>
+                <option value="stripe">Stripe</option>
+                <option value="grid">Grid</option>
+              </select>
+            </div>
+
+            {/* Gaussian params */}
+            {gridLayoutParams.initialDistType === 'gaussian' && (
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs">σx (px)</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distSigmaX}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distSigmaX: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs">σy (px)</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distSigmaY}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distSigmaY: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Ring params */}
+            {gridLayoutParams.initialDistType === 'ring' && (
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs">r₀ (px)</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distR0}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distR0: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs">Δr (px)</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distDR}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distDR: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Stripe params */}
+            {gridLayoutParams.initialDistType === 'stripe' && (
+              <div>
+                <label className="block text-xs">Thickness (px)</label>
+                <input
+                  type="number"
+                  value={gridLayoutParams.distThickness}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      distThickness: parseFloat(e.target.value),
+                    })
+                  }
+                  className="w-full border rounded px-2 py-1 text-sm"
+                />
+              </div>
+            )}
+
+            {/* Grid params */}
+            {gridLayoutParams.initialDistType === 'grid' && (
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-xs">nx</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distNx}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distNx: parseInt(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs">ny</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distNy}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distNy: parseInt(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs">Jitter (px)</label>
+                  <input
+                    type="number"
+                    value={gridLayoutParams.distJitter}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distJitter: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        )}
         </div>
 
         {/* Random Walk Strategy */}
