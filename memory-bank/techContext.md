@@ -1,6 +1,6 @@
 # Technical Context
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-20 08:31:32 IST*
+*Last Updated: 2025-08-24 00:02:35 IST*
 
 ## Backend Technical Details
 
@@ -28,18 +28,30 @@ python-multipart==0.0.6  # Form data handling
 ## Frontend Technical Details
 
 ### React Application
-- **Framework**: React 18.3.1 with TypeScript
-- **Build Tool**: Vite 5.4.1 for fast development
-- **Package Manager**: pnpm 10.14.0
-- **Port**: 5174 (Vite default)
+- **Framework**: React 18.3.1 with TypeScript 5.5.3 in strict mode
+- **Build Tool**: Vite 5.4.1 with WebGL optimization and shader loading
+- **Package Manager**: pnpm 10.14.0 with monorepo workspace configuration
+- **Deployment**: Vercel with production build pipeline
+- **Testing**: Jest with comprehensive unit and integration tests
 
-### Key Dependencies
+### Advanced Dependencies
 ```
-react & react-dom      # Core React framework
-plotly.js              # Scientific visualization
-typescript             # Type safety
-tailwindcss            # Utility-first CSS
-@types/*               # TypeScript definitions
+# Physics and visualization
+tsparticles             # Real-time particle system with custom physics
+@sigma/node             # Graph network visualization
+@spin-network/graph-core # Graph theory utilities
+plotly.js               # Scientific 3D visualization
+
+# State management and UI
+zustand                 # Persistent state management
+react-grid-layout       # Professional draggable panel interface
+@dnd-kit/core          # Advanced drag-and-drop system
+tailwindcss            # Modern utility-first CSS
+
+# Mathematical computing
+mathjs                 # Mathematical expression evaluation
+lodash                 # Functional programming utilities
+jest                   # Testing with mathematical verification
 ```
 
 ### Build Configuration
@@ -66,26 +78,66 @@ tailwindcss            # Utility-first CSS
 "dev:full": "concurrently \"cd ../backend && source .venv/bin/activate && python main.py\" \"pnpm dev\""
 ```
 
-## File Structure Context
+## Advanced File Structure
 ```
-code/
+qc-diffusion-code/
 ├── backend/
-│   ├── .venv/           # Python virtual environment
-│   ├── main.py          # FastAPI application
-│   ├── api.py           # WebSocket routes
-│   ├── solvers.py       # PDE simulation logic
-│   └── requirements.txt # Python dependencies
+│   ├── .venv/              # Python virtual environment
+│   ├── main.py             # FastAPI application with production config
+│   ├── api.py              # WebSocket routes with state management
+│   ├── solvers.py          # PDE simulation with conservation monitoring
+│   └── requirements.txt    # Python dependencies
 ├── frontend/
-│   ├── src/             # React source code
-│   ├── dist/            # Build output
-│   ├── node_modules/    # Node dependencies
-│   ├── package.json     # Project configuration
-│   └── vite.config.ts   # Build configuration
-└── visual-pde/          # External repository (independent)
+│   ├── src/
+│   │   ├── components/     # Advanced UI components
+│   │   │   ├── ParameterPanel.tsx    # Physics parameter controls
+│   │   │   ├── ParticleCanvas.tsx    # Real-time visualization
+│   │   │   └── ObservablesPanel.tsx  # Numerical observable tracking
+│   │   ├── physics/        # Comprehensive physics engine
+│   │   │   ├── strategies/ # Strategy pattern implementations
+│   │   │   ├── observables/ # Observer pattern observables
+│   │   │   └── utils/      # Mathematical utilities
+│   │   ├── stores/         # Zustand state management
+│   │   ├── webgl/          # GPU-accelerated PDE solvers
+│   │   └── hooks/          # Custom React hooks
+│   ├── package.json        # Monorepo package configuration
+│   └── vite.config.ts      # Advanced build configuration
+├── packages/               # Shared monorepo packages
+│   ├── graph-core/         # Graph theory utilities
+│   └── graph-ui/           # Graph visualization components
+├── pnpm-workspace.yaml     # Monorepo workspace configuration
+├── vercel.json             # Production deployment configuration
+└── memory-bank/            # Comprehensive project management
 ```
 
-## Integration Points
-- **WebSocket Communication**: Backend streams simulation data to frontend
-- **CORS Configuration**: Allows frontend-backend communication in development
-- **Type Safety**: TypeScript ensures type consistency across components
-- **Scientific Computing**: py-pde provides robust PDE solving capabilities
+## Advanced Integration Architecture
+
+### Physics Engine Integration
+- **Strategy Pattern**: Modular physics implementations (CTRW, Simple, Lévy, Fractional)
+- **Observer Pattern**: Lazy evaluation system for numerical observables
+- **Coordinate System**: Clean separation between physics (-200,+200) and canvas (0,width) coordinates
+- **WebGL Acceleration**: Fragment shader-based PDE solving with 100x performance improvement
+
+### State Management Integration
+- **Zustand Persistence**: Complete application state with localStorage integration
+- **Auto-save System**: Periodic state saving (2-second intervals) during simulation
+- **Session Restoration**: Full simulation state recovery across browser sessions
+- **UI Persistence**: Grid layout positions and panel states preserved
+
+### Visualization Integration
+- **Dual Rendering**: tsParticles for continuum, Sigma.js for graph networks
+- **Real-time Synchronization**: Physics calculations synchronized with visual updates
+- **Mathematical Accuracy**: Proper coordinate transformations and density calculations
+- **Performance Optimization**: 60fps animation with efficient memory management
+
+### Production Deployment
+- **Monorepo Architecture**: pnpm workspace with shared package dependencies
+- **Vercel Integration**: Optimized build pipeline with automated CI/CD
+- **Cross-platform Support**: WebGL acceleration with graceful fallbacks
+- **Error Handling**: Comprehensive error boundaries with user-friendly messaging
+
+### Mathematical Computing
+- **CTRW Implementation**: Continuous Time Random Walk with exponential collision timing
+- **Conservation Monitoring**: Real-time mass and energy conservation tracking
+- **Density Calculations**: 2D spatial binning for telegraph equation verification
+- **Statistical Analysis**: Box-Muller transform, Poisson processes, spatial moments

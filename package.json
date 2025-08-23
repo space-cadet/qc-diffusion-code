@@ -1,4 +1,7 @@
 {
+	"name": "qc-diffusion-code",
+	"version": "1.0.0",
+	"private": true,
 	"scripts": {
 		"build": "pnpm --filter qc-diffusion-frontend build"
 	},

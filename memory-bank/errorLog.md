@@ -1,5 +1,67 @@
 # Error Log
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-20 08:31:32 IST*
+*Last Updated: 2025-08-24 00:02:35 IST*
 
-*No errors recorded yet*
+## 2025-08-23 21:40: C5b - State Restoration Not Working Despite Implementation
+**File:** `frontend/src/RandomWalkSim.tsx`
+**Error:** State restoration on page reload not functioning - particles not maintaining ring distribution after browser refresh
+**Cause:** Implementation completed but restoration logic not triggering properly during component initialization
+**Fix:** Requires debugging of useEffect timing and particle data structure validation
+**Changes:** Enhanced persistence architecture implemented but needs connection verification
+**Task:** C5b
+
+## 2025-08-23 18:49: C9 - pnpm Lockfile Synchronization Issues  
+**File:** `frontend/package.json`, `pnpm-lock.yaml`
+**Error:** ERR_PNPM_OUTDATED_LOCKFILE preventing Vercel deployment
+**Cause:** Adding local graph-core dependency created lockfile inconsistency
+**Fix:** Created pnpm-workspace.yaml with proper monorepo configuration, updated build commands
+**Changes:** Resolved through workspace-aware pnpm commands and Vercel build configuration
+**Task:** C9
+
+## 2025-08-23 17:05: C8 - Density Profile Clustering at Canvas Corners
+**File:** `frontend/src/physics/RandomWalkSimulator.ts`  
+**Error:** Density calculations showing artificial clustering at (0,0) instead of uniform distribution
+**Cause:** Coordinate mapping error between canvas coordinates and physics space during initialization
+**Fix:** Corrected coordinate conversion flow: canvas → physics for proper density calculation
+**Changes:** Fixed initialization to use physics coordinates consistently
+**Task:** C8
+
+## 2025-08-22 21:11: C5c - Physics-Canvas Coordinate System Misalignment
+**File:** `frontend/src/physics/ParticleManager.ts`
+**Error:** Particle boundaries not matching expected physics simulation space
+**Cause:** Inconsistent coordinate transformations between physics space (-200,+200) and canvas (0,width)
+**Fix:** Added coordinate transformation functions mapToCanvas() and mapToPhysics() with boundary visualization
+**Changes:** Implemented proper coordinate system separation with visual boundary indicators  
+**Task:** C5c
+
+## 2025-08-22 18:38: C5b - Particle Animation Interference Issues
+**File:** `frontend/src/RandomWalkSim.tsx`, `frontend/src/config/tsParticlesConfig.ts`
+**Error:** Particle display not updating during simulation, animation conflicts between tsParticles and custom physics
+**Cause:** Destructive container.refresh() calls interfering with particle state
+**Fix:** Replaced container.refresh() with container.draw(false), decoupled physics from rendering
+**Changes:** Clean separation between physics stepping and animation rendering
+**Task:** C5b
+
+## 2025-08-22 12:04: C6a - tsParticles High-Level API Animation Conflicts
+**File:** `frontend/src/components/ParticleCanvas.tsx`
+**Error:** Built-in tsParticles movement interfering with custom CTRW physics implementation
+**Cause:** High-level React wrapper providing limited control over particle motion
+**Fix:** Complete rewrite using low-level tsParticles API with direct engine management
+**Changes:** Manual container management, eliminated animation conflicts, direct particle control
+**Task:** C6a
+
+## 2025-08-20 23:44: C4 - Non-Functional Pause Button
+**File:** `frontend/src/App.tsx`, `backend/api.py`  
+**Error:** Pause button had no effect on running simulations for both WebGL and WebSocket solvers
+**Cause:** Missing WebGL pause handling, backend state not persisting during pause, frontend-backend synchronization issues
+**Fix:** Added backend parameter storage, WebGL pause integration, pause_state message synchronization
+**Changes:** Unified pause behavior across solver types with proper state management
+**Task:** C4
+
+## 2025-08-20 10:43: C1 - Telegraph Equation Numerical Instability
+**File:** `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/simulation_shaders.js`
+**Error:** Telegraph equation showing numerical instability and incorrect conservation behavior
+**Cause:** Incorrect mathematical implementation as single equation instead of proper first-order system
+**Fix:** Corrected to proper first-order system: du/dt = w, dw/dt = v²∇²u - 2aw with velocity parameter
+**Changes:** Added velocity field extraction, conservation monitoring system, proper physical implementation
+**Task:** C1
