@@ -18,6 +18,7 @@ export interface Particle {
   lastCollisionTime: number;
   nextCollisionTime: number;
   collisionCount: number;
+  waitingTime: number;
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;
 }

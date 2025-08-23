@@ -27,7 +27,16 @@ const ReactGridLayout = WidthProvider(RGL);
 
 export default function RandomWalkSim() {
   // Get parameters from Zustand store (persistent)
-  const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts } = useAppStore();
+  const { 
+    gridLayoutParams, 
+    setGridLayoutParams, 
+    randomWalkSimLayouts, 
+    setRandomWalkSimLayouts,
+    randomWalkSimulationState,
+    setRandomWalkSimulationState,
+    updateSimulationMetrics,
+    saveSimulationSnapshot
+  } = useAppStore();
 
   // Physics simulation ref
   const simulatorRef = useRef<RandomWalkSimulator | null>(null);
@@ -35,13 +44,38 @@ export default function RandomWalkSim() {
   const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
   // Runtime state (non-persistent)
-
-  const [simulationState, setSimulationState] = useState<SimulationState>({
-    isRunning: false,
-    time: 0,
-    collisions: 0,
-    status: "Stopped",
-  });
+  const [isRunning, setIsRunning] = useState(false);
+  
+  // Create combined simulation state for compatibility
+  const simulationState: SimulationState = {
+    isRunning,
+    ...randomWalkSimulationState,
+  };
+  
+  const setSimulationState = (state: SimulationState | ((prev: SimulationState) => SimulationState)) => {
+    if (typeof state === 'function') {
+      const newState = state(simulationState);
+      setIsRunning(newState.isRunning);
+      setRandomWalkSimulationState({
+        time: newState.time,
+        collisions: newState.collisions,
+        status: newState.status,
+        particleData: newState.particleData || [],
+        densityHistory: newState.densityHistory || [],
+        observableData: newState.observableData || {}
+      });
+    } else {
+      setIsRunning(state.isRunning);
+      setRandomWalkSimulationState({
+        time: state.time,
+        collisions: state.collisions,
+        status: state.status,
+        particleData: state.particleData || [],
+        densityHistory: state.densityHistory || [],
+        observableData: state.observableData || {}
+      });
+    }
+  };
 
   // Graph physics reference
   const graphPhysicsRef = useRef<PhysicsRandomWalk | null>(null);
@@ -53,11 +87,36 @@ export default function RandomWalkSim() {
   // Update refs when state changes
   useEffect(() => {
     simulationStateRef.current = simulationState;
-  }, [simulationState]);
+  }, [simulationState, isRunning, randomWalkSimulationState]);
 
   useEffect(() => {
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
+
+  // Periodically save simulation state when running
+  useEffect(() => {
+    if (!isRunning) return;
+    
+    const saveInterval = setInterval(() => {
+      if (simulatorRef.current) {
+        const particles = simulatorRef.current.getParticleManager().getAllParticles();
+        const particleData = particles.map(p => ({
+          id: p.id,
+          position: p.position,
+          velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
+          collisionCount: p.collisionCount || 0,
+          lastCollisionTime: p.lastCollisionTime || 0,
+          waitingTime: p.waitingTime || 0
+        }));
+        
+        const densityHistory = simulatorRef.current.getDensityHistory();
+        
+        saveSimulationSnapshot(particleData, densityHistory, {});
+      }
+    }, 2000); // Save every 2 seconds
+    
+    return () => clearInterval(saveInterval);
+  }, [isRunning, saveSimulationSnapshot]);
 
   // Initialize physics simulator
   useEffect(() => {
@@ -88,6 +147,7 @@ export default function RandomWalkSim() {
     // Connect particle manager to tsParticles
     if (simulatorRef.current) {
       setParticleManager(simulatorRef.current.getParticleManager());
+      
       // If a container already exists, propagate canvas size and update overlay rect
       if (tsParticlesContainerRef.current) {
         const container = tsParticlesContainerRef.current;
@@ -113,6 +173,7 @@ export default function RandomWalkSim() {
             },
             bounds,
             overlay: { x, y, w: rectW, h: rectH },
+            restoredState: !!randomWalkSimulationState.particleData
           });
         }
       }
@@ -178,6 +239,22 @@ export default function RandomWalkSim() {
   };
 
   const handlePause = () => {
+    // Save state when pausing
+    if (simulationState.isRunning && simulatorRef.current) {
+      const particles = simulatorRef.current.getParticleManager().getAllParticles();
+      const particleData = particles.map(p => ({
+        id: p.id,
+        position: p.position,
+        velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
+        collisionCount: p.collisionCount || 0,
+        lastCollisionTime: p.lastCollisionTime || 0,
+        waitingTime: p.waitingTime || 0
+      }));
+      
+      const densityHistory = simulatorRef.current.getDensityHistory();
+      saveSimulationSnapshot(particleData, densityHistory, {});
+    }
+    
     setSimulationState((prev) => ({
       ...prev,
       isRunning: !prev.isRunning,
@@ -199,6 +276,9 @@ export default function RandomWalkSim() {
       time: 0,
       collisions: 0,
       status: "Stopped",
+      particleData: [],
+      densityHistory: [],
+      observableData: {}
     });
   };
 
@@ -272,17 +352,21 @@ export default function RandomWalkSim() {
       // Add to tsParticles in canvas coordinates
       for (const p of particles) {
         const canvasPos = pm.mapToCanvas(p.position);
-        container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y, color: "#3b82f6" });
+        container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
       }
 
-      // Trigger a redraw without reloading options (avoid refresh which clears manual particles)
-      const beforeRedraw = container.particles.count;
-      console.log("handleInitialize: BEFORE REDRAW count", { beforeRedraw });
-      (container as any).draw?.(false);
-      const afterRedraw = container.particles.count;
-      console.log("handleInitialize: AFTER REDRAW count", { afterRedraw });
-
-      console.log(`Initialized ${gridLayoutParams.particles} particles`);
+      // Save the initialized particle state
+      const particleData = particles.map(p => ({
+        id: p.id,
+        position: p.position,
+        velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
+        collisionCount: p.collisionCount || 0,
+        lastCollisionTime: p.lastCollisionTime || 0,
+        waitingTime: p.waitingTime || 0
+      }));
+      
+      saveSimulationSnapshot(particleData, [], {});
+      
     } else {
       console.log("handleInitialize: FAILED - missing refs", {
         hasSimulator: !!simulatorRef.current,
@@ -296,6 +380,9 @@ export default function RandomWalkSim() {
       time: 0,
       collisions: 0,
       status: "Initialized",
+      particleData: [],
+      densityHistory: [],
+      observableData: {}
     });
 
     console.log("Physics engine initialized with parameters:", {
@@ -326,6 +413,39 @@ export default function RandomWalkSim() {
       // setCanvasSize is optional-safe in case of older builds
       (pm as any).setCanvasSize?.(w, h);
 
+      // Restore previous simulation state if available and sync with canvas
+      if (randomWalkSimulationState.particleData && randomWalkSimulationState.particleData.length > 0) {
+        console.log("Restoring particle positions to canvas");
+        
+        // Clear existing canvas particles
+        container.particles.clear();
+        
+        // Restore particle positions and velocities in physics engine
+        pm.clearAllParticles();
+        randomWalkSimulationState.particleData.forEach(particle => {
+          const tsParticle = {
+            id: particle.id,
+            position: particle.position,
+            velocity: { x: particle.velocity.vx, y: particle.velocity.vy }
+          };
+          pm.initializeParticle(tsParticle);
+        });
+        
+        // Restore simulation time
+        (simulatorRef.current as any).time = randomWalkSimulationState.time;
+        
+        // Get restored particles from physics engine and add to canvas
+        const restoredParticles = pm.getAllParticles();
+        restoredParticles.forEach(p => {
+          const canvasPos = pm.mapToCanvas(p.position);
+          container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
+        });
+        
+        // Force canvas redraw
+        (container as any).draw?.(false);
+        console.log(`Restored ${restoredParticles.length} particles to canvas`);
+      }
+
       // Compute boundary rectangle in canvas pixels from physics bounds
       const bounds = (pm as any).getBoundaries?.();
       if (bounds) {
@@ -340,6 +460,7 @@ export default function RandomWalkSim() {
           canvas: { w, h },
           bounds,
           overlay: { x, y, w: rectW, h: rectH },
+          restoredParticles: randomWalkSimulationState.particleData?.length || 0
         });
       }
     }
@@ -353,6 +474,16 @@ export default function RandomWalkSim() {
         // Always advance physics when running, regardless of animation toggle
         if (isRunning) {
           simulatorRef.current.step(0.016);
+          
+          // Update simulation state with current time and collisions
+          const currentTime = simulatorRef.current.getTime();
+          const collisionStats = simulatorRef.current.getCollisionStats();
+          
+          updateSimulationMetrics(
+            currentTime,
+            collisionStats.totalCollisions || 0,
+            'Running'
+          );
         }
 
         // Render only if animation is enabled
@@ -476,4 +607,4 @@ export default function RandomWalkSim() {
       </div>
     </div>
   );
-}
+};

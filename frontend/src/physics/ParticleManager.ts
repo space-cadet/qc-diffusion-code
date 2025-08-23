@@ -81,6 +81,7 @@ export class ParticleManager {
       nextCollisionTime: currentTime + Math.random() * 0.5,
       collisionCount: 0,
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
+      waitingTime: 0,
       isActive: true,
     };
 

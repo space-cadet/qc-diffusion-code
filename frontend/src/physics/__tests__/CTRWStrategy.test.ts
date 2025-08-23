@@ -21,6 +21,7 @@ describe('CTRWStrategy', () => {
       nextCollisionTime: (Date.now() / 1000) + 1.0,
       collisionCount: 0,
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
+      waitingTime: 0,
       isActive: true
     };
   });

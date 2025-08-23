@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 
@@ -52,11 +52,100 @@ export const ParameterPanel = ({
   handleReset,
   handleInitialize,
 }: ParameterPanelProps) => {
+  const { randomWalkUIState, setRandomWalkUIState } = useAppStore();
+  
+  const updateUIState = (updates: Partial<typeof randomWalkUIState>) => {
+    setRandomWalkUIState({ ...randomWalkUIState, ...updates });
+  };
   return (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
         Parameters
       </h3>
+
+      {/* Simulation Controls - Moved to top */}
+      <div className="mb-6 space-y-3">
+        <button
+          onClick={handleInitialize}
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Initialize
+        </button>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={handleStart}
+            disabled={simulationState.isRunning}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Start
+          </button>
+          
+          <button
+            onClick={handlePause}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
+          >
+            {simulationState.isRunning ? (
+              <>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                </svg>
+                Pause
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                Resume
+              </>
+            )}
+          </button>
+        </div>
+        
+        <button
+          onClick={handleReset}
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Reset
+        </button>
+
+        {/* Status Display */}
+        <div className="border rounded-lg p-3 bg-gray-50 space-y-2 text-sm">
+          <div className="flex justify-between items-center">
+            <span className="font-medium">Status:</span>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${
+                simulationState.status === "Running"
+                  ? "bg-green-500"
+                  : simulationState.status === "Paused" 
+                  ? "bg-amber-500"
+                  : "bg-gray-400"
+              }`} />
+              <span className="font-medium text-gray-900">
+                {simulationState.status}
+              </span>
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <span>Time:</span>
+            <span className="font-mono">{simulationState.time.toFixed(1)}s</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Collisions:</span>
+            <span className="font-mono">{simulationState.collisions.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-6">
         {/* Simulation Type */}
@@ -99,297 +188,341 @@ export const ParameterPanel = ({
             </label>
           </div>
 
-        {/* Initial Distribution (only for Continuum) */}
+        {/* Initial Distribution (only for Continuum) - Collapsible */}
         {gridLayoutParams.simulationType === "continuum" && (
-        <div className="border rounded p-3 bg-gray-50">
-          <h4 className="font-medium mb-2">Initial Distribution</h4>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm mb-1">Type:</label>
-              <select
-                value={gridLayoutParams.initialDistType}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    initialDistType: e.target.value as GridLayoutParams['initialDistType'],
-                  })
-                }
-                className="w-full border rounded px-2 py-1 text-sm"
+          <div className="border rounded p-3 bg-gray-50">
+            <button
+              type="button"
+              onClick={() => updateUIState({ isDistributionOpen: !randomWalkUIState.isDistributionOpen })}
+              className="flex items-center justify-between w-full text-sm font-medium text-left mb-2"
+            >
+              <span>Initial Distribution</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${randomWalkUIState.isDistributionOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <option value="uniform">Uniform</option>
-                <option value="gaussian">Gaussian</option>
-                <option value="ring">Ring / Annulus</option>
-                <option value="stripe">Stripe</option>
-                <option value="grid">Grid</option>
-              </select>
-            </div>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {randomWalkUIState.isDistributionOpen && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm mb-1">Type:</label>
+                  <select
+                    value={gridLayoutParams.initialDistType}
+                    onChange={(e) =>
+                      setGridLayoutParams({
+                        ...gridLayoutParams,
+                        initialDistType: e.target.value as GridLayoutParams['initialDistType'],
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1 text-sm"
+                  >
+                    <option value="uniform">Uniform</option>
+                    <option value="gaussian">Gaussian</option>
+                    <option value="ring">Ring / Annulus</option>
+                    <option value="stripe">Stripe</option>
+                    <option value="grid">Grid</option>
+                  </select>
+                </div>
 
-            {/* Gaussian params */}
-            {gridLayoutParams.initialDistType === 'gaussian' && (
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs">σx (px)</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distSigmaX}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distSigmaX: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs">σy (px)</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distSigmaY}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distSigmaY: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-              </div>
-            )}
+                {/* Gaussian params */}
+                {gridLayoutParams.initialDistType === 'gaussian' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs">σx (px)</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distSigmaX}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distSigmaX: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs">σy (px)</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distSigmaY}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distSigmaY: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
 
-            {/* Ring params */}
-            {gridLayoutParams.initialDistType === 'ring' && (
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs">r₀ (px)</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distR0}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distR0: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs">Δr (px)</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distDR}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distDR: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-              </div>
-            )}
+                {/* Ring params */}
+                {gridLayoutParams.initialDistType === 'ring' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs">r₀ (px)</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distR0}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distR0: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs">Δr (px)</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distDR}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distDR: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
 
-            {/* Stripe params */}
-            {gridLayoutParams.initialDistType === 'stripe' && (
-              <div>
-                <label className="block text-xs">Thickness (px)</label>
-                <input
-                  type="number"
-                  value={gridLayoutParams.distThickness}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      distThickness: parseFloat(e.target.value),
-                    })
-                  }
-                  className="w-full border rounded px-2 py-1 text-sm"
-                />
-              </div>
-            )}
+                {/* Stripe params */}
+                {gridLayoutParams.initialDistType === 'stripe' && (
+                  <div>
+                    <label className="block text-xs">Thickness (px)</label>
+                    <input
+                      type="number"
+                      value={gridLayoutParams.distThickness}
+                      onChange={(e) =>
+                        setGridLayoutParams({
+                          ...gridLayoutParams,
+                          distThickness: parseFloat(e.target.value),
+                        })
+                      }
+                      className="w-full border rounded px-2 py-1 text-sm"
+                    />
+                  </div>
+                )}
 
-            {/* Grid params */}
-            {gridLayoutParams.initialDistType === 'grid' && (
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs">nx</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distNx}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distNx: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs">ny</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distNy}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distNy: parseInt(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs">Jitter (px)</label>
-                  <input
-                    type="number"
-                    value={gridLayoutParams.distJitter}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        distJitter: parseFloat(e.target.value),
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  />
-                </div>
+                {/* Grid params */}
+                {gridLayoutParams.initialDistType === 'grid' && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs">nx</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distNx}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distNx: parseInt(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs">ny</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distNy}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distNy: parseInt(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs">Jitter (px)</label>
+                      <input
+                        type="number"
+                        value={gridLayoutParams.distJitter}
+                        onChange={(e) =>
+                          setGridLayoutParams({
+                            ...gridLayoutParams,
+                            distJitter: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </div>
         )}
         </div>
 
-        {/* Random Walk Strategy */}
+        {/* Random Walk Strategy - Collapsible */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Random Walk Strategy:
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="strategy"
-                value="ctrw"
-                checked={gridLayoutParams.strategy === "ctrw"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                  })
-                }
-                className="mr-2"
-              />
-              CTRW (Continuous Time Random Walk)
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="strategy"
-                value="simple"
-                checked={gridLayoutParams.strategy === "simple"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                  })
-                }
-                className="mr-2"
-              />
-              Simple Random Walk
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="strategy"
-                value="levy"
-                checked={gridLayoutParams.strategy === "levy"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                  })
-                }
-                className="mr-2"
-              />
-              Lévy Flight
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="strategy"
-                value="fractional"
-                checked={gridLayoutParams.strategy === "fractional"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                  })
-                }
-                className="mr-2"
-              />
-              Fractional Brownian Motion
-            </label>
-          </div>
+          <button
+            type="button"
+            onClick={() => updateUIState({ isStrategyOpen: !randomWalkUIState.isStrategyOpen })}
+            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
+          >
+            <span>Random Walk Strategy:</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${randomWalkUIState.isStrategyOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {randomWalkUIState.isStrategyOpen && (
+            <div className="space-y-2 ml-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="strategy"
+                  value="ctrw"
+                  checked={gridLayoutParams.strategy === "ctrw"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                    })
+                  }
+                  className="mr-2"
+                />
+                CTRW (Continuous Time Random Walk)
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="strategy"
+                  value="simple"
+                  checked={gridLayoutParams.strategy === "simple"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Simple Random Walk
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="strategy"
+                  value="levy"
+                  checked={gridLayoutParams.strategy === "levy"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Lévy Flight
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="strategy"
+                  value="fractional"
+                  checked={gridLayoutParams.strategy === "fractional"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Fractional Brownian Motion
+              </label>
+            </div>
+          )}
         </div>
 
-        {/* Boundary Conditions */}
+        {/* Boundary Conditions - Collapsible */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Boundary Conditions:
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="boundaryCondition"
-                value="periodic"
-                checked={gridLayoutParams.boundaryCondition === "periodic"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                  })
-                }
-                className="mr-2"
-              />
-              Periodic (wrap around)
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="boundaryCondition"
-                value="reflective"
-                checked={gridLayoutParams.boundaryCondition === "reflective"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                  })
-                }
-                className="mr-2"
-              />
-              Reflective (bounce back)
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="boundaryCondition"
-                value="absorbing"
-                checked={gridLayoutParams.boundaryCondition === "absorbing"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                  })
-                }
-                className="mr-2"
-              />
-              Absorbing (particles disappear)
-            </label>
-          </div>
+          <button
+            type="button"
+            onClick={() => updateUIState({ isBoundaryOpen: !randomWalkUIState.isBoundaryOpen })}
+            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
+          >
+            <span>Boundary Conditions:</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${randomWalkUIState.isBoundaryOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {randomWalkUIState.isBoundaryOpen && (
+            <div className="space-y-2 ml-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="boundaryCondition"
+                  value="periodic"
+                  checked={gridLayoutParams.boundaryCondition === "periodic"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Periodic (wrap around)
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="boundaryCondition"
+                  value="reflective"
+                  checked={gridLayoutParams.boundaryCondition === "reflective"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Reflective (bounce back)
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="boundaryCondition"
+                  value="absorbing"
+                  checked={gridLayoutParams.boundaryCondition === "absorbing"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
+                    })
+                  }
+                  className="mr-2"
+                />
+                Absorbing (particles disappear)
+              </label>
+            </div>
+          )}
         </div>
 
         <div>
@@ -489,166 +622,133 @@ export const ParameterPanel = ({
           </div>
         )}
 
-        {/* Particle Count */}
+        {/* Physics Parameters - Collapsible */}
         <div>
-          <label className="block text-sm font-medium mb-2">Particles:</label>
-          <input
-            type="range"
-            min="50"
-            max="2000"
-            step="1"
-            value={gridLayoutParams.particles}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                particles: parseInt(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>50</span>
-            <span className="font-medium">{gridLayoutParams.particles}</span>
-            <span>2000</span>
-          </div>
-        </div>
-
-        {/* Collision Rate */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            λ (Collision Rate):
-          </label>
-          <input
-            type="range"
-            min="0.1"
-            max="10.0"
-            step="0.1"
-            value={gridLayoutParams.collisionRate}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                collisionRate: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.1</span>
-            <span className="font-medium">
-              {gridLayoutParams.collisionRate}
-            </span>
-            <span>10.0</span>
-          </div>
-        </div>
-
-        {/* Jump Length */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            a (Jump Length):
-          </label>
-          <input
-            type="range"
-            min="0.01"
-            max="1.0"
-            step="0.01"
-            value={gridLayoutParams.jumpLength}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                jumpLength: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.01</span>
-            <span className="font-medium">{gridLayoutParams.jumpLength}</span>
-            <span>1.0</span>
-          </div>
-        </div>
-
-        {/* Velocity */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            v (Velocity):
-          </label>
-          <input
-            type="range"
-            min="0.1"
-            max="5.0"
-            step="0.1"
-            value={gridLayoutParams.velocity}
-            onChange={(e) =>
-              setGridLayoutParams({
-                ...gridLayoutParams,
-                velocity: parseFloat(e.target.value),
-              })
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>0.1</span>
-            <span className="font-medium">{gridLayoutParams.velocity}</span>
-            <span>5.0</span>
-          </div>
-        </div>
-
-        {/* Control Buttons */}
-        <div className="border-t pt-4 space-y-2">
           <button
-            onClick={handleInitialize}
-            className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            type="button"
+            onClick={() => updateUIState({ isParametersOpen: !randomWalkUIState.isParametersOpen })}
+            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
           >
-            🎯 Initialize
-          </button>
-          <div className="flex gap-2">
-            <button
-              onClick={handleStart}
-              disabled={simulationState.isRunning}
-              className="flex-1 px-3 py-2 bg-green-500 text-white rounded disabled:bg-gray-300"
+            <span>Physics Parameters:</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${randomWalkUIState.isParametersOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              ▶️ Start
-            </button>
-            <button
-              onClick={handlePause}
-              className="flex-1 px-3 py-2 bg-yellow-500 text-white rounded"
-            >
-              {simulationState.isRunning ? "⏸️ Pause" : "▶️ Resume"}
-            </button>
-          </div>
-          <button
-            onClick={handleReset}
-            className="w-full px-3 py-2 bg-red-500 text-white rounded"
-          >
-            🔄 Reset
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
+          {randomWalkUIState.isParametersOpen && (
+            <div className="space-y-4 ml-2">
+              {/* Particle Count */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Particles:</label>
+                <input
+                  type="range"
+                  min="50"
+                  max="2000"
+                  step="1"
+                  value={gridLayoutParams.particles}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      particles: parseInt(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>50</span>
+                  <span className="font-medium">{gridLayoutParams.particles}</span>
+                  <span>2000</span>
+                </div>
+              </div>
+
+              {/* Collision Rate */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  λ (Collision Rate):
+                </label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="10.0"
+                  step="0.1"
+                  value={gridLayoutParams.collisionRate}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      collisionRate: parseFloat(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>0.1</span>
+                  <span className="font-medium">
+                    {gridLayoutParams.collisionRate}
+                  </span>
+                  <span>10.0</span>
+                </div>
+              </div>
+
+              {/* Jump Length */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  a (Jump Length):
+                </label>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="1.0"
+                  step="0.01"
+                  value={gridLayoutParams.jumpLength}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      jumpLength: parseFloat(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>0.01</span>
+                  <span className="font-medium">{gridLayoutParams.jumpLength}</span>
+                  <span>1.0</span>
+                </div>
+              </div>
+
+              {/* Velocity */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  v (Velocity):
+                </label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="5.0"
+                  step="0.1"
+                  value={gridLayoutParams.velocity}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      velocity: parseFloat(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>0.1</span>
+                  <span className="font-medium">{gridLayoutParams.velocity}</span>
+                  <span>5.0</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Status Display */}
-        <div className="border-t pt-4 space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>Status:</span>
-            <span
-              className={`font-medium ${
-                simulationState.status === "Running"
-                  ? "text-green-600"
-                  : simulationState.status === "Paused"
-                  ? "text-yellow-600"
-                  : "text-gray-600"
-              }`}
-            >
-              ● {simulationState.status}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Time:</span>
-            <span>{simulationState.time.toFixed(1)}s</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Collisions:</span>
-            <span>{simulationState.collisions.toLocaleString()}</span>
-          </div>
-        </div>
+
 
         {/* Derived Parameters */}
         <div className="border-t pt-4 space-y-1 text-xs text-gray-600">
