@@ -27,8 +27,8 @@ importers:
         specifier: 5.0.4
         version: 5.0.4(graphology@0.26.0(graphology-types@0.24.8))(react@18.3.1)(sigma@3.0.2(graphology-types@0.24.8))
       '@spin-network/graph-core':
-        specifier: file:/Users/deepak/code/spin-network-app/packages/graph-core
-        version: file:../../../../../../../../../Users/deepak/code/spin-network-app/packages/graph-core(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@5.0.1)
+        specifier: file:../packages/graph-core
+        version: file:../packages/graph-core(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@5.0.1)
       '@tsparticles/engine':
         specifier: 3.9.1
         version: 3.9.1
@@ -810,8 +810,8 @@ packages:
   '@sinonjs/fake-timers@10.3.0':
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==}
 
-  '@spin-network/graph-core@file:../../../../../../../../../Users/deepak/code/spin-network-app/packages/graph-core':
-    resolution: {directory: ../../../../../../../../../Users/deepak/code/spin-network-app/packages/graph-core, type: directory}
+  '@spin-network/graph-core@file:../packages/graph-core':
+    resolution: {directory: ../packages/graph-core, type: directory}
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -4868,7 +4868,7 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
-  '@spin-network/graph-core@file:../../../../../../../../../Users/deepak/code/spin-network-app/packages/graph-core(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@5.0.1)':
+  '@spin-network/graph-core@file:../packages/graph-core(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@5.0.1)':
     dependencies:
       dexie: 4.0.11
       graphology: 0.26.0(graphology-types@0.24.8)
