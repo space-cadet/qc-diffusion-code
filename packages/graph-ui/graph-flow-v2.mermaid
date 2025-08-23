@@ -1,0 +1,40 @@
+graph TD
+    subgraph GraphCanvas[GraphCanvas Component]
+        Props[GraphCanvas Props] --> Decision{External Graph?}
+        Decision -- Yes --> External[Use External Graph]
+        Decision -- No --> Internal[Use Internal Graph]
+        Internal --> Hook[useGraphInstance Hook]
+    end
+
+    subgraph Instance[useGraphInstance Hook - Modified]
+        Hook --> Create[Create GraphologyAdapter]
+        Create --> Nodes[Add Initial Nodes with 3D coords]
+        Nodes --> Edges[Add Initial Edges]
+        Edges --> Convert[Convert to Three.js format]
+    end
+
+    subgraph ThreeFiber[React Three Fiber Canvas]
+        Convert --> Canvas[Canvas Component]
+        Canvas --> Camera[PerspectiveCamera]
+        Camera --> Controls[OrbitControls]
+        Controls --> Scene[Scene Setup]
+        Scene --> NodeMeshes[Render Node Meshes]
+        NodeMeshes --> EdgeLines[Render Edge Lines/Cylinders]
+        EdgeLines --> Lighting[Add Lighting]
+        Lighting --> Interactions[Click/Hover Handlers]
+    end
+
+    External --> Convert
+
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef component fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef hook fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef threejs fill:#ff5722,stroke:#bf360c,stroke-width:2px,color:#fff
+    classDef removed fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5
+    classDef new fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+
+    class GraphCanvas component
+    class Instance hook
+    class ThreeFiber threejs
+    class Removed removed
+    class NewComponents new

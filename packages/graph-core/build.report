@@ -1,0 +1,11 @@
+
+> @spin-network/graph-core@0.1.0 build
+> tsc && vite build
+
+file:///Users/deepak/code/spin_network_app/node_modules/.pnpm/vite@6.3.5_@types+node@20.17.50_jiti@1.21.7_terser@5.39.0_yaml@2.8.0/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:4
+import fsp, { constants as constants$3 } from 'node:fs/promises';
+              ^^^^^^^^^
+SyntaxError: The requested module 'node:fs/promises' does not provide an export named 'constants'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:121:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:171:5)
+    at async Loader.import (node:internal/modules/esm/loader:178:24)

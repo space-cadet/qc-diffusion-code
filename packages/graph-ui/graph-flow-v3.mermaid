@@ -1,0 +1,73 @@
+%% Graph UI Architecture (Clean Separation - Top to Bottom Flow)
+classDiagram
+    direction TB
+    %% graph-core (pure logic - top level)
+    class IGraph {
+        +nodes: IGraphNode[]
+        +edges: IGraphEdge[]
+        +topology: 'torus' | 'planar' | 'sphere'
+        +dimensions: 2 | 3
+        +addNode(node: IGraphNode): void
+        +addEdge(edge: IGraphEdge): void
+        +getNode(id: string): IGraphNode
+        +getNeighbors(nodeId: string): IGraphNode[]
+        %% No rendering info
+    }
+    class IGraphNode {
+        +id: string
+        %% No x/y/z coordinates
+    }
+    class IGraphEdge {
+        +source: IGraphNode
+        +target: IGraphNode
+    }
+
+    %% Layout transformation (middle layer)
+    class GraphLayout {
+        +graph: IGraph
+        +nodePositions: Map<string, [number, number, number]>
+        +edgePaths: Map<string, [number, number, number][]>
+        +update(): void
+        +getNodePosition(nodeId: string): [number, number, number]
+        +getEdgePath(edgeId: string): [number, number, number][]
+        +layout(graph: IGraph): RenderGraph
+    }
+    class RenderGraph {
+        +renderNodes: RenderNode[]
+        +renderEdges: RenderEdge[]
+        %% Has coordinates, visual props
+    }
+    class RenderNode {
+        +id: string
+        +x: number
+        +y: number
+        +z: number
+        +color: string
+    }
+    class RenderEdge {
+        +source: RenderNode
+        +target: RenderNode
+    }
+    class GraphRenderer {
+        +render(graph: RenderGraph)
+    }
+    class ThreeFiberRenderer {
+        +render3D(graph: RenderGraph)
+    }
+
+    %% Relationships
+    IGraph "1" *-- "*" IGraphNode
+    IGraph "1" *-- "*" IGraphEdge
+    GraphLayout "1" *-- "1" IGraph : uses
+    GraphLayout "1" --> "1" RenderGraph : returns
+    RenderGraph "1" *-- "*" RenderNode
+    RenderGraph "1" *-- "*" RenderEdge
+    GraphRenderer <|-- ThreeFiberRenderer
+    GraphRenderer "1" *-- "1" RenderGraph : renders
+
+    %% Package boundaries
+    class IGraph IGraphNode IGraphEdge graph-core
+    class GraphLayout RenderGraph RenderNode RenderEdge GraphRenderer ThreeFiberRenderer graph-ui
+
+    %% Dependency direction
+    graph-ui ..> graph-core : depends on

@@ -17,10 +17,11 @@
     "@dnd-kit/utilities": "3.2.2",
     "@heroicons/react": "2.2.0",
     "@react-sigma/core": "5.0.4",
-    "@spin-network/graph-core": "file:/Users/deepak/code/spin-network-app/packages/graph-core",
+
     "@tsparticles/engine": "3.9.1",
     "@tsparticles/react": "3.0.0",
     "@tsparticles/slim": "3.9.1",
+    "@spin-network/graph-core": "file:../packages/graph-core",
     "buffer": "6.0.3",
     "graphology": "0.26.0",
     "graphology-generators": "0.11.2",
