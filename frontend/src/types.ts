@@ -1,3 +1,9 @@
+export interface SolverConfig {
+  telegraph: string;
+  diffusion: string;
+  wheeler_dewitt?: string;
+}
+
 export interface SimulationParams {
   collision_rate: number;
   velocity: number;
@@ -24,6 +30,7 @@ export interface SimulationParams {
   x_max: number;
   mesh_size: number;
   solver_type?: 'python' | 'webgl';
+  solver_config?: SolverConfig;
   selectedEquations?: string[];
 }
 

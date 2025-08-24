@@ -1,7 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 03:08:37 IST_
+_Last Updated: 2025-08-25 03:47:05 IST_
+
+### 2025-08-25
+
+#### 03:47 - C11: PDE Solver Strategy Infrastructure Implementation
+- Created `frontend/src/webgl/solvers/BaseSolver.ts` - Strategy interface for numerical solvers with stability checking and WebGL integration methods
+- Created `frontend/src/webgl/solvers/ForwardEulerSolver.ts` - Forward Euler strategy implementation encapsulating existing shader generation and stepping logic
+- Updated `frontend/src/webgl/webgl-solver.js` - Added setSolver method for runtime strategy switching, integrated strategy delegation in step method
+- Updated `frontend/src/types.ts` - Added SolverConfig interface for per-equation solver configuration with telegraph/diffusion solver selection
+- Created `memory-bank/tasks/C11.md` - New task for PDE solver choice implementation with completion criteria and progress tracking
+- Created `memory-bank/implementation-details/pde-solver-choice-plan.md` - Comprehensive implementation plan documenting solver analysis, architecture design, and technical approach
+- Updated `memory-bank/tasks.md` - Added C11 to active tasks registry and task details section with strategy infrastructure completion status
 
 ### 2025-08-25
 

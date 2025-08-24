@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 03:08:37 IST_
+_Last Updated: 2025-08-25 03:47:05 IST_
 
 ## Active Tasks
 
@@ -20,6 +20,7 @@ _Last Updated: 2025-08-25 03:08:37 IST_
 | C8  | Density Profile Calculation Implementation            | ✅ COMPLETED   | HIGH     | 2025-08-23 | C5c, C7      |
 | C9  | Standalone Repository Setup and Vercel Deployment    | ✅ COMPLETED   | HIGH     | 2025-08-23 | C1, C5b, C7, C8 |
 | C10 | GitHub App Release v1.0.0                            | ✅ COMPLETED   | HIGH     | 2025-08-24 | C9, C5b, C8     |
+| C11 | PDE Solver Choice Implementation                      | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C1, C2          |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 
 ## Task Details
@@ -97,6 +98,12 @@ _Last Updated: 2025-08-25 03:08:37 IST_
 **Status**: ✅ COMPLETED **Last**: 2025-08-24 11:16:39 IST
 **Files**: `README.md`, `package.json`, `frontend/package.json`
 **Notes**: Version 1.0.0 released with comprehensive documentation, git tagging, and release preparation completed
+
+### C11: PDE Solver Choice Implementation
+**Description**: Implement Crank-Nicolson and RK4 solvers to address diffusion equation stability issues with per-equation solver selection
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:43:52 IST
+**Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
+**Notes**: Strategy pattern infrastructure completed - ForwardEulerSolver encapsulates existing logic, WebGLSolver delegates to solver strategies
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency

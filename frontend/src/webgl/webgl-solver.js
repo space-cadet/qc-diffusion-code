@@ -3,6 +3,7 @@
 import { RDShaderTop, RDShaderMain, RDShaderBot } from './simulation_shaders.js';
 import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs.js';
 import { genericVertexShader } from './generic_shaders.js';
+import { ForwardEulerSolver } from './solvers/ForwardEulerSolver.ts';
 
 export class WebGLSolver {
   constructor(canvas) {
@@ -30,6 +31,16 @@ export class WebGLSolver {
     this.program = null;
     this.uniforms = {};
     this.initialized = false;
+    this.solverStrategy = new ForwardEulerSolver(); // Default solver
+    this.currentEquationType = null;
+  }
+
+  setSolver(solverStrategy) {
+    this.solverStrategy = solverStrategy;
+    // Re-setup equation if already initialized
+    if (this.currentEquationType) {
+      this.setupEquation(this.currentEquationType, this.currentParameters || {});
+    }
   }
 
   init(width, height) {
@@ -119,44 +130,24 @@ export class WebGLSolver {
     }
     
     const gl = this.gl;
-    const readTexture = this.textures[this.currentTexture];
-    const writeTexture = this.textures[1 - this.currentTexture];
-    const writeFramebuffer = this.framebuffers[1 - this.currentTexture];
-    
-    // Bind framebuffer for rendering
-    gl.bindFramebuffer(gl.FRAMEBUFFER, writeFramebuffer);
-    gl.viewport(0, 0, this.width, this.height);
-    
-    // Use shader program
-    gl.useProgram(this.program);
-    
-    // Set uniforms
-    gl.uniform1f(this.uniforms.dt, dt);
     const dx = (xMax - xMin) / Math.max(1, this.width - 1);
     const dy = (xMax - xMin) / Math.max(1, this.height - 1);
-    gl.uniform1f(this.uniforms.dx, dx);
-    gl.uniform1f(this.uniforms.dy, dy);
-    gl.uniform1f(this.uniforms.L_x, xMax - xMin);
-    gl.uniform1f(this.uniforms.L_y, xMax - xMin);
-    gl.uniform1f(this.uniforms.MINX, xMin);
-    gl.uniform1f(this.uniforms.MINY, xMin);
     
-    Object.keys(parameters).forEach(key => {
-      if (this.uniforms[key] !== undefined) {
-        gl.uniform1f(this.uniforms[key], parameters[key]);
-      }
-    });
+    // Set viewport and common uniforms
+    gl.viewport(0, 0, this.width, this.height);
+    if (this.uniforms.L_x) gl.uniform1f(this.uniforms.L_x, xMax - xMin);
+    if (this.uniforms.L_y) gl.uniform1f(this.uniforms.L_y, xMax - xMin);
+    if (this.uniforms.MINX) gl.uniform1f(this.uniforms.MINX, xMin);
+    if (this.uniforms.MINY) gl.uniform1f(this.uniforms.MINY, xMin);
     
-    // Bind input texture
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, readTexture);
-    gl.uniform1i(this.uniforms.textureSource, 0);
+    // Delegate to solver strategy
+    this.currentTexture = this.solverStrategy.step(
+      gl, this.textures, this.framebuffers, this.program, this.uniforms,
+      dt, dx, dy, parameters, this.currentTexture
+    );
     
     // Render quad
     this.renderQuad();
-    
-    // Swap textures
-    this.currentTexture = 1 - this.currentTexture;
   }
 
   renderQuad() {
@@ -220,7 +211,10 @@ export class WebGLSolver {
   }
 
   setupEquation(equationType, parameters) {
-    const shaderSource = this.getShaderForEquation(equationType);
+    this.currentEquationType = equationType;
+    this.currentParameters = parameters;
+    
+    const shaderSource = this.solverStrategy.getShaderSource(equationType);
     
     this.program = this.createProgram(shaderSource);
     this.uniforms = {
