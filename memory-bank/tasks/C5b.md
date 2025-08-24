@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-24 11:54:58 IST_
+_Last Updated: 2025-08-24 21:50:24 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -157,7 +157,7 @@ This task implements the complete UI framework for the random walk simulation ba
 - Collapsible sections for better space management
 - Enhanced user experience with immediate control access
 
-**Performance Optimization Session (2025-08-24)**:
+**Performance Optimization Session (2025-08-24 by GPT5)**:
 
 - ✅ **Persistent Observable Settings**: Made observable panel expand/collapse state and all checkbox states (particle count, kinetic energy, momentum components) persistent across page reloads via Zustand store
 - ✅ **Persistent Density Settings**: Made density profile auto-update toggle persistent (record history kept as session-specific)
@@ -167,12 +167,25 @@ This task implements the complete UI framework for the random walk simulation ba
 - ✅ **Render Optimization**: Added React.memo() to ParticleCanvas, memoized simulationState object, moved time/collision tracking to refs
 - ✅ **Animation Loop Optimization**: Removed updateSimulationMetrics from frame-by-frame animation loop, added 1-second interval for periodic state sync, only update metrics on pause/resume/reset events
 
-**Known Issues**:
+**CPU Usage Elimination (2025-08-24)**:
 
-- Observable registration timing issue causing "No observer registered for id: particleCount" error when ParticleCanvas re-render prevention affects useEffect dependencies
+- ✅ **Simulation Status-Gated Animation**: Modified ParticleCanvas to check case-insensitive simulation status - when not "running", draws single static frame and skips requestAnimationFrame loop entirely
+- ✅ **tsParticles Internal Ticker Disabled**: Added autoPlay: false to engine.load options and explicit container.pause() to eliminate hidden internal RAF loops
+- ✅ **Complete Rendering Control**: Enhanced RandomWalkSim with simReady flag, renderEnabledRef for independent rendering control, visibility change handlers for tab switching
+- ✅ **Observable Registration Race Fix**: Added simReady prop and isRegistered local flag to ObservablesPanel to prevent registration before simulator ready and gate polling appropriately
+- ✅ **Dependency Optimization**: Removed unnecessary simulatorRef.current from useDensityVisualization effect dependencies
+- ✅ **Debug Logging**: Added comprehensive debug logging to trace effect lifecycle, animation loops, and cleanup events
 
-**Next Steps**:
+**Technical Improvements**:
+- High CPU usage when paused/stopped completely eliminated
+- Both custom RAF and tsParticles internal loops properly disabled in idle states
+- Single-frame rendering for static states with proper animation resume
+- Race condition prevention between observable registration and simulator readiness
+- Tab visibility handling for battery conservation
 
-- Fix observable registration/unregistration timing issue
-- Test performance improvements and ensure stable 60fps without React re-renders
-- Complete observable infrastructure for kinetic energy and momentum components
+**Known Issues Resolved**:
+
+- ✅ Observable registration timing issue resolved with simReady flag and isRegistered gating
+- ✅ High CPU usage while paused eliminated through comprehensive animation control
+
+**Final Status**: COMPLETED with comprehensive performance optimization and CPU usage elimination

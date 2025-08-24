@@ -252,11 +252,29 @@ const ParticleCanvasComponent: React.FC<{
 
   // Custom animation loop (render only; physics updates are driven by parent)
   useEffect(() => {
+    console.log("[PC] effect start", {
+      hasContainer: !!container,
+      showAnimation: gridLayoutParams.showAnimation,
+      simulationStatus,
+    });
+
     if (!container || !gridLayoutParams.showAnimation) {
+      console.log("[PC] effect early return: no container or showAnimation=false");
       return;
     }
 
+    // Normalize status and avoid rAF loop unless actually running
+    const isRunningStatus = String(simulationStatus || "").toLowerCase() === "running";
+    // If simulation isn't running, draw a single static frame and avoid rAF loop
+    if (!isRunningStatus) {
+      console.log("[PC] paused/stopped: draw single frame; no rAF loop");
+      (container as any).draw?.(false);
+      return;
+    }
+
+    let drawCount = 0;
     const animate = () => {
+      drawCount++;
       // Log once at start of animation loop
       if ((animate as any)._logged !== true) {
         console.log("ParticleCanvas: animation loop started", {
@@ -267,17 +285,23 @@ const ParticleCanvasComponent: React.FC<{
       }
       // Do not update positions here; parent (RandomWalkSim) controls physics
       (container as any).draw?.(false);
+      if (drawCount % 120 === 0) {
+        console.log("[PC] animate tick", { drawCount });
+      }
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
+      console.log("[PC] cleanup: cancelAnimationFrame", {
+        hadRaf: !!animationFrameRef.current,
+      });
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [container, gridLayoutParams.showAnimation]);
+  }, [container, gridLayoutParams.showAnimation, simulationStatus]);
 
   // Cleanup on unmount
   useEffect(() => {

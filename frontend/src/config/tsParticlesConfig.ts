@@ -33,6 +33,7 @@ export const createParticleContainer = async (
     id: "manual-particles",
     element: canvasElement,
     options: {
+      autoPlay: false, // disable internal rAF loop; we'll drive rendering manually
       background: {
         color: "#f8f9fa",
       },
@@ -71,6 +72,14 @@ export const createParticleContainer = async (
 
   // Clear any default particles and create our own
   container.particles.clear();
+
+  // Ensure internal ticker remains stopped until explicitly started
+  // This prevents hidden rAF activity when simulation is paused/stopped
+  try {
+    container.pause();
+  } catch (_) {
+    // no-op: pause may be unnecessary depending on engine version
+  }
 
   // Create particles manually
   for (let i = 0; i < particleCount; i++) {

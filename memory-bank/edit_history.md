@@ -1,11 +1,24 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 11:54:58 IST_
+_Last Updated: 2025-08-24 21:50:24 IST_
 
 ### 2025-08-24
 
-#### 11:54 - C5b: Performance Optimization - Random Walk UI Implementation
+#### 21:50 - C5b: CPU Usage Elimination and Performance Optimization Completion
+- Updated `frontend/src/RandomWalkSim.tsx` - Added simReady state flag for component dependency gating, renderEnabledRef for independent rendering control, visibility change handlers for tab switching, enhanced pause/resume effects without enabling tsParticles internal play
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Added simReady prop dependency, isRegistered local flag for polling gate, fixed observable registration race conditions
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Implemented simulation status-gated animation with case-insensitive checking, single frame draws for non-running states, comprehensive debug logging
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Disabled tsParticles internal ticker with autoPlay: false, added explicit container.pause() to prevent hidden RAF loops
+- Updated `frontend/src/hooks/useDensityVisualization.ts` - Removed simulatorRef.current from useEffect dependencies to prevent unnecessary updates
+- Updated `memory-bank/tasks/C5b.md` - Added CPU usage elimination section with technical achievements, marked all issues resolved
+- Updated `memory-bank/tasks.md` - Updated C5b status with CPU optimization completion details
+- Updated `memory-bank/session_cache.md` - Changed focus task to CPU usage elimination, updated session references
+- Created `memory-bank/sessions/2025-08-24-evening.md` - Complete session documentation for performance optimization completion
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Added CPU usage elimination section and technical achievements
+- Updated `memory-bank/edit_history.md` - Added current session entries with comprehensive file changes
+
+#### 11:54 - C5b: Performance Optimization - Random Walk UI Implementation (by GPT5)
 - Updated `frontend/src/stores/appStore.ts` - Added persistent observable and density settings to RandomWalkUIState interface
 - Updated `frontend/src/components/ObservablesPanel.tsx` - Connected to Zustand store for persistent state, added React hooks for observable controls, removed duplicate useEffect
 - Updated `frontend/src/components/DensityComparison.tsx` - Made auto-update toggle persistent via store while keeping recordHistory session-specific

@@ -45,6 +45,8 @@ export default function RandomWalkSim() {
 
   // Runtime state (non-persistent)
   const [isRunning, setIsRunning] = useState(false);
+  // Signal to children that simulatorRef is ready
+  const [simReady, setSimReady] = useState(false);
   
   // Refs for time/collision tracking
   const timeRef = useRef(0);
@@ -87,6 +89,8 @@ export default function RandomWalkSim() {
   // Refs to track current values for animation loop
   const simulationStateRef = useRef(simulationState);
   const gridLayoutParamsRef = useRef(gridLayoutParams);
+  // Control rendering independently from physics
+  const renderEnabledRef = useRef(true);
 
   // Update refs when state changes
   useEffect(() => {
@@ -96,6 +100,44 @@ export default function RandomWalkSim() {
   useEffect(() => {
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
+
+  // Manage rendering when tab/window visibility changes
+  useEffect(() => {
+    const onVisibility = () => {
+      const container = tsParticlesContainerRef.current;
+      if (!container) return;
+
+      if (document.hidden) {
+        renderEnabledRef.current = false;
+        // Stop tsParticles' internal RAF (rendering only)
+        container.pause?.();
+      } else {
+        renderEnabledRef.current = true;
+        // Sync one frame and resume rendering
+        try {
+          // Internal RAF stays disabled; draw a single frame to sync
+          updateParticlesWithCTRW(container, true);
+        } catch {}
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  // Pause/Play rendering when simulation pauses/resumes (physics handled separately)
+  useEffect(() => {
+    const container = tsParticlesContainerRef.current;
+    if (!container) return;
+
+    if (isRunning) {
+      // Keep tsParticles internal RAF disabled; our own loop drives rendering
+    } else {
+      // Draw one last frame then pause internal RAF
+      try { (container as any).draw?.(false); } catch {}
+      container.pause?.();
+    }
+  }, [isRunning]);
 
   // Periodically save simulation state and sync metrics when running
   useEffect(() => {
@@ -134,6 +176,8 @@ export default function RandomWalkSim() {
   useEffect(() => {
     const canvasWidth = tsParticlesContainerRef.current?.canvas?.size?.width || 800;
     const canvasHeight = tsParticlesContainerRef.current?.canvas?.size?.height || 600;
+    // simulator is being (re)created
+    setSimReady(false);
     
     simulatorRef.current = new RandomWalkSimulator({
       collisionRate: gridLayoutParams.collisionRate,
@@ -155,6 +199,9 @@ export default function RandomWalkSim() {
       distNy: gridLayoutParams.distNy,
       distJitter: gridLayoutParams.distJitter,
     });
+
+    // mark simulator as ready for dependent components
+    setSimReady(true);
 
     // Connect particle manager to tsParticles
     if (simulatorRef.current) {
@@ -496,6 +543,7 @@ export default function RandomWalkSim() {
     const updateLoop = () => {
       const isRunning = simulationStateRef.current.isRunning;
       const showAnim = gridLayoutParamsRef.current.showAnimation;
+      const canRender = showAnim && renderEnabledRef.current && !document.hidden && isRunning;
 
       if (simulatorRef.current) {
         // Always advance physics when running, regardless of animation toggle
@@ -508,18 +556,15 @@ export default function RandomWalkSim() {
           collisionsRef.current = collisionStats.totalCollisions || 0;
         }
 
-        // Render only if animation is enabled
-        if (showAnim) {
-          if (isRunning) {
-            updateParticlesWithCTRW(container, true);
-          } else {
-            // Paused: redraw current frame without updating positions
-            (container as any).draw?.(false);
-          }
+        // Render only if animation/visibility conditions are met and running
+        if (canRender) {
+          updateParticlesWithCTRW(container, true);
         }
       }
 
-      requestAnimationFrame(updateLoop);
+      if (simulationStateRef.current.isRunning || renderEnabledRef.current) {
+        requestAnimationFrame(updateLoop);
+      }
     };
     requestAnimationFrame(updateLoop);
   }, []);
@@ -582,6 +627,7 @@ export default function RandomWalkSim() {
               simulatorRef={simulatorRef}
               isRunning={simulationState.isRunning}
               simulationStatus={simulationState.status}
+              simReady={simReady}
             />
           </div>
 

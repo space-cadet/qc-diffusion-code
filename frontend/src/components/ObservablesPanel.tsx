@@ -9,15 +9,18 @@ interface ObservablesPanelProps {
   simulatorRef: React.RefObject<RandomWalkSimulator | null>;
   isRunning: boolean;
   simulationStatus: string;
+  simReady?: boolean;
 }
 
-export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: ObservablesPanelProps) {
+export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, simReady }: ObservablesPanelProps) {
   const { 
     randomWalkUIState, 
     setRandomWalkUIState 
   } = useAppStore();
   
   const [particleCountData, setParticleCountData] = useState<ParticleCountResult | null>(null);
+  // Local flag to ensure polling starts only after observable registration
+  const [isRegistered, setIsRegistered] = useState(false);
 
   // Helper functions to update persistent state
   const setIsExpanded = (expanded: boolean) => {
@@ -64,25 +67,28 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
 
   // Register/unregister ParticleCountObservable based on visibility
   useEffect(() => {
-    if (!simulatorRef.current) return;
+    if (!simReady || !simulatorRef.current) return;
 
     if (randomWalkUIState.showParticleCount) {
       const observable = new ParticleCountObservable();
       simulatorRef.current.registerObservable(observable);
       console.log("[ObservablesPanel] Registered ParticleCountObservable");
+      setIsRegistered(true);
 
       return () => {
         if (simulatorRef.current) {
           simulatorRef.current.unregisterObservable('particleCount');
           console.log("[ObservablesPanel] Unregistered ParticleCountObservable");
         }
+        setIsRegistered(false);
       };
     }
-  }, [randomWalkUIState.showParticleCount, simulatorRef]);
+  }, [randomWalkUIState.showParticleCount, simReady]);
 
   // Update data when running or refresh when simulation state changes
   useEffect(() => {
     if (!randomWalkUIState.showParticleCount || !randomWalkUIState.isObservablesExpanded) return;
+    if (!isRegistered) return; // gate polling until observable is registered
 
     if (isRunning) {
       const interval = setInterval(() => {
@@ -103,7 +109,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
         }
       }
     }
-  }, [randomWalkUIState.showParticleCount, randomWalkUIState.isObservablesExpanded, isRunning, simulatorRef]);
+  }, [randomWalkUIState.showParticleCount, randomWalkUIState.isObservablesExpanded, isRunning, isRegistered, simReady]);
 
   // Reset observable data when simulation is reset
   useEffect(() => {

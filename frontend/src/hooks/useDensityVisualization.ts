@@ -85,7 +85,7 @@ export const useDensityVisualization = (
 
   useEffect(() => {
     updateDensity();
-  }, [simulatorRef.current, binSize]);
+  }, [binSize]);
 
   return {
     canvasRef,
