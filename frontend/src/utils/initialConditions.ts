@@ -15,11 +15,17 @@ function gaussianDistribution(x: number[], center: number = 0, sigma: number = 1
   return x.map(xi => Math.exp(-0.5 * Math.pow((xi - center) / sigma, 2)));
 }
 
+function doubleGaussian(x: number[], c1: number, s1: number, c2: number, s2: number, w: number): number[] {
+  const g1 = gaussianDistribution(x, c1, s1);
+  const g2 = gaussianDistribution(x, c2, s2);
+  return g1.map((v, i) => w * v + (1 - w) * g2[i]);
+}
+
 /**
  * Step function distribution
  */
-function stepDistribution(x: number[], left: number = -1, right: number = 1): number[] {
-  return x.map(xi => (xi >= left && xi <= right) ? 1.0 : 0.0);
+function stepDistribution(x: number[], left: number = -1, right: number = 1, height: number = 1): number[] {
+  return x.map(xi => (xi >= left && xi <= right) ? height : 0.0);
 }
 
 /**
@@ -40,6 +46,10 @@ function sineDistribution(x: number[], frequency: number = 1, amplitude: number 
   return x.map(xi => amplitude * Math.sin(frequency * Math.PI * xi));
 }
 
+function cosineDistribution(x: number[], frequency: number = 1, amplitude: number = 1): number[] {
+  return x.map(xi => amplitude * Math.cos(frequency * Math.PI * xi));
+}
+
 /**
  * Generate initial conditions based on distribution type
  */
@@ -52,22 +62,42 @@ export function generateInitialConditions(params: SimulationParams): AnimationFr
   
   // Generate initial distribution
   let u: number[];
-  
+  const c = params.dist_center ?? 0;
+  const s = params.dist_sigma ?? 1;
+  const sl = params.step_left ?? -1;
+  const sr = params.step_right ?? 1;
+  const sh = params.step_height ?? 1;
+  const sf = params.sine_freq ?? 1;
+  const sa = params.sine_amp ?? 1;
+  const cf = params.cos_freq ?? 1;
+  const ca = params.cos_amp ?? 1;
+  const c1 = params.dg_center1 ?? -1;
+  const s1 = params.dg_sigma1 ?? 0.5;
+  const c2 = params.dg_center2 ?? 1;
+  const s2 = params.dg_sigma2 ?? 0.5;
+  const w = Math.min(Math.max(params.dg_weight ?? 0.5, 0), 1);
+
   switch (distribution) {
     case 'gaussian':
-      u = gaussianDistribution(x, 0, 1);
+      u = gaussianDistribution(x, c, s);
+      break;
+    case 'double_gaussian':
+      u = doubleGaussian(x, c1, s1, c2, s2, w);
       break;
     case 'step':
-      u = stepDistribution(x, -1, 1);
+      u = stepDistribution(x, sl, sr, sh);
       break;
     case 'delta':
-      u = deltaDistribution(x, 0, 0.1);
+      u = deltaDistribution(x, c, s || 0.1);
       break;
     case 'sine':
-      u = sineDistribution(x, 1, 1);
+      u = sineDistribution(x, sf, sa);
+      break;
+    case 'cosine':
+      u = cosineDistribution(x, cf, ca);
       break;
     default:
-      u = gaussianDistribution(x, 0, 1);
+      u = gaussianDistribution(x, c, s);
   }
   
   // Create result with only selected equations

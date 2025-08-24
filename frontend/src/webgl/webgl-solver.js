@@ -132,8 +132,10 @@ export class WebGLSolver {
     
     // Set uniforms
     gl.uniform1f(this.uniforms.dt, dt);
-    gl.uniform1f(this.uniforms.dx, (xMax - xMin) / this.width);
-    gl.uniform1f(this.uniforms.dy, (xMax - xMin) / this.height);
+    const dx = (xMax - xMin) / Math.max(1, this.width - 1);
+    const dy = (xMax - xMin) / Math.max(1, this.height - 1);
+    gl.uniform1f(this.uniforms.dx, dx);
+    gl.uniform1f(this.uniforms.dy, dy);
     gl.uniform1f(this.uniforms.L_x, xMax - xMin);
     gl.uniform1f(this.uniforms.L_y, xMax - xMin);
     gl.uniform1f(this.uniforms.MINX, xMin);
@@ -252,6 +254,32 @@ export class WebGLSolver {
     return this.textures[this.currentTexture];
   }
 
+  // Upload a 1D initial profile (u) into the red channel of texture 0
+  setInitialProfile(uArray) {
+    const gl = this.gl;
+    const data = new Float32Array(this.width * this.height * 4);
+    // write on middle row
+    const row = Math.floor(this.height / 2);
+    for (let j = 0; j < this.width; j++) {
+      const idx = (row * this.width + j) * 4;
+      const u = j < uArray.length ? uArray[j] : 0;
+      data[idx] = u;         // u → R
+      data[idx + 1] = 0;     // w → G
+      data[idx + 2] = 0;
+      data[idx + 3] = 0;
+    }
+    gl.bindTexture(gl.TEXTURE_2D, this.textures[0]);
+    if (this.floatTextureSupported) {
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.RGBA, gl.FLOAT, data);
+    } else {
+      const uintData = new Uint8Array(data.length);
+      for (let i = 0; i < data.length; i++) uintData[i] = Math.min(255, Math.max(0, data[i] * 255));
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, uintData);
+    }
+    // reset ping-pong to read from texture 0 first
+    this.currentTexture = 0;
+  }
+
   setInitialConditions(distribution, xMin, xMax) {
     const gl = this.gl;
     const data = new Float32Array(this.width * this.height * 4);
@@ -296,8 +324,9 @@ export class WebGLSolver {
     const pixels = this.readPixels();
     const x = [], u = [], w = [];
     
+    const denom = Math.max(1, this.width - 1);
     for (let j = 0; j < this.width; j++) {
-      const xVal = xMin + (j / this.width) * (xMax - xMin);
+      const xVal = xMin + (j / denom) * (xMax - xMin);
       const idx = (Math.floor(this.height/2) * this.width + j) * 4;
       x.push(xVal);
       u.push(pixels[idx]);     // Red channel: u

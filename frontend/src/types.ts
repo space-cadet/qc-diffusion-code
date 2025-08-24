@@ -5,6 +5,21 @@ export interface SimulationParams {
   t_range: number;
   dt: number;
   distribution: string;
+  // Distribution parameters (1D)
+  dist_center?: number;      // for gaussian/delta
+  dist_sigma?: number;       // for gaussian/delta
+  step_left?: number;        // for step
+  step_right?: number;       // for step
+  step_height?: number;      // for step height
+  sine_freq?: number;        // for sine
+  sine_amp?: number;         // for sine
+  cos_freq?: number;         // for cosine
+  cos_amp?: number;          // for cosine
+  dg_center1?: number;       // for double_gaussian
+  dg_sigma1?: number;
+  dg_center2?: number;
+  dg_sigma2?: number;
+  dg_weight?: number;        // mix weight of first vs second
   x_min: number;
   x_max: number;
   mesh_size: number;

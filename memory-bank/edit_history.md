@@ -1,7 +1,27 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 23:39:25 IST_
+_Last Updated: 2025-08-25 01:07:16 IST_
+
+### 2025-08-25
+
+#### 01:07 - C2/C5b: PDE Initial Conditions Enhancement and WebGL Solver Improvements
+- Updated `frontend/src/webgl/webgl-solver.js` - Added setInitialProfile(uArray) method for uploading precomputed 1D initial conditions to texture 0, fixed mesh consistency using (width-1) denominator for endpoint inclusion in extractPlotData(), updated step() method dx/dy calculations for uniform spacing
+- Updated `frontend/src/webgl/webgl-solver.d.ts` - Added TypeScript declaration for setInitialProfile(u: number[]): void method
+- Updated `frontend/src/hooks/useWebGLSolver.ts` - Enhanced initSolver to generate initial conditions in JS using generateInitialConditions() and upload via setInitialProfile(), ensuring both telegraph and diffusion solvers use identical precomputed profiles
+- Updated `frontend/src/App.tsx` - Added comprehensive useEffect dependencies for initial condition regeneration including all per-distribution parameters (dist_center, dist_sigma, step_left, step_right, step_height, sine_freq, sine_amp, cos_freq, cos_amp, dg_center1, dg_sigma1, dg_center2, dg_sigma2, dg_weight)
+- Updated `frontend/src/Controls.tsx` - Fixed negative number input UX by implementing local string state for negative-capable fields (dist_center, dg_center1, dg_center2, step_left, step_right), changed input type from "number" to "text" with onBlur commit pattern, added useEffect synchronization hooks
+- Updated `frontend/src/PlotComponent.tsx` - Added autoscale toggle checkbox with proper range persistence control, implemented conditional layout using autorange vs fixed ranges, added range clearing when enabling autoscale
+- Updated `frontend/src/stores/appStore.ts` - Extended PdePlotState interface with autoscale boolean flag, added default autoscale: false to pdeState.plot initialization
+- Updated `frontend/src/types.ts` - Enhanced SimulationParams with per-distribution parameters (dist_center, dist_sigma, step_left, step_right, step_height, sine_freq, sine_amp, cos_freq, cos_amp, dg_center1, dg_sigma1, dg_center2, dg_sigma2, dg_weight)
+- Updated `frontend/src/utils/initialConditions.ts` - Added expanded distribution generators for double gaussian, step function, delta function, sine wave, cosine wave with parameterized generation
+- Updated `memory-bank/tasks/C2.md` - Changed status to IN PROGRESS, added recent enhancements section documenting setInitialProfile implementation and mesh consistency fixes
+- Updated `memory-bank/tasks/C5b.md` - Added PDE UI Enhancements section documenting negative input handling and parameter persistence improvements
+- Updated `memory-bank/implementation-details/visual-pde-gpu-solver-plan.md` - Added Phase 7 completion section documenting initial condition enhancement with technical achievements
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Added PDE Controls Enhancement section documenting negative input support and user experience improvements
+- Updated `memory-bank/tasks.md` - Updated timestamps and progress notes for C1 with enhanced PDE simulation capabilities
+- Updated `memory-bank/session_cache.md` - Updated current session information for early morning PDE enhancement work
+- Created `memory-bank/sessions/2025-08-25-early-morning.md` - Complete session documentation with objectives, work completed, technical achievements, and next steps
 
 ### 2025-08-24
 

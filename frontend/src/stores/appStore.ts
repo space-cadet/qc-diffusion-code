@@ -78,6 +78,21 @@ interface RandomWalkSimulationState {
   observableData: Record<string, any>
 }
 
+// Persistent PDE page state (simulation + UI bits)
+interface PdePlotState {
+  xRange?: [number, number]
+  yRange?: [number, number]
+  legend?: boolean
+  autoscale?: boolean
+}
+
+interface PdeState {
+  isRunning: boolean
+  time: number
+  lastFrame: any | null // AnimationFrame shape; keep as any to avoid circular type imports here
+  plot: PdePlotState
+}
+
 interface AppState {
   activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim'
   simulationParams: SimulationParams
@@ -89,6 +104,16 @@ interface AppState {
   observablesWindow: WindowRect
   zCounter: number
   observablesCollapsed: boolean
+  // PDE persistent state
+  pdeState: PdeState
+  // PDE UI fold states for Controls panel
+  pdeUIState: {
+    equationsOpen: boolean
+    telegraphOpen: boolean
+    diffusionOpen: boolean
+    initialConditionsOpen: boolean
+    simulationSettingsOpen: boolean
+  }
   setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: GridLayoutParams) => void
@@ -104,6 +129,9 @@ interface AppState {
     densityHistory: RandomWalkSimulationState['densityHistory'],
     observableData: RandomWalkSimulationState['observableData']
   ) => void
+  // PDE setters
+  setPdeState: (partial: Partial<PdeState>) => void
+  setPdeUIState: (partial: Partial<AppState['pdeUIState']>) => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -115,12 +143,40 @@ export const useAppStore = create<AppState>()(
         velocity: 1.0,
         diffusivity: 1.0,
         t_range: 5.0,
-        dt: 0.01,
-        distribution: "gaussian",
+        dt: 0.02,
+        distribution: 'gaussian',
+        // distribution params defaults
+        dist_center: 0,
+        dist_sigma: 1,
+        step_left: -1,
+        step_right: 1,
+        step_height: 1,
+        sine_freq: 1,
+        sine_amp: 1,
+        cos_freq: 1,
+        cos_amp: 1,
+        dg_center1: -1,
+        dg_sigma1: 0.5,
+        dg_center2: 1,
+        dg_sigma2: 0.5,
+        dg_weight: 0.5,
         x_min: -5.0,
         x_max: 5.0,
         mesh_size: 64,
         selectedEquations: ['telegraph', 'diffusion'],
+      },
+      pdeState: {
+        isRunning: false,
+        time: 0,
+        lastFrame: null,
+        plot: { autoscale: false },
+      },
+      pdeUIState: {
+        equationsOpen: true,
+        telegraphOpen: true,
+        diffusionOpen: true,
+        initialConditionsOpen: true,
+        simulationSettingsOpen: true,
       },
       gridLayoutParams: {
         particles: 1000,
@@ -215,6 +271,10 @@ export const useAppStore = create<AppState>()(
             observableData
           }
         })),
+      setPdeState: (partial) =>
+        set((state) => ({ pdeState: { ...state.pdeState, ...partial } })),
+      setPdeUIState: (partial) =>
+        set((state) => ({ pdeUIState: { ...state.pdeUIState, ...partial } })),
     }),
     { 
       name: 'qc-diffusion-app-state',
@@ -222,6 +282,8 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         activeTab: state.activeTab,
         simulationParams: state.simulationParams,
+        pdeState: state.pdeState,
+        pdeUIState: state.pdeUIState,
         gridLayoutParams: state.gridLayoutParams,
         randomWalkSimLayouts: state.randomWalkSimLayouts,
         randomWalkUIState: state.randomWalkUIState,

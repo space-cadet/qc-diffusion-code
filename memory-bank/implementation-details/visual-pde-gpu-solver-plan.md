@@ -1,7 +1,7 @@
 # VisualPDE GPU Solver Integration Plan
 
 _Created: 2025-08-19 23:18:35 IST_
-_Last Updated: 2025-08-20 10:43:45 IST_
+_Last Updated: 2025-08-25 01:07:16 IST_
 
 ## Objective
 
@@ -308,7 +308,52 @@ generateTelegraphShader(parameters) {
 
 **Key Achievement**: Pause button now works correctly for both solver types with proper state management and clean user experience.
 
-### Phase 7: Wheeler-DeWitt Implementation (NEXT)
+### Phase 7: Initial Condition Enhancement (✅ COMPLETED - 2025-08-25)
+
+**Goal**: Enhance PDE simulation initial conditions with expanded distributions and improved user experience
+
+**Completed Tasks**:
+
+1. ✅ **Expanded Distribution Types**:
+   - Added double gaussian, step function, delta function, sine wave, cosine wave distributions
+   - Implemented per-distribution parameter controls (centers, sigmas, frequencies, amplitudes)
+   - Enhanced SimulationParams type with distribution-specific parameters
+
+2. ✅ **WebGL Solver Enhancement**:
+   - Added setInitialProfile(uArray) method for uploading precomputed initial conditions
+   - Fixed mesh consistency between telegraph and diffusion equations using (width-1) denominator
+   - Aligned GPU x-sampling with CPU mesh generation for consistent resolution
+   - Enhanced useWebGLSolver to generate initial conditions in JS and upload to GPU
+
+3. ✅ **UI/UX Improvements**:
+   - Fixed negative number input handling with local string state and onBlur commit pattern
+   - Added autoscale toggle for plot axes with proper range persistence control
+   - Enhanced Controls component with dynamic parameter inputs for each distribution type
+   - Implemented real-time plot updates when distribution parameters change (pre-start)
+
+4. ✅ **State Management**:
+   - Extended Zustand store with all new distribution parameters and autoscale flag
+   - Added comprehensive useEffect dependencies in App.tsx for initial condition regeneration
+   - Ensured simulation starts with exact initial conditions shown in plot
+
+**Files Modified** (~400 lines total):
+- `frontend/src/webgl/webgl-solver.js` - Added setInitialProfile, fixed mesh consistency
+- `frontend/src/webgl/webgl-solver.d.ts` - TypeScript declarations
+- `frontend/src/hooks/useWebGLSolver.ts` - JS initial condition generation and upload
+- `frontend/src/App.tsx` - Enhanced dependency tracking for plot updates
+- `frontend/src/Controls.tsx` - Negative input handling and expanded distribution UI
+- `frontend/src/PlotComponent.tsx` - Autoscale toggle implementation
+- `frontend/src/stores/appStore.ts` - Extended state with distribution params and autoscale
+- `frontend/src/types.ts` - Per-distribution parameter types
+- `frontend/src/utils/initialConditions.ts` - Expanded distribution generation
+
+**Technical Achievements**:
+- Seamless integration between CPU-generated initial conditions and GPU simulation
+- Consistent mesh resolution across all equation types eliminating visual artifacts
+- Enhanced user experience with immediate plot feedback and negative number support
+- Foundation prepared for adaptive mesh refinement implementation
+
+### Phase 8: Wheeler-DeWitt Implementation (NEXT)
 
 **Goal**: Implement Wheeler-DeWitt equations as additional equation types in the flexible system
 

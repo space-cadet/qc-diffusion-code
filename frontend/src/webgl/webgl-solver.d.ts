@@ -29,6 +29,8 @@ export declare class WebGLSolver {
     xMax: number
   ): void;
   
+  setInitialProfile(u: number[]): void;
+  
   step(
     dt: number, 
     parameters: SolverParameters, 

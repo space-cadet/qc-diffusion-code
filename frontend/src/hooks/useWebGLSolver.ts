@@ -1,6 +1,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebGLSolver } from '../webgl/webgl-solver';
-import type { SimulationParams } from '../types';
+import type { SimulationParams, AnimationFrame } from '../types';
+import { generateInitialConditions } from '../utils/initialConditions';
 
 export interface WebGLPlotData {
   x: number[];
@@ -26,6 +27,8 @@ export function useWebGLSolver() {
     try {
       const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
       const solvers = new Map<string, WebGLSolver>();
+      // precompute initial conditions in JS so WebGL uses exactly what Plot shows
+      const initialFrame: AnimationFrame = generateInitialConditions(params);
       
       selectedEquations.forEach(equationType => {
         const solver = new WebGLSolver(canvas);
@@ -41,8 +44,14 @@ export function useWebGLSolver() {
             k: params.diffusivity 
           });
         }
-        
-        solver.setInitialConditions(params.distribution, params.x_min, params.x_max);
+        // upload precomputed u profile for this equation
+        const frameData = initialFrame[equationType] as { x: number[]; u: number[] } | undefined;
+        if (frameData && frameData.u) {
+          solver.setInitialProfile(frameData.u);
+        } else {
+          // fallback: upload zeros if not present
+          solver.setInitialProfile(new Array(params.mesh_size).fill(0));
+        }
         solvers.set(equationType, solver);
       });
       
@@ -77,10 +86,10 @@ export function useWebGLSolver() {
     return results;
   }, []);
 
-  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SimulationResult) => void) => {
+  const runAnimation = useCallback((params: SimulationParams, onFrame: (data: SimulationResult) => void, startTime: number = 0) => {
     if (solversRef.current.size === 0) return;
 
-    let time = 0;
+    let time = startTime;
     const animate = () => {
       if (time < params.t_range) {
         const data = step(params.dt, params);

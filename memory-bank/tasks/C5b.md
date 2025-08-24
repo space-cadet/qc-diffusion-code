@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-24 23:36:15 IST_
+_Last Updated: 2025-08-25 01:07:16 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -206,3 +206,10 @@ This task implements the complete UI framework for the random walk simulation ba
 - Event handlers explicitly typed as `React.ChangeEvent<HTMLInputElement>`
 
 **Final Status**: COMPLETED with comprehensive performance optimization, CPU usage elimination, and floating observables panel
+
+**PDE UI Enhancements (2025-08-25)**:
+
+- ✅ **Negative Input Handling**: Fixed negative number input UX in PDE Controls by implementing local string state for center/position fields (dist_center, dg_center1, dg_center2, step_left, step_right) with onBlur commit pattern
+- ✅ **Parameter Persistence**: Enhanced Controls component with useEffect synchronization to keep local string states aligned with external parameter changes (reset/load scenarios)
+- ✅ **Input Field Conversion**: Changed negative-capable numeric inputs from type="number" to type="text" to allow intermediate values like "-" during typing
+- ✅ **State Management**: Added proper useState and useEffect imports to Controls.tsx for local state management of string inputs

@@ -3,6 +3,7 @@ import Plotly from "plotly.js";
 import { ConservationMonitor } from "./utils/conservationMonitor";
 import ConservationDisplay from "./ConservationDisplay";
 import type { AnimationFrame, PlotData, SimulationParams, EquationMetadata } from "./types";
+import { useAppStore } from "./stores/appStore";
 
 interface PlotComponentProps {
   frame: AnimationFrame | null;
@@ -49,6 +50,7 @@ export default function PlotComponent({
   const plotRef = useRef<HTMLDivElement>(null);
   const plotInitialized = useRef(false);
   const conservationMonitor = useRef(new ConservationMonitor());
+  const { pdeState, setPdeState } = useAppStore();
   const [conservationData, setConservationData] = useState<{
     currentQuantities: any;
     errors: any;
@@ -71,8 +73,12 @@ export default function PlotComponent({
 
       const layout: Partial<Plotly.Layout> = {
         title,
-        xaxis: { title: "Position (x)", range: [params.x_min, params.x_max] },
-        yaxis: { title: "Amplitude (u)", range: [-0.5, 1.2] },
+        xaxis: pdeState.plot.autoscale
+          ? { title: "Position (x)", autorange: true as const }
+          : { title: "Position (x)", range: pdeState.plot.xRange ?? [params.x_min, params.x_max] },
+        yaxis: pdeState.plot.autoscale
+          ? { title: "Amplitude (u)", autorange: true as const }
+          : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
         showlegend: true,
         height: 500,
         annotations: [
@@ -104,6 +110,23 @@ export default function PlotComponent({
       plotInitialized.current = true;
     }
   }, [selectedEquations]);
+
+  // Persist plot ranges on zoom/pan (disabled when autoscale is on)
+  useEffect(() => {
+    if (!plotRef.current) return;
+    const el: any = plotRef.current;
+    const onRelayout = (evt: any) => {
+      if (pdeState.plot.autoscale) return; // don't persist ranges while autoscaling
+      const xr0 = evt?.["xaxis.range[0]"]; const xr1 = evt?.["xaxis.range[1]"];
+      const yr0 = evt?.["yaxis.range[0]"]; const yr1 = evt?.["yaxis.range[1]"];
+      const next: any = {};
+      if (typeof xr0 === 'number' && typeof xr1 === 'number') next.xRange = [xr0, xr1] as [number, number];
+      if (typeof yr0 === 'number' && typeof yr1 === 'number') next.yRange = [yr0, yr1] as [number, number];
+      if (next.xRange || next.yRange) setPdeState({ plot: { ...pdeState.plot, ...next } });
+    };
+    el.on && el.on('plotly_relayout', onRelayout);
+    return () => { el.removeAllListeners && el.removeAllListeners('plotly_relayout'); };
+  }, [setPdeState, pdeState.plot]);
 
   useEffect(() => {
     if (!plotRef.current || !data) return;
@@ -155,8 +178,12 @@ export default function PlotComponent({
 
     const layout: Partial<Plotly.Layout> = {
       title,
-      xaxis: { title: "Position (x)", range: [params.x_min, params.x_max] },
-      yaxis: { title: "Amplitude (u)", range: [-0.5, 1.2] },
+      xaxis: pdeState.plot.autoscale
+        ? { title: "Position (x)", autorange: true as const }
+        : { title: "Position (x)", range: pdeState.plot.xRange ?? [params.x_min, params.x_max] },
+      yaxis: pdeState.plot.autoscale
+        ? { title: "Amplitude (u)", autorange: true as const }
+        : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
       showlegend: true,
       height: 500,
       annotations: [
@@ -202,7 +229,25 @@ export default function PlotComponent({
 
       {/* Bottom Controls */}
       <div className="border-t border-gray-200 pt-3">
-        <div className="flex gap-6 items-center justify-center">
+        <div className="flex gap-6 items-center justify-center flex-wrap">
+          {/* Plot Options */}
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-semibold text-gray-700">Plot</h3>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={!!pdeState.plot.autoscale}
+                onChange={(e) => {
+                  const autoscale = e.target.checked;
+                  // when turning on autoscale, clear stored ranges
+                  const nextPlot = autoscale ? { ...pdeState.plot, autoscale, xRange: undefined, yRange: undefined } : { ...pdeState.plot, autoscale };
+                  setPdeState({ plot: nextPlot });
+                }}
+              />
+              <span className="text-sm">Autoscale axes</span>
+            </label>
+          </div>
+
           {/* Solver Type */}
           <div className="flex items-center gap-4">
             <h3 className="text-sm font-semibold text-gray-700">Solver Type</h3>

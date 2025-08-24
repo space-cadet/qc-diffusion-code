@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-24 21:50:24 IST*
+*Last Updated: 2025-08-25 01:07:16 IST*
 
 ## Overview
 
@@ -433,6 +433,12 @@ UI implementation completed with comprehensive performance optimization:
 2. Continue with kinetic energy and momentum observable implementations
 3. Complete observer pattern integration for numerical analysis
 4. System ready for advanced physics features with optimal performance
+
+### PDE Controls Enhancement (2025-08-25)
+- **Negative Input Support**: Fixed negative number input UX by implementing local string state for position/center fields
+- **Input Field Optimization**: Changed negative-capable inputs from type="number" to type="text" with onBlur commit pattern
+- **Parameter Synchronization**: Added useEffect hooks to sync local string states with external parameter changes
+- **Enhanced User Experience**: Users can now type negative values naturally without input field interference
 
 ## Success Criteria
 

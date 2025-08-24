@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 23:36:15 IST_
+_Last Updated: 2025-08-25 01:07:16 IST_
 
 ## Active Tasks
 
@@ -27,9 +27,9 @@ _Last Updated: 2025-08-24 23:36:15 IST_
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 10:29:12 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 01:07:16 IST
 **Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/RandomWalkSim.tsx`
-**Notes**: Random walk interface completed - dual mode support for continuum and graph simulations
+**Notes**: Enhanced PDE simulation with expanded initial distributions (gaussian, double gaussian, step, delta, sine, cosine) and improved parameter controls with negative input support
 
 ### C3: GPU AMR Integration for PDE Solver
 
