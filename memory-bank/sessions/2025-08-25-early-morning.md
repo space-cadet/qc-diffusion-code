@@ -1,8 +1,8 @@
 # Session: 2025-08-25 Early Morning
 
 _Started: 2025-08-25 01:07:16 IST_
-_Last Updated: 2025-08-25 03:43:52 IST_
-_Focus: C2/C5b - PDE Initial Conditions Enhancement and WebGL Solver Improvements_
+_Last Updated: 2025-08-25 04:43:30 IST_
+_Focus: C2/C5b/C11 - PDE Initial Conditions Enhancement and Crank-Nicolson Solver Implementation_
 
 ## Session Objectives
 
@@ -182,17 +182,65 @@ _Focus: C2/C5b - PDE Initial Conditions Enhancement and WebGL Solver Improvement
 - Designed Strategy pattern solution for multiple numerical methods per equation
 - Planned Crank-Nicolson for unconditional stability, RK4 for higher accuracy
 
+## Crank-Nicolson Solver Implementation (C11)
+
+### Shader Compilation Fixes
+
+1. **Uniform and Varying Issues**
+   - Fixed shader compilation errors in CrankNicolsonSolver.ts
+   - Removed illegal uniform declarations inside GLSL functions
+   - Replaced `vUv` references with `textureCoords` to match vertex shader outputs
+   - Pinned vertex attribute locations in generic_shaders.js (0=position, 1=uv)
+
+2. **Texture Binding Corrections**
+   - Removed custom `iterativeTexture` uniform; reused existing `textureSource1`
+   - Updated `webgl-solver.js` to get uniform location for `textureSource1`
+   - Fixed texture binding in CN step function for iterative textures
+
+3. **Shader Logic Refactoring**
+   - Converted CN diffusion shader to standalone fragment shader
+   - Simplified to 1D diffusion (x-only) for stability with height=1 textures
+   - Properly separated u^n sampling (textureSource) from iterative solution (textureSource1)
+   - Fixed RHS calculation to use u^n neighbors for explicit part
+
+### Iterative Solver Improvements
+
+1. **Jacobi Method Implementation**
+   - Implemented Jacobi iterative method for implicit CN diffusion
+   - First iteration uses readTexture (u^n) as initial guess
+   - Final iteration renders directly to writeFramebuffer
+   - Removed copyTexSubImage2D seeding approach
+   - Set dt uniform to full dt value
+
+2. **Boundary Condition Handling**
+   - Leveraged WebGL's CLAMP_TO_EDGE for Neumann boundary conditions
+   - Prepared for future user-configurable boundary conditions
+
+3. **Integration with WebGL Pipeline**
+   - Updated step() to perform iterative solve branch when diffusion coefficient k is present
+   - Added solver parameter support (max_iter, tolerance, theta)
+   - Set default configuration in appStore.ts: telegraph=forward-euler, diffusion=crank-nicolson
+
+### Files Modified for CN Implementation
+
+- `frontend/src/webgl/solvers/CrankNicolsonSolver.ts` - Main solver implementation with Jacobi iterations
+- `frontend/src/webgl/webgl-solver.js` - Added textureSource1 uniform support
+- `frontend/src/webgl/generic_shaders.js` - Pinned vertex attribute locations
+- `frontend/src/hooks/useWebGLSolver.ts` - Solver strategy integration
+- `frontend/src/types.ts` - Enhanced SolverParams interface
+- `frontend/src/stores/appStore.ts` - Default solver configurations
+
 ## Next Steps
 
-1. Implement CrankNicolsonSolver.ts with GPU tridiagonal matrix solver
-2. Create RK4Solver.ts for improved telegraph equation accuracy
-3. Add per-equation solver selection UI to PdeParameterPanel
+1. Create RK4Solver.ts for improved telegraph equation accuracy
+2. Add per-equation solver selection UI to PdeParameterPanel
+3. Implement user-configurable boundary conditions (Neumann/Dirichlet/Periodic)
 4. Continue observer pattern implementation for random walk observables (C7)
 5. Performance benchmarking of different solvers
 
 ## Session Status
 
-**Status**: EXTENDED TO SOLVER INFRASTRUCTURE
-**Duration**: ~4 hours (PDE enhancements + component refactoring + solver strategy setup)
-**Focus Areas**: WebGL solver improvements, component separation, solver strategy infrastructure
-**Key Achievement**: Complete solver strategy pattern foundation ready for Crank-Nicolson implementation
+**Status**: COMPLETED CRANK-NICOLSON IMPLEMENTATION
+**Duration**: ~6 hours (PDE enhancements + component refactoring + solver strategy + CN implementation)
+**Focus Areas**: WebGL solver improvements, component separation, solver strategy, CN diffusion solver
+**Key Achievement**: Fully functional Crank-Nicolson solver with Jacobi iterations for diffusion equation

@@ -1,9 +1,24 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 03:47:05 IST_
+_Last Updated: 2025-08-25 04:43:45 IST_
 
 ### 2025-08-25
+
+#### 04:43 - C11: Crank-Nicolson Solver Implementation
+- Created `frontend/src/webgl/solvers/CrankNicolsonSolver.ts` - Implemented Crank-Nicolson solver with Jacobi iterations for implicit diffusion, standalone fragment shader, 1D diffusion (x-only) for stability, proper texture binding and iterative solver initialization (220 lines)
+- Updated `frontend/src/webgl/webgl-solver.js` - Added textureSource1 uniform location lookup, removed iterativeTexture uniform, integrated strategy pattern with setSolver method
+- Updated `frontend/src/webgl/generic_shaders.js` - Pinned vertex attribute locations (0=position, 1=uv) for consistent shader binding
+- Updated `frontend/src/hooks/useWebGLSolver.ts` - Enhanced with solver strategy integration and parameter passing, added solver creation based on configuration
+- Updated `frontend/src/types.ts` - Added SolverParams interface with dt_factor, theta, tolerance, max_iter fields, enhanced SolverType and SolverConfig types
+- Updated `frontend/src/stores/appStore.ts` - Added default solver configurations (telegraph=forward-euler, diffusion=crank-nicolson) with solver parameters
+- Updated `frontend/src/webgl/solvers/BaseSolver.ts` - Enhanced SolverStrategy interface with isStable method, added SolverType and SolverConfig type definitions
+- Updated `frontend/src/PdeParameterPanel.tsx` - Added solver selection UI components, solver type change handlers, and solver parameter controls
+- Updated `memory-bank/tasks/C11.md` - Marked Crank-Nicolson implementation as completed, added recent session work summary
+- Updated `memory-bank/implementation-details/pde-solver-choice-plan.md` - Updated Phase 2 status to completed with implementation details
+- Updated `memory-bank/tasks.md` - Updated last modified timestamp
+- Updated `memory-bank/session_cache.md` - Updated C11 status with Crank-Nicolson completion
+- Updated `memory-bank/sessions/2025-08-25-early-morning.md` - Added Crank-Nicolson implementation details section
 
 #### 03:47 - C11: PDE Solver Strategy Infrastructure Implementation
 - Created `frontend/src/webgl/solvers/BaseSolver.ts` - Strategy interface for numerical solvers with stability checking and WebGL integration methods

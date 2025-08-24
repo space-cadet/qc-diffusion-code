@@ -4,9 +4,32 @@ import { RDShaderTop, RDShaderMain, RDShaderBot } from './simulation_shaders.js'
 import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs.js';
 import { genericVertexShader } from './generic_shaders.js';
 import { ForwardEulerSolver } from './solvers/ForwardEulerSolver.ts';
+import { CrankNicolsonSolver } from './solvers/CrankNicolsonSolver.ts';
+
+/** @typedef {import('./solvers/BaseSolver').SolverStrategy} SolverStrategy */
+
+/**
+ * @typedef {'forward-euler' | 'crank-nicolson' | 'rk4'} SolverType
+ */
 
 export class WebGLSolver {
+  /**
+   * @param {SolverType} solverType
+   * @returns {SolverStrategy}
+   */
+  static createSolver(solverType) {
+    switch (solverType) {
+      case 'forward-euler':
+        return new ForwardEulerSolver();
+      case 'crank-nicolson':
+        return new CrankNicolsonSolver();
+      default:
+        console.warn(`Unknown solver type: ${solverType}, using forward-euler`);
+        return new ForwardEulerSolver();
+    }
+  }
   constructor(canvas) {
+    this.solverStrategy = new ForwardEulerSolver();
     this.canvas = canvas;
     this.gl = canvas.getContext('webgl2', {
       powerPreference: 'high-performance',
@@ -35,11 +58,24 @@ export class WebGLSolver {
     this.currentEquationType = null;
   }
 
+  /** @param {SolverStrategy} solverStrategy */
   setSolver(solverStrategy) {
     this.solverStrategy = solverStrategy;
     // Re-setup equation if already initialized
     if (this.currentEquationType) {
       this.setupEquation(this.currentEquationType, this.currentParameters || {});
+    }
+  }
+
+  static createSolver(solverType) {
+    switch (solverType) {
+      case 'forward-euler':
+        return new ForwardEulerSolver();
+      case 'crank-nicolson':
+        return new CrankNicolsonSolver();
+      default:
+        console.warn(`Unknown solver type: ${solverType}, using forward-euler`);
+        return new ForwardEulerSolver();
     }
   }
 
@@ -225,7 +261,8 @@ export class WebGLSolver {
       L_y: this.gl.getUniformLocation(this.program, 'L_y'),
       MINX: this.gl.getUniformLocation(this.program, 'MINX'),
       MINY: this.gl.getUniformLocation(this.program, 'MINY'),
-      textureSource: this.gl.getUniformLocation(this.program, 'textureSource')
+      textureSource: this.gl.getUniformLocation(this.program, 'textureSource'),
+      textureSource1: this.gl.getUniformLocation(this.program, 'textureSource1')
     };
     
     Object.keys(parameters).forEach(key => {

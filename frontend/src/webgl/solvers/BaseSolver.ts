@@ -19,13 +19,15 @@ export interface SolverStrategy {
   ): number; // returns new currentTexture index
 }
 
+export type SolverType = 'forward-euler' | 'crank-nicolson' | 'rk4';
+
 export interface SolverConfig {
-  telegraph: string;
-  diffusion: string;
-  wheeler_dewitt?: string;
+  telegraph: SolverType;
+  diffusion: SolverType;
+  wheeler_dewitt?: SolverType;
 }
 
 export const DEFAULT_SOLVER_CONFIG: SolverConfig = {
-  telegraph: 'forward_euler',
-  diffusion: 'forward_euler'
+  telegraph: 'forward-euler',
+  diffusion: 'forward-euler'
 };

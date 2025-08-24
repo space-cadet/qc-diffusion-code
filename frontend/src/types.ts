@@ -1,7 +1,16 @@
+export type SolverType = 'forward-euler' | 'crank-nicolson' | 'rk4';
+
 export interface SolverConfig {
-  telegraph: string;
-  diffusion: string;
-  wheeler_dewitt?: string;
+  telegraph?: SolverType;
+  diffusion?: SolverType;
+  wheeler_dewitt?: SolverType;
+}
+
+export interface SolverParams {
+  dt_factor?: number;    // time step multiplier
+  theta?: number;        // CN implicit weight (0.5 = centered)
+  tolerance?: number;    // iterative solver tolerance
+  max_iter?: number;     // max iterations for implicit
 }
 
 export interface SimulationParams {
@@ -31,6 +40,7 @@ export interface SimulationParams {
   mesh_size: number;
   solver_type?: 'python' | 'webgl';
   solver_config?: SolverConfig;
+  solver_params?: SolverParams;
   selectedEquations?: string[];
 }
 

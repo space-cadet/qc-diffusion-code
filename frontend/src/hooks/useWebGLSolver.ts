@@ -1,6 +1,9 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebGLSolver } from '../webgl/webgl-solver';
 import type { SimulationParams, AnimationFrame } from '../types';
+import type { SolverStrategy } from '../webgl/solvers/BaseSolver';
+import { ForwardEulerSolver } from '../webgl/solvers/ForwardEulerSolver';
+import { CrankNicolsonSolver } from '../webgl/solvers/CrankNicolsonSolver';
 import { generateInitialConditions } from '../utils/initialConditions';
 
 export interface WebGLPlotData {
@@ -8,6 +11,8 @@ export interface WebGLPlotData {
   u: number[];
   w?: number[];
 }
+
+interface SolverParameters extends Record<string, number> {}
 
 export type SimulationResult = {
   [equationType: string]: {
@@ -17,6 +22,18 @@ export type SimulationResult = {
     time: number;
   };
 } & { time: number };
+
+function createSolver(solverType: string): SolverStrategy {
+  switch (solverType) {
+    case 'forward-euler':
+      return new ForwardEulerSolver();
+    case 'crank-nicolson':
+      return new CrankNicolsonSolver();
+    default:
+      console.warn(`Unknown solver type: ${solverType}, using forward-euler`);
+      return new ForwardEulerSolver();
+  }
+}
 
 export function useWebGLSolver() {
   const solversRef = useRef<Map<string, WebGLSolver>>(new Map());
@@ -34,15 +51,24 @@ export function useWebGLSolver() {
         const solver = new WebGLSolver(canvas);
         solver.init(params.mesh_size, 1);
         
+        // Set solver strategy based on configuration
+        const solverType = params.solver_config?.[equationType as keyof typeof params.solver_config] || 'forward-euler';
+        const solverStrategy: SolverStrategy = createSolver(solverType);
+        (solver as any).setSolver(solverStrategy);
+        
         if (equationType === 'telegraph') {
-          solver.setupEquation('telegraph', { 
+          const solverParams: SolverParameters = { 
             a: params.collision_rate, 
-            v: params.velocity
-          });
+            v: params.velocity,
+            ...params.solver_params
+          };
+          solver.setupEquation('telegraph', solverParams);
         } else if (equationType === 'diffusion') {
-          solver.setupEquation('diffusion', { 
-            k: params.diffusivity 
-          });
+          const solverParams: SolverParameters = { 
+            k: params.diffusivity,
+            ...params.solver_params
+          };
+          solver.setupEquation('diffusion', solverParams);
         }
         // upload precomputed u profile for this equation
         const frameData = initialFrame[equationType] as { x: number[]; u: number[] } | undefined;

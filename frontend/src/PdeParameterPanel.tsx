@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { SimulationParams } from './types';
+import type { SimulationParams, SolverType } from './types';
 import { useAppStore } from './stores/appStore';
 
 interface ControlsProps {
@@ -33,6 +33,11 @@ export default function Controls({ params, onChange }: ControlsProps) {
       ? currentEquations.filter(eq => eq !== equation)
       : [...currentEquations, equation];
     onChange({ ...params, selectedEquations: newEquations });
+  };
+
+  const handleSolverChange = (equation: 'telegraph' | 'diffusion', solver: SolverType) => {
+    const newConfig = { ...params.solver_config, [equation]: solver };
+    onChange({ ...params, solver_config: newConfig });
   };
 
   const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
@@ -135,6 +140,18 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       className="w-full"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Solver</label>
+                    <select
+                      value={params.solver_config?.telegraph ?? 'forward-euler'}
+                      onChange={(e) => handleSolverChange('telegraph', e.target.value as SolverType)}
+                      className="w-full p-2 border border-gray-300 rounded text-sm"
+                    >
+                      <option value="forward-euler">Forward Euler</option>
+                      <option value="rk4">Runge-Kutta 4</option>
+                      <option value="crank-nicolson">Crank-Nicolson</option>
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
@@ -175,6 +192,18 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       className="w-full"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Solver</label>
+                    <select
+                      value={params.solver_config?.diffusion ?? 'crank-nicolson'}
+                      onChange={(e) => handleSolverChange('diffusion', e.target.value as SolverType)}
+                      className="w-full p-2 border border-gray-300 rounded text-sm"
+                    >
+                      <option value="crank-nicolson">Crank-Nicolson</option>
+                      <option value="forward-euler">Forward Euler</option>
+                      <option value="rk4">Runge-Kutta 4</option>
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
@@ -189,6 +218,83 @@ export default function Controls({ params, onChange }: ControlsProps) {
           </div>
         )}
       </div>
+
+      {/* Solver Parameters - conditional based on selected solvers */}
+      {(params.solver_config?.telegraph === 'crank-nicolson' || 
+        params.solver_config?.diffusion === 'crank-nicolson' ||
+        params.solver_config?.telegraph === 'rk4' || 
+        params.solver_config?.diffusion === 'rk4') && (
+        <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
+          <h3 className="text-sm font-semibold mb-3 text-gray-700">Solver Parameters</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">DT Factor</label>
+              <input
+                type="number"
+                min="0.1"
+                max="2.0"
+                step="0.1"
+                value={params.solver_params?.dt_factor ?? 1.0}
+                onChange={(e) => onChange({ 
+                  ...params, 
+                  solver_params: { ...params.solver_params, dt_factor: parseFloat(e.target.value) }
+                })}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+            {(params.solver_config?.telegraph === 'crank-nicolson' || 
+              params.solver_config?.diffusion === 'crank-nicolson') && (
+              <>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">CN Theta</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={params.solver_params?.theta ?? 0.5}
+                    onChange={(e) => onChange({ 
+                      ...params, 
+                      solver_params: { ...params.solver_params, theta: parseFloat(e.target.value) }
+                    })}
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Tolerance</label>
+                  <input
+                    type="number"
+                    min="1e-8"
+                    max="1e-3"
+                    step="1e-7"
+                    value={params.solver_params?.tolerance ?? 1e-6}
+                    onChange={(e) => onChange({ 
+                      ...params, 
+                      solver_params: { ...params.solver_params, tolerance: parseFloat(e.target.value) }
+                    })}
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Max Iter</label>
+                  <input
+                    type="number"
+                    min="10"
+                    max="1000"
+                    step="10"
+                    value={params.solver_params?.max_iter ?? 100}
+                    onChange={(e) => onChange({ 
+                      ...params, 
+                      solver_params: { ...params.solver_params, max_iter: parseInt(e.target.value) }
+                    })}
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Initial Conditions (foldable) */}
       <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
@@ -505,6 +611,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
               className="w-full"
             />
           </div>
+
         </div>
         )}
       </div>

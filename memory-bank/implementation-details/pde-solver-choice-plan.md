@@ -1,6 +1,6 @@
 # PDE Solver Choice Implementation Plan
 *Created: 2025-08-25 03:43:52 IST*
-*Last Updated: 2025-08-25 03:43:52 IST*
+*Last Updated: 2025-08-25 04:41:45 IST*
 
 ## Overview
 Implementation plan for addressing diffusion equation stability issues through multiple numerical solver support using Strategy pattern architecture.
@@ -56,16 +56,20 @@ class WebGLSolver {
 - ✅ `webgl-solver.js` - Strategy integration (50 lines)
 - ✅ `types.ts` - SolverConfig definitions (30 lines)
 
-### Phase 2: Crank-Nicolson Implementation (NEXT)
-**Files to Create/Modify**: 3 files (~200 lines)
-- `CrankNicolsonSolver.ts` - CN strategy implementation (120 lines)
-- `cn-diffusion.glsl` - CN shader with tridiagonal solver (60 lines)
-- `cn-telegraph.glsl` - IMEX approach for telegraph (20 lines)
+### Phase 2: Crank-Nicolson Implementation ✅ COMPLETED 2025-08-25
+**Files Created/Modified**: 5 files (~300 lines)
+- ✅ `CrankNicolsonSolver.ts` - CN strategy implementation with Jacobi iterations (217 lines)
+- ✅ `webgl-solver.js` - Added textureSource1 uniform support (updated)
+- ✅ `generic_shaders.js` - Pinned vertex attribute locations (updated)
+- ✅ `useWebGLSolver.ts` - Solver strategy integration (updated)
+- ✅ `appStore.ts` - Default CN configuration for diffusion (updated)
 
-**Technical Challenges**:
-- GPU tridiagonal matrix solver for implicit step
-- Boundary condition handling in implicit scheme
-- Texture coordination for implicit/explicit splitting
+**Implementation Approach**:
+- Jacobi iterative method instead of direct tridiagonal solve
+- Standalone fragment shader for CN diffusion with proper texture sampling
+- 1D diffusion (x-only) for stability with height=1 textures
+- Proper initialization: first iteration uses u^n, final renders to output
+- Fixed shader compilation issues: uniform scope, varying names, texture binding
 
 ### Phase 3: RK4 Implementation
 **Files to Create/Modify**: 2 files (~140 lines)

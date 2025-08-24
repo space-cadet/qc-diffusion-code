@@ -136,6 +136,8 @@ export const useAppStore = create<AppState>()(
         x_max: 5.0,
         mesh_size: 64,
         selectedEquations: ['telegraph', 'diffusion'],
+        solver_config: { telegraph: 'forward-euler', diffusion: 'crank-nicolson' },
+        solver_params: { dt_factor: 1.0, theta: 0.5, tolerance: 1e-6, max_iter: 100 },
       },
       pdeState: {
         isRunning: false,
