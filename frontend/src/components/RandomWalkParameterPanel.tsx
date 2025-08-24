@@ -17,7 +17,7 @@ interface ParameterPanelProps {
   handleInitialize: () => void;
 }
 
-export const ParameterPanel = ({
+export const RandomWalkParameterPanel = ({
   simulatorRef,
   gridLayoutParams,
   setGridLayoutParams,
@@ -164,6 +164,7 @@ export const ParameterPanel = ({
             </label>
           </div>
 
+        
         {/* Initial Distribution (only for Continuum) - Collapsible */}
         {gridLayoutParams.simulationType === "continuum" && (
           <div className="border rounded p-3 bg-gray-50">
@@ -650,7 +651,7 @@ export const ParameterPanel = ({
                   type="range"
                   min="0.1"
                   max="10.0"
-                  step="0.1"
+                  step="any"
                   value={gridLayoutParams.collisionRate}
                   onChange={(e) =>
                     setGridLayoutParams({
@@ -678,7 +679,7 @@ export const ParameterPanel = ({
                   type="range"
                   min="0.01"
                   max="1.0"
-                  step="0.01"
+                  step="any"
                   value={gridLayoutParams.jumpLength}
                   onChange={(e) =>
                     setGridLayoutParams({
@@ -704,7 +705,7 @@ export const ParameterPanel = ({
                   type="range"
                   min="0.1"
                   max="5.0"
-                  step="0.1"
+                  step="any"
                   value={gridLayoutParams.velocity}
                   onChange={(e) =>
                     setGridLayoutParams({

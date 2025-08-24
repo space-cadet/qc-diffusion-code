@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 01:07:16 IST_
+_Last Updated: 2025-08-25 03:08:37 IST_
 
 ### 2025-08-25
+
+#### 03:08 - C1/C5b/C5c: Component Refactoring and Type Consolidation
+- Created `frontend/src/PdeParameterPanel.tsx` - Renamed from Controls.tsx with enhanced solver selection UI and parameter visibility fixes
+- Created `frontend/src/components/RandomWalkParameterPanel.tsx` - Dedicated Random Walk parameter controls component renamed from ParameterPanel.tsx
+- Updated `frontend/src/App.tsx` - Changed import from Controls to PdeParameterPanel
+- Updated `frontend/src/Controls.tsx` - Enhanced with solver selection panel, removed equation selection dependency for parameter visibility, added range input "any" step values
+- Updated `frontend/src/RandomWalkSim.tsx` - Changed import from ParameterPanel to RandomWalkParameterPanel
+- Updated `frontend/src/components/ParameterPanel.tsx` - Modified interface to use RandomWalkParams type instead of local GridLayoutParams
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Updated type imports to use RandomWalkParams from simulationTypes
+- Updated `frontend/src/stores/appStore.ts` - Removed local GridLayoutParams interface, imported RandomWalkParams from simulationTypes, added solver parameters to defaults
+- Updated `frontend/src/types/simulationTypes.ts` - Expanded RandomWalkParams interface with comprehensive type definitions including solver configuration
 
 #### 01:07 - C2/C5b: PDE Initial Conditions Enhancement and WebGL Solver Improvements
 - Updated `frontend/src/webgl/webgl-solver.js` - Added setInitialProfile(uArray) method for uploading precomputed 1D initial conditions to texture 0, fixed mesh consistency using (width-1) denominator for endpoint inclusion in extractPlotData(), updated step() method dx/dy calculations for uniform spacing

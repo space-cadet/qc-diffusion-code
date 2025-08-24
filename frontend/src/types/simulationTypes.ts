@@ -5,14 +5,33 @@ export interface SimulationState {
   status: 'Running' | 'Paused' | 'Stopped' | 'Initialized';
 }
 
-export interface GridLayoutParams {
+export interface RandomWalkParams {
   simulationType: 'continuum' | 'graph';
   collisionRate: number;
   jumpLength: number;
   velocity: number;
   particles: number;
-  graphType?: string;
-  graphSize?: number;
+  graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
+  graphSize: number;
+  isPeriodic: boolean;
+  showEdgeWeights: boolean;
   showAnimation: boolean;
-  // Add other params as needed
+  strategy: 'ctrw' | 'simple' | 'levy' | 'fractional';
+  boundaryCondition: 'periodic' | 'reflective' | 'absorbing';
+  initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  distSigmaX: number;
+  distSigmaY: number;
+  distR0: number;
+  distDR: number;
+  distThickness: number;
+  distNx: number;
+  distNy: number;
+  distJitter: number;
+  solverType: 'gpu_explicit' | 'gpu_explicit_substep' | 'cpu_crank_nicolson';
+  solverParams: {
+    substeps: number;
+    cnTheta: number;
+    tolerance: number;
+    maxIter: number;
+  };
 }

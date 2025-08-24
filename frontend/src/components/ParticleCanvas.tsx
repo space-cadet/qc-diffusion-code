@@ -24,21 +24,10 @@ interface EdgeAttributes {
   color?: string;
 }
 
-interface GridLayoutParams {
-  simulationType: "continuum" | "graph";
-  showAnimation: boolean;
-  graphType: "lattice1D" | "lattice2D" | "path" | "complete";
-  graphSize: number;
-  isPeriodic: boolean;
-  showEdgeWeights: boolean;
-  particles: number;
-  collisionRate: number;
-  jumpLength: number;
-  velocity: number;
-}
+import type { RandomWalkParams } from '../types/simulationTypes';
 
 interface ParticleCanvasProps {
-  gridLayoutParams: GridLayoutParams;
+  gridLayoutParams: RandomWalkParams;
   simulationStatus: string;
   tsParticlesContainerRef: React.RefObject<Container>;
   particlesLoaded: (container: Container) => void;
@@ -48,7 +37,7 @@ interface ParticleCanvasProps {
 
 // Graph visualization subcomponent
 const GraphVisualization: React.FC<{
-  gridLayoutParams: GridLayoutParams;
+  gridLayoutParams: RandomWalkParams;
   graphPhysicsRef: React.RefObject<PhysicsRandomWalk>;
 }> = ({ gridLayoutParams, graphPhysicsRef }) => {
   const sigma = useSigma();
@@ -144,7 +133,7 @@ const GraphVisualization: React.FC<{
 
 // Particle Canvas component with low-level tsParticles control
 const ParticleCanvasComponent: React.FC<{
-  gridLayoutParams: GridLayoutParams;
+  gridLayoutParams: RandomWalkParams;
   simulationStatus: string;
   particlesLoaded: (container: Container) => void;
   tsParticlesContainerRef: React.RefObject<Container>;

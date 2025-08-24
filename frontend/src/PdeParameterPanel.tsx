@@ -9,6 +9,7 @@ interface ControlsProps {
 
 export default function Controls({ params, onChange }: ControlsProps) {
   const { pdeUIState, setPdeUIState } = useAppStore();
+  const [solverOpen, setSolverOpen] = useState<boolean>(false);
   // Local string states to allow negative typing and intermediate values
   const [centerStr, setCenterStr] = useState<string>(String(params.dist_center ?? 0));
   const [dgCenter1Str, setDgCenter1Str] = useState<string>(String(params.dg_center1 ?? -1));
@@ -39,6 +40,38 @@ export default function Controls({ params, onChange }: ControlsProps) {
   return (
     <div className="p-4 bg-gray-50 border-r border-gray-200">
       <h2 className="text-lg font-semibold mb-6">Parameters</h2>
+
+      {/* Solver Selection (foldable) */}
+      <div className="mb-6">
+        <button
+          type="button"
+          onClick={() => setSolverOpen(!solverOpen)}
+          className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50"
+        >
+          <span className="text-sm font-semibold text-gray-700">Solver</span>
+          <span className="text-xs text-gray-500">{solverOpen ? 'Hide' : 'Show'}</span>
+        </button>
+        {solverOpen && (
+          <div className="mt-2 p-3 bg-white rounded-lg border border-gray-200 space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Type</label>
+              <select
+                value={params.solver_type ?? 'python'}
+                onChange={(e) => onChange({ ...params, solver_type: e.target.value as 'python' | 'webgl' })}
+                className="w-full p-2 border border-gray-300 rounded text-sm"
+              >
+                <option value="python">CPU (Backend Python)</option>
+                <option value="webgl">GPU (WebGL Explicit)</option>
+              </select>
+            </div>
+            {params.solver_type === 'webgl' && (
+              <div className="text-xs text-gray-600">
+                Forward Euler is CFL-limited. If unstable at high k, reduce dt or switch to CPU.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       
       {/* Equations Panel (foldable + scrollable) */}
       <div className="mb-6">
@@ -82,7 +115,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       type="range"
                       min="0.1"
                       max="3"
-                      step="0.1"
+                      step="any"
                       value={params.collision_rate}
                       onChange={(e) => handleChange('collision_rate', parseFloat(e.target.value))}
                       className="w-full"
@@ -96,7 +129,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       type="range"
                       min="0.5"
                       max="3"
-                      step="0.1"
+                      step="any"
                       value={params.velocity}
                       onChange={(e) => handleChange('velocity', parseFloat(e.target.value))}
                       className="w-full"
@@ -136,7 +169,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       type="range"
                       min="0.1"
                       max="2"
-                      step="0.1"
+                      step="any"
                       value={params.diffusivity}
                       onChange={(e) => handleChange('diffusivity', parseFloat(e.target.value))}
                       className="w-full"
@@ -421,7 +454,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
               type="range"
               min="-10"
               max="0"
-              step="0.5"
+              step="any"
               value={params.x_min}
               onChange={(e) => handleChange('x_min', parseFloat(e.target.value))}
               className="w-full"
@@ -436,7 +469,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
               type="range"
               min="0"
               max="10"
-              step="0.5"
+              step="any"
               value={params.x_max}
               onChange={(e) => handleChange('x_max', parseFloat(e.target.value))}
               className="w-full"
@@ -451,7 +484,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
               type="range"
               min="0.5"
               max="20"
-              step="0.5"
+              step="any"
               value={params.t_range}
               onChange={(e) => handleChange('t_range', parseFloat(e.target.value))}
               className="w-full"

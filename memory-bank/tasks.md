@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 01:07:16 IST_
+_Last Updated: 2025-08-25 03:08:37 IST_
 
 ## Active Tasks
 
@@ -27,9 +27,9 @@ _Last Updated: 2025-08-25 01:07:16 IST_
 ### C1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 01:07:16 IST
-**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/RandomWalkSim.tsx`
-**Notes**: Enhanced PDE simulation with expanded initial distributions (gaussian, double gaussian, step, delta, sine, cosine) and improved parameter controls with negative input support
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:08:37 IST
+**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/PdeParameterPanel.tsx`
+**Notes**: Component separation completed - PDE controls moved to dedicated PdeParameterPanel.tsx with enhanced solver selection, parameter visibility fixes applied
 
 ### C3: GPU AMR Integration for PDE Solver
 
@@ -52,9 +52,9 @@ _Last Updated: 2025-08-25 01:07:16 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-24 23:36:15 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/hooks/useDensityVisualization.ts`
-**Notes**: Floating observables panel implemented with react-rnd, collapse state persistence, internal header removal, TypeScript error fixes, and UI simplification completed
+**Status**: ✅ COMPLETED **Last**: 2025-08-25 03:08:37 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulationTypes.ts`
+**Notes**: Component refactoring completed - separated PDE and Random Walk parameter panels, consolidated type definitions into RandomWalkParams, enhanced solver support
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence

@@ -4,7 +4,7 @@ import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
 import { Rnd } from "react-rnd";
 import { useAppStore } from "./stores/appStore";
-import { ParameterPanel } from "./components/ParameterPanel";
+import { RandomWalkParameterPanel } from "./components/RandomWalkParameterPanel";
 import { DensityComparison } from "./components/DensityComparison";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { ReplayControls } from "./components/ReplayControls";
@@ -604,7 +604,7 @@ export default function RandomWalkSim() {
         >
           {/* Parameters Panel */}
           <div key="parameters">
-            <ParameterPanel
+            <RandomWalkParameterPanel
               simulatorRef={simulatorRef}
               gridLayoutParams={gridLayoutParams}
               setGridLayoutParams={setGridLayoutParams}

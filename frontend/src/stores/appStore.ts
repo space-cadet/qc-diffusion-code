@@ -2,35 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { SimulationParams } from '../types'
 import type { Layout } from 'react-grid-layout'
-
-interface GridLayoutParams {
-  particles: number
-  collisionRate: number
-  jumpLength: number
-  velocity: number
-  simulationType: 'continuum' | 'graph'
-  strategy: 'ctrw' | 'simple' | 'levy' | 'fractional'
-  boundaryCondition: 'periodic' | 'reflective' | 'absorbing'
-  graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete'
-  graphSize: number
-  isPeriodic: boolean
-  showEdgeWeights: boolean
-  showAnimation: boolean
-  // Initial distribution controls
-  initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid'
-  // Gaussian
-  distSigmaX: number
-  distSigmaY: number
-  // Ring
-  distR0: number
-  distDR: number
-  // Stripe (vertical band)
-  distThickness: number
-  // Grid
-  distNx: number
-  distNy: number
-  distJitter: number
-}
+import type { RandomWalkParams } from '../types/simulationTypes'
 
 interface RandomWalkUIState {
   isStrategyOpen: boolean
@@ -96,7 +68,7 @@ interface PdeState {
 interface AppState {
   activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim'
   simulationParams: SimulationParams
-  gridLayoutParams: GridLayoutParams
+  gridLayoutParams: RandomWalkParams
   randomWalkSimLayouts: Layout[]
   randomWalkUIState: RandomWalkUIState
   randomWalkSimulationState: RandomWalkSimulationState
@@ -116,7 +88,7 @@ interface AppState {
   }
   setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim') => void
   setSimulationParams: (params: SimulationParams) => void
-  setGridLayoutParams: (params: GridLayoutParams) => void
+  setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
   setRandomWalkUIState: (state: RandomWalkUIState) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
@@ -191,6 +163,9 @@ export const useAppStore = create<AppState>()(
         isPeriodic: false,
         showEdgeWeights: false,
         showAnimation: true,
+        // Solver selection defaults
+        solverType: 'gpu_explicit',
+        solverParams: { substeps: 1, cnTheta: 0.5, tolerance: 1e-4, maxIter: 50 },
         initialDistType: 'uniform',
         distSigmaX: 80,
         distSigmaY: 80,

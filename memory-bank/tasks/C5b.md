@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-25 01:07:16 IST_
+_Last Updated: 2025-08-25 03:08:37 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -213,3 +213,12 @@ This task implements the complete UI framework for the random walk simulation ba
 - ✅ **Parameter Persistence**: Enhanced Controls component with useEffect synchronization to keep local string states aligned with external parameter changes (reset/load scenarios)
 - ✅ **Input Field Conversion**: Changed negative-capable numeric inputs from type="number" to type="text" to allow intermediate values like "-" during typing
 - ✅ **State Management**: Added proper useState and useEffect imports to Controls.tsx for local state management of string inputs
+
+**Component Refactoring (2025-08-25)**:
+
+- ✅ **Parameter Panel Separation**: Split Controls.tsx into PdeParameterPanel.tsx for PDE simulation controls, maintained RandomWalkParameterPanel.tsx for random walk controls
+- ✅ **Type Consolidation**: Unified duplicate GridLayoutParams interfaces into comprehensive RandomWalkParams type in simulationTypes.ts
+- ✅ **Enhanced Solver Support**: Added solver selection UI to PDE panel with GPU/CPU options and solver parameter configuration
+- ✅ **Import Updates**: Updated App.tsx to use PdeParameterPanel, RandomWalkSim.tsx to use RandomWalkParameterPanel
+- ✅ **Store Integration**: Updated appStore.ts to use consolidated RandomWalkParams type, added solver parameters to defaults
+- ✅ **Parameter Visibility Fix**: Removed equation selection dependency for parameter panel visibility in Controls logic

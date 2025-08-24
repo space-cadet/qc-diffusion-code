@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-25 01:07:16 IST*
+*Last Updated: 2025-08-25 03:08:37 IST*
 
 ## Overview
 
@@ -439,6 +439,15 @@ UI implementation completed with comprehensive performance optimization:
 - **Input Field Optimization**: Changed negative-capable inputs from type="number" to type="text" with onBlur commit pattern
 - **Parameter Synchronization**: Added useEffect hooks to sync local string states with external parameter changes
 - **Enhanced User Experience**: Users can now type negative values naturally without input field interference
+
+### Component Refactoring and Type Consolidation (2025-08-25)
+- **Parameter Panel Separation**: Split Controls.tsx into dedicated PdeParameterPanel.tsx for PDE simulations, maintained RandomWalkParameterPanel.tsx for random walk physics
+- **Type System Unification**: Eliminated duplicate GridLayoutParams interfaces by creating comprehensive RandomWalkParams type in simulationTypes.ts
+- **Enhanced Solver Integration**: Added solver selection UI to PDE panel with GPU/CPU options and solver parameter configuration
+- **Import Updates**: Updated App.tsx and RandomWalkSim.tsx imports to use dedicated parameter panel components
+- **Store Consolidation**: Updated appStore.ts to use unified RandomWalkParams type with solver defaults
+- **Parameter Visibility Fix**: Removed equation selection dependency for parameter visibility in PDE controls
+- **Range Input Enhancement**: Changed step values from fixed to "any" for smoother parameter adjustment
 
 ## Success Criteria
 

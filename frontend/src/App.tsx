@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import Controls from "./Controls";
+import PdeParameterPanel from "./PdeParameterPanel";
 import PlotComponent from "./PlotComponent";
 import RandomWalkSim from "./RandomWalkSim";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
@@ -207,7 +207,7 @@ export default function App() {
         {activeTab === 'simulation' ? (
           <div className="h-full flex">
             <div className="w-80">
-              <Controls
+              <PdeParameterPanel
                 params={simulationParams}
                 onChange={setSimulationParams}
               />
