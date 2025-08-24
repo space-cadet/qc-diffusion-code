@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-23 21:40:42 IST_
+_Last Updated: 2025-08-24 11:54:58 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -157,12 +157,22 @@ This task implements the complete UI framework for the random walk simulation ba
 - Collapsible sections for better space management
 - Enhanced user experience with immediate control access
 
+**Performance Optimization Session (2025-08-24)**:
+
+- ✅ **Persistent Observable Settings**: Made observable panel expand/collapse state and all checkbox states (particle count, kinetic energy, momentum components) persistent across page reloads via Zustand store
+- ✅ **Persistent Density Settings**: Made density profile auto-update toggle persistent (record history kept as session-specific)
+- ✅ **Observable Panel UI Fix**: Fixed panel collapsible behavior - panel now properly shows only header when collapsed instead of maintaining full height with empty content
+- ✅ **Vertical Scrolling**: Added overflow-y-auto to observables panel content area for proper scrolling when observable list exceeds panel height
+- ✅ **Performance Issue Identification**: Identified excessive re-rendering of ParticleCanvas (60fps) caused by updateSimulationMetrics calls in animation loop triggering React state updates
+- ✅ **Render Optimization**: Added React.memo() to ParticleCanvas, memoized simulationState object, moved time/collision tracking to refs
+- ✅ **Animation Loop Optimization**: Removed updateSimulationMetrics from frame-by-frame animation loop, added 1-second interval for periodic state sync, only update metrics on pause/resume/reset events
+
 **Known Issues**:
 
-- State restoration on page reload not working correctly (requires debugging in next session)
+- Observable registration timing issue causing "No observer registered for id: particleCount" error when ParticleCanvas re-render prevention affects useEffect dependencies
 
 **Next Steps**:
 
-- Debug and fix state restoration functionality
-- Test complete persistence workflow across browser refreshes
-- Continue component extraction for remaining large components
+- Fix observable registration/unregistration timing issue
+- Test performance improvements and ensure stable 60fps without React re-renders
+- Complete observable infrastructure for kinetic energy and momentum components

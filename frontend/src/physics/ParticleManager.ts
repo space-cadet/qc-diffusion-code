@@ -115,15 +115,15 @@ export class ParticleManager {
     tsParticle.velocity.y = particle.velocity.vy;
 
     // Periodic diagnostics for one representative particle
-    if (tsParticle.id === "p0" && this.diagCounter % 30 === 0) {
-      console.log("[PM] updateParticle p0", {
-        physicsPos: { ...particle.position },
-        mappedPos: mapped,
-        canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
-        bounds: this.strategy.getBoundaries(),
-        velocity: particle.velocity,
-      });
-    }
+    // if (tsParticle.id === "p0" && this.diagCounter % 30 === 0) {
+    //   console.log("[PM] updateParticle p0", {
+    //     physicsPos: { ...particle.position },
+    //     mappedPos: mapped,
+    //     canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
+    //     bounds: this.strategy.getBoundaries(),
+    //     velocity: particle.velocity,
+    //   });
+    // }
     this.diagCounter++;
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
@@ -46,11 +46,15 @@ export default function RandomWalkSim() {
   // Runtime state (non-persistent)
   const [isRunning, setIsRunning] = useState(false);
   
+  // Refs for time/collision tracking
+  const timeRef = useRef(0);
+  const collisionsRef = useRef(0);
+  
   // Create combined simulation state for compatibility
-  const simulationState: SimulationState = {
+  const simulationState: SimulationState = useMemo(() => ({
     isRunning,
     ...randomWalkSimulationState,
-  };
+  }), [isRunning, randomWalkSimulationState]);
   
   const setSimulationState = (state: SimulationState | ((prev: SimulationState) => SimulationState)) => {
     if (typeof state === 'function') {
@@ -93,7 +97,7 @@ export default function RandomWalkSim() {
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
 
-  // Periodically save simulation state when running
+  // Periodically save simulation state and sync metrics when running
   useEffect(() => {
     if (!isRunning) return;
     
@@ -115,8 +119,16 @@ export default function RandomWalkSim() {
       }
     }, 2000); // Save every 2 seconds
     
-    return () => clearInterval(saveInterval);
-  }, [isRunning, saveSimulationSnapshot]);
+    const metricsInterval = setInterval(() => {
+      // Sync refs to state every 1 second
+      updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running');
+    }, 1000);
+    
+    return () => {
+      clearInterval(saveInterval);
+      clearInterval(metricsInterval);
+    };
+  }, [isRunning, saveSimulationSnapshot, updateSimulationMetrics]);
 
   // Initialize physics simulator
   useEffect(() => {
@@ -236,6 +248,9 @@ export default function RandomWalkSim() {
       isRunning: true,
       status: "Running",
     }));
+    
+    // Update state when starting
+    updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running');
   };
 
   const handlePause = () => {
@@ -255,11 +270,15 @@ export default function RandomWalkSim() {
       saveSimulationSnapshot(particleData, densityHistory, {});
     }
     
+    const newStatus = simulationState.isRunning ? "Paused" : "Running";
     setSimulationState((prev) => ({
       ...prev,
       isRunning: !prev.isRunning,
-      status: prev.isRunning ? "Paused" : "Running",
+      status: newStatus,
     }));
+    
+    // Update metrics when pausing/resuming
+    updateSimulationMetrics(timeRef.current, collisionsRef.current, newStatus);
   };
 
   const handleReset = () => {
@@ -271,6 +290,11 @@ export default function RandomWalkSim() {
         observableManager.reset();
       }
     }
+    
+    // Reset refs
+    timeRef.current = 0;
+    collisionsRef.current = 0;
+    
     setSimulationState({
       isRunning: false,
       time: 0,
@@ -280,6 +304,9 @@ export default function RandomWalkSim() {
       densityHistory: [],
       observableData: {}
     });
+    
+    // Update metrics when resetting
+    updateSimulationMetrics(0, 0, 'Stopped');
   };
 
   const handleInitialize = () => {
@@ -475,15 +502,10 @@ export default function RandomWalkSim() {
         if (isRunning) {
           simulatorRef.current.step(0.016);
           
-          // Update simulation state with current time and collisions
-          const currentTime = simulatorRef.current.getTime();
+          // Update refs with current time and collisions (no state updates)
+          timeRef.current = simulatorRef.current.getTime();
           const collisionStats = simulatorRef.current.getCollisionStats();
-          
-          updateSimulationMetrics(
-            currentTime,
-            collisionStats.totalCollisions || 0,
-            'Running'
-          );
+          collisionsRef.current = collisionStats.totalCollisions || 0;
         }
 
         // Render only if animation is enabled

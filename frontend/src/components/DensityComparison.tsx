@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useAppStore } from '../stores/appStore';
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 import { useDensityVisualization } from '../hooks/useDensityVisualization';
 
@@ -15,10 +16,22 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   simulatorRef,
   gridLayoutParams,
 }) => {
+  const { 
+    randomWalkUIState, 
+    setRandomWalkUIState 
+  } = useAppStore();
+  
   const { canvasRef, densityData, updateDensity } = useDensityVisualization(simulatorRef, 15);
-  const [autoUpdate, setAutoUpdate] = useState(false);
   const [recordHistory, setRecordHistory] = useState(false);
   const [waveFrontAnalysis, setWaveFrontAnalysis] = useState({ measuredSpeed: 0, theoreticalSpeed: 0, error: 0 });
+
+  // Helper function to update persistent autoUpdate state
+  const setAutoUpdate = (autoUpdate: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      densityAutoUpdate: autoUpdate
+    });
+  };
 
   // Calculate theoretical values
   const diffusionCoefficient =
@@ -42,7 +55,7 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
 
   // Auto-update density when simulation is running
   useEffect(() => {
-    if (!autoUpdate) return;
+    if (!randomWalkUIState.densityAutoUpdate) return;
     
     const interval = setInterval(() => {
       updateDensity();
@@ -53,7 +66,7 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     }, 100);
 
     return () => clearInterval(interval);
-  }, [autoUpdate, recordHistory, updateDensity]);
+  }, [randomWalkUIState.densityAutoUpdate, recordHistory, updateDensity]);
 
   return (
     <div className="bg-white border rounded-lg p-4 h-full flex flex-col">
@@ -69,14 +82,14 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
             Update
           </button>
           <button
-            onClick={() => setAutoUpdate(!autoUpdate)}
+            onClick={() => setAutoUpdate(!randomWalkUIState.densityAutoUpdate)}
             className={`px-3 py-1 text-xs rounded ${
-              autoUpdate 
+              randomWalkUIState.densityAutoUpdate 
                 ? 'bg-green-500 text-white hover:bg-green-600' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            {autoUpdate ? 'Auto ON' : 'Auto OFF'}
+            {randomWalkUIState.densityAutoUpdate ? 'Auto ON' : 'Auto OFF'}
           </button>
           <button
             onClick={() => {

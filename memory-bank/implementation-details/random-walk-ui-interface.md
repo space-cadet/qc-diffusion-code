@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-23 17:05:57 IST*
+*Last Updated: 2025-08-24 11:54:58 IST*
 
 ## Overview
 
@@ -393,18 +393,31 @@ The UI framework is complete with dual mode support for both continuum and graph
 - ✅ **Coordinate System Fix**: GPT5 corrected coordinate mapping preventing density clustering at corners
 - ✅ **Visualization Synchronization**: Claude 3.5 ensured initial particle view matches selected distribution pattern immediately
 
-### Current Status (2025-08-23)
-All major UI and physics integration issues resolved:
-1. Grid layout positions persist across browser sessions
-2. Sophisticated particle distribution controls with mathematical precision
-3. Coordinate system properly aligned between physics (-200,+200) and canvas (0,width) spaces
-4. Initial particle visualization synchronized with distribution selection
-5. Ready for telegraph equation verification with accurate density profile calculations
+### Current Status (2025-08-24)
+UI implementation completed with performance optimizations:
+1. ✅ **Persistent Settings**: Observable panel states, density auto-update, and all checkbox states persist across sessions
+2. ✅ **Panel Collapsing**: Fixed observables panel to properly collapse to header-only instead of maintaining full height
+3. ✅ **Scrolling Support**: Added vertical scrolling to observables panel for future observable additions
+4. ✅ **Performance Optimization**: Resolved 60fps ParticleCanvas re-rendering issue through React.memo() and animation loop decoupling
+5. ✅ **State Management**: Decoupled physics updates from React state updates using refs and periodic sync intervals
+
+### Performance Enhancements (2025-08-24)
+- **Animation Loop Optimization**: Removed updateSimulationMetrics from frame-by-frame animation loop
+- **React Re-render Prevention**: Applied React.memo() to ParticleCanvas component
+- **Memoized State Objects**: Used useMemo() for simulationState to prevent object recreation
+- **Ref-based Tracking**: Moved time/collision counters to refs, sync to state every 1 second
+- **Selective Updates**: Metrics only update on pause/resume/reset events, not every frame
+
+### Observable System Architecture
+- **Persistent Observable Controls**: Checkbox states for particle count, kinetic energy, total momentum, momentum X/Y components
+- **Future-Ready Framework**: UI infrastructure prepared for kinetic energy and momentum observable implementations
+- **Timing Issue Identified**: Observable registration/unregistration timing conflict with React.memo optimization
 
 ### Ready for Next Phase
-1. Telegraph equation verification using corrected density calculations
-2. Temporal evolution tracking for wave front analysis
-3. Observer pattern integration for real-time numerical observables
+1. Fix observable registration timing issue causing "No observer registered" warnings
+2. Implement kinetic energy and momentum observable calculations
+3. Complete observer pattern integration for numerical analysis
+4. Maintain 60fps performance while expanding observable system
 
 ## Success Criteria
 

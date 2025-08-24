@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 11:16:39 IST_
+_Last Updated: 2025-08-24 11:54:58 IST_
 
 ## Active Tasks
 
@@ -52,9 +52,9 @@ _Last Updated: 2025-08-24 11:16:39 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-23 21:36:48 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ParameterPanel.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/types/Particle.ts`, `frontend/src/types/simulation.ts`
-**Notes**: Modern UI with shadcn-inspired styling, collapsible sections, enhanced Zustand persistence for simulation state - controls repositioned to top of panel for immediate access
+**Status**: ✅ COMPLETED **Last**: 2025-08-24 11:54:58 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ParameterPanel.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/components/ParticleCanvas.tsx`
+**Notes**: Performance optimized with persistent observable/density settings, React.memo() on ParticleCanvas, animation loop decoupled from React state updates for 60fps without re-renders
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence

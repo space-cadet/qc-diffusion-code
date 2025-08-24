@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "../physics/observables/ParticleCountObservable";
 import type { ParticleCountResult } from "../physics/observables/ParticleCountObservable";
@@ -11,15 +12,61 @@ interface ObservablesPanelProps {
 }
 
 export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: ObservablesPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [showParticleCount, setShowParticleCount] = useState(false);
+  const { 
+    randomWalkUIState, 
+    setRandomWalkUIState 
+  } = useAppStore();
+  
   const [particleCountData, setParticleCountData] = useState<ParticleCountResult | null>(null);
+
+  // Helper functions to update persistent state
+  const setIsExpanded = (expanded: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      isObservablesExpanded: expanded
+    });
+  };
+
+  const setShowParticleCount = (show: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      showParticleCount: show
+    });
+  };
+
+  const setShowKineticEnergy = (show: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      showKineticEnergy: show
+    });
+  };
+
+  const setShowTotalMomentum = (show: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      showTotalMomentum: show
+    });
+  };
+
+  const setShowMomentumX = (show: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      showMomentumX: show
+    });
+  };
+
+  const setShowMomentumY = (show: boolean) => {
+    setRandomWalkUIState({
+      ...randomWalkUIState,
+      showMomentumY: show
+    });
+  };
 
   // Register/unregister ParticleCountObservable based on visibility
   useEffect(() => {
     if (!simulatorRef.current) return;
 
-    if (showParticleCount && isExpanded) {
+    if (randomWalkUIState.showParticleCount) {
       const observable = new ParticleCountObservable();
       simulatorRef.current.registerObservable(observable);
       console.log("[ObservablesPanel] Registered ParticleCountObservable");
@@ -31,11 +78,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
         }
       };
     }
-  }, [showParticleCount, isExpanded, simulatorRef]);
+  }, [randomWalkUIState.showParticleCount, simulatorRef]);
 
   // Update data when running or refresh when simulation state changes
   useEffect(() => {
-    if (!showParticleCount || !isExpanded) return;
+    if (!randomWalkUIState.showParticleCount || !randomWalkUIState.isObservablesExpanded) return;
 
     if (isRunning) {
       const interval = setInterval(() => {
@@ -56,7 +103,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
         }
       }
     }
-  }, [showParticleCount, isExpanded, isRunning, simulatorRef]);
+  }, [randomWalkUIState.showParticleCount, randomWalkUIState.isObservablesExpanded, isRunning, simulatorRef]);
 
   // Reset observable data when simulation is reset
   useEffect(() => {
@@ -66,9 +113,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
   }, [simulationStatus]);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow h-full flex flex-col">
+    <div className={`bg-white rounded-lg shadow flex flex-col ${
+      randomWalkUIState.isObservablesExpanded ? 'h-full' : 'h-auto'
+    }`}>
       {/* Header with drag handle and collapse toggle */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
           <div className="drag-handle cursor-move p-1">
             <div className="w-4 h-4 grid grid-cols-2 gap-1">
@@ -81,10 +130,10 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
           <h3 className="text-lg font-semibold">Observables</h3>
         </div>
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setIsExpanded(!randomWalkUIState.isObservablesExpanded)}
           className="p-1 hover:bg-gray-100 rounded"
         >
-          {isExpanded ? (
+          {randomWalkUIState.isObservablesExpanded ? (
             <ChevronDownIcon className="w-5 h-5" />
           ) : (
             <ChevronRightIcon className="w-5 h-5" />
@@ -93,21 +142,22 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
       </div>
 
       {/* Content */}
-      {isExpanded && (
-        <div className="flex-1 space-y-4">
+      {randomWalkUIState.isObservablesExpanded && (
+        <div className="flex-1 px-4 pb-4 overflow-y-auto">
+          <div className="space-y-4">
           {/* Particle Count Observable */}
           <div className="border rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Particle Count N(t)</label>
               <input
                 type="checkbox"
-                checked={showParticleCount}
+                checked={randomWalkUIState.showParticleCount}
                 onChange={(e) => setShowParticleCount(e.target.checked)}
                 className="rounded"
               />
             </div>
             
-            {showParticleCount && (
+            {randomWalkUIState.showParticleCount && (
               <div className="text-sm space-y-1">
                 {particleCountData ? (
                   <>
@@ -141,21 +191,65 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus }: 
             )}
           </div>
 
-          {/* Placeholder for future observables */}
+          {/* Kinetic Energy Observable */}
           <div className="border rounded-lg p-3 opacity-50">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Kinetic Energy</label>
-              <input type="checkbox" disabled className="rounded" />
+              <input 
+                type="checkbox" 
+                checked={randomWalkUIState.showKineticEnergy}
+                onChange={(e) => setShowKineticEnergy(e.target.checked)}
+                disabled 
+                className="rounded" 
+              />
             </div>
             <div className="text-xs text-gray-400">Coming soon</div>
           </div>
 
+          {/* Total Momentum Observable */}
           <div className="border rounded-lg p-3 opacity-50">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Total Momentum</label>
-              <input type="checkbox" disabled className="rounded" />
+              <input 
+                type="checkbox" 
+                checked={randomWalkUIState.showTotalMomentum}
+                onChange={(e) => setShowTotalMomentum(e.target.checked)}
+                disabled 
+                className="rounded" 
+              />
             </div>
             <div className="text-xs text-gray-400">Coming soon</div>
+          </div>
+
+          {/* X-Component Momentum Observable */}
+          <div className="border rounded-lg p-3 opacity-50">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium">Momentum X</label>
+              <input 
+                type="checkbox" 
+                checked={randomWalkUIState.showMomentumX}
+                onChange={(e) => setShowMomentumX(e.target.checked)}
+                disabled 
+                className="rounded" 
+              />
+            </div>
+            <div className="text-xs text-gray-400">Coming soon</div>
+          </div>
+
+          {/* Y-Component Momentum Observable */}
+          <div className="border rounded-lg p-3 opacity-50">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium">Momentum Y</label>
+              <input 
+                type="checkbox" 
+                checked={randomWalkUIState.showMomentumY}
+                onChange={(e) => setShowMomentumY(e.target.checked)}
+                disabled 
+                className="rounded" 
+              />
+            </div>
+            <div className="text-xs text-gray-400">Coming soon</div>
+          </div>
           </div>
         </div>
       )}

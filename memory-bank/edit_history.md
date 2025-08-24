@@ -1,9 +1,21 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 11:16:39 IST_
+_Last Updated: 2025-08-24 11:54:58 IST_
 
 ### 2025-08-24
+
+#### 11:54 - C5b: Performance Optimization - Random Walk UI Implementation
+- Updated `frontend/src/stores/appStore.ts` - Added persistent observable and density settings to RandomWalkUIState interface
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Connected to Zustand store for persistent state, added React hooks for observable controls, removed duplicate useEffect
+- Updated `frontend/src/components/DensityComparison.tsx` - Made auto-update toggle persistent via store while keeping recordHistory session-specific
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Wrapped with React.memo() to prevent unnecessary re-renders
+- Updated `frontend/src/RandomWalkSim.tsx` - Added useMemo import, memoized simulationState object, added timeRef and collisionsRef for tracking, removed updateSimulationMetrics from animation loop
+- Updated `memory-bank/tasks/C5b.md` - Added performance optimization session details with timing issue identification
+- Updated `memory-bank/tasks.md` - Updated C5b entry with performance optimization status
+- Updated `memory-bank/sessions/2025-08-24-morning.md` - Added C5b performance work to session record
+- Updated `memory-bank/session_cache.md` - Changed focus task to C5b performance optimization
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Added performance enhancement section and observable system architecture
 
 #### 11:16 - META-1, C10: Memory Bank Updates and GitHub Release v1.0.0
 - Created `memory-bank/tasks/META-1.md` - Recurring maintenance task for memory bank system updates and documentation consistency

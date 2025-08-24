@@ -37,6 +37,15 @@ interface RandomWalkUIState {
   isBoundaryOpen: boolean
   isParametersOpen: boolean
   isDistributionOpen: boolean
+  // Observables Panel
+  isObservablesExpanded: boolean
+  showParticleCount: boolean
+  showKineticEnergy: boolean
+  showTotalMomentum: boolean
+  showMomentumX: boolean
+  showMomentumY: boolean
+  // Density Profile Panel
+  densityAutoUpdate: boolean
 }
 
 interface RandomWalkSimulationState {
@@ -133,6 +142,15 @@ export const useAppStore = create<AppState>()(
         isBoundaryOpen: false,
         isParametersOpen: true,
         isDistributionOpen: false,
+        // Observables Panel
+        isObservablesExpanded: true,
+        showParticleCount: false,
+        showKineticEnergy: false,
+        showTotalMomentum: false,
+        showMomentumX: false,
+        showMomentumY: false,
+        // Density Profile Panel
+        densityAutoUpdate: false,
       },
       randomWalkSimulationState: {
         time: 0,

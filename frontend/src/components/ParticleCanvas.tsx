@@ -324,7 +324,7 @@ const ParticleCanvasComponent: React.FC<{
   );
 };
 
-export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
+export const ParticleCanvas = React.memo<ParticleCanvasProps>(({
   gridLayoutParams,
   simulationStatus,
   tsParticlesContainerRef,
@@ -377,4 +377,4 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({
       </div>
     </div>
   );
-};
+});
