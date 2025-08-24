@@ -1,9 +1,16 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 21:50:24 IST_
+_Last Updated: 2025-08-24 22:21:48 IST_
 
 ### 2025-08-24
+
+#### 22:21 - C7: Kinetic Energy, Momentum, and MSD Observables Implementation
+- Created `frontend/src/physics/observables/KineticEnergyObservable.ts` - Comprehensive kinetic energy observable with total, average, max, min calculations and statistical analysis methods
+- Created `frontend/src/physics/observables/MomentumObservable.ts` - Momentum tracking observable with vector calculations, total and component momentum tracking
+- Created `frontend/src/physics/observables/MSDObservable.ts` - Mean squared displacement observable with diffusion coefficient analysis and displacement tracking from initial positions
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Added UI integration for kinetic energy, momentum, and MSD observables with registration/unregistration lifecycle and real-time data display
+- Updated `frontend/src/stores/appStore.ts` - Added showMSD to RandomWalkUIState interface and default state configuration
 
 #### 21:50 - C5b: CPU Usage Elimination and Performance Optimization Completion
 - Updated `frontend/src/RandomWalkSim.tsx` - Added simReady state flag for component dependency gating, renderEnabledRef for independent rendering control, visibility change handlers for tab switching, enhanced pause/resume effects without enabling tsParticles internal play

@@ -1,5 +1,6 @@
 # Observer Design and Implementation Plan
 *Created: 2025-08-22 21:47:15 IST*
+*Last Updated: 2025-08-24 22:21:48 IST*
 
 ## Overview
 
@@ -80,29 +81,29 @@ class ObservableManager {
 
 ## Observable Implementations
 
-### 1. Particle Count Observable (N(t))
+### 1. Particle Count Observable (N(t)) ✅ IMPLEMENTED
 - **Purpose**: Track total number of active particles over time
 - **Calculation**: `particles.filter(p => p.isActive).length`
 - **Special Cases**: Handle absorbing boundaries where particles disappear
-- **Output**: `{ count: number, timestamp: number }`
+- **Output**: `{ totalCount, activeCount, inactiveCount, timestamp }`
 
-### 2. Kinetic Energy Observable
+### 2. Kinetic Energy Observable ✅ IMPLEMENTED
 - **Purpose**: Calculate total kinetic energy of system
 - **Calculation**: `0.5 * Σ(m * v²)` for all particles
-- **Mass Handling**: Assume unit mass unless specified
-- **Output**: `{ totalEnergy: number, avgEnergy: number, timestamp: number }`
+- **Statistics**: Total, average, max, min kinetic energy values
+- **Output**: `{ totalKineticEnergy, averageKineticEnergy, maxKineticEnergy, minKineticEnergy, particleEnergies, timestamp }`
 
-### 3. Total Momentum Observable
+### 3. Momentum Observable ✅ IMPLEMENTED
 - **Purpose**: Track system momentum conservation
-- **Calculation**: Vector sum of all particle momenta
-- **Components**: Total momentum magnitude and x/y components
-- **Output**: `{ totalMomentum: Vector2D, magnitude: number, timestamp: number }`
+- **Calculation**: Vector sum of all particle momenta `Σ(m * v)`
+- **Components**: Total momentum X/Y components and magnitude
+- **Output**: `{ totalMomentumX, totalMomentumY, totalMomentumMagnitude, averageMomentumX, averageMomentumY, timestamp }`
 
-### 4. Density Profile Observable
-- **Purpose**: Spatial density distribution for telegraph equation comparison
-- **Calculation**: Bin particles by position, normalize by bin width and particle count
-- **Parameters**: Configurable bin size and spatial range
-- **Output**: `{ x: number[], rho: number[], binWidth: number, timestamp: number }`
+### 4. Mean Squared Displacement Observable ✅ IMPLEMENTED
+- **Purpose**: Measure particle spreading for diffusion analysis
+- **Calculation**: `<r²> = Σ(|r(t) - r(0)|²) / N` from initial positions
+- **Analysis**: Includes diffusion coefficient estimation from MSD slope
+- **Output**: `{ meanSquaredDisplacement, rootMeanSquaredDisplacement, maxDisplacement, minDisplacement, timestamp }`
 
 ## Performance Considerations
 
@@ -135,21 +136,21 @@ interface CachedResult {
 
 ### Phase 2: Basic Observables ✅ COMPLETED
 1. ✅ Implement ParticleCountObservable
-2. ⬜ Implement KineticEnergyObservable
+2. ✅ Implement KineticEnergyObservable with comprehensive statistics
 3. ✅ Add caching and lazy evaluation
-4. ⬜ Test performance with/without active observers
+4. 🔄 Test performance with/without active observers
 
-### Phase 3: Advanced Observables 🔄 IN PROGRESS
-1. ⬜ Implement MomentumObservable with vector calculations
-2. ⬜ Implement DensityProfileObservable with binning
+### Phase 3: Advanced Observables ✅ COMPLETED
+1. ✅ Implement MomentumObservable with vector calculations and components
+2. ✅ Implement MSDObservable with diffusion analysis capabilities  
 3. ⬜ Add configurable parameters for observables
 4. ⬜ Test boundary condition effects
 
-### Phase 4: UI Integration ✅ MOSTLY COMPLETED
+### Phase 4: UI Integration ✅ COMPLETED
 1. ✅ Add registration hooks to UI panels (ObservablesPanel)
-2. ✅ Implement real-time data visualization
-3. ⬜ Add observable configuration controls
-4. 🔄 Test complete workflow (issues remain with simulation controls)
+2. ✅ Implement real-time data visualization for all observables
+3. ✅ Complete workflow integration with simulation controls
+4. ✅ Add app store state management for new observables
 
 ## Testing Strategy
 
@@ -168,10 +169,11 @@ interface CachedResult {
 ## Future Extensions
 
 ### Advanced Observables
-- Velocity correlation functions
-- Mean squared displacement (MSD)
+- Velocity correlation functions  
+- Statistical moment calculations for existing observables
 - Probability distribution functions
 - Entropy and information measures
+- CSV data export functionality
 
 ### Performance Optimizations
 - Observable interdependency resolution

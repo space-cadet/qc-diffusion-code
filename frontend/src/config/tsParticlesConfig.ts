@@ -132,13 +132,13 @@ export const updateParticlesWithCTRW = (
     for (let i = 0; i < particles.length; i++) {
       particleManager!.updateParticle(particles[i]);
     }
-    if (_diagFrameCounter % 60 === 0) {
-      console.log("updateParticlesWithCTRW: updated particles", {
-        count: particles.length,
-        accessPath,
-        containerCount: container.particles.count,
-      });
-    }
+    // if (_diagFrameCounter % 60 === 0) {
+    //   console.log("updateParticlesWithCTRW: updated particles", {
+    //     count: particles.length,
+    //     accessPath,
+    //     containerCount: container.particles.count,
+    //   });
+    // }
   } else {
     console.warn("Could not find particles array in container");
   }

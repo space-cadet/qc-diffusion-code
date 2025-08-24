@@ -44,6 +44,7 @@ interface RandomWalkUIState {
   showTotalMomentum: boolean
   showMomentumX: boolean
   showMomentumY: boolean
+  showMSD: boolean
   // Density Profile Panel
   densityAutoUpdate: boolean
 }
@@ -149,6 +150,7 @@ export const useAppStore = create<AppState>()(
         showTotalMomentum: false,
         showMomentumX: false,
         showMomentumY: false,
+        showMSD: false,
         // Density Profile Panel
         densityAutoUpdate: false,
       },

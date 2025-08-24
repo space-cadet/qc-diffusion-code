@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 21:50:24 IST_
+_Last Updated: 2025-08-24 22:21:48 IST_
 
 ## Active Tasks
 
@@ -75,10 +75,10 @@ _Last Updated: 2025-08-24 21:50:24 IST_
 **Notes**: Low-level API implementation completed - eliminated animation interference, physics timing needs connection
 
 ### C7: Observer Design and Implementation
-**Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum) with temporal consistency
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-22 22:35:47 IST
-**Files**: `frontend/src/physics/ObservableManager.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/ParticleCountObservable.ts`
-**Notes**: Core infrastructure complete with collapsible UI panel - ParticleCountObservable working, simulation control integration needs fixes
+**Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum, MSD) with temporal consistency
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-24 22:21:48 IST
+**Files**: `frontend/src/physics/observables/KineticEnergyObservable.ts`, `frontend/src/physics/observables/MomentumObservable.ts`, `frontend/src/physics/observables/MSDObservable.ts`
+**Notes**: Four observables implemented with full UI integration - reveals constant particle speeds, momentum tracking, and MSD for telegraph equation verification
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification
