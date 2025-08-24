@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "../physics/observables/ParticleCountObservable";
@@ -33,14 +32,6 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
   const [isKineticEnergyRegistered, setIsKineticEnergyRegistered] = useState(false);
   const [isMomentumRegistered, setIsMomentumRegistered] = useState(false);
   const [isMSDRegistered, setIsMSDRegistered] = useState(false);
-
-  // Helper functions to update persistent state
-  const setIsExpanded = (expanded: boolean) => {
-    setRandomWalkUIState({
-      ...randomWalkUIState,
-      isObservablesExpanded: expanded
-    });
-  };
 
   const setShowParticleCount = (show: boolean) => {
     setRandomWalkUIState({
@@ -152,7 +143,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
   // Update particle count data when running or refresh when simulation state changes
   useEffect(() => {
-    if (!randomWalkUIState.showParticleCount || !randomWalkUIState.isObservablesExpanded) return;
+    if (!randomWalkUIState.showParticleCount) return;
     if (!isParticleCountRegistered) return; // gate polling until observable is registered
 
     if (isRunning) {
@@ -174,11 +165,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         }
       }
     }
-  }, [randomWalkUIState.showParticleCount, randomWalkUIState.isObservablesExpanded, isRunning, isParticleCountRegistered, simReady]);
+  }, [randomWalkUIState.showParticleCount, isRunning, isParticleCountRegistered, simReady]);
 
   // Update kinetic energy data when running or refresh when simulation state changes
   useEffect(() => {
-    if (!randomWalkUIState.showKineticEnergy || !randomWalkUIState.isObservablesExpanded) return;
+    if (!randomWalkUIState.showKineticEnergy) return;
     if (!isKineticEnergyRegistered) return; // gate polling until observable is registered
 
     if (isRunning) {
@@ -200,11 +191,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         }
       }
     }
-  }, [randomWalkUIState.showKineticEnergy, randomWalkUIState.isObservablesExpanded, isRunning, isKineticEnergyRegistered, simReady]);
+  }, [randomWalkUIState.showKineticEnergy, isRunning, isKineticEnergyRegistered, simReady]);
 
   // Update momentum data when running or refresh when simulation state changes
   useEffect(() => {
-    if (!randomWalkUIState.showTotalMomentum || !randomWalkUIState.isObservablesExpanded) return;
+    if (!randomWalkUIState.showTotalMomentum) return;
     if (!isMomentumRegistered) return; // gate polling until observable is registered
 
     if (isRunning) {
@@ -226,11 +217,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         }
       }
     }
-  }, [randomWalkUIState.showTotalMomentum, randomWalkUIState.isObservablesExpanded, isRunning, isMomentumRegistered, simReady]);
+  }, [randomWalkUIState.showTotalMomentum, isRunning, isMomentumRegistered, simReady]);
 
   // Update MSD data when running or refresh when simulation state changes
   useEffect(() => {
-    if (!randomWalkUIState.showMSD || !randomWalkUIState.isObservablesExpanded) return;
+    if (!randomWalkUIState.showMSD) return;
     if (!isMSDRegistered) return; // gate polling until observable is registered
 
     if (isRunning) {
@@ -252,7 +243,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         }
       }
     }
-  }, [randomWalkUIState.showMSD, randomWalkUIState.isObservablesExpanded, isRunning, isMSDRegistered, simReady]);
+  }, [randomWalkUIState.showMSD, isRunning, isMSDRegistered, simReady]);
 
   // Reset observable data when simulation is reset
   useEffect(() => {
@@ -265,248 +256,214 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
   }, [simulationStatus]);
 
   return (
-    <div className={`bg-white rounded-lg shadow flex flex-col ${
-      randomWalkUIState.isObservablesExpanded ? 'h-full' : 'h-auto'
-    }`}>
-      {/* Header with drag handle and collapse toggle */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-2">
-          <div className="drag-handle cursor-move p-1">
-            <div className="w-4 h-4 grid grid-cols-2 gap-1">
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold">Observables</h3>
+    <div className="space-y-4">
+      {/* Particle Count Observable */}
+      <div className="border rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">Particle Count N(t)</label>
+          <input
+            type="checkbox"
+            checked={randomWalkUIState.showParticleCount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowParticleCount(e.target.checked)}
+            className="rounded"
+          />
         </div>
-        <button
-          onClick={() => setIsExpanded(!randomWalkUIState.isObservablesExpanded)}
-          className="p-1 hover:bg-gray-100 rounded"
-        >
-          {randomWalkUIState.isObservablesExpanded ? (
-            <ChevronDownIcon className="w-5 h-5" />
-          ) : (
-            <ChevronRightIcon className="w-5 h-5" />
-          )}
-        </button>
+
+        {randomWalkUIState.showParticleCount && (
+          <div className="text-sm space-y-1">
+            {particleCountData ? (
+              <>
+                <div className="flex justify-between">
+                  <span>Total:</span>
+                  <span className="font-mono">{particleCountData?.totalCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Active:</span>
+                  <span className="font-mono text-green-600">{particleCountData?.activeCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Inactive:</span>
+                  <span className="font-mono text-red-600">{particleCountData?.inactiveCount}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Time:</span>
+                  <span className="font-mono">{particleCountData?.timestamp.toFixed(2)}s</span>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-500 text-xs">
+                {simulationStatus === "Stopped"
+                  ? "Start simulation to see data"
+                  : simulationStatus === "Paused"
+                  ? "Paused - showing last data"
+                  : "Calculating..."}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      {randomWalkUIState.isObservablesExpanded && (
-        <div className="flex-1 px-4 pb-4 overflow-y-auto">
-          <div className="space-y-4">
-          {/* Particle Count Observable */}
-          <div className="border rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Particle Count N(t)</label>
-              <input
-                type="checkbox"
-                checked={randomWalkUIState.showParticleCount}
-                onChange={(e) => setShowParticleCount(e.target.checked)}
-                className="rounded"
-              />
-            </div>
-            
-            {randomWalkUIState.showParticleCount && (
-              <div className="text-sm space-y-1">
-                {particleCountData ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span>Total:</span>
-                      <span className="font-mono">{particleCountData.totalCount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Active:</span>
-                      <span className="font-mono text-green-600">{particleCountData.activeCount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Inactive:</span>
-                      <span className="font-mono text-red-600">{particleCountData.inactiveCount}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Time:</span>
-                      <span className="font-mono">{particleCountData.timestamp.toFixed(2)}s</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-500 text-xs">
-                    {simulationStatus === "Stopped" 
-                      ? "Start simulation to see data"
-                      : simulationStatus === "Paused"
-                      ? "Paused - showing last data"
-                      : "Calculating..."}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Kinetic Energy Observable */}
-          <div className="border rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Kinetic Energy</label>
-              <input 
-                type="checkbox" 
-                checked={randomWalkUIState.showKineticEnergy}
-                onChange={(e) => setShowKineticEnergy(e.target.checked)}
-                className="rounded" 
-              />
-            </div>
-            
-            {randomWalkUIState.showKineticEnergy && (
-              <div className="text-sm space-y-1">
-                {kineticEnergyData ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span>Total KE:</span>
-                      <span className="font-mono">{kineticEnergyData.totalKineticEnergy.toFixed(3)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Average KE:</span>
-                      <span className="font-mono">{kineticEnergyData.averageKineticEnergy.toFixed(6)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Max KE:</span>
-                      <span className="font-mono text-orange-600">{kineticEnergyData.maxKineticEnergy.toFixed(6)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Min KE:</span>
-                      <span className="font-mono text-blue-600">{kineticEnergyData.minKineticEnergy.toFixed(6)}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Active particles:</span>
-                      <span className="font-mono">{kineticEnergyData.activeParticleCount}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Time:</span>
-                      <span className="font-mono">{kineticEnergyData.timestamp.toFixed(2)}s</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-500 text-xs">
-                    {simulationStatus === "Stopped" 
-                      ? "Start simulation to see data"
-                      : simulationStatus === "Paused"
-                      ? "Paused - showing last data"
-                      : "Calculating..."}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Momentum Observable */}
-          <div className="border rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Total Momentum</label>
-              <input 
-                type="checkbox" 
-                checked={randomWalkUIState.showTotalMomentum}
-                onChange={(e) => setShowMomentum(e.target.checked)}
-                className="rounded" 
-              />
-            </div>
-            
-            {randomWalkUIState.showTotalMomentum && (
-              <div className="text-sm space-y-1">
-                {momentumData ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span>|P| total:</span>
-                      <span className="font-mono">{momentumData.totalMomentumMagnitude.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Px:</span>
-                      <span className="font-mono text-red-600">{momentumData.totalMomentumX.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Py:</span>
-                      <span className="font-mono text-green-600">{momentumData.totalMomentumY.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>|P| avg:</span>
-                      <span className="font-mono">{momentumData.averageMomentumMagnitude.toFixed(4)}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Active particles:</span>
-                      <span className="font-mono">{momentumData.activeParticleCount}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Time:</span>
-                      <span className="font-mono">{momentumData.timestamp.toFixed(2)}s</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-500 text-xs">
-                    {simulationStatus === "Stopped" 
-                      ? "Start simulation to see data"
-                      : simulationStatus === "Paused"
-                      ? "Paused - showing last data"
-                      : "Calculating..."}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Mean Squared Displacement Observable */}
-          <div className="border rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">Mean Squared Displacement</label>
-              <input 
-                type="checkbox" 
-                checked={randomWalkUIState.showMSD}
-                onChange={(e) => setShowMSD(e.target.checked)}
-                className="rounded" 
-              />
-            </div>
-            
-            {randomWalkUIState.showMSD && (
-              <div className="text-sm space-y-1">
-                {msdData ? (
-                  <>
-                    <div className="flex justify-between">
-                      <span>MSD:</span>
-                      <span className="font-mono">{msdData.meanSquaredDisplacement.toFixed(1)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>RMSD:</span>
-                      <span className="font-mono">{msdData.rootMeanSquaredDisplacement.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Max disp:</span>
-                      <span className="font-mono text-orange-600">{msdData.maxDisplacement.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Min disp:</span>
-                      <span className="font-mono text-blue-600">{msdData.minDisplacement.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Active particles:</span>
-                      <span className="font-mono">{msdData.activeParticleCount}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Time:</span>
-                      <span className="font-mono">{msdData.timestamp.toFixed(2)}s</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-500 text-xs">
-                    {simulationStatus === "Stopped" 
-                      ? "Start simulation to see data"
-                      : simulationStatus === "Paused"
-                      ? "Paused - showing last data"
-                      : "Calculating..."}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          </div>
+      {/* Kinetic Energy Observable */}
+      <div className="border rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">Kinetic Energy</label>
+          <input
+            type="checkbox"
+            checked={randomWalkUIState.showKineticEnergy}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowKineticEnergy(e.target.checked)}
+            className="rounded"
+          />
         </div>
-      )}
+
+        {randomWalkUIState.showKineticEnergy && (
+          <div className="text-sm space-y-1">
+            {kineticEnergyData ? (
+              <>
+                <div className="flex justify-between">
+                  <span>Total KE:</span>
+                  <span className="font-mono">{kineticEnergyData?.totalKineticEnergy.toFixed(3)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Average KE:</span>
+                  <span className="font-mono">{kineticEnergyData?.averageKineticEnergy.toFixed(6)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Max KE:</span>
+                  <span className="font-mono text-orange-600">{kineticEnergyData?.maxKineticEnergy.toFixed(6)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Min KE:</span>
+                  <span className="font-mono text-blue-600">{kineticEnergyData?.minKineticEnergy.toFixed(6)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Active particles:</span>
+                  <span className="font-mono">{kineticEnergyData?.activeParticleCount}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Time:</span>
+                  <span className="font-mono">{kineticEnergyData?.timestamp.toFixed(2)}s</span>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-500 text-xs">
+                {simulationStatus === "Stopped"
+                  ? "Start simulation to see data"
+                  : simulationStatus === "Paused"
+                  ? "Paused - showing last data"
+                  : "Calculating..."}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Momentum Observable */}
+      <div className="border rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">Total Momentum</label>
+          <input
+            type="checkbox"
+            checked={randomWalkUIState.showTotalMomentum}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowMomentum(e.target.checked)}
+            className="rounded"
+          />
+        </div>
+
+        {randomWalkUIState.showTotalMomentum && (
+          <div className="text-sm space-y-1">
+            {momentumData ? (
+              <>
+                <div className="flex justify-between">
+                  <span>|P| total:</span>
+                  <span className="font-mono">{momentumData?.totalMomentumMagnitude.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Px:</span>
+                  <span className="font-mono text-red-600">{momentumData?.totalMomentumX.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Py:</span>
+                  <span className="font-mono text-green-600">{momentumData?.totalMomentumY.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>|P| avg:</span>
+                  <span className="font-mono">{momentumData?.averageMomentumMagnitude.toFixed(4)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Active particles:</span>
+                  <span className="font-mono">{momentumData?.activeParticleCount}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Time:</span>
+                  <span className="font-mono">{momentumData?.timestamp.toFixed(2)}s</span>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-500 text-xs">
+                {simulationStatus === "Stopped"
+                  ? "Start simulation to see data"
+                  : simulationStatus === "Paused"
+                  ? "Paused - showing last data"
+                  : "Calculating..."}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Mean Squared Displacement Observable */}
+      <div className="border rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">Mean Squared Displacement</label>
+          <input
+            type="checkbox"
+            checked={randomWalkUIState.showMSD}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowMSD(e.target.checked)}
+            className="rounded"
+          />
+        </div>
+
+        {randomWalkUIState.showMSD && (
+          <div className="text-sm space-y-1">
+            {msdData ? (
+              <>
+                <div className="flex justify-between">
+                  <span>MSD:</span>
+                  <span className="font-mono">{msdData?.meanSquaredDisplacement.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>RMSD:</span>
+                  <span className="font-mono">{msdData?.rootMeanSquaredDisplacement.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Max disp:</span>
+                  <span className="font-mono text-orange-600">{msdData?.maxDisplacement.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Min disp:</span>
+                  <span className="font-mono text-blue-600">{msdData?.minDisplacement.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Active particles:</span>
+                  <span className="font-mono">{msdData?.activeParticleCount}</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Time:</span>
+                  <span className="font-mono">{msdData?.timestamp.toFixed(2)}s</span>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-500 text-xs">
+                {simulationStatus === "Stopped"
+                  ? "Start simulation to see data"
+                  : simulationStatus === "Paused"
+                  ? "Paused - showing last data"
+                  : "Calculating..."}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

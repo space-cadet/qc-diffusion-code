@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 22:21:48 IST_
+_Last Updated: 2025-08-24 23:39:25 IST_
 
 ### 2025-08-24
+
+#### 23:36 - C5b/C7: Observables Panel UI Refinement and Memory Bank Updates
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Removed internal "Observables" header and collapse toggle to eliminate duplicate controls, fixed all TypeScript syntax errors and null safety issues with proper optional chaining (?.operator), added explicit React.ChangeEvent<HTMLInputElement> typing for checkbox handlers, streamlined component to render only content sections without internal collapse logic
+- Updated `frontend/src/stores/appStore.ts` - Added observablesCollapsed boolean state with persistence for floating window collapse control
+- Updated `frontend/src/RandomWalkSim.tsx` - Integrated floating observables window using react-rnd with collapse state management, height control (40px collapsed, resizable when expanded), and scrollable content body
+- Updated `memory-bank/tasks/C5b.md` - Added comprehensive Observables Panel UI Refinement section documenting floating window implementation, collapse state persistence, internal header removal, and TypeScript fixes
+- Updated `memory-bank/tasks/C7.md` - Added UI Refinement Session section with floating panel conversion, component cleanup, and technical implementation details
+- Updated `memory-bank/tasks.md` - Updated timestamps and status information for C5b and C7 tasks with latest session changes
+- Updated `memory-bank/session_cache.md` - Updated current session focus to C5b/C7 UI refinement and timestamps
+- Updated `memory-bank/sessions/2025-08-24-night.md` - Extended session documentation with UI refinement work, architectural decisions, and component simplification details
+- Updated `frontend/src/App.tsx` - removed unused "Random Walk" page with DnD components from main App. Code is saved for later use
 
 #### 22:21 - C7: Kinetic Energy, Momentum, and MSD Observables Implementation
 - Created `frontend/src/physics/observables/KineticEnergyObservable.ts` - Comprehensive kinetic energy observable with total, average, max, min calculations and statistical analysis methods

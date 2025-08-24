@@ -49,6 +49,15 @@ interface RandomWalkUIState {
   densityAutoUpdate: boolean
 }
 
+// Floating window geometry for Observables panel rendered via react-rnd
+interface WindowRect {
+  left: number
+  top: number
+  width: number
+  height: number
+  zIndex: number
+}
+
 interface RandomWalkSimulationState {
   time: number
   collisions: number
@@ -76,12 +85,19 @@ interface AppState {
   randomWalkSimLayouts: Layout[]
   randomWalkUIState: RandomWalkUIState
   randomWalkSimulationState: RandomWalkSimulationState
+  // RND-based Observables floating window state
+  observablesWindow: WindowRect
+  zCounter: number
+  observablesCollapsed: boolean
   setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: GridLayoutParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
   setRandomWalkUIState: (state: RandomWalkUIState) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
+  setObservablesWindow: (rect: WindowRect) => void
+  setZCounter: (value: number) => void
+  setObservablesCollapsed: (collapsed: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status']) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -162,12 +178,25 @@ export const useAppStore = create<AppState>()(
         densityHistory: [],
         observableData: {},
       },
+      // Default position/size for Observables floating window
+      observablesWindow: {
+        left: 24,
+        top: 24,
+        width: 420,
+        height: 320,
+        zIndex: 1,
+      },
+      zCounter: 1,
+      observablesCollapsed: false,
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
       setRandomWalkUIState: (state) => set({ randomWalkUIState: state }),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
+      setObservablesWindow: (rect) => set({ observablesWindow: rect }),
+      setZCounter: (value) => set({ zCounter: value }),
+      setObservablesCollapsed: (collapsed) => set({ observablesCollapsed: collapsed }),
       updateSimulationMetrics: (time, collisions, status) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -197,6 +226,9 @@ export const useAppStore = create<AppState>()(
         randomWalkSimLayouts: state.randomWalkSimLayouts,
         randomWalkUIState: state.randomWalkUIState,
         randomWalkSimulationState: state.randomWalkSimulationState,
+        observablesWindow: state.observablesWindow,
+        zCounter: state.zCounter,
+        observablesCollapsed: state.observablesCollapsed,
       }),
     }
   )

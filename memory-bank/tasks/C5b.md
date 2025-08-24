@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-24 21:50:24 IST_
+_Last Updated: 2025-08-24 23:36:15 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -188,4 +188,21 @@ This task implements the complete UI framework for the random walk simulation ba
 - ✅ Observable registration timing issue resolved with simReady flag and isRegistered gating
 - ✅ High CPU usage while paused eliminated through comprehensive animation control
 
-**Final Status**: COMPLETED with comprehensive performance optimization and CPU usage elimination
+**Observables Panel UI Refinement (2025-08-24 Evening)**:
+
+- ✅ **Floating Window Implementation**: Converted Observables panel from React Grid Layout block to floating window using react-rnd for better UX
+- ✅ **Collapse State Persistence**: Added observablesCollapsed state to Zustand store with persistence across page reloads
+- ✅ **Window Controls**: Implemented collapse/expand toggle in floating window header with proper height management (40px collapsed, resizable when expanded)
+- ✅ **Scrollable Content**: Made floating window body vertically scrollable when expanded to handle multiple observables
+- ✅ **Internal Header Removal**: Cleaned up ObservablesPanel component by removing internal "Observables" title and collapse toggle to avoid duplicate controls
+- ✅ **TypeScript Fixes**: Fixed JSX syntax errors and null safety issues with proper event typing and optional chaining operators
+- ✅ **UI Simplification**: Streamlined component to render only observable content sections without internal state management for collapse
+
+**Technical Details**:
+- Floating window positioned at top-right with drag handle and resize capabilities
+- Single collapse control in window header eliminates UI confusion
+- ObservablesPanel now purely content-focused without header/collapse logic
+- Proper null checks using `?.` operator for all observable data fields
+- Event handlers explicitly typed as `React.ChangeEvent<HTMLInputElement>`
+
+**Final Status**: COMPLETED with comprehensive performance optimization, CPU usage elimination, and floating observables panel

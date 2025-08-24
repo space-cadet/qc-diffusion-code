@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
+import { Rnd } from "react-rnd";
 import { useAppStore } from "./stores/appStore";
 import { ParameterPanel } from "./components/ParameterPanel";
 import { DensityComparison } from "./components/DensityComparison";
@@ -35,7 +36,13 @@ export default function RandomWalkSim() {
     randomWalkSimulationState,
     setRandomWalkSimulationState,
     updateSimulationMetrics,
-    saveSimulationSnapshot
+    saveSimulationSnapshot,
+    observablesWindow,
+    setObservablesWindow,
+    zCounter,
+    setZCounter,
+    observablesCollapsed,
+    setObservablesCollapsed
   } = useAppStore();
 
   // Physics simulation ref
@@ -47,6 +54,7 @@ export default function RandomWalkSim() {
   const [isRunning, setIsRunning] = useState(false);
   // Signal to children that simulatorRef is ready
   const [simReady, setSimReady] = useState(false);
+  // Collapsed state persisted in store (observablesCollapsed)
   
   // Refs for time/collision tracking
   const timeRef = useRef(0);
@@ -581,7 +589,7 @@ export default function RandomWalkSim() {
         </p>
       </div>
 
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 relative">
         <ReactGridLayout
           className="layout"
           layout={randomWalkSimLayouts}
@@ -621,15 +629,13 @@ export default function RandomWalkSim() {
             />
           </div>
 
-          {/* Observables Panel */}
-          <div key="observables">
-            <ObservablesPanel
-              simulatorRef={simulatorRef}
-              isRunning={simulationState.isRunning}
-              simulationStatus={simulationState.status}
-              simReady={simReady}
-            />
-          </div>
+          {/* Observables Panel placeholder kept to preserve RGL layout key.
+              Original block retained for future reference:
+              <div key="observables">
+                <ObservablesPanel ... />
+              </div>
+          */}
+          <div key="observables" />
 
           {/* Density Panel */}
           <div key="density">
@@ -672,6 +678,63 @@ export default function RandomWalkSim() {
             />
           </div>
         </ReactGridLayout>
+
+        {/* Floating Observables Window via react-rnd */}
+        <Rnd
+          bounds="parent"
+          size={{ width: observablesWindow.width, height: observablesCollapsed ? 40 : observablesWindow.height }}
+          position={{ x: observablesWindow.left, y: observablesWindow.top }}
+          onDragStop={(e: any, d: any) => {
+            setObservablesWindow({
+              ...observablesWindow,
+              left: d.x,
+              top: d.y,
+            });
+          }}
+          onResizeStop={(e: any, dir: any, ref: any, delta: any, position: any) => {
+            setObservablesWindow({
+              ...observablesWindow,
+              width: ref.offsetWidth,
+              height: ref.offsetHeight,
+              left: position.x,
+              top: position.y,
+            });
+          }}
+          onMouseDown={() => {
+            const nextZ = zCounter + 1;
+            setZCounter(nextZ);
+            setObservablesWindow({ ...observablesWindow, zIndex: nextZ });
+          }}
+          dragHandleClassName="drag-handle"
+          enableResizing={observablesCollapsed ? { top: false, right: false, bottom: false, left: false, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false } : { top: true, right: true, bottom: true, left: true, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true }}
+          style={{ zIndex: observablesWindow.zIndex }}
+          className="shadow-lg rounded-md bg-white border border-gray-200 overflow-hidden"
+        >
+          <div className="drag-handle flex items-center justify-between cursor-move select-none px-3 py-2 bg-gray-100 border-b border-gray-200 text-sm font-medium">
+            <span>Observables</span>
+            <button
+              type="button"
+              className="ml-2 cursor-pointer rounded px-2 py-0.5 text-xs border border-gray-300 bg-white hover:bg-gray-50"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                setObservablesCollapsed(!observablesCollapsed);
+              }}
+            >
+              {observablesCollapsed ? 'Expand' : 'Collapse'}
+            </button>
+          </div>
+          {!observablesCollapsed && (
+            <div className="p-3 overflow-y-auto" style={{ maxHeight: observablesWindow.height ? observablesWindow.height - 40 : undefined }}>
+              <ObservablesPanel
+                simulatorRef={simulatorRef}
+                isRunning={simulationState.isRunning}
+                simulationStatus={simulationState.status}
+                simReady={simReady}
+              />
+            </div>
+          )}
+        </Rnd>
       </div>
     </div>
   );

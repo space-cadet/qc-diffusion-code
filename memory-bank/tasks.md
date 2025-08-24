@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-24 22:21:48 IST_
+_Last Updated: 2025-08-24 23:36:15 IST_
 
 ## Active Tasks
 
@@ -52,9 +52,9 @@ _Last Updated: 2025-08-24 22:21:48 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-24 21:50:24 IST
+**Status**: ✅ COMPLETED **Last**: 2025-08-24 23:36:15 IST
 **Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/hooks/useDensityVisualization.ts`
-**Notes**: CPU usage elimination completed - disabled tsParticles internal RAF, gated animation by simulation status, fixed observable registration race conditions, comprehensive performance optimization
+**Notes**: Floating observables panel implemented with react-rnd, collapse state persistence, internal header removal, TypeScript error fixes, and UI simplification completed
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
@@ -76,9 +76,9 @@ _Last Updated: 2025-08-24 22:21:48 IST_
 
 ### C7: Observer Design and Implementation
 **Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum, MSD) with temporal consistency
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-24 22:21:48 IST
-**Files**: `frontend/src/physics/observables/KineticEnergyObservable.ts`, `frontend/src/physics/observables/MomentumObservable.ts`, `frontend/src/physics/observables/MSDObservable.ts`
-**Notes**: Four observables implemented with full UI integration - reveals constant particle speeds, momentum tracking, and MSD for telegraph equation verification
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-24 23:36:15 IST
+**Files**: `frontend/src/physics/observables/KineticEnergyObservable.ts`, `frontend/src/physics/observables/MomentumObservable.ts`, `frontend/src/physics/observables/MSDObservable.ts`, `frontend/src/components/ObservablesPanel.tsx`
+**Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification
