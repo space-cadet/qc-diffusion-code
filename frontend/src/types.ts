@@ -1,4 +1,4 @@
-export type SolverType = 'forward-euler' | 'crank-nicolson' | 'rk4';
+export type SolverType = 'forward-euler' | 'crank-nicolson' | 'rk4' | 'lax-wendroff';
 
 export interface SolverConfig {
   telegraph?: SolverType;
@@ -19,6 +19,7 @@ export interface SimulationParams {
   diffusivity: number;
   t_range: number;
   dt: number;
+  animationSpeed?: number;
   distribution: string;
   // Distribution parameters (1D)
   dist_center?: number;      // for gaussian/delta

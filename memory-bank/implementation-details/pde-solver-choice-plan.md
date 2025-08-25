@@ -1,6 +1,6 @@
 # PDE Solver Choice Implementation Plan
 *Created: 2025-08-25 03:43:52 IST*
-*Last Updated: 2025-08-25 04:41:45 IST*
+*Last Updated: 2025-08-25 12:54:55 IST*
 
 ## Overview
 Implementation plan for addressing diffusion equation stability issues through multiple numerical solver support using Strategy pattern architecture.
@@ -71,15 +71,45 @@ class WebGLSolver {
 - Proper initialization: first iteration uses u^n, final renders to output
 - Fixed shader compilation issues: uniform scope, varying names, texture binding
 
-### Phase 3: RK4 Implementation
+### Phase 3: Lax-Wendroff Implementation ✅ COMPLETED 2025-08-25
+**Files Created/Modified**: 5 files (~95 lines)
+- ✅ `LaxWendroffSolver.ts` - Hyperbolic solver with predictor-corrector method (95 lines)
+- ✅ `useWebGLSolver.ts` - Added Lax-Wendroff solver factory support (3 lines)
+- ✅ `types.ts` - Added lax-wendroff to SolverType (1 line)
+- ✅ `appStore.ts` - Set Lax-Wendroff as default for telegraph (1 line)
+- ✅ `PdeParameterPanel.tsx` - Added UI dropdown option (1 line)
+
+**Implementation Details**:
+- Two-step predictor-corrector method optimized for hyperbolic PDEs
+- Half-step predictor at cell interfaces for stability
+- Full-step corrector using predicted values
+- CFL stability condition: dt ≤ dx/v for telegraph equation
+- Replaces problematic Crank-Nicolson for telegraph (CN falls back to explicit anyway)
+
+### Phase 4: Animation Speed Control ✅ COMPLETED 2025-08-25
+**Files Modified**: 4 files (~45 lines)
+- ✅ `types.ts` - Added animationSpeed parameter to SimulationParams (1 line)
+- ✅ `appStore.ts` - Default animation speed value (1 line)
+- ✅ `PlotComponent.tsx` - Speed slider UI control with 0.1x-5.0x range (15 lines)
+- ✅ `useWebGLSolver.ts` - Modified animation loop for speed control (15 lines)
+
+**Implementation Approach**:
+- For speeds ≤1x: Frame delay control using setTimeout
+- For speeds >1x: Multiple simulation steps per frame at 60fps
+- Proper frame delay calculation: 16ms base scaled by speed
+- Eliminates animation stuttering while maintaining visual smoothness
+
+### Phase 5: RK4 Implementation (Future)
 **Files to Create/Modify**: 2 files (~140 lines)
 - `RK4Solver.ts` - Multi-stage explicit strategy (80 lines)
 - Additional texture management for intermediate stages (60 lines)
 
-### Phase 4: UI Integration
-**Files to Modify**: 2 files (~90 lines)
-- `PdeParameterPanel.tsx` - Per-equation solver dropdowns (50 lines)
-- `appStore.ts` - Solver configuration state (40 lines)
+### Phase 6: Boundary Conditions System (NEW - Task C2a)
+**Files to Create/Modify**: 4 files (~120 lines)
+- Boundary condition parameter in SimulationParams and UI
+- WebGL texture wrap mode switching based on BC type
+- Shader modifications for Dirichlet/absorbing boundary implementations
+- BC selection dropdown in PdeParameterPanel
 
 ## Technical Implementation Details
 

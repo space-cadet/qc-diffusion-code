@@ -5,6 +5,23 @@ _Last Updated: 2025-08-25 04:43:45 IST_
 
 ### 2025-08-25
 
+#### 12:54 - C11/C2a/C2b: Animation speed slider and Lax-Wendroff solver implementation
+- Added `frontend/src/types.ts` - animationSpeed parameter to SimulationParams and lax-wendroff SolverType
+- Updated `frontend/src/stores/appStore.ts` - animation speed default and Lax-Wendroff as telegraph default
+- Modified `frontend/src/PlotComponent.tsx` - speed slider UI with 0.1x-5.0x range and live display
+- Updated `frontend/src/hooks/useWebGLSolver.ts` - animation loop with multiple steps per frame for speedup
+- Created `frontend/src/webgl/solvers/LaxWendroffSolver.ts` - hyperbolic solver with predictor-corrector method
+- Updated `frontend/src/PdeParameterPanel.tsx` - added Lax-Wendroff option to telegraph solver dropdown
+- Created `memory-bank/tasks/C2a.md` - PDE Solver Methods and Boundary Conditions task
+- Created `memory-bank/tasks/C2b.md` - PDE UI Implementation task
+- Updated `memory-bank/tasks.md` - added new tasks to registry with timestamps
+- Updated `memory-bank/implementation-details/pde-solver-choice-plan.md` - documented completed phases
+- Updated `memory-bank/implementation-details/visual-pde-gpu-solver-plan.md` - added Phase 8 completion
+- Created `memory-bank/sessions/2025-08-25-afternoon.md` - session documentation
+- Updated `memory-bank/session_cache.md` - current session and history tracking
+
+### 2025-08-25
+
 #### 04:43 - C11: Crank-Nicolson Solver Implementation
 - Created `frontend/src/webgl/solvers/CrankNicolsonSolver.ts` - Implemented Crank-Nicolson solver with Jacobi iterations for implicit diffusion, standalone fragment shader, 1D diffusion (x-only) for stability, proper texture binding and iterative solver initialization (220 lines)
 - Updated `frontend/src/webgl/webgl-solver.js` - Added textureSource1 uniform location lookup, removed iterativeTexture uniform, integrated strategy pattern with setSolver method

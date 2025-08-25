@@ -248,6 +248,23 @@ export default function PlotComponent({
             </label>
           </div>
 
+          {/* Animation Speed */}
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-semibold text-gray-700">Speed</h3>
+            <label className="flex items-center gap-2">
+              <span className="text-xs">{(params.animationSpeed || 1.0).toFixed(1)}x</span>
+              <input
+                type="range"
+                min="0.1"
+                max="5.0"
+                step="0.1"
+                value={params.animationSpeed || 1.0}
+                onChange={(e) => onChange({ ...params, animationSpeed: parseFloat(e.target.value) })}
+                className="w-20"
+              />
+            </label>
+          </div>
+
           {/* Solver Type */}
           <div className="flex items-center gap-4">
             <h3 className="text-sm font-semibold text-gray-700">Solver Type</h3>

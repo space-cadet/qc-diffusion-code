@@ -147,6 +147,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                       onChange={(e) => handleSolverChange('telegraph', e.target.value as SolverType)}
                       className="w-full p-2 border border-gray-300 rounded text-sm"
                     >
+                      <option value="lax-wendroff">Lax-Wendroff</option>
                       <option value="forward-euler">Forward Euler</option>
                       <option value="rk4">Runge-Kutta 4</option>
                       <option value="crank-nicolson">Crank-Nicolson</option>

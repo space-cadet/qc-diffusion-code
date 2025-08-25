@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 04:42:00 IST_
+_Last Updated: 2025-08-25 12:49:41 IST_
 
 ## Active Tasks
 
@@ -21,6 +21,8 @@ _Last Updated: 2025-08-25 04:42:00 IST_
 | C9  | Standalone Repository Setup and Vercel Deployment    | ✅ COMPLETED   | HIGH     | 2025-08-23 | C1, C5b, C7, C8 |
 | C10 | GitHub App Release v1.0.0                            | ✅ COMPLETED   | HIGH     | 2025-08-24 | C9, C5b, C8     |
 | C11 | PDE Solver Choice Implementation                      | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C1, C2          |
+| C2a | PDE Solver Methods                                    | 🆕 NEW         | MEDIUM   | 2025-08-25 | C2, C11         |
+| C2b | PDE UI Implementation                                 | 🆕 NEW         | MEDIUM   | 2025-08-25 | C1, C2a         |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 
 ## Task Details
@@ -104,6 +106,18 @@ _Last Updated: 2025-08-25 04:42:00 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:43:52 IST
 **Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
 **Notes**: Strategy pattern infrastructure completed - ForwardEulerSolver encapsulates existing logic, WebGLSolver delegates to solver strategies
+
+### C2a: PDE Solver Methods and Boundary Conditions
+**Description**: Extend WebGL PDE solvers with boundary condition system and hyperbolic solver improvements
+**Status**: 🆕 NEW **Last**: 2025-08-25 12:49:41 IST
+**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/types.ts`
+**Notes**: Lax-Wendroff solver implemented for telegraph stability - need boundary condition system for flexible physics scenarios
+
+### C2b: PDE UI Implementation
+**Description**: Enhance PDE parameter panel with advanced solver controls and boundary condition selection
+**Status**: 🆕 NEW **Last**: 2025-08-25 12:49:41 IST
+**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/types.ts`
+**Notes**: Animation speed control completed - need boundary condition UI and solver parameter validation
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency

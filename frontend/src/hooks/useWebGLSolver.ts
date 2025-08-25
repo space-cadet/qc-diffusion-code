@@ -4,6 +4,7 @@ import type { SimulationParams, AnimationFrame } from '../types';
 import type { SolverStrategy } from '../webgl/solvers/BaseSolver';
 import { ForwardEulerSolver } from '../webgl/solvers/ForwardEulerSolver';
 import { CrankNicolsonSolver } from '../webgl/solvers/CrankNicolsonSolver';
+import { LaxWendroffSolver } from '../webgl/solvers/LaxWendroffSolver';
 import { generateInitialConditions } from '../utils/initialConditions';
 
 export interface WebGLPlotData {
@@ -29,6 +30,8 @@ function createSolver(solverType: string): SolverStrategy {
       return new ForwardEulerSolver();
     case 'crank-nicolson':
       return new CrankNicolsonSolver();
+    case 'lax-wendroff':
+      return new LaxWendroffSolver();
     default:
       console.warn(`Unknown solver type: ${solverType}, using forward-euler`);
       return new ForwardEulerSolver();
@@ -116,15 +119,22 @@ export function useWebGLSolver() {
     if (solversRef.current.size === 0) return;
 
     let time = startTime;
+    const animationSpeed = params.animationSpeed || 1.0;
+    const frameDelay = animationSpeed >= 1.0 ? 16 : 16 / animationSpeed;
+    const stepsPerFrame = Math.max(1, Math.floor(animationSpeed));
+    
     const animate = () => {
       if (time < params.t_range) {
-        const data = step(params.dt, params);
+        let data;
+        for (let i = 0; i < stepsPerFrame && time < params.t_range; i++) {
+          data = step(params.dt, params);
+          time += params.dt;
+        }
         if (data) {
           const frameData = { ...data, time } as SimulationResult;
           onFrame(frameData);
         }
-        time += params.dt;
-        animationRef.current = requestAnimationFrame(animate);
+        animationRef.current = window.setTimeout(animate, frameDelay) as unknown as number;
       }
     };
     animate();
@@ -132,7 +142,7 @@ export function useWebGLSolver() {
 
   const stop = useCallback(() => {
     if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
+      clearTimeout(animationRef.current);
       animationRef.current = null;
     }
   }, []);

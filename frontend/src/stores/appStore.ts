@@ -116,6 +116,7 @@ export const useAppStore = create<AppState>()(
         diffusivity: 1.0,
         t_range: 5.0,
         dt: 0.02,
+        animationSpeed: 1.0,
         distribution: 'gaussian',
         // distribution params defaults
         dist_center: 0,
@@ -136,7 +137,7 @@ export const useAppStore = create<AppState>()(
         x_max: 5.0,
         mesh_size: 64,
         selectedEquations: ['telegraph', 'diffusion'],
-        solver_config: { telegraph: 'forward-euler', diffusion: 'crank-nicolson' },
+        solver_config: { telegraph: 'lax-wendroff', diffusion: 'crank-nicolson' },
         solver_params: { dt_factor: 1.0, theta: 0.5, tolerance: 1e-6, max_iter: 100 },
       },
       pdeState: {
