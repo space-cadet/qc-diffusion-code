@@ -14,9 +14,17 @@ export class ForwardEulerSolver implements SolverStrategy {
   }
 
   isStable(dt: number, dx: number, parameters: any): boolean {
-    // CFL condition for explicit methods
-    const maxDiffusivity = Math.max(parameters.k || 0, parameters.v * parameters.v || 0);
-    return dt <= 0.5 * dx * dx / maxDiffusivity;
+    // Combined CFL-style checks for explicit methods
+    // Parabolic (diffusion): dt <= 0.5 * dx^2 / k
+    // Hyperbolic (telegraph/advection-like): dt <= dx / v
+    const k = parameters.k || 0;
+    const v = parameters.v || 0;
+    const eps = 1e-12;
+    let dtMax = Number.POSITIVE_INFINITY;
+    if (k > 0) dtMax = Math.min(dtMax, 0.5 * dx * dx / k);
+    if (v > 0) dtMax = Math.min(dtMax, dx / Math.max(v, eps));
+    if (!isFinite(dtMax)) return true; // no constraints known
+    return dt <= dtMax;
   }
 
   getShaderSource(equationType: string): string {
@@ -62,8 +70,20 @@ export class ForwardEulerSolver implements SolverStrategy {
     gl.bindFramebuffer(gl.FRAMEBUFFER, writeFramebuffer);
     gl.useProgram(program);
     
+    // Auto dt guard (CFL-style)
+    const k = parameters.k || 0;
+    const v = parameters.v || 0;
+    const safety = 0.9; // conservative factor
+    let dtLocal = dt;
+    if (k > 0) {
+      dtLocal = Math.min(dtLocal, safety * 0.5 * dx * dx / k);
+    }
+    if (v > 0) {
+      dtLocal = Math.min(dtLocal, safety * dx / v);
+    }
+
     // Set uniforms
-    if (uniforms.dt) gl.uniform1f(uniforms.dt, dt);
+    if (uniforms.dt) gl.uniform1f(uniforms.dt, dtLocal);
     if (uniforms.dx) gl.uniform1f(uniforms.dx, dx);
     if (uniforms.dy) gl.uniform1f(uniforms.dy, dy);
     

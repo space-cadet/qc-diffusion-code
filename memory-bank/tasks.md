@@ -1,14 +1,14 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 12:49:41 IST_
+_Last Updated: 2025-08-25 14:41:42 IST_
 
 ## Active Tasks
 
 | ID  | Title                                                 | Status         | Priority | Started    | Dependencies |
 | --- | ----------------------------------------------------- | -------------- | -------- | ---------- | ------------ |
 | C1  | Numerical Simulations for QC-Diffusion Paper Concepts | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
-| C2  | VisualPDE GPU Solver Integration                      | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
+| C2  | PDE Simulation (Parent Task)                          | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | C3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
 | C5  | Random Walk Derivation of Telegraph Equation         | 🔄 IN PROGRESS | HIGH     | 2025-08-20 | C1           |
 | C5a | Random Walk Architecture Planning                     | 🔄 IN PROGRESS | HIGH     | 2025-08-21 | C5           |
@@ -20,9 +20,8 @@ _Last Updated: 2025-08-25 12:49:41 IST_
 | C8  | Density Profile Calculation Implementation            | ✅ COMPLETED   | HIGH     | 2025-08-23 | C5c, C7      |
 | C9  | Standalone Repository Setup and Vercel Deployment    | ✅ COMPLETED   | HIGH     | 2025-08-23 | C1, C5b, C7, C8 |
 | C10 | GitHub App Release v1.0.0                            | ✅ COMPLETED   | HIGH     | 2025-08-24 | C9, C5b, C8     |
-| C11 | PDE Solver Choice Implementation                      | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C1, C2          |
-| C2a | PDE Solver Methods                                    | 🆕 NEW         | MEDIUM   | 2025-08-25 | C2, C11         |
-| C2b | PDE UI Implementation                                 | 🆕 NEW         | MEDIUM   | 2025-08-25 | C1, C2a         |
+| C2a | PDE Solver Methods and Boundary Conditions           | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C2              |
+| C2b | PDE UI Implementation                                 | 🔄 IN PROGRESS | MEDIUM   | 2025-08-25 | C2, C2a         |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 
 ## Task Details
@@ -33,6 +32,12 @@ _Last Updated: 2025-08-25 12:49:41 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:08:37 IST
 **Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/PdeParameterPanel.tsx`
 **Notes**: Component separation completed - PDE controls moved to dedicated PdeParameterPanel.tsx with enhanced solver selection, parameter visibility fixes applied
+
+### C2: PDE Simulation (Parent Task)
+**Description**: Complete WebGL GPU-based PDE simulation system with multiple solver methods and boundary conditions
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 13:03:55 IST
+**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/PdeParameterPanel.tsx`, `frontend/src/webgl/solvers/`
+**Notes**: Parent task encompassing all PDE simulation functionality - solver methods (C2a) and UI components (C2b)
 
 ### C3: GPU AMR Integration for PDE Solver
 
@@ -101,23 +106,17 @@ _Last Updated: 2025-08-25 12:49:41 IST_
 **Files**: `README.md`, `package.json`, `frontend/package.json`
 **Notes**: Version 1.0.0 released with comprehensive documentation, git tagging, and release preparation completed
 
-### C11: PDE Solver Choice Implementation
-**Description**: Implement Crank-Nicolson and RK4 solvers to address diffusion equation stability issues with per-equation solver selection
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:43:52 IST
-**Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
-**Notes**: Strategy pattern infrastructure completed - ForwardEulerSolver encapsulates existing logic, WebGLSolver delegates to solver strategies
-
 ### C2a: PDE Solver Methods and Boundary Conditions
-**Description**: Extend WebGL PDE solvers with boundary condition system and hyperbolic solver improvements
-**Status**: 🆕 NEW **Last**: 2025-08-25 12:49:41 IST
-**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/types.ts`
-**Notes**: Lax-Wendroff solver implemented for telegraph stability - need boundary condition system for flexible physics scenarios
+**Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 14:41:42 IST
+**Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/CrankNicolsonSolver.ts`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
+**Notes**: Boundary condition unification completed - fixed Lax-Wendroff CLAMP_TO_EDGE, added Forward Euler automatic dt stability guard with CFL conditions, comprehensive documentation created
 
 ### C2b: PDE UI Implementation
 **Description**: Enhance PDE parameter panel with advanced solver controls and boundary condition selection
-**Status**: 🆕 NEW **Last**: 2025-08-25 12:49:41 IST
-**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/types.ts`
-**Notes**: Animation speed control completed - need boundary condition UI and solver parameter validation
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 14:41:42 IST
+**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/ConservationDisplay.tsx`, `frontend/src/types.ts`
+**Notes**: Conservation panel enhancements completed - improved readability, added dt diagnostics and parameters sections with standardized formatting
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency
@@ -143,3 +142,4 @@ _Last Updated: 2025-08-25 12:49:41 IST_
 | C5b | Random Walk UI Implementation              | 2025-08-22 18:34:25 IST |
 | C4  | Fix Pause Button Functionality            | 2025-08-20 23:44:20 IST |
 | C0  | Code Subproject Memory Bank Initialization | 2025-08-20 08:42:01 IST |
+| C11 | PDE Solver Choice Implementation (merged into C2a) | 2025-08-25 13:03:55 IST |

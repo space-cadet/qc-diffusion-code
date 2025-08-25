@@ -2,9 +2,9 @@
 *Created: 2025-08-25 12:54:55 IST*
 
 ## Focus Task
-C11: PDE Solver Choice Implementation
+C2a/C2b: PDE Boundary Conditions and UI Enhancements
 **Status**: 🔄 IN PROGRESS
-**Time Spent**: 45 minutes
+**Time Spent**: 2 hours 15 minutes
 
 ## Tasks Worked On
 ### C11: PDE Solver Choice Implementation
@@ -17,44 +17,55 @@ C11: PDE Solver Choice Implementation
 - Updated UI dropdown with Lax-Wendroff option for telegraph equation
 **Status Change**: 🔄 IN PROGRESS → 🔄 IN PROGRESS
 
-### C2a: PDE Solver Methods and Boundary Conditions (NEW)
-**Priority**: MEDIUM
+### C2a: PDE Solver Methods and Boundary Conditions
+**Priority**: HIGH
 **Progress Made**:
-- Created task framework for boundary condition system implementation
-- Identified current hardcoded Neumann boundary conditions (CLAMP_TO_EDGE)
-- Documented need for flexible BC system (Dirichlet, Periodic, Absorbing)
-**Status Change**: NEW → 🆕 NEW
+- Fixed Lax-Wendroff solver missing CLAMP_TO_EDGE texture wrapping for consistent Neumann boundaries
+- Implemented automatic dt stability guard in ForwardEulerSolver with CFL conditions (safety=0.9)
+- Combined diffusion (dt ≤ 0.5×dx²/k) and telegraph (dt ≤ dx/v) stability limits
+- Created comprehensive documentation at memory-bank/implementation-details/pde-bcs-equations-stability.md
+- Non-invasive implementation preserving UI dt while using effective dt in shader
+**Status Change**: NEW → 🔄 IN PROGRESS
 
-### C2b: PDE UI Implementation (NEW)
+### C2b: PDE UI Implementation  
 **Priority**: MEDIUM
 **Progress Made**:
-- Created task framework for enhanced PDE parameter controls
-- Documented animation speed slider completion
-- Identified boundary condition UI requirements
-**Status Change**: NEW → 🆕 NEW
+- Enhanced "Conserved Quantities" panel readability with larger fonts (text-sm/base)
+- Added "Time Step Diagnostics" section showing UI dt, effective dt, and stability limits
+- Added "Parameters" section displaying selected equations and current values
+- Standardized all numerical displays with monospace fonts for consistency
+- Improved contrast with better color scheme (gray-600/700/800)
+**Status Change**: NEW → 🔄 IN PROGRESS
 
 ## Files Modified
 - `frontend/src/types.ts` - Added animationSpeed parameter to SimulationParams
 - `frontend/src/stores/appStore.ts` - Added animation speed default value
-- `frontend/src/PlotComponent.tsx` - Implemented speed slider control
+- `frontend/src/PlotComponent.tsx` - Implemented speed slider control, dt diagnostics computation
 - `frontend/src/hooks/useWebGLSolver.ts` - Modified animation timing with multiple steps per frame
-- `frontend/src/webgl/solvers/LaxWendroffSolver.ts` - New hyperbolic solver implementation
+- `frontend/src/webgl/solvers/LaxWendroffSolver.ts` - New hyperbolic solver implementation, added CLAMP_TO_EDGE
+- `frontend/src/webgl/solvers/ForwardEulerSolver.ts` - Added automatic dt stability guard with CFL conditions
+- `frontend/src/ConservationDisplay.tsx` - Enhanced readability, added dt diagnostics and parameters sections
 - `frontend/src/PdeParameterPanel.tsx` - Added Lax-Wendroff option to telegraph solver dropdown
-- `memory-bank/tasks/C2a.md` - New task file for solver methods and boundary conditions
-- `memory-bank/tasks/C2b.md` - New task file for PDE UI enhancements
-- `memory-bank/tasks.md` - Added new tasks to registry
+- `memory-bank/tasks/C2a.md` - Task file for solver methods and boundary conditions (updated)
+- `memory-bank/tasks/C2b.md` - Task file for PDE UI enhancements (updated)
+- `memory-bank/tasks.md` - Updated task registry with session progress
+- `memory-bank/session_cache.md` - Updated current session focus and task statuses
+- `memory-bank/implementation-details/pde-bcs-equations-stability.md` - Comprehensive session documentation
 
 ## Key Decisions Made
 - Used setTimeout with frame delay calculation instead of requestAnimationFrame for speed control
 - Implemented multiple simulation steps per frame for speeds >1x rather than just reducing delays
 - Created separate tasks C2a/C2b to organize PDE solver work into methods vs UI concerns
 - Chose Lax-Wendroff over Crank-Nicolson for telegraph equation due to hyperbolic nature
+- Fixed boundary condition inconsistency by adding CLAMP_TO_EDGE to all solvers for unified Neumann BCs
+- Implemented non-invasive dt stability guard preserving UI control while ensuring numerical stability
+- Enhanced Conservation panel with comprehensive diagnostics and standardized formatting
 
 ## Context for Next Session
-Telegraph equation instability resolved with Lax-Wendroff solver. Animation speed control working properly for both slow and fast speeds. Need to implement boundary condition system and enhance UI controls for better physics simulation flexibility.
+Boundary condition unification completed - all solvers now use consistent Neumann boundaries via CLAMP_TO_EDGE. Forward Euler stability significantly improved with automatic dt clamping based on CFL conditions. Conservation panel enhanced with dt diagnostics, parameter display, and improved readability. Comprehensive documentation created for session work.
 
 ## Next Session Priorities
-1. Implement boundary condition parameter system in SimulationParams
-2. Add BC selection UI controls in PdeParameterPanel
-3. Modify WebGL texture wrapping based on BC selection
-4. Update planning documents for visual-pde integration
+1. Test unified boundary behavior across solvers (Forward Euler vs Lax-Wendroff reflective consistency)
+2. Implement flexible boundary condition system (Dirichlet, Periodic, Absorbing) with shader-based selection
+3. Add per-equation solver selection UI integration
+4. Consider optional UI feedback for dt capping events and stability warnings

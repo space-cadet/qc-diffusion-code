@@ -118,7 +118,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                     </label>
                     <input
                       type="range"
-                      min="0.1"
+                      min="0.001"
                       max="3"
                       step="any"
                       value={params.collision_rate}
@@ -185,7 +185,7 @@ export default function Controls({ params, onChange }: ControlsProps) {
                     </label>
                     <input
                       type="range"
-                      min="0.1"
+                      min="0.001"
                       max="2"
                       step="any"
                       value={params.diffusivity}
@@ -589,8 +589,8 @@ export default function Controls({ params, onChange }: ControlsProps) {
             </label>
             <input
               type="range"
-              min="0.5"
-              max="20"
+              min="0.001"
+              max="100"
               step="any"
               value={params.t_range}
               onChange={(e) => handleChange('t_range', parseFloat(e.target.value))}

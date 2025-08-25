@@ -80,9 +80,9 @@ export default function Controls({ params, onChange }: ControlsProps) {
                     </label>
                     <input
                       type="range"
-                      min="0.1"
+                      min="0.001"
                       max="3"
-                      step="0.1"
+                      step="0.001"
                       value={params.collision_rate}
                       onChange={(e) => handleChange('collision_rate', parseFloat(e.target.value))}
                       className="w-full"

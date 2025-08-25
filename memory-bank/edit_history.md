@@ -1,9 +1,21 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 04:43:45 IST_
+_Last Updated: 2025-08-25 14:45:32 IST_
 
 ### 2025-08-25
+
+#### 14:45 - C2a/C2b: Boundary condition unification and UI enhancements
+- Updated `frontend/src/webgl/solvers/LaxWendroffSolver.ts` - Added CLAMP_TO_EDGE texture wrapping for consistent Neumann boundaries
+- Updated `frontend/src/webgl/solvers/ForwardEulerSolver.ts` - Added automatic dt stability guard with CFL conditions (safety=0.9)
+- Enhanced `frontend/src/ConservationDisplay.tsx` - Improved readability, added dt diagnostics and parameters sections
+- Updated `frontend/src/PlotComponent.tsx` - Added dt computation and parameter passing for diagnostics display
+- Created `memory-bank/implementation-details/pde-bcs-equations-stability.md` - Comprehensive session documentation
+- Updated `memory-bank/tasks/C2a.md` - Added boundary condition unification and stability guard progress
+- Updated `memory-bank/tasks/C2b.md` - Added conservation panel enhancements and UI improvements
+- Updated `memory-bank/tasks.md` - Updated task registry with session progress and file modifications
+- Updated `memory-bank/session_cache.md` - Updated current session focus and task statuses
+- Updated `memory-bank/sessions/2025-08-25-afternoon.md` - Enhanced session documentation with comprehensive progress
 
 #### 12:54 - C11/C2a/C2b: Animation speed slider and Lax-Wendroff solver implementation
 - Added `frontend/src/types.ts` - animationSpeed parameter to SimulationParams and lax-wendroff SolverType

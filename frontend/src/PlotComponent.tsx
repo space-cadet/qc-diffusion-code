@@ -337,11 +337,38 @@ export default function PlotComponent({
       </div>
 
       {/* Conservation Quantities Display */}
-      <ConservationDisplay
-        currentQuantities={conservationData.currentQuantities}
-        errors={conservationData.errors}
-        isStable={conservationData.isStable}
-      />
+      {(() => {
+        // dt diagnostics computed from current params
+        const dx = (params.x_max - params.x_min) / params.mesh_size;
+        const k = params.diffusivity || 0;
+        const v = params.velocity || 0;
+        const safety = 0.9;
+        const dt_ui = params.dt;
+        const dt_limit_diff = k > 0 ? 0.5 * dx * dx / k : undefined;
+        const dt_limit_tel = v > 0 ? dx / v : undefined;
+        let dt_effective = dt_ui;
+        if (typeof dt_limit_diff === 'number') dt_effective = Math.min(dt_effective, safety * dt_limit_diff);
+        if (typeof dt_limit_tel === 'number') dt_effective = Math.min(dt_effective, safety * dt_limit_tel);
+        const dtInfo = { dt_ui, dt_limit_diff, dt_limit_tel, dt_effective, safety };
+
+        // equation params for display
+        const eqSelected = selectedEquations;
+        const equationParams = {
+          selected: eqSelected,
+          telegraph: eqSelected.includes('telegraph') ? { collision_rate: params.collision_rate, velocity: params.velocity } : undefined,
+          diffusion: eqSelected.includes('diffusion') ? { diffusivity: params.diffusivity } : undefined,
+        };
+
+        return (
+          <ConservationDisplay
+            currentQuantities={conservationData.currentQuantities}
+            errors={conservationData.errors}
+            isStable={conservationData.isStable}
+            dtInfo={dtInfo}
+            equationParams={equationParams}
+          />
+        );
+      })()}
     </div>
   );
 }

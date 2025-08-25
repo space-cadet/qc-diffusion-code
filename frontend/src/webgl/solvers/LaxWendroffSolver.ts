@@ -104,6 +104,9 @@ void main() {
     gl.bindTexture(gl.TEXTURE_2D, readTexture);
     if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
 
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     return 1 - currentTexture;
   }
