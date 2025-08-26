@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "dev:full": "concurrently \"cd ../backend && source .venv/bin/activate && python main.py\" \"pnpm dev\"",
     "test": "jest",
+    "test:boundary": "jest boundaryConditions.test.ts",
     "test:watch": "jest --watch"
   },
   "dependencies": {

@@ -1,13 +1,17 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true,
-    }],
+    '^.+\\.[jt]sx?$': 'ts-jest'
   },
-  extensionsToTreatAsEsm: ['.ts', '.tsx']
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        allowJs: true
+      }
+    }
+  }
 };

@@ -33,74 +33,44 @@ export class CrankNicolsonSolver implements SolverStrategy {
     let equationCode = '';
     
     if (equationType === 'telegraph') {
-      // For telegraph equation, fall back to explicit (CN is complex for hyperbolic)
       equationCode = `
+        vec4 uvwq = sampleWithBC(textureSource, textureCoords);
+        vec4 uvwqR = sampleWithBC(textureSource, textureCoords + vec2(texel.x, 0.0));
+        vec4 uvwqL = sampleWithBC(textureSource, textureCoords - vec2(texel.x, 0.0));
+        vec4 uvwqT = sampleWithBC(textureSource, textureCoords + vec2(0.0, texel.y));
+        vec4 uvwqB = sampleWithBC(textureSource, textureCoords - vec2(0.0, texel.y));
+        
         float u = uvwq.r;
         float w = uvwq.g;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(w, v*v*laplacian - 2.0*a*w, 0.0, 0.0);
-        
-        // Apply boundary conditions
-        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     } else if (equationType === 'diffusion') {
-      // Standalone CN Jacobi iteration shader with BC support
-      const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
-      
-      return `#version 300 es
-precision highp float; precision highp sampler2D;
-in vec2 textureCoords;
-uniform sampler2D textureSource;   // u^n
-uniform sampler2D textureSource1;  // u^{n+1,(m)} (current iterate)
-uniform float dt;
-uniform float dx;
-uniform float dy;
-uniform float k;
-out vec4 fragColor;
-
-${bcShaderCode}
-
-void main() {
-  // u^n and its neighbors for RHS
-  vec2 texelOld = 1.0 / vec2(textureSize(textureSource, 0));\n
-  float u_old  = texture(textureSource, textureCoords).r;\n
-  float u_old_r = texture(textureSource, textureCoords + vec2(texelOld.x, 0.0)).r;\n
-  float u_old_l = texture(textureSource, textureCoords - vec2(texelOld.x, 0.0)).r;\n
-  float u_old_t = texture(textureSource, textureCoords + vec2(0.0, texelOld.y)).r;\n
-  float u_old_b = texture(textureSource, textureCoords - vec2(0.0, texelOld.y)).r;\n
-\n
-  // Explicit RHS (1D): (I + 0.5 * dt * k * Lx) u^n
-  float lap_old = (u_old_r + u_old_l - 2.0 * u_old) / (dx * dx);\n
-  float rhs = u_old + 0.5 * dt * k * lap_old;\n
-\n
-  // Implicit Jacobi uses current iterate neighbors (1D)
-  vec2 texelIter = 1.0 / vec2(textureSize(textureSource1, 0));
-  float u_r = texture(textureSource1, textureCoords + vec2(texelIter.x, 0.0)).r;
-  float u_l = texture(textureSource1, textureCoords - vec2(texelIter.x, 0.0)).r;
-
-  float coeff_x = 1.0 / (dx * dx);
-  float diagonal = 1.0 + 0.5 * dt * k * (2.0 * coeff_x);
-  float neighbors = coeff_x * (u_r + u_l);\n
-  float u_updated = (rhs + 0.5 * dt * k * neighbors) / diagonal;\n
-\n
-  vec4 result = vec4(u_updated, 0.0, 0.0, 0.0);\n
-  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}\n
-  fragColor = result;\n
-}`;
+      equationCode = `
+        vec4 uvwq = sampleWithBC(textureSource, textureCoords);
+        vec4 uvwqR = sampleWithBC(textureSource, textureCoords + vec2(texel.x, 0.0));
+        vec4 uvwqL = sampleWithBC(textureSource, textureCoords - vec2(texel.x, 0.0));
+        vec4 uvwqT = sampleWithBC(textureSource, textureCoords + vec2(0.0, texel.y));
+        vec4 uvwqB = sampleWithBC(textureSource, textureCoords - vec2(0.0, texel.y));
+        
+        float u = uvwq.r;
+        float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
+        result = vec4(k*laplacian, 0.0, 0.0, 0.0);
+      }`;
     }
 
     const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
-    const baseShader = RDShaderTop("FE")
-      .replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs())
+    
+    let shaderSource = RDShaderTop("FE")
       .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)");
     
-    // Insert BC shader code after auxiliary functions
     if (bcShaderCode) {
-      return baseShader.replace(auxiliary_GLSL_funs(), bcShaderCode + "\n" + auxiliary_GLSL_funs())
-        + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
+      shaderSource = shaderSource.replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs() + "\n" + bcShaderCode);
+    } else {
+      shaderSource = shaderSource.replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs());
     }
     
-    return baseShader + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.1, 1.0)") + RDShaderBot();
+    return shaderSource + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
   }
 
   private initializeIterativeSolver(

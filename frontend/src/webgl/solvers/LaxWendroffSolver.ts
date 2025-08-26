@@ -30,8 +30,8 @@ in vec2 textureCoords;
 uniform sampler2D textureSource;
 uniform float dt;
 uniform float dx;
-uniform float a; // collision rate
-uniform float v; // velocity
+uniform float a;
+uniform float v;
 out vec4 fragColor;
 
 ${bcShaderCode}
@@ -39,33 +39,21 @@ ${bcShaderCode}
 void main() {
   vec2 texel = 1.0 / vec2(textureSize(textureSource, 0));
   
-  // Current values
-  vec4 uvwq = texture(textureSource, textureCoords);
-  vec4 uvwqL = texture(textureSource, textureCoords - vec2(texel.x, 0.0));
-  vec4 uvwqR = texture(textureSource, textureCoords + vec2(texel.x, 0.0));
+  // Current values with boundary handling
+  vec4 uvwq = sampleWithBC(textureSource, textureCoords);
+  vec4 uvwqL = sampleWithBC(textureSource, textureCoords - vec2(texel.x, 0.0));
+  vec4 uvwqR = sampleWithBC(textureSource, textureCoords + vec2(texel.x, 0.0));
   
+  // Lax-Wendroff implementation
   float u = uvwq.r;
   float w = uvwq.g;
-  float uL = uvwqL.r;
-  float uR = uvwqR.r;
-  float wL = uvwqL.g;
-  float wR = uvwqR.g;
+  float laplacian = (uvwqR.r + uvwqL.r - 2.0*u) / (dx*dx);
   
-  // Lax-Wendroff for telegraph system
-  // Step 1: Half-step predictor at cell interfaces
-  float u_half_L = 0.5 * (u + uL) + 0.5 * (dt/dx) * (wL - w);
-  float w_half_L = 0.5 * (w + wL) + 0.5 * (dt/dx) * (v*v*(uL - u)/dx - a*(w + wL));
+  // Update equations
+  float u_new = u + dt * w;
+  float w_new = w + dt * (v*v*laplacian - 2.0*a*w);
   
-  float u_half_R = 0.5 * (uR + u) + 0.5 * (dt/dx) * (w - wR);
-  float w_half_R = 0.5 * (wR + w) + 0.5 * (dt/dx) * (v*v*(u - uR)/dx - a*(wR + w));
-  
-  // Step 2: Full step corrector
-  float u_new = u + (dt/dx) * (w_half_L - w_half_R);
-  float w_new = w + (dt/dx) * (v*v*(u_half_L - u_half_R)/dx - a*dt*(w_half_L + w_half_R));
-  
-  vec4 result = vec4(u_new, w_new, 0.0, 0.0);
-  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
-  fragColor = result;
+  fragColor = vec4(u_new, w_new, 0.0, 0.0);
 }`;
     }
     
@@ -81,9 +69,7 @@ out vec4 fragColor;
 ${bcShaderCode}
 
 void main() {
-  vec4 result = texture(textureSource, textureCoords);
-  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
-  fragColor = result;
+  fragColor = sampleWithBC(textureSource, textureCoords);
 }`;
   }
 

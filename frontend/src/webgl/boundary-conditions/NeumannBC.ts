@@ -38,8 +38,5 @@ export class NeumannBC extends BaseBoundaryCondition {
     // Set texture wrapping to clamp to edge for Neumann BCs
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    
-    // Pass texel size for boundary detection
-    this.setUniform(gl, program, 'u_texelSize', [1.0 / width, 1.0 / height]);
   }
 }

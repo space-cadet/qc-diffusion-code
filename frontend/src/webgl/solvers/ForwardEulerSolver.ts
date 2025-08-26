@@ -38,22 +38,28 @@ export class ForwardEulerSolver implements SolverStrategy {
     
     if (equationType === 'telegraph') {
       equationCode = `
+        vec4 uvwq = sampleWithBC(textureSource, textureCoords);
+        vec4 uvwqR = sampleWithBC(textureSource, textureCoords + vec2(texel.x, 0.0));
+        vec4 uvwqL = sampleWithBC(textureSource, textureCoords - vec2(texel.x, 0.0));
+        vec4 uvwqT = sampleWithBC(textureSource, textureCoords + vec2(0.0, texel.y));
+        vec4 uvwqB = sampleWithBC(textureSource, textureCoords - vec2(0.0, texel.y));
+        
         float u = uvwq.r;
         float w = uvwq.g;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(w, v*v*laplacian - 2.0*a*w, 0.0, 0.0);
-        
-        // Apply boundary conditions
-        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     } else if (equationType === 'diffusion') {
       equationCode = `
+        vec4 uvwq = sampleWithBC(textureSource, textureCoords);
+        vec4 uvwqR = sampleWithBC(textureSource, textureCoords + vec2(texel.x, 0.0));
+        vec4 uvwqL = sampleWithBC(textureSource, textureCoords - vec2(texel.x, 0.0));
+        vec4 uvwqT = sampleWithBC(textureSource, textureCoords + vec2(0.0, texel.y));
+        vec4 uvwqB = sampleWithBC(textureSource, textureCoords - vec2(0.0, texel.y));
+        
         float u = uvwq.r;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(k*laplacian, 0.0, 0.0, 0.0);
-        
-        // Apply boundary conditions
-        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     }
 
@@ -62,7 +68,6 @@ export class ForwardEulerSolver implements SolverStrategy {
     let shaderSource = RDShaderTop("FE")
       .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)");
     
-    // Insert BC shader code after auxiliary functions placeholder
     if (bcShaderCode) {
       shaderSource = shaderSource.replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs() + "\n" + bcShaderCode);
     } else {
@@ -121,6 +126,8 @@ export class ForwardEulerSolver implements SolverStrategy {
     if (this.boundaryCondition) {
       this.boundaryCondition.applyBoundaries(gl, program, dx, dy);
     }
+    // Execute compute pass into the write framebuffer
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     return 1 - currentTexture;
   }

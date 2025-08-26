@@ -100,33 +100,69 @@ export class WebGLSolver {
   init(width, height) {
     this.width = width;
     this.height = height;
+
+    // Prepare full-screen quad buffer once so compute passes can render
+    if (!this.quadBuffer) {
+      const gl = this.gl;
+      const vertices = new Float32Array([
+        -1, -1, 0, 0,
+         1, -1, 1, 0,
+        -1,  1, 0, 1,
+         1,  1, 1, 1
+      ]);
+      this.quadBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+      // Create VAO to capture vertex attrib state (positions at loc 0, uvs at loc 1)
+      this.quadVao = gl.createVertexArray();
+      gl.bindVertexArray(this.quadVao);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 16, 0);
+      gl.enableVertexAttribArray(1);
+      gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
+      gl.bindVertexArray(null);
+    }
     
     // Create textures for double buffering
-    this.createTextures();
+    this._createTextures();
     this.createFramebuffers();
     
     this.initialized = true;
   }
 
-  createTextures() {
-    const gl = this.gl;
+  _createTextures() {
+    const { gl, width, height } = this;
     
-    for (let i = 0; i < 2; i++) {
-      const texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      
-      if (this.floatTextureSupported) {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
-      } else {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-      }
-      
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      this.textures.push(texture);
-    }
+    this.textures = [
+      this._createTexture(width, height),
+      this._createTexture(width, height)
+    ];
+  }
+
+  _createTexture(width, height) {
+    const texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    
+    // Set basic texture parameters without wrapping mode
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+    
+    // Initialize with empty data
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA32F,
+      width,
+      height,
+      0,
+      this.gl.RGBA,
+      this.gl.FLOAT,
+      null
+    );
+    
+    return texture;
   }
 
   createFramebuffers() {
@@ -193,7 +229,9 @@ export class WebGLSolver {
     if (this.uniforms.L_y) gl.uniform1f(this.uniforms.L_y, xMax - xMin);
     if (this.uniforms.MINX) gl.uniform1f(this.uniforms.MINX, xMin);
     if (this.uniforms.MINY) gl.uniform1f(this.uniforms.MINY, xMin);
-    
+    // Bind VAO so solver draw calls have valid vertex attributes
+    if (this.quadVao) gl.bindVertexArray(this.quadVao);
+
     // Delegate to solver strategy
     this.currentTexture = this.solverStrategy.step(
       gl, this.textures, this.framebuffers, this.program, this.uniforms,
@@ -206,27 +244,8 @@ export class WebGLSolver {
 
   renderQuad() {
     const gl = this.gl;
-    
-    // Create quad geometry if not exists
-    if (!this.quadBuffer) {
-      const vertices = new Float32Array([
-        -1, -1, 0, 0,
-         1, -1, 1, 0,
-        -1,  1, 0, 1,
-         1,  1, 1, 1
-      ]);
-      
-      this.quadBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    }
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 16, 0);
-    gl.enableVertexAttribArray(1);
-    gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
-    
+    // Bind VAO for onscreen draw
+    if (this.quadVao) gl.bindVertexArray(this.quadVao);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
