@@ -1,11 +1,11 @@
 # C2a: PDE Solver Methods and Boundary Conditions
 *Created: 2025-08-25 12:49:41 IST*
-*Last Updated: 2025-08-25 14:41:42 IST*
+*Last Updated: 2025-08-26 20:40:41 IST*
 
 **Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements for WebGL PDE simulation
 **Status**: 🔄 IN PROGRESS **Priority**: HIGH
 **Started**: 2025-08-25
-**Last Active**: 2025-08-25 14:41:42 IST
+**Last Active**: 2025-08-26 20:40:41 IST
 **Dependencies**: C2
 
 ## Completion Criteria
@@ -62,5 +62,14 @@ Strategy pattern infrastructure completed with BaseSolver interface. Crank-Nicol
   - Non-invasive: UI dt preserved, effective dt passed to shader
 - **Documentation**: Created comprehensive implementation notes at `memory-bank/implementation-details/pde-bcs-equations-stability.md`
 
+**Boundary Condition Architecture Analysis (2025-08-26 20:40:41 IST):**
+Completed comprehensive comparison of four BC implementation approaches:
+- GPT-5 Plan: Shader-only with phased implementation
+- DeepSeek Plan: Shader-only with optional Strategy pattern
+- Complex Strategy: Multi-pattern composition (rejected for KIRSS violations)
+- Simple Template: KIRSS-compliant domain-level BCs
+
+**Final Decision:** Implement "Corrected GPT-5" approach using domain-level boundary conditions with shader-only implementation for physics accuracy and KIRSS compliance.
+
 **Next Steps:**
-Need RK4 solver for telegraph equation accuracy improvements and boundary condition system for flexible physics scenarios beyond current hardcoded Neumann (CLAMP_TO_EDGE) boundaries. Test unified boundary behavior and stability improvements.
+Implement boundary condition system using shader-only approach with domain-level BCs (all equations share same boundaries). Start with Neumann, Dirichlet, Periodic types leveraging existing simulation_shaders.js functions.

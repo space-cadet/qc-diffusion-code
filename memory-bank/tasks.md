@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-25 14:41:42 IST_
+_Last Updated: 2025-08-26 20:40:41 IST_
 
 ## Active Tasks
 
@@ -108,9 +108,9 @@ _Last Updated: 2025-08-25 14:41:42 IST_
 
 ### C2a: PDE Solver Methods and Boundary Conditions
 **Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 14:41:42 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-26 20:40:41 IST
 **Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/CrankNicolsonSolver.ts`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
-**Notes**: Boundary condition unification completed - fixed Lax-Wendroff CLAMP_TO_EDGE, added Forward Euler automatic dt stability guard with CFL conditions, comprehensive documentation created
+**Notes**: BC architecture analysis completed - selected "Corrected GPT-5" shader-only approach with domain-level BCs for physics accuracy and KIRSS compliance, ready for implementation
 
 ### C2b: PDE UI Implementation
 **Description**: Enhance PDE parameter panel with advanced solver controls and boundary condition selection
