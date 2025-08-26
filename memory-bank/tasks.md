@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-26 20:40:41 IST_
+_Last Updated: 2025-08-26 23:28:39 IST_
 
 ## Active Tasks
 
@@ -107,10 +107,10 @@ _Last Updated: 2025-08-26 20:40:41 IST_
 **Notes**: Version 1.0.0 released with comprehensive documentation, git tagging, and release preparation completed
 
 ### C2a: PDE Solver Methods and Boundary Conditions
-**Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-26 20:40:41 IST
-**Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/CrankNicolsonSolver.ts`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
-**Notes**: BC architecture analysis completed - selected "Corrected GPT-5" shader-only approach with domain-level BCs for physics accuracy and KIRSS compliance, ready for implementation
+**Description**: Implement multiple PDE solver methods with boundary condition strategy pattern system
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-26 23:28:39 IST
+**Files**: `frontend/src/webgl/boundary-conditions/`, `frontend/src/webgl/solvers/`, `frontend/src/PdeParameterPanel.tsx`, `frontend/src/types.ts`
+**Notes**: BC strategy pattern infrastructure implemented with Neumann/Dirichlet support, partial shader integration completed, WebGL compilation errors need resolution
 
 ### C2b: PDE UI Implementation
 **Description**: Enhance PDE parameter panel with advanced solver controls and boundary condition selection

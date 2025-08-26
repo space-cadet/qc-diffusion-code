@@ -5,6 +5,7 @@ import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs.js';
 import { genericVertexShader } from './generic_shaders.js';
 import { ForwardEulerSolver } from './solvers/ForwardEulerSolver.ts';
 import { CrankNicolsonSolver } from './solvers/CrankNicolsonSolver.ts';
+import { NeumannBC } from './boundary-conditions/NeumannBC.ts';
 
 /** @typedef {import('./solvers/BaseSolver').SolverStrategy} SolverStrategy */
 
@@ -30,6 +31,7 @@ export class WebGLSolver {
   }
   constructor(canvas) {
     this.solverStrategy = new ForwardEulerSolver();
+    this.boundaryCondition = new NeumannBC();
     this.canvas = canvas;
     this.gl = canvas.getContext('webgl2', {
       powerPreference: 'high-performance',
@@ -54,13 +56,29 @@ export class WebGLSolver {
     this.program = null;
     this.uniforms = {};
     this.initialized = false;
-    this.solverStrategy = new ForwardEulerSolver(); // Default solver
+    this.solverStrategy = new ForwardEulerSolver();
     this.currentEquationType = null;
+    
+    // Inject boundary condition into solver
+    this.solverStrategy.setBoundaryCondition(this.boundaryCondition);
+  }
+
+  /**
+   * Update the active boundary condition and inject into current solver strategy.
+   * @param {import('./boundary-conditions/BaseBoundaryCondition').BaseBoundaryCondition} bc
+   */
+  setBoundaryCondition(bc) {
+    this.boundaryCondition = bc;
+    if (this.solverStrategy && typeof this.solverStrategy.setBoundaryCondition === 'function') {
+      this.solverStrategy.setBoundaryCondition(bc);
+    }
   }
 
   /** @param {SolverStrategy} solverStrategy */
   setSolver(solverStrategy) {
     this.solverStrategy = solverStrategy;
+    // Inject current boundary condition into new solver
+    this.solverStrategy.setBoundaryCondition(this.boundaryCondition);
     // Re-setup equation if already initialized
     if (this.currentEquationType) {
       this.setupEquation(this.currentEquationType, this.currentParameters || {});

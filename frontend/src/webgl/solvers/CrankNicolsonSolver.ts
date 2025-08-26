@@ -1,6 +1,7 @@
 // CrankNicolsonSolver.ts - Crank-Nicolson implicit solver strategy
 
 import type { SolverStrategy } from './BaseSolver';
+import { BaseBoundaryCondition } from '../boundary-conditions/BaseBoundaryCondition';
 import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders.js';
 import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs.js';
 
@@ -9,6 +10,11 @@ export class CrankNicolsonSolver implements SolverStrategy {
   private iterativeFramebuffers: WebGLFramebuffer[] = [];
   private iterativeProgram: WebGLProgram | null = null;
   private initialized = false;
+  private boundaryCondition: BaseBoundaryCondition | null = null;
+
+  setBoundaryCondition(bc: BaseBoundaryCondition): void {
+    this.boundaryCondition = bc;
+  }
 
   getName(): string {
     return 'crank_nicolson';
@@ -33,21 +39,28 @@ export class CrankNicolsonSolver implements SolverStrategy {
         float w = uvwq.g;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(w, v*v*laplacian - 2.0*a*w, 0.0, 0.0);
+        
+        // Apply boundary conditions
+        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     } else if (equationType === 'diffusion') {
-      // Standalone CN Jacobi iteration shader: writes u^{n+1,(m+1)} directly to fragColor
-      return `#version 300 es\n
-precision highp float; precision highp sampler2D;\n
-in vec2 textureCoords;\n
-uniform sampler2D textureSource;   // u^n\n
-uniform sampler2D textureSource1;  // u^{n+1,(m)} (current iterate)\n
-uniform float dt;\n
-uniform float dx;\n
-uniform float dy;\n
-uniform float k;\n
-out vec4 fragColor;\n
-\n
-void main() {\n
+      // Standalone CN Jacobi iteration shader with BC support
+      const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
+      
+      return `#version 300 es
+precision highp float; precision highp sampler2D;
+in vec2 textureCoords;
+uniform sampler2D textureSource;   // u^n
+uniform sampler2D textureSource1;  // u^{n+1,(m)} (current iterate)
+uniform float dt;
+uniform float dx;
+uniform float dy;
+uniform float k;
+out vec4 fragColor;
+
+${bcShaderCode}
+
+void main() {
   // u^n and its neighbors for RHS
   vec2 texelOld = 1.0 / vec2(textureSize(textureSource, 0));\n
   float u_old  = texture(textureSource, textureCoords).r;\n
@@ -70,14 +83,24 @@ void main() {\n
   float neighbors = coeff_x * (u_r + u_l);\n
   float u_updated = (rhs + 0.5 * dt * k * neighbors) / diagonal;\n
 \n
-  fragColor = vec4(u_updated, 0.0, 0.0, 0.0);\n
+  vec4 result = vec4(u_updated, 0.0, 0.0, 0.0);\n
+  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}\n
+  fragColor = result;\n
 }`;
     }
 
-    return RDShaderTop("FE")
+    const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
+    const baseShader = RDShaderTop("FE")
       .replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs())
-      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)")
-      + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
+      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)");
+    
+    // Insert BC shader code after auxiliary functions
+    if (bcShaderCode) {
+      return baseShader.replace(auxiliary_GLSL_funs(), bcShaderCode + "\n" + auxiliary_GLSL_funs())
+        + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
+    }
+    
+    return baseShader + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.1, 1.0)") + RDShaderBot();
   }
 
   private initializeIterativeSolver(
@@ -126,7 +149,9 @@ void main() {\n
     currentTexture: number
   ): number {
     const canvas = gl.canvas as HTMLCanvasElement;
-    this.initializeIterativeSolver(gl, canvas.width, canvas.height);
+    const width = canvas.width;
+    const height = canvas.height;
+    this.initializeIterativeSolver(gl, width, height);
 
     const readTexture = textures[currentTexture];
     const writeTexture = textures[1 - currentTexture];
@@ -171,8 +196,24 @@ void main() {\n
         gl.bindTexture(gl.TEXTURE_2D, readIterTexture);
         if (uniforms.textureSource1) gl.uniform1i(uniforms.textureSource1, 1);
 
+        // Apply boundary conditions (setup uniforms/wrap based on pixel dims)
+        if (this.boundaryCondition) {
+          // Note: pass framebuffer pixel dimensions, not physical dx, dy
+          this.boundaryCondition.applyBoundaries(gl, program, width, height);
+        }
+
         // Draw
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        
+        // Post-pass to enforce BCs on the written target
+        if (this.boundaryCondition) {
+          this.boundaryCondition.applyPostPass(
+            gl as unknown as WebGLRenderingContext,
+            writeIterFramebuffer as unknown as WebGLFramebuffer,
+            width,
+            height
+          );
+        }
         
         if (!isLast) currentIterTexture = 1 - currentIterTexture;
       }
@@ -201,6 +242,16 @@ void main() {\n
       if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      // Post-pass to enforce BCs for explicit fallback path
+      if (this.boundaryCondition) {
+        this.boundaryCondition.applyPostPass(
+          gl as unknown as WebGLRenderingContext,
+          writeFramebuffer as unknown as WebGLFramebuffer,
+          width,
+          height
+        );
+      }
     }
 
     return 1 - currentTexture;

@@ -1,10 +1,16 @@
 // ForwardEulerSolver.ts - Forward Euler solver strategy
 
 import type { SolverStrategy } from './BaseSolver';
+import { BaseBoundaryCondition } from '../boundary-conditions/BaseBoundaryCondition';
 import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders.js';
 import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs.js';
 
 export class ForwardEulerSolver implements SolverStrategy {
+  private boundaryCondition: BaseBoundaryCondition | null = null;
+
+  setBoundaryCondition(bc: BaseBoundaryCondition): void {
+    this.boundaryCondition = bc;
+  }
   getName(): string {
     return 'forward_euler';
   }
@@ -36,19 +42,34 @@ export class ForwardEulerSolver implements SolverStrategy {
         float w = uvwq.g;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(w, v*v*laplacian - 2.0*a*w, 0.0, 0.0);
+        
+        // Apply boundary conditions
+        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     } else if (equationType === 'diffusion') {
       equationCode = `
         float u = uvwq.r;
         float laplacian = (uvwqR.r + uvwqL.r + uvwqT.r + uvwqB.r - 4.0*uvwq.r) / (dx*dx);
         result = vec4(k*laplacian, 0.0, 0.0, 0.0);
+        
+        // Apply boundary conditions
+        ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
       }`;
     }
 
-    return RDShaderTop("FE")
-      .replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs())
-      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)")
-      + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
+    const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
+    
+    let shaderSource = RDShaderTop("FE")
+      .replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)");
+    
+    // Insert BC shader code after auxiliary functions placeholder
+    if (bcShaderCode) {
+      shaderSource = shaderSource.replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs() + "\n" + bcShaderCode);
+    } else {
+      shaderSource = shaderSource.replace("AUXILIARY_GLSL_FUNS", auxiliary_GLSL_funs());
+    }
+    
+    return shaderSource + equationCode + RDShaderMain("FE").replace(/TIMESCALES/g, "vec4(1.0, 1.0, 1.0, 1.0)") + RDShaderBot();
   }
 
   step(
@@ -95,6 +116,11 @@ export class ForwardEulerSolver implements SolverStrategy {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, readTexture);
     if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
+
+    // Apply boundary conditions
+    if (this.boundaryCondition) {
+      this.boundaryCondition.applyBoundaries(gl, program, dx, dy);
+    }
 
     return 1 - currentTexture;
   }

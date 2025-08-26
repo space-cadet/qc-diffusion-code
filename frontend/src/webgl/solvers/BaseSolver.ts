@@ -1,10 +1,12 @@
 // BaseSolver.ts - Strategy interface for numerical solvers
+import { BaseBoundaryCondition } from '../boundary-conditions/BaseBoundaryCondition';
 
 export interface SolverStrategy {
   getName(): string;
   getShaderSource(equationType: string): string;
   getTextureCount(): number;
   isStable(dt: number, dx: number, parameters: any): boolean;
+  setBoundaryCondition(bc: BaseBoundaryCondition): void;
   step(
     gl: WebGL2RenderingContext,
     textures: WebGLTexture[],

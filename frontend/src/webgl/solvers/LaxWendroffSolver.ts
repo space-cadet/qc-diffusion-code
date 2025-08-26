@@ -1,6 +1,12 @@
 import type { SolverStrategy } from './BaseSolver';
+import { BaseBoundaryCondition } from '../boundary-conditions/BaseBoundaryCondition';
 
 export class LaxWendroffSolver implements SolverStrategy {
+  private boundaryCondition: BaseBoundaryCondition | null = null;
+
+  setBoundaryCondition(bc: BaseBoundaryCondition): void {
+    this.boundaryCondition = bc;
+  }
   getName(): string {
     return 'lax_wendroff';
   }
@@ -15,6 +21,8 @@ export class LaxWendroffSolver implements SolverStrategy {
   }
 
   getShaderSource(equationType: string): string {
+    const bcShaderCode = this.boundaryCondition?.getShaderCode() || '';
+    
     if (equationType === 'telegraph') {
       return `#version 300 es
 precision highp float;
@@ -25,6 +33,8 @@ uniform float dx;
 uniform float a; // collision rate
 uniform float v; // velocity
 out vec4 fragColor;
+
+${bcShaderCode}
 
 void main() {
   vec2 texel = 1.0 / vec2(textureSize(textureSource, 0));
@@ -53,7 +63,9 @@ void main() {
   float u_new = u + (dt/dx) * (w_half_L - w_half_R);
   float w_new = w + (dt/dx) * (v*v*(u_half_L - u_half_R)/dx - a*dt*(w_half_L + w_half_R));
   
-  fragColor = vec4(u_new, w_new, 0.0, 0.0);
+  vec4 result = vec4(u_new, w_new, 0.0, 0.0);
+  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
+  fragColor = result;
 }`;
     }
     
@@ -65,8 +77,13 @@ uniform sampler2D textureSource;
 uniform float dt;
 uniform float dx;
 out vec4 fragColor;
+
+${bcShaderCode}
+
 void main() {
-  fragColor = texture(textureSource, textureCoords);
+  vec4 result = texture(textureSource, textureCoords);
+  ${this.boundaryCondition?.getType() === 'dirichlet' ? 'result = applyDirichletBC(result, textureCoords);' : ''}
+  fragColor = result;
 }`;
   }
 
@@ -104,8 +121,13 @@ void main() {
     gl.bindTexture(gl.TEXTURE_2D, readTexture);
     if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // Apply boundary conditions
+    if (this.boundaryCondition) {
+      this.boundaryCondition.applyBoundaries(gl, program, dx, dy);
+    } else {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    }
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     return 1 - currentTexture;

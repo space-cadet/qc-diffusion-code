@@ -71,6 +71,15 @@ export default function PlotComponent({
         ? `${selectedEquations.map(eq => equationMetadata[eq]?.displayName).join(' vs ')} Comparison`
         : equationMetadata[selectedEquations[0]]?.displayName || "Equation Simulation";
 
+      const bcText = (() => {
+        const bc = params.boundaryCondition || 'neumann';
+        if (bc === 'dirichlet') {
+          const val = params.dirichlet_value ?? 0;
+          return `BC: Dirichlet (u = ${val})`;
+        }
+        return 'BC: Neumann (no-flux)';
+      })();
+
       const layout: Partial<Plotly.Layout> = {
         title,
         xaxis: pdeState.plot.autoscale
@@ -90,6 +99,18 @@ export default function PlotComponent({
             text: "t = 0.00",
             showarrow: false,
             font: { size: 14, color: "#333" },
+            bgcolor: "rgba(255,255,255,0.8)",
+            bordercolor: "#ccc",
+            borderwidth: 1,
+          },
+          {
+            x: 0.02,
+            y: 0.92,
+            xref: "paper" as const,
+            yref: "paper" as const,
+            text: bcText,
+            showarrow: false,
+            font: { size: 12, color: "#333" },
             bgcolor: "rgba(255,255,255,0.8)",
             bordercolor: "#ccc",
             borderwidth: 1,
@@ -144,13 +165,6 @@ export default function PlotComponent({
         errors,
         isStable
       });
-    } else if (!isRunning && (!data.time || (data.time as number) === 0)) {
-      // Reset conservation data when not running and at initial conditions
-      setConservationData({
-        currentQuantities: null,
-        errors: { mass_telegraph_error: 0, mass_diffusion_error: 0, energy_telegraph_error: 0 },
-        isStable: true
-      });
     }
 
     const traces: PlotData[] = selectedEquations.map(equationType => {
@@ -176,6 +190,15 @@ export default function PlotComponent({
       ? `${selectedEquations.map(eq => equationMetadata[eq]?.displayName).join(' vs ')} Comparison`
       : equationMetadata[selectedEquations[0]]?.displayName || "Equation Simulation";
 
+    const bcText = (() => {
+      const bc = params.boundaryCondition || 'neumann';
+      if (bc === 'dirichlet') {
+        const val = params.dirichlet_value ?? 0;
+        return `BC: Dirichlet (u = ${val})`;
+      }
+      return 'BC: Neumann (no-flux)';
+    })();
+
     const layout: Partial<Plotly.Layout> = {
       title,
       xaxis: pdeState.plot.autoscale
@@ -195,6 +218,18 @@ export default function PlotComponent({
           text: `t = ${(data.time as number).toFixed(2)}`,
           showarrow: false,
           font: { size: 14, color: "#333" },
+          bgcolor: "rgba(255,255,255,0.8)",
+          bordercolor: "#ccc",
+          borderwidth: 1,
+        },
+        {
+          x: 0.02,
+          y: 0.92,
+          xref: "paper" as const,
+          yref: "paper" as const,
+          text: bcText,
+          showarrow: false,
+          font: { size: 12, color: "#333" },
           bgcolor: "rgba(255,255,255,0.8)",
           bordercolor: "#ccc",
           borderwidth: 1,
@@ -321,7 +356,12 @@ export default function PlotComponent({
                 onClick={() => {
                   conservationMonitor.current.reset();
                   setConservationData({
-                    currentQuantities: null,
+                    currentQuantities: {
+                      mass_telegraph: 0,
+                      mass_diffusion: 0,
+                      energy_telegraph: 0,
+                      time: 0
+                    },
                     errors: { mass_telegraph_error: 0, mass_diffusion_error: 0, energy_telegraph_error: 0 },
                     isStable: true
                   });

@@ -15,6 +15,7 @@ export interface SolverParameters {
 
 export declare class WebGLSolver {
   constructor(canvas: HTMLCanvasElement);
+  setBoundaryCondition(bc: any): void;
   
   init(width: number, height: number): void;
   

@@ -1,5 +1,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebGLSolver } from '../webgl/webgl-solver';
+import { DirichletBC } from '../webgl/boundary-conditions/DirichletBC';
+import { NeumannBC } from '../webgl/boundary-conditions/NeumannBC';
 import type { SimulationParams, AnimationFrame } from '../types';
 import type { SolverStrategy } from '../webgl/solvers/BaseSolver';
 import { ForwardEulerSolver } from '../webgl/solvers/ForwardEulerSolver';
@@ -53,6 +55,11 @@ export function useWebGLSolver() {
       selectedEquations.forEach(equationType => {
         const solver = new WebGLSolver(canvas);
         solver.init(params.mesh_size, 1);
+        // Set boundary condition based on params
+        const bc = (params.boundaryCondition === 'dirichlet')
+          ? new DirichletBC(params.dirichlet_value ?? 0)
+          : new NeumannBC();
+        (solver as any).setBoundaryCondition(bc);
         
         // Set solver strategy based on configuration
         const solverType = params.solver_config?.[equationType as keyof typeof params.solver_config] || 'forward-euler';
@@ -102,6 +109,11 @@ export function useWebGLSolver() {
     selectedEquations.forEach(equationType => {
       const solver = solversRef.current.get(equationType);
       if (solver) {
+        // Re-apply BC in case it changed at runtime
+        const bc = (params.boundaryCondition === 'dirichlet')
+          ? new DirichletBC(params.dirichlet_value ?? 0)
+          : new NeumannBC();
+        (solver as any).setBoundaryCondition(bc);
         const stepParams = equationType === 'telegraph' 
           ? { a: params.collision_rate, v: params.velocity }
           : { k: params.diffusivity };

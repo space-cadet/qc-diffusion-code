@@ -1,5 +1,7 @@
 export type SolverType = 'forward-euler' | 'crank-nicolson' | 'rk4' | 'lax-wendroff';
 
+export type BoundaryConditionType = 'neumann' | 'dirichlet';
+
 export interface SolverConfig {
   telegraph?: SolverType;
   diffusion?: SolverType;
@@ -43,6 +45,8 @@ export interface SimulationParams {
   solver_config?: SolverConfig;
   solver_params?: SolverParams;
   selectedEquations?: string[];
+  boundaryCondition?: BoundaryConditionType;
+  dirichlet_value?: number;
 }
 
 export interface SolutionData {
