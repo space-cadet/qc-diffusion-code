@@ -10,6 +10,23 @@ This project is a sophisticated computational simulation system for studying fin
 
 The project is well-structured and uses modern tools like `pnpm` for monorepo management, TypeScript for type safety, and Jest for testing.
 
+## Simulation Details
+
+### 2D Random Walk
+
+The frontend application implements a 2D random walk simulation on the "Random Walk Sim" page. The core logic is located in `frontend/src/physics/strategies/CTRWStrategy.ts`. In this file, the `handleCollision` function calculates a new, random 2D direction for each particle, and the `updateParticle` function updates the particle's position based on its velocity components.
+
+### 1D PDE Solvers
+
+The application also implements WebGL-based solvers for 1D partial differential equations. The implementation uses a strategy pattern, with different solvers available:
+
+*   **Forward Euler:** An explicit method, implemented in `frontend/src/webgl/solvers/ForwardEulerSolver.ts`.
+*   **Crank-Nicolson:** An implicit, unconditionally stable method, implemented in `frontend/src/webgl/solvers/CrankNicolsonSolver.ts`.
+
+## Agent Instructions
+
+This project contains a set of integrated rules and guidelines for the Gemini agent. These rules cover file modifications, session management, implementation workflows, and more. The full set of rules can be found in `memory-bank/integrated-rules-v6.8.md`.
+
 ## Building and Running
 
 ### Prerequisites

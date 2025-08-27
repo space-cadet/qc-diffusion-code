@@ -1,5 +1,5 @@
 import { RandomWalkSimulator } from '../RandomWalkSimulator';
-import { CTRWStrategy } from '../strategies/CTRWStrategy';
+import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { ParticleManager } from '../ParticleManager';
 
 describe('Random Walk Integration', () => {
@@ -10,7 +10,9 @@ describe('Random Walk Integration', () => {
       collisionRate: 1.0,
       jumpLength: 1.0,
       velocity: 50.0,
-      particleCount: 10
+      particleCount: 10,
+      dimension: '2D',
+      interparticleCollisions: false
     });
   });
 
@@ -24,7 +26,9 @@ describe('Random Walk Integration', () => {
       particleCount: 10,
       simulationType: 'continuum',
       graphType: 'lattice1D',
-      graphSize: 10
+      graphSize: 10,
+      dimension: '2D',
+      interparticleCollisions: false
     });
     
     const updatedStats = simulator.getCollisionStats();
@@ -38,13 +42,13 @@ describe('Random Walk Integration', () => {
   });
 
   test('particle manager and strategy coordination', () => {
-    const strategy = new CTRWStrategy({
+    const strategy = new CTRWStrategy2D({
       collisionRate: 1.0,
       jumpLength: 1.0,
       velocity: 50.0
     });
     
-    const manager = new ParticleManager(strategy);
+    const manager = new ParticleManager(strategy, '2D');
     const mockTsParticle = {
       id: 'test-1',
       position: { x: 0, y: 0 },

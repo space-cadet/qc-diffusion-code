@@ -9,6 +9,7 @@ interface DensityComparisonProps {
     simulationType: "continuum" | "graph";
     velocity: number;
     collisionRate: number;
+    dimension: '1D' | '2D';
   };
 }
 
@@ -21,7 +22,7 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     setRandomWalkUIState 
   } = useAppStore();
   
-  const { canvasRef, densityData, updateDensity } = useDensityVisualization(simulatorRef, 15);
+  const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(simulatorRef, 15, gridLayoutParams.dimension);
   const [recordHistory, setRecordHistory] = useState(false);
   const [waveFrontAnalysis, setWaveFrontAnalysis] = useState({ measuredSpeed: 0, theoreticalSpeed: 0, error: 0 });
 
@@ -40,9 +41,10 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     simulatorRef.current?.getDensityField()?.error || 0.023;
 
   // Calculate effective values from density data
-  const maxDensity = densityData ? Math.max(...densityData.density.flat()) : 0;
-  const totalBins = densityData ? densityData.density.length * densityData.density[0]?.length || 0 : 0;
-  const occupiedBins = densityData ? densityData.density.flat().filter(d => d > 0).length : 0;
+  const densityData = gridLayoutParams.dimension === '1D' ? densityData1D : densityData2D;
+  const maxDensity = densityData ? Math.max(...(densityData.density as number[] | number[][]).flat() as number[]) : 0;
+  const totalBins = densityData ? (gridLayoutParams.dimension === '1D' ? densityData.density.length : (densityData.density as number[][]).length * (densityData.density as number[][])[0]?.length || 0) : 0;
+  const occupiedBins = densityData ? (densityData.density as number[] | number[][]).flat().filter((d: number) => d > 0).length : 0;
   const spreadRatio = totalBins > 0 ? occupiedBins / totalBins : 0;
 
   // Telegraph equation verification
@@ -135,8 +137,11 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
             <div>Max ρ: {maxDensity.toFixed(4)}</div>
             <div>Spread: {(spreadRatio * 100).toFixed(1)}%</div>
             <div>Bins: {occupiedBins}/{totalBins}</div>
-            {densityData && (
-              <div>Size: {densityData.density[0]?.length || 0}×{densityData.density.length}</div>
+            {densityData && gridLayoutParams.dimension === '2D' && densityData.density && (
+              <div>Size: {(densityData.density as number[][])[0]?.length || 0}×{(densityData.density as number[][]).length}</div>
+            )}
+            {densityData && gridLayoutParams.dimension === '1D' && densityData.density && (
+              <div>Size: {(densityData.density as number[]).length}</div>
             )}
           </div>
           

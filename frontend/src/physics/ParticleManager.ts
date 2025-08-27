@@ -4,13 +4,15 @@ import { CircularBuffer } from "./utils/CircularBuffer";
 
 export class ParticleManager {
   private strategy: RandomWalkStrategy;
+  private dimension: '1D' | '2D';
   private particles: Map<string, Particle> = new Map();
   private canvasWidth: number = 800;
   private canvasHeight: number = 600;
   private diagCounter: number = 0;
 
-  constructor(strategy: RandomWalkStrategy) {
+  constructor(strategy: RandomWalkStrategy, dimension: '1D' | '2D') {
     this.strategy = strategy;
+    this.dimension = dimension;
   }
 
   // Update the canvas size so we can convert physics coordinates -> canvas pixels
@@ -29,10 +31,9 @@ export class ParticleManager {
   public mapToCanvas(pos: { x: number; y: number }): { x: number; y: number } {
     const bounds = this.strategy.getBoundaries();
     const widthPhysics = bounds.xMax - bounds.xMin || 1;
-    const heightPhysics = bounds.yMax - bounds.yMin || 1;
 
     const x = ((pos.x - bounds.xMin) / widthPhysics) * this.canvasWidth;
-    const y = ((pos.y - bounds.yMin) / heightPhysics) * this.canvasHeight;
+    const y = this.dimension === '1D' ? this.canvasHeight / 2 : ((pos.y - bounds.yMin) / (bounds.yMax - bounds.yMin || 1)) * this.canvasHeight;
     return { x, y };
   }
 
@@ -40,17 +41,15 @@ export class ParticleManager {
   private mapToPhysics(pos: { x: number; y: number }) {
     const bounds = this.strategy.getBoundaries();
     const widthPhysics = bounds.xMax - bounds.xMin || 1;
-    const heightPhysics = bounds.yMax - bounds.yMin || 1;
 
     const x =
       bounds.xMin + (pos.x / Math.max(this.canvasWidth, 1)) * widthPhysics;
-    const y =
-      bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * heightPhysics;
+    const y = this.dimension === '1D' ? 0 : bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * (bounds.yMax - bounds.yMin || 1);
     return { x, y };
   }
 
   initializeParticle(tsParticle: any): Particle {
-    const angle = Math.random() * 2 * Math.PI;
+    const angle = this.dimension === '1D' ? (Math.random() < 0.5 ? 0 : Math.PI) : Math.random() * 2 * Math.PI;
     const speed = 50;
     const currentTime = Date.now() / 1000;
     // Convert initial canvas position to physics coordinates
@@ -99,7 +98,7 @@ export class ParticleManager {
       particle = this.initializeParticle(tsParticle);
     }
 
-    this.strategy.updateParticle(particle);
+    this.strategy.updateParticle(particle, this.getAllParticles());
 
     // Update trajectory
     particle.trajectory.push({

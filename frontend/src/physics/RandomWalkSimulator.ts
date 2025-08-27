@@ -1,7 +1,8 @@
 import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
 import type { BoundaryConfig } from './types/BoundaryConfig';
 import { ParticleManager } from './ParticleManager';
-import { CTRWStrategy } from './strategies/CTRWStrategy';
+import { CTRWStrategy1D } from './strategies/CTRWStrategy1D';
+import { CTRWStrategy2D } from './strategies/CTRWStrategy2D';
 import { ObservableManager } from './ObservableManager';
 import type { Observable } from './interfaces/Observable';
 
@@ -10,6 +11,8 @@ interface SimulatorParams {
   jumpLength: number;
   velocity: number;
   particleCount: number;
+  dimension: '1D' | '2D';
+  interparticleCollisions: boolean;
   simulationType?: string;
   graphType?: string;
   graphSize?: number;
@@ -32,6 +35,7 @@ interface SimulatorParams {
 export class RandomWalkSimulator {
   private particleManager: ParticleManager;
   private strategy: RandomWalkStrategy;
+  private dimension: '1D' | '2D';
   private particleCount: number;
   private time: number = 0;
   private observableManager: ObservableManager;
@@ -53,16 +57,27 @@ export class RandomWalkSimulator {
   }> = [];
 
   constructor(params: SimulatorParams) {
+    this.dimension = params.dimension;
     const boundaryConfig = this.createBoundaryConfig(params);
     
-    this.strategy = new CTRWStrategy({
-      collisionRate: params.collisionRate,
-      jumpLength: params.jumpLength,
-      velocity: params.velocity,
-      boundaryConfig
-    });
+    if (params.dimension === '1D') {
+      this.strategy = new CTRWStrategy1D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+        interparticleCollisions: params.interparticleCollisions,
+      });
+    } else {
+      this.strategy = new CTRWStrategy2D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+      });
+    }
     
-    this.particleManager = new ParticleManager(this.strategy);
+    this.particleManager = new ParticleManager(this.strategy, params.dimension);
     this.particleCount = params.particleCount;
     this.observableManager = new ObservableManager();
     // Ensure ParticleManager knows canvas size before seeding particles,
@@ -98,6 +113,40 @@ export class RandomWalkSimulator {
   private sampleCanvasPosition(i: number): { x: number; y: number } {
     const cx = this.canvasWidth / 2;
     const cy = this.canvasHeight / 2;
+
+    if (this.dimension === '1D') {
+      // For 1D, we only care about the x-coordinate.
+      // We can use the existing logic for the x-coordinate and set y to a constant.
+      switch (this.initialDistType) {
+        case 'gaussian': {
+          const bm = () => {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+          };
+          const x = cx + bm() * this.distSigmaX;
+          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
+        }
+        case 'stripe': {
+          const half = this.distThickness / 2;
+          const x = cx + (Math.random() * 2 - 1) * half;
+          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
+        }
+        case 'grid': {
+          const nx = Math.max(1, this.distNx);
+          const gx = i % nx;
+          const cellW = this.canvasWidth / nx;
+          const jitterX = (Math.random() * 2 - 1) * this.distJitter;
+          const x = (gx + 0.5) * cellW + jitterX;
+          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
+        }
+        case 'uniform':
+        default:
+          return { x: Math.random() * this.canvasWidth, y: cy };
+      }
+    }
+
     switch (this.initialDistType) {
       case 'gaussian': {
         // Box-Muller
@@ -189,13 +238,24 @@ export class RandomWalkSimulator {
 
   updateParameters(params: SimulatorParams): void {
     const boundaryConfig = this.createBoundaryConfig(params);
-    
-    const newStrategy = new CTRWStrategy({
-      collisionRate: params.collisionRate,
-      jumpLength: params.jumpLength,
-      velocity: params.velocity,
-      boundaryConfig
-    });
+    let newStrategy: RandomWalkStrategy;
+
+    if (params.dimension === '1D') {
+      newStrategy = new CTRWStrategy1D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+        interparticleCollisions: params.interparticleCollisions,
+      });
+    } else {
+      newStrategy = new CTRWStrategy2D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+      });
+    }
     
     this.strategy = newStrategy;
     this.particleManager.updatePhysicsEngine(newStrategy);
@@ -296,6 +356,52 @@ export class RandomWalkSimulator {
       density: normalizedDensity,
       xBounds: { min: xMin, max: xMax },
       yBounds: { min: yMin, max: yMax },
+      binSize
+    };
+  }
+
+  getDensityProfile1D(binSize: number = 10): {
+    density: number[];
+    xBounds: { min: number; max: number };
+    binSize: number;
+  } {
+    const particles = this.particleManager.getAllParticles();
+    const positions = particles.map(p => p.position);
+    
+    if (positions.length === 0) {
+      return {
+        density: [],
+        xBounds: { min: 0, max: 0 },
+        binSize
+      };
+    }
+    
+    // Calculate bounds
+    const xMin = Math.min(...positions.map(p => p.x));
+    const xMax = Math.max(...positions.map(p => p.x));
+    
+    // Calculate grid dimensions
+    const xBins = Math.ceil((xMax - xMin) / binSize) + 1;
+    
+    // Initialize 1D density array
+    const density: number[] = Array(xBins).fill(0);
+    
+    // Bin particles
+    positions.forEach(pos => {
+      const xBin = Math.floor((pos.x - xMin) / binSize);
+      
+      if (xBin >= 0 && xBin < xBins) {
+        density[xBin]++;
+      }
+    });
+    
+    // Normalize by bin area and total particles
+    const binArea = binSize;
+    const normalizedDensity = density.map(count => count / (this.particleCount * binArea));
+    
+    return {
+      density: normalizedDensity,
+      xBounds: { min: xMin, max: xMax },
       binSize
     };
   }

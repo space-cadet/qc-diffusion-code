@@ -161,6 +161,8 @@ export const useAppStore = create<AppState>()(
         jumpLength: 0.1,
         velocity: 1.0,
         simulationType: 'continuum',
+        dimension: '2D',
+        interparticleCollisions: false,
         strategy: 'ctrw',
         boundaryCondition: 'periodic',
         graphType: 'lattice1D',

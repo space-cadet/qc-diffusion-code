@@ -1,21 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 
-interface DensityData {
+interface DensityData2D {
   density: number[][];
   xBounds: { min: number; max: number };
   yBounds: { min: number; max: number };
   binSize: number;
 }
 
+interface DensityData1D {
+  density: number[];
+  xBounds: { min: number; max: number };
+  binSize: number;
+}
+
 export const useDensityVisualization = (
   simulatorRef: React.RefObject<RandomWalkSimulator>,
-  binSize: number = 20
+  binSize: number = 20,
+  dimension: '1D' | '2D' = '2D'
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [densityData, setDensityData] = useState<DensityData | null>(null);
+  const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
+  const [densityData1D, setDensityData1D] = useState<DensityData1D | null>(null);
 
-  const drawDensityHeatmap = (data: DensityData) => {
+  const drawDensityHeatmap = (data: DensityData2D) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -34,7 +42,7 @@ export const useDensityVisualization = (
     const yScale = canvas.height / density.length;
 
     // Find max density for normalization
-    const maxDensity = Math.max(...density.flat());
+    const maxDensity = Math.max(...(density.flat() as number[]));
     
     if (maxDensity === 0) return;
 
@@ -75,12 +83,51 @@ export const useDensityVisualization = (
     }
   };
 
+  const drawDensity1D = (data: DensityData1D) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const { density } = data;
+    
+    if (density.length === 0) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Find max density for normalization
+    const maxDensity = Math.max(...density);
+    
+    if (maxDensity === 0) return;
+
+    // Draw line chart
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height - (density[0] / maxDensity) * canvas.height);
+
+    for (let x = 1; x < density.length; x++) {
+      const y = canvas.height - (density[x] / maxDensity) * canvas.height;
+      ctx.lineTo(x * (canvas.width / density.length), y);
+    }
+
+    ctx.stroke();
+  };
+
   const updateDensity = () => {
     if (!simulatorRef.current) return;
     
-    const data = simulatorRef.current.getDensityProfile2D(binSize);
-    setDensityData(data);
-    drawDensityHeatmap(data);
+    if (dimension === '1D') {
+      const data = simulatorRef.current.getDensityProfile1D(binSize);
+      setDensityData1D(data);
+      drawDensity1D(data);
+    } else {
+      const data = simulatorRef.current.getDensityProfile2D(binSize);
+      setDensityData2D(data);
+      drawDensityHeatmap(data);
+    }
   };
 
   useEffect(() => {
@@ -89,8 +136,10 @@ export const useDensityVisualization = (
 
   return {
     canvasRef,
-    densityData,
+    densityData1D,
+    densityData2D,
     updateDensity,
-    drawDensityHeatmap
+    drawDensityHeatmap,
+    drawDensity1D
   };
 };

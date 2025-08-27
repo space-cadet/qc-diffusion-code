@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 11:53:16 IST_
+_Last Updated: 2025-08-27 14:06:13 IST_
 
 ## Active Tasks
 
@@ -23,6 +23,7 @@ _Last Updated: 2025-08-27 11:53:16 IST_
 | C2a | PDE Solver Methods and Boundary Conditions           | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C2              |
 | C2b | PDE UI Implementation                                 | 🔄 IN PROGRESS | MEDIUM   | 2025-08-25 | C2, C2a         |
 | C12 | Interparticle Collisions and Obstacles Implementation | 🔄 IN PROGRESS | HIGH     | 2025-08-27 | C5c             |
+| C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 
 ## Task Details
@@ -125,6 +126,12 @@ _Last Updated: 2025-08-27 11:53:16 IST_
 **Files**: `frontend/src/physics/strategies/`, `memory-bank/implementation-details/interparticle-collision-plan.md`
 **Notes**: Implementation plan completed - Matter.js recommended for initial phase, Rapier.js for performance upgrade, both have excellent built-in obstacle support
 
+### C13: 1D Random Walk Implementation
+**Description**: Implement 1D random walk simulation with interparticle collision support, extending the existing 2D framework to support dimensional constraints and specialized physics
+**Status**: ✅ COMPLETED **Last**: 2025-08-27 14:06:13 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/CTRWStrategy1D.ts`, `frontend/src/physics/strategies/CTRWStrategy2D.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`
+**Notes**: Implemented by Gemini 2.5 (Pro + Flash) - Complete dimensional abstraction with 1D/2D strategy separation, UI controls for dimension selection and collision toggle, enhanced density profiling for 1D systems
+
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency
 **Status**: 🔄 ACTIVE **Last**: 2025-08-24 11:16:39 IST
@@ -142,6 +149,7 @@ _Last Updated: 2025-08-27 11:53:16 IST_
 | ID  | Title                                      | Completed               |
 | --- | ------------------------------------------ | ----------------------- |
 | C9  | Standalone Repository Setup and Vercel Deployment | 2025-08-23 18:49:57 IST |
+| C13 | 1D Random Walk Implementation              | 2025-08-27 14:06:13 IST |
 | C10 | GitHub App Release v1.0.0                         | 2025-08-24 11:16:39 IST |
 | C6a | Rewrite ts-particles Component Using Low-Level API | 2025-08-22 12:04:06 IST |
 | C6  | Random Walk Physics Engine Redesign       | 2025-08-22 10:57:25 IST |

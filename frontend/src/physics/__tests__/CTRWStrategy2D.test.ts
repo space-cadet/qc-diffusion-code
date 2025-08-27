@@ -1,13 +1,13 @@
-import { CTRWStrategy } from '../strategies/CTRWStrategy';
+import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { CircularBuffer } from '../utils/CircularBuffer';
 import type { Particle, TrajectoryPoint } from '../types/Particle';
 
-describe('CTRWStrategy', () => {
-  let strategy: CTRWStrategy;
+describe('CTRWStrategy2D', () => {
+  let strategy: CTRWStrategy2D;
   let mockParticle: Particle;
 
   beforeEach(() => {
-    strategy = new CTRWStrategy({
+    strategy = new CTRWStrategy2D({
       collisionRate: 1.0,
       jumpLength: 1.0,
       velocity: 50.0

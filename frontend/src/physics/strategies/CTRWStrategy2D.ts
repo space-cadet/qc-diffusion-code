@@ -5,7 +5,7 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { IGraph } from '@spin-network/graph-core';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
 
-export class CTRWStrategy implements RandomWalkStrategy {
+export class CTRWStrategy2D implements RandomWalkStrategy {
   private collisionRate: number;
   private jumpLength: number;
   private velocity: number;

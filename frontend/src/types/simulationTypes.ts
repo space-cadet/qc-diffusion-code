@@ -7,6 +7,8 @@ export interface SimulationState {
 
 export interface RandomWalkParams {
   simulationType: 'continuum' | 'graph';
+  dimension: '1D' | '2D';
+  interparticleCollisions: boolean;
   collisionRate: number;
   jumpLength: number;
   velocity: number;

@@ -1,5 +1,5 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
-import { CTRWStrategy } from './CTRWStrategy';
+import { CTRWStrategy2D } from './CTRWStrategy2D';
 
 export type StrategyType = 'CTRW' | 'Brownian';
 
@@ -17,7 +17,7 @@ export class StrategyFactory {
   static createStrategy(params: StrategyParams): RandomWalkStrategy {
     switch (params.type) {
       case 'CTRW':
-        return new CTRWStrategy({
+        return new CTRWStrategy2D({
           collisionRate: params.collisionRate,
           jumpLength: params.jumpLength,
           velocity: params.velocity

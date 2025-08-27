@@ -1,7 +1,7 @@
 # Boundary Conditions Implementation
 
 *Created: 2025-08-27 10:04:13 IST*
-*Last Updated: 2025-08-27 11:46:00 IST*
+*Last Updated: 2025-08-27 14:08:14 IST*
 
 ## Overview
 
@@ -130,6 +130,56 @@ This ensures the solver actually renders its updated field before the Dirichlet 
 - Add UI for boundary condition selection
 - Support additional BC types (Periodic, Absorbing)
 
+## Future Enhancements for True Modularity (Gemini 2.5 Pro)
+
+To make the PDE boundary condition implementation truly modular, the following changes would be required:
+
+1.  **Complete the Boundary Condition Classes:**
+    *   Flesh out the `DirichletBC.ts` and `NeumannBC.ts` classes, and create new classes for other boundary conditions like `RobinBC`.
+    *   Each class should extend `BaseBoundaryCondition.ts` and implement the necessary methods to provide its specific GLSL shader code, set any required uniforms, and handle any post-processing passes. The `getShaderCode()` method in each class would return the specific GLSL code for that boundary condition.
+
+2.  **Refactor the Shader Generation:**
+    *   Modify the `simulation_shaders.js` file to remove the hardcoded boundary condition logic from the main shader generation functions.
+    *   Instead, the main shader code should have a placeholder (e.g., a special comment or a function call) where the boundary condition shader code can be injected.
+
+3.  **Update the `WebGLSolver`:**
+    *   Modify the `WebGLSolver` to accept a `BaseBoundaryCondition` object as a parameter during initialization.
+    *   The `WebGLSolver` would then call the `getShaderCode()` method on the provided boundary condition object to get the appropriate GLSL code and inject it into the main shader before compilation.
+    *   The solver would also call the other methods on the boundary condition object (e.g., `applyBoundaries`, `applyPostPass`) at the appropriate times in the rendering loop.
+
+4.  **Update the `useWebGLSolver` Hook:**
+    *   In the `initSolver` function within `useWebGLSolver.ts`, you would instantiate the correct boundary condition class based on the user's selection (e.g., `new DirichletBC(params.dirichlet_value)`).
+    *   This boundary condition object would then be passed to the `WebGLSolver` during its initialization.
+
+By implementing these changes, you would decouple the `WebGLSolver` from the specific boundary condition implementations. This would allow you to add new boundary conditions simply by creating a new class, without needing to modify the core solver or shader logic, thus achieving true modularity.
+
+### Advisory notes and phased plan (GPT-5)
+
+- **Advisability**
+  - Proceed to a BC-class abstraction if adding more BCs soon (Periodic, Absorbing/Robin) or planning 2D; it decouples solvers from BC logic and scales better.
+  - If staying with Neumann + Dirichlet short term, current post-pass is simple and adequate; defer full modularity.
+
+- **Suitability**
+  - Fits the current architecture: solvers already generate shader source, and `useWebGLSolver()`/store carry BC params. A `BaseBoundaryCondition` that supplies GLSL snippets/uniforms/post-pass hooks integrates cleanly.
+
+- **Feasibility**
+  - Implement via a single sampling abstraction (e.g., `sampleWithBC(...)`) injected into `RDShaderTop/Main/Bot`, plus optional `applyPostPass()` for cases like Dirichlet clamp.
+  - Centralize texture creation/wrapping; standardize channel layout to avoid divergence across modules.
+  - Ensure uniform/program management handles runtime BC changes (recompile vs dynamic uniforms). Post-pass adds bandwidth but is fine for 1D.
+
+- **Immediate technical issues to address**
+  - Duplicate `createSolver` in `frontend/src/webgl/webgl-solver.js` — keep one.
+  - Texture format mismatch: `BaseSolver.createBoundaryTextures` uses `RG32F` while `WebGLSolver` uses `RGBA32F`. Choose one (consistent channel usage) and consolidate creation.
+  - `BaseSolver.createBoundaryTextures` is currently unused by `WebGLSolver` — either wire it in or remove it.
+  - Dirichlet enforcement is x-only — decide whether y-boundaries are required now.
+
+- **Pragmatic, staged recommendation**
+  1) Short term: keep post-pass Dirichlet; fix duplicate factory, standardize texture format/creation, and add y-boundary support if needed.
+  2) When adding more BCs/2D: introduce `BaseBoundaryCondition` interface with `getSamplingGLSL()`, `setUniforms()`, `applyPostPass()`; implement `Neumann` and `Dirichlet` first, then `Periodic`; inject `sampleWithBC` into shaders; construct BC class in `useWebGLSolver` and pass to `WebGLSolver`.
+
+- **Overall verdict**
+  - The modular BC system is suitable and feasible. Adopt it when expanding BC coverage or dimensionality; otherwise, the current solver-agnostic post-pass remains a solid minimal approach.
+
 ## Implementation Benefits
 
 1. **Solver-Agnostic Design**: BC enforcement works with any solver implementation
@@ -163,4 +213,32 @@ This ensures the solver actually renders its updated field before the Dirichlet 
 
 ## Conclusion
 
-Successfully implemented solver-agnostic Dirichlet boundary condition enforcement through a post-processing pass. Fixed the Forward Euler solver to properly render its updates before BC enforcement. Enhanced the plot visualization with solver and parameter information in the legend. This implementation provides a clean foundation for adding UI controls for boundary condition selection in the future.
+Successfully implemented solver-agnostic Dirichlet boundary condition enforcement through a post-processing pass. Fixed the Forward Euler solver to properly render its updates before BC enforcement. Enhanced the plot visualization with solver and parameter information in the legend. This implementation provides a clean foundation for adding UI controls for boundary condition selection in the future.## Related Work
+
+### C13: 1D Random Walk Implementation
+*Completed: 2025-08-27 14:08:14 IST by Gemini 2.5 (Pro + Flash)*
+
+Parallel development of dimensional physics simulation with boundary condition considerations:
+- Implemented 1D/2D dimensional abstraction in random walk physics
+- Added interparticle collision modeling for 1D systems
+- Created dimension-aware UI controls and parameter visibility
+- Enhanced density profiling with 1D-specific algorithms
+
+The 1D random walk implementation provides complementary insights for boundary condition physics, particularly for particle-based systems that may inform PDE boundary behavior in discrete-to-continuum limits.
+
+## Next Steps
+
+1. **Boundary Condition UI Selection System**
+   - Add dropdown/radio buttons for BC type selection in PdeParameterPanel.tsx
+   - Support Neumann (current), Dirichlet, Periodic, Absorbing boundary conditions
+   - Per-boundary control (left, right, top, bottom) for 2D systems
+
+2. **Additional Boundary Condition Types**
+   - Periodic boundary conditions with texture wrapping
+   - Absorbing boundary conditions for wave equations
+   - Mixed boundary conditions (different types on different boundaries)
+
+3. **Per-Equation Solver Selection**
+   - UI controls for selecting solver method per equation
+   - Validation of solver-equation compatibility
+   - Performance optimization for mixed solver scenarios

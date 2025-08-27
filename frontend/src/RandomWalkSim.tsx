@@ -192,6 +192,8 @@ export default function RandomWalkSim() {
       jumpLength: gridLayoutParams.jumpLength,
       velocity: gridLayoutParams.velocity,
       particleCount: gridLayoutParams.particles,
+      dimension: gridLayoutParams.dimension,
+      interparticleCollisions: gridLayoutParams.interparticleCollisions,
       strategy: gridLayoutParams.strategy,
       boundaryCondition: gridLayoutParams.boundaryCondition,
       canvasWidth,
@@ -273,6 +275,8 @@ export default function RandomWalkSim() {
         jumpLength: gridLayoutParams.jumpLength,
         velocity: gridLayoutParams.velocity,
         simulationType: gridLayoutParams.simulationType,
+        dimension: gridLayoutParams.dimension,
+        interparticleCollisions: gridLayoutParams.interparticleCollisions,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles,
@@ -399,6 +403,8 @@ export default function RandomWalkSim() {
         velocity: gridLayoutParams.velocity,
         particleCount: gridLayoutParams.particles,
         simulationType: gridLayoutParams.simulationType,
+        dimension: gridLayoutParams.dimension,
+        interparticleCollisions: gridLayoutParams.interparticleCollisions,
         strategy: gridLayoutParams.strategy,
         boundaryCondition: gridLayoutParams.boundaryCondition,
         graphType: gridLayoutParams.graphType,
@@ -626,6 +632,7 @@ export default function RandomWalkSim() {
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
               boundaryRect={boundaryRect || undefined}
+              dimension={gridLayoutParams.dimension}
             />
           </div>
 

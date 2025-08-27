@@ -164,6 +164,63 @@ export const RandomWalkParameterPanel = ({
             </label>
           </div>
 
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-2">
+              Dimension:
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="dimension"
+                  value="1D"
+                  checked={gridLayoutParams.dimension === "1D"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      dimension: e.target.value as "1D" | "2D",
+                    })
+                  }
+                  className="mr-2"
+                />
+                1D
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="dimension"
+                  value="2D"
+                  checked={gridLayoutParams.dimension === "2D"}
+                  onChange={(e) =>
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      dimension: e.target.value as "1D" | "2D",
+                    })
+                  }
+                  className="mr-2"
+                />
+                2D
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={gridLayoutParams.interparticleCollisions}
+                onChange={(e) =>
+                  setGridLayoutParams({
+                    ...gridLayoutParams,
+                    interparticleCollisions: e.target.checked,
+                  })
+                }
+                className="mr-2"
+              />
+              Interparticle Collisions
+            </label>
+          </div>
+
         
         {/* Initial Distribution (only for Continuum) - Collapsible */}
         {gridLayoutParams.simulationType === "continuum" && (
@@ -222,25 +279,27 @@ export const RandomWalkParameterPanel = ({
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs">σy (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distSigmaY}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distSigmaY: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
-                    </div>
+                    {gridLayoutParams.dimension === '2D' && (
+                      <div>
+                        <label className="block text-xs">σy (px)</label>
+                        <input
+                          type="number"
+                          value={gridLayoutParams.distSigmaY}
+                          onChange={(e) =>
+                            setGridLayoutParams({
+                              ...gridLayoutParams,
+                              distSigmaY: parseFloat(e.target.value),
+                            })
+                          }
+                          className="w-full border rounded px-2 py-1 text-sm"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {/* Ring params */}
-                {gridLayoutParams.initialDistType === 'ring' && (
+                {gridLayoutParams.initialDistType === 'ring' && gridLayoutParams.dimension === '2D' && (
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-xs">r₀ (px)</label>
@@ -308,34 +367,38 @@ export const RandomWalkParameterPanel = ({
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs">ny</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distNy}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distNy: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs">Jitter (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distJitter}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distJitter: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
-                    </div>
+                    {gridLayoutParams.dimension === '2D' && (
+                      <div>
+                        <label className="block text-xs">ny</label>
+                        <input
+                          type="number"
+                          value={gridLayoutParams.distNy}
+                          onChange={(e) =>
+                            setGridLayoutParams({
+                              ...gridLayoutParams,
+                              distNy: parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full border rounded px-2 py-1 text-sm"
+                        />
+                      </div>
+                    )}
+                    {gridLayoutParams.dimension === '2D' && (
+                      <div>
+                        <label className="block text-xs">Jitter (px)</label>
+                        <input
+                          type="number"
+                          value={gridLayoutParams.distJitter}
+                          onChange={(e) =>
+                            setGridLayoutParams({
+                              ...gridLayoutParams,
+                              distJitter: parseFloat(e.target.value),
+                            })
+                          }
+                          className="w-full border rounded px-2 py-1 text-sm"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

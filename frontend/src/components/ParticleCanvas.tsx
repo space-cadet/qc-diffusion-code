@@ -33,6 +33,7 @@ interface ParticleCanvasProps {
   particlesLoaded: (container: Container) => void;
   graphPhysicsRef: React.RefObject<PhysicsRandomWalk>;
   boundaryRect?: { x: number; y: number; w: number; h: number };
+  dimension: '1D' | '2D';
 }
 
 // Graph visualization subcomponent
@@ -138,12 +139,14 @@ const ParticleCanvasComponent: React.FC<{
   particlesLoaded: (container: Container) => void;
   tsParticlesContainerRef: React.RefObject<Container>;
   boundaryRect?: { x: number; y: number; w: number; h: number };
+  dimension: '1D' | '2D';
 }> = ({
   gridLayoutParams,
   simulationStatus,
   particlesLoaded,
   tsParticlesContainerRef,
   boundaryRect,
+  dimension,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isEngineReady, setIsEngineReady] = useState(false);
@@ -226,7 +229,7 @@ const ParticleCanvasComponent: React.FC<{
       for (let i = 0; i < targetCount; i++) {
         container.particles.addParticle({
           x: Math.random() * container.canvas.size.width,
-          y: Math.random() * container.canvas.size.height,
+          y: dimension === '1D' ? container.canvas.size.height / 2 : Math.random() * container.canvas.size.height,
         });
       }
 
@@ -344,6 +347,7 @@ export const ParticleCanvas = React.memo<ParticleCanvasProps>(({
   particlesLoaded,
   graphPhysicsRef,
   boundaryRect,
+  dimension,
 }) => {
   console.log("ParticleCanvas: Component rendering/re-rendering");
 
@@ -362,6 +366,7 @@ export const ParticleCanvas = React.memo<ParticleCanvasProps>(({
             particlesLoaded={particlesLoaded}
             tsParticlesContainerRef={tsParticlesContainerRef}
             boundaryRect={boundaryRect}
+            dimension={dimension}
           />
         ) : (
           <div className="w-full h-full relative min-h-0" id="sigma-container">

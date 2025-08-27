@@ -15,6 +15,7 @@ export interface Particle {
     vx: number;
     vy: number;
   };
+  radius?: number;
   lastCollisionTime: number;
   nextCollisionTime: number;
   collisionCount: number;
