@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 09:43:58 IST_
+_Last Updated: 2025-08-27 10:04:13 IST_
 
 ## Active Tasks
 
@@ -108,16 +108,16 @@ _Last Updated: 2025-08-27 09:43:58 IST_
 **Notes**: Version 1.0.0 released with comprehensive documentation, git tagging, and release preparation completed
 
 ### C2a: PDE Solver Methods and Boundary Conditions
-**Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-26 20:40:41 IST
-**Files**: `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/CrankNicolsonSolver.ts`, `frontend/src/webgl/solvers/LaxWendroffSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/webgl/webgl-solver.js`, `frontend/src/types.ts`
-**Notes**: BC architecture analysis completed - selected "Corrected GPT-5" shader-only approach with domain-level BCs for physics accuracy and KIRSS compliance, ready for implementation
+**Description**: Implement boundary condition infrastructure with Neumann/Dirichlet support and clean separation from solver logic
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 10:04:13 IST
+**Files**: `frontend/src/webgl/boundary-conditions/BaseBoundaryCondition.ts`, `frontend/src/webgl/boundary-conditions/DirichletBC.ts`, `frontend/src/webgl/boundary-conditions/NeumannBC.ts`, `frontend/src/types.ts`
+**Notes**: Safe BC components imported from boundary-conditions branch - abstract interface, type definitions, and placeholder implementations created without problematic shader integration
 
 ### C2b: PDE UI Implementation
-**Description**: Enhance PDE parameter panel with advanced solver controls and boundary condition selection
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 14:41:42 IST
-**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/ConservationDisplay.tsx`, `frontend/src/types.ts`
-**Notes**: Conservation panel enhancements completed - improved readability, added dt diagnostics and parameters sections with standardized formatting
+**Description**: Complete boundary conditions UI with parameter controls and plot annotations
+**Status**: ✅ COMPLETED **Last**: 2025-08-27 10:04:13 IST
+**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/types.ts`
+**Notes**: Boundary conditions UI fully implemented - dropdown selection, conditional Dirichlet value input, plot annotations showing current BC type and values
 
 ### C12: Interparticle Collisions and Obstacles Implementation
 **Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries

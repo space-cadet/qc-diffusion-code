@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { SimulationParams, SolverType } from './types';
+import type { SimulationParams, SolverType, BoundaryConditionType } from './types';
 import { useAppStore } from './stores/appStore';
 
 interface ControlsProps {
@@ -296,6 +296,34 @@ export default function Controls({ params, onChange }: ControlsProps) {
           </div>
         </div>
       )}
+
+      {/* Boundary Conditions */}
+      <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
+        <h3 className="text-sm font-semibold mb-3 text-gray-700">Boundary Conditions</h3>
+        <div>
+          <label className="block text-sm font-medium mb-1">Type</label>
+          <select
+            value={params.boundaryCondition ?? 'neumann'}
+            onChange={(e) => onChange({ ...params, boundaryCondition: e.target.value as BoundaryConditionType })}
+            className="w-full p-2 border border-gray-300 rounded text-sm"
+          >
+            <option value="neumann">Neumann (zero gradient)</option>
+            <option value="dirichlet">Dirichlet (fixed value)</option>
+          </select>
+        </div>
+        {params.boundaryCondition === 'dirichlet' && (
+          <div className="mt-3">
+            <label className="block text-sm font-medium mb-1">Boundary Value</label>
+            <input
+              type="number"
+              step="0.1"
+              value={params.dirichlet_value ?? 0.0}
+              onChange={(e) => onChange({ ...params, dirichlet_value: parseFloat(e.target.value) })}
+              className="w-full p-2 border border-gray-300 rounded text-sm"
+            />
+          </div>
+        )}
+      </div>
 
       {/* Initial Conditions (foldable) */}
       <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
