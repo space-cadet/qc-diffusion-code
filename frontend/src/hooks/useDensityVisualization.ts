@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 
 interface DensityData2D {
@@ -16,14 +16,14 @@ interface DensityData1D {
 
 export const useDensityVisualization = (
   simulatorRef: React.RefObject<RandomWalkSimulator>,
-  binSize: number = 20,
+  binSize?: number,
   dimension: '1D' | '2D' = '2D'
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
   const [densityData1D, setDensityData1D] = useState<DensityData1D | null>(null);
 
-  const drawDensityHeatmap = (data: DensityData2D) => {
+  const drawDensityHeatmap = useCallback((data: DensityData2D) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -81,9 +81,9 @@ export const useDensityVisualization = (
       ctx.lineTo(canvas.width, y * yScale);
       ctx.stroke();
     }
-  };
+  }, []);
 
-  const drawDensity1D = (data: DensityData1D) => {
+  const drawDensity1D = useCallback((data: DensityData1D) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -102,37 +102,49 @@ export const useDensityVisualization = (
     
     if (maxDensity === 0) return;
 
-    // Draw line chart
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height - (density[0] / maxDensity) * canvas.height);
+    const barWidth = canvas.width / density.length;
+    const barSpacing = Math.max(1, barWidth * 0.1); // 10% spacing
+    const actualBarWidth = barWidth - barSpacing;
 
-    for (let x = 1; x < density.length; x++) {
-      const y = canvas.height - (density[x] / maxDensity) * canvas.height;
-      ctx.lineTo(x * (canvas.width / density.length), y);
+    // Draw histogram bars
+    for (let i = 0; i < density.length; i++) {
+      const barHeight = (density[i] / maxDensity) * canvas.height * 0.85;
+      const x = i * barWidth + barSpacing / 2;
+      const y = canvas.height - barHeight;
+
+      // Create gradient for each bar
+      const gradient = ctx.createLinearGradient(0, y, 0, canvas.height);
+      gradient.addColorStop(0, '#f59e0b'); // Orange top
+      gradient.addColorStop(1, '#d97706'); // Darker orange bottom
+
+      // Draw bar
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x, y, actualBarWidth, barHeight);
+
+      // Draw bar border
+      ctx.strokeStyle = '#92400e';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(x, y, actualBarWidth, barHeight);
     }
+  }, []);
 
-    ctx.stroke();
-  };
-
-  const updateDensity = () => {
+  const updateDensity = useCallback(() => {
     if (!simulatorRef.current) return;
     
     if (dimension === '1D') {
-      const data = simulatorRef.current.getDensityProfile1D(binSize);
+      const data = simulatorRef.current.getDensityProfile1D(binSize || 20);
       setDensityData1D(data);
       drawDensity1D(data);
     } else {
-      const data = simulatorRef.current.getDensityProfile2D(binSize);
+      const data = simulatorRef.current.getDensityProfile2D(binSize || 20);
       setDensityData2D(data);
       drawDensityHeatmap(data);
     }
-  };
+  }, [simulatorRef, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
 
   useEffect(() => {
     updateDensity();
-  }, [binSize]);
+  }, [binSize, dimension]);
 
   return {
     canvasRef,

@@ -22,7 +22,7 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     setRandomWalkUIState 
   } = useAppStore();
   
-  const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(simulatorRef, 15, gridLayoutParams.dimension);
+  const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(simulatorRef, undefined, gridLayoutParams.dimension);
   const [recordHistory, setRecordHistory] = useState(false);
   const [waveFrontAnalysis, setWaveFrontAnalysis] = useState({ measuredSpeed: 0, theoreticalSpeed: 0, error: 0 });
 
@@ -69,6 +69,11 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
 
     return () => clearInterval(interval);
   }, [randomWalkUIState.densityAutoUpdate, recordHistory, updateDensity]);
+
+  // Redraw when dimension changes
+  useEffect(() => {
+    updateDensity();
+  }, [gridLayoutParams.dimension]);
 
   return (
     <div className="bg-white border rounded-lg p-4 h-full flex flex-col">

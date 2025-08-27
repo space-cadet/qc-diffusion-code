@@ -257,7 +257,11 @@ export class RandomWalkSimulator {
       });
     }
     
+    // Check if dimension changed
+    const dimensionChanged = this.dimension !== params.dimension;
+    
     this.strategy = newStrategy;
+    this.dimension = params.dimension;
     this.particleManager.updatePhysicsEngine(newStrategy);
     // Update canvas size if provided so future initializations/mappings are correct
     if (params.canvasWidth && params.canvasHeight) {
@@ -276,10 +280,10 @@ export class RandomWalkSimulator {
     if (params.distNy !== undefined) this.distNy = params.distNy;
     if (params.distJitter !== undefined) this.distJitter = params.distJitter;
     
-    // Update particle count if changed
-    if (this.particleCount !== params.particleCount) {
+    // Update particle count if changed or reinitialize if dimension changed
+    if (this.particleCount !== params.particleCount || dimensionChanged) {
       this.particleCount = params.particleCount;
-      this.initializeParticles(); // Re-initialize with new count
+      this.initializeParticles(); // Re-initialize with new count or dimension
     }
   }
 
@@ -379,16 +383,24 @@ export class RandomWalkSimulator {
     // Calculate bounds
     const xMin = Math.min(...positions.map(p => p.x));
     const xMax = Math.max(...positions.map(p => p.x));
+    const spatialRange = xMax - xMin;
     
-    // Calculate grid dimensions
-    const xBins = Math.ceil((xMax - xMin) / binSize) + 1;
+    // Adaptive bin count based on particle count (smooth scaling)
+    // Use square root scaling with a reasonable range: 15-60 bins
+    const minBins = 15;
+    const maxBins = 60;
+    const optimalBins = Math.sqrt(this.particleCount) * 1.5;
+    const xBins = Math.max(minBins, Math.min(maxBins, Math.round(optimalBins)));
+    
+    // Calculate effective bin size from adaptive bin count
+    const effectiveBinSize = spatialRange / xBins;
     
     // Initialize 1D density array
     const density: number[] = Array(xBins).fill(0);
     
     // Bin particles
     positions.forEach(pos => {
-      const xBin = Math.floor((pos.x - xMin) / binSize);
+      const xBin = Math.floor((pos.x - xMin) / effectiveBinSize);
       
       if (xBin >= 0 && xBin < xBins) {
         density[xBin]++;
@@ -396,13 +408,12 @@ export class RandomWalkSimulator {
     });
     
     // Normalize by bin area and total particles
-    const binArea = binSize;
-    const normalizedDensity = density.map(count => count / (this.particleCount * binArea));
+    const normalizedDensity = density.map(count => count / (this.particleCount * effectiveBinSize));
     
     return {
       density: normalizedDensity,
       xBounds: { min: xMin, max: xMax },
-      binSize
+      binSize: effectiveBinSize
     };
   }
 
