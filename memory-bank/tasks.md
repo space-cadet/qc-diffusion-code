@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-26 20:40:41 IST_
+_Last Updated: 2025-08-27 09:43:58 IST_
 
 ## Active Tasks
 
@@ -22,6 +22,7 @@ _Last Updated: 2025-08-26 20:40:41 IST_
 | C10 | GitHub App Release v1.0.0                            | ✅ COMPLETED   | HIGH     | 2025-08-24 | C9, C5b, C8     |
 | C2a | PDE Solver Methods and Boundary Conditions           | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C2              |
 | C2b | PDE UI Implementation                                 | 🔄 IN PROGRESS | MEDIUM   | 2025-08-25 | C2, C2a         |
+| C12 | Interparticle Collisions and Obstacles Implementation | 🔄 IN PROGRESS | HIGH     | 2025-08-27 | C5c             |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 
 ## Task Details
@@ -117,6 +118,12 @@ _Last Updated: 2025-08-26 20:40:41 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 14:41:42 IST
 **Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/ConservationDisplay.tsx`, `frontend/src/types.ts`
 **Notes**: Conservation panel enhancements completed - improved readability, added dt diagnostics and parameters sections with standardized formatting
+
+### C12: Interparticle Collisions and Obstacles Implementation
+**Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 09:43:58 IST
+**Files**: `frontend/src/physics/strategies/`, `memory-bank/implementation-details/interparticle-collision-plan.md`
+**Notes**: Implementation plan completed - Matter.js recommended for initial phase, Rapier.js for performance upgrade, both have excellent built-in obstacle support
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency
