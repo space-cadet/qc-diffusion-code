@@ -3,6 +3,9 @@ import type { BoundaryConfig } from './types/BoundaryConfig';
 import { ParticleManager } from './ParticleManager';
 import { CTRWStrategy1D } from './strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from './strategies/CTRWStrategy2D';
+import { BallisticStrategy } from './strategies/BallisticStrategy';
+import { CompositeStrategy } from './strategies/CompositeStrategy';
+import { InterparticleCollisionStrategy } from './strategies/InterparticleCollisionStrategy';
 import { ObservableManager } from './ObservableManager';
 import type { Observable } from './interfaces/Observable';
 
@@ -16,7 +19,7 @@ interface SimulatorParams {
   simulationType?: string;
   graphType?: string;
   graphSize?: number;
-  strategy?: string;
+  strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
   boundaryCondition?: string;
   canvasWidth?: number;
   canvasHeight?: number;
@@ -59,23 +62,7 @@ export class RandomWalkSimulator {
   constructor(params: SimulatorParams) {
     this.dimension = params.dimension;
     const boundaryConfig = this.createBoundaryConfig(params);
-    
-    if (params.dimension === '1D') {
-      this.strategy = new CTRWStrategy1D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-        interparticleCollisions: params.interparticleCollisions,
-      });
-    } else {
-      this.strategy = new CTRWStrategy2D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-      });
-    }
+    this.strategy = this.createStrategy(params, boundaryConfig);
     
     this.particleManager = new ParticleManager(this.strategy, params.dimension);
     this.particleCount = params.particleCount;
@@ -108,6 +95,41 @@ export class RandomWalkSimulator {
       yMin: -200,
       yMax: 200
     };
+  }
+
+  private createStrategy(params: SimulatorParams, boundaryConfig: BoundaryConfig): RandomWalkStrategy {
+    const strategies: RandomWalkStrategy[] = [];
+    const selectedStrategies = params.strategies || [];
+
+    // For 1D, handle legacy interparticleCollisions parameter
+    if (params.dimension === '1D') {
+      return new CTRWStrategy1D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+        interparticleCollisions: params.interparticleCollisions || selectedStrategies.includes('collisions'),
+      });
+    }
+
+    // For 2D, always start with ballistic motion as base
+    strategies.push(new BallisticStrategy({ boundaryConfig }));
+
+    // Add selected strategies on top of ballistic motion
+    if (selectedStrategies.includes('ctrw')) {
+      strategies.push(new CTRWStrategy2D({
+        collisionRate: params.collisionRate,
+        jumpLength: params.jumpLength,
+        velocity: params.velocity,
+        boundaryConfig,
+      }));
+    }
+
+    if (selectedStrategies.includes('collisions')) {
+      strategies.push(new InterparticleCollisionStrategy({ boundaryConfig }));
+    }
+
+    return strategies.length === 1 ? strategies[0] : new CompositeStrategy(strategies);
   }
 
   private sampleCanvasPosition(i: number): { x: number; y: number } {
@@ -238,24 +260,7 @@ export class RandomWalkSimulator {
 
   updateParameters(params: SimulatorParams): void {
     const boundaryConfig = this.createBoundaryConfig(params);
-    let newStrategy: RandomWalkStrategy;
-
-    if (params.dimension === '1D') {
-      newStrategy = new CTRWStrategy1D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-        interparticleCollisions: params.interparticleCollisions,
-      });
-    } else {
-      newStrategy = new CTRWStrategy2D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-      });
-    }
+    const newStrategy = this.createStrategy(params, boundaryConfig);
     
     // Check if dimension changed
     const dimensionChanged = this.dimension !== params.dimension;

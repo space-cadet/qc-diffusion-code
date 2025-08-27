@@ -1,7 +1,25 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 23:15:00 IST_
+_Last Updated: 2025-08-28 00:14:17 IST_
+
+### 2025-08-28
+
+#### 00:14 - C14: Composite Strategy Framework Implementation
+- Created `frontend/src/physics/strategies/BallisticStrategy.ts` - Default ballistic motion physics with boundary conditions and trajectory recording
+- Created `frontend/src/physics/strategies/CompositeStrategy.ts` - Strategy combiner for multiple simultaneous physics strategies
+- Created `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - 2D elastic collision physics with momentum conservation and particle separation
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Removed ballistic motion to prevent double application, focused on collision events only
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added BallisticStrategy import, updated createStrategy method to always include ballistic motion as base
+- Updated `frontend/src/types/simulationTypes.ts` - Changed strategy field from single string to strategies array for multi-select support
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Replaced radio buttons with checkboxes for multi-select strategy interface, removed redundant interparticle collisions checkbox
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Added strategy annotation showing active physics strategies in top-right corner
+- Created `memory-bank/tasks/C13.md` - Complete task documentation for composite strategy framework with completion criteria and technical details
+- Updated `memory-bank/tasks/C12.md` - Added composite strategy foundation progress
+- Updated `memory-bank/tasks.md` - Added C13 to completed tasks, renamed C13→C14 for 1D random walk task
+- Updated `memory-bank/implementation-details/interparticle-collision-plan.md` - Added implementation status update with completed collision strategy
+- Updated `memory-bank/sessions/2025-08-27-night.md` - Extended session with C13 framework implementation details
+- Updated `memory-bank/session_cache.md` - Changed focus task to C13, updated task counts and session history
 
 ### 2025-08-27
 

@@ -38,6 +38,10 @@ export const RandomWalkParameterPanel = ({
   // Derived values and helpers for Particles control (kept outside JSX to reduce cognitive load)
   const minP = useMemo(() => gridLayoutParams.minParticles ?? 0, [gridLayoutParams.minParticles]);
   const maxP = useMemo(() => gridLayoutParams.maxParticles ?? 2000, [gridLayoutParams.maxParticles]);
+
+  const typeGuard = (s: string): s is 'ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions' => 
+    ['ctrw', 'simple', 'levy', 'fractional', 'collisions'].includes(s);
+
   return (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
@@ -209,22 +213,7 @@ export const RandomWalkParameterPanel = ({
             </div>
           </div>
 
-          <div className="mt-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={gridLayoutParams.interparticleCollisions}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    interparticleCollisions: e.target.checked,
-                  })
-                }
-                className="mr-2"
-              />
-              Interparticle Collisions
-            </label>
-          </div>
+
 
         
         {/* Initial Distribution (only for Continuum) - Collapsible */}
@@ -433,64 +422,90 @@ export const RandomWalkParameterPanel = ({
             <div className="space-y-2 ml-2">
               <label className="flex items-center">
                 <input
-                  type="radio"
-                  name="strategy"
-                  value="ctrw"
-                  checked={gridLayoutParams.strategy === "ctrw"}
-                  onChange={(e) =>
+                  type="checkbox"
+                  checked={gridLayoutParams.strategies?.includes("ctrw") || false}
+                  onChange={(e) => {
+                    const strategies = gridLayoutParams.strategies || [];
+                    const newStrategies = e.target.checked
+                      ? [...strategies.filter(s => s !== "ctrw"), "ctrw" as const]
+                      : strategies.filter(s => s !== "ctrw");
                     setGridLayoutParams({
                       ...gridLayoutParams,
-                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                    })
-                  }
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                    });
+                  }}
                   className="mr-2"
                 />
                 CTRW (Continuous Time Random Walk)
               </label>
               <label className="flex items-center">
                 <input
-                  type="radio"
-                  name="strategy"
-                  value="simple"
-                  checked={gridLayoutParams.strategy === "simple"}
-                  onChange={(e) =>
+                  type="checkbox"
+                  checked={gridLayoutParams.strategies?.includes("collisions") || false}
+                  onChange={(e) => {
+                    const strategies = gridLayoutParams.strategies || [];
+                    const newStrategies = e.target.checked
+                      ? [...strategies.filter(s => s !== "collisions"), "collisions" as const]
+                      : strategies.filter(s => s !== "collisions");
                     setGridLayoutParams({
                       ...gridLayoutParams,
-                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                    })
-                  }
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                    });
+                  }}
+                  className="mr-2"
+                />
+                Interparticle Collisions
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={gridLayoutParams.strategies?.includes("simple") || false}
+                  onChange={(e) => {
+                    const strategies = gridLayoutParams.strategies || [];
+                    const newStrategies = e.target.checked
+                      ? [...strategies.filter(s => s !== "simple"), "simple" as const]
+                      : strategies.filter(s => s !== "simple");
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                    });
+                  }}
                   className="mr-2"
                 />
                 Simple Random Walk
               </label>
               <label className="flex items-center">
                 <input
-                  type="radio"
-                  name="strategy"
-                  value="levy"
-                  checked={gridLayoutParams.strategy === "levy"}
-                  onChange={(e) =>
+                  type="checkbox"
+                  checked={gridLayoutParams.strategies?.includes("levy") || false}
+                  onChange={(e) => {
+                    const strategies = gridLayoutParams.strategies || [];
+                    const newStrategies = e.target.checked
+                      ? [...strategies.filter(s => s !== "levy"), "levy" as const]
+                      : strategies.filter(s => s !== "levy");
                     setGridLayoutParams({
                       ...gridLayoutParams,
-                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                    })
-                  }
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                    });
+                  }}
                   className="mr-2"
                 />
                 Lévy Flight
               </label>
               <label className="flex items-center">
                 <input
-                  type="radio"
-                  name="strategy"
-                  value="fractional"
-                  checked={gridLayoutParams.strategy === "fractional"}
-                  onChange={(e) =>
+                  type="checkbox"
+                  checked={gridLayoutParams.strategies?.includes("fractional") || false}
+                  onChange={(e) => {
+                    const strategies = gridLayoutParams.strategies || [];
+                    const newStrategies = e.target.checked
+                      ? [...strategies.filter(s => s !== "fractional"), "fractional" as const]
+                      : strategies.filter(s => s !== "fractional");
                     setGridLayoutParams({
                       ...gridLayoutParams,
-                      strategy: e.target.value as "ctrw" | "simple" | "levy" | "fractional",
-                    })
-                  }
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                    });
+                  }}
                   className="mr-2"
                 />
                 Fractional Brownian Motion
@@ -707,7 +722,7 @@ export const RandomWalkParameterPanel = ({
                 </label>
                 <input
                   type="range"
-                  min="0.1"
+                  min="0.0"
                   max="10.0"
                   step="any"
                   value={gridLayoutParams.collisionRate}

@@ -1,20 +1,52 @@
 # Inter-Particle Collision Implementation Plan
 
 *Created: 2025-08-27 09:34:31 IST*
-*Last Updated: 2025-08-27 09:43:58 IST*
+*Last Updated: 2025-08-28 00:14:17 IST*
 
 ## Current State Analysis
 
-**Existing System**: Continuous Time Random Walk (CTRW) with background scatterers
+**Updated System Status (2025-08-28)**: Composite Strategy Framework implemented
+- **Completed**: Basic interparticle collision strategy within composite framework
+- **Architecture**: Ballistic motion as default, with optional CTRW and collision strategies
+- **Implementation**: 2D elastic collisions with momentum conservation and particle separation
+- **Integration**: Strategy selection via checkbox UI with real-time canvas annotations
+
+**Previous System**: Continuous Time Random Walk (CTRW) with background scatterers
 - Each particle collides with invisible medium at fixed `collisionRate`
 - Random directional scattering: `newDirection = Math.random() * 2 * Math.PI`
 - No inter-particle interactions - particles are independent
 - Physics valid for dilute systems only
 
-**Limitations**: 
+**Previous Limitations**: 
 - High density regions show unrealistic behavior
 - No momentum/energy conservation between particles
 - Collision rate independent of local particle density
+
+## Implementation Status Update
+
+### Phase 1: Basic Collision Strategy ✅ COMPLETED
+- **InterparticleCollisionStrategy**: 2D elastic collision physics with momentum conservation
+- **BallisticStrategy**: Default straight-line motion with boundary conditions
+- **CompositeStrategy**: Framework for combining multiple physics strategies
+- **UI Integration**: Multi-select checkbox interface for strategy selection
+- **Canvas Annotations**: Real-time display of active strategies
+
+### Current Collision Implementation
+```typescript
+private elasticCollision2D(v1x: number, v1y: number, v2x: number, v2y: number, m1: number, m2: number): [number, number, number, number] {
+  const totalMass = m1 + m2;
+  const newV1x = ((m1 - m2) * v1x + 2 * m2 * v2x) / totalMass;
+  const newV1y = ((m1 - m2) * v1y + 2 * m2 * v2y) / totalMass;
+  const newV2x = ((m2 - m1) * v2x + 2 * m1 * v1x) / totalMass;
+  const newV2y = ((m2 - m1) * v2y + 2 * m1 * v1y) / totalMass;
+  return [newV1x, newV1y, newV2x, newV2y];
+}
+```
+
+### Next Phase Goals
+- **Debugging**: Strategy effectiveness issues in 2D simulations
+- **Matter.js Integration**: Replace basic collision detection with physics engine
+- **Obstacle System**: Add arbitrary obstacle creation and management
 
 ## Implementation Options
 

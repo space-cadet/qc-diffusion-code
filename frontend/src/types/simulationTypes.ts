@@ -20,7 +20,7 @@ export interface RandomWalkParams {
   isPeriodic: boolean;
   showEdgeWeights: boolean;
   showAnimation: boolean;
-  strategy: 'ctrw' | 'simple' | 'levy' | 'fractional';
+  strategies: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
   boundaryCondition: 'periodic' | 'reflective' | 'absorbing';
   initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
   distSigmaX: number;

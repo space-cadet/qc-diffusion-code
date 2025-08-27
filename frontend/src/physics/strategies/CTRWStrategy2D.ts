@@ -34,35 +34,21 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
     };
   }
 
-  updateParticle(particle: Particle): void {
-    const step = this.calculateStep(particle);
-    particle.position.x += step.dx;
-    if (step.dy) particle.position.y += step.dy;
+  updateParticle(particle: Particle, allParticles: Particle[]): void {
+    const collision = this.handleCollision(particle);
     
-    // Apply boundary conditions
-    const boundaryResult = this.applyBoundaryCondition(particle);
-    particle.position = boundaryResult.position;
-    if (boundaryResult.velocity) {
-      particle.velocity = boundaryResult.velocity;
-    }
-    if (boundaryResult.absorbed) {
-      particle.isActive = false;
-    }
-    
-    // Record trajectory point for every update
-    particle.trajectory.push({
-      position: { ...particle.position },
-      timestamp: step.timestamp
-    });
-    
-    if (step.collision?.occurred) {
-      if (step.collision.newVelocity) {
-        particle.velocity = step.collision.newVelocity;
-      }
-      particle.lastCollisionTime = step.collision.timestamp;
-      particle.nextCollisionTime = step.collision.timestamp + step.collision.waitTime;
+    if (collision.occurred && collision.newVelocity) {
+      particle.velocity = collision.newVelocity;
+      particle.lastCollisionTime = collision.timestamp;
+      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
       particle.collisionCount++;
     }
+    
+    // Record trajectory point
+    particle.trajectory.push({
+      position: { ...particle.position },
+      timestamp: Date.now() / 1000
+    });
   }
 
   private applyBoundaryCondition(particle: Particle) {

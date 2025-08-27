@@ -167,7 +167,7 @@ export const useAppStore = create<AppState>()(
         simulationType: 'continuum',
         dimension: '2D',
         interparticleCollisions: false,
-        strategy: 'ctrw',
+        strategies: ['ctrw'],
         boundaryCondition: 'periodic',
         graphType: 'lattice1D',
         graphSize: 20,
