@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-25 03:08:37 IST_
+_Last Updated: 2025-08-27 23:15:00 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -206,6 +206,15 @@ This task implements the complete UI framework for the random walk simulation ba
 - Event handlers explicitly typed as `React.ChangeEvent<HTMLInputElement>`
 
 **Final Status**: COMPLETED with comprehensive performance optimization, CPU usage elimination, and floating observables panel
+
+**Log-Scale Particle Slider Enhancement (2025-08-27)**:
+
+- ✅ **Logarithmic Scale Option**: Added toggle for log-scale particle count slider to improve usability across wide ranges (0-2000)
+- ✅ **Synchronized Numeric Input**: Added direct number input field next to slider for precise value entry
+- ✅ **Reusable Component**: Created generic LogNumberSlider component in common/ directory for any parameter needing log scale
+- ✅ **State Persistence**: Added particlesLogScale flag to randomWalkUIState with persistence across page reloads
+- ✅ **Edge Case Handling**: Added safety guard in RandomWalkSimulator.getDensityField() for zero particles
+- ✅ **Performance Optimization**: Used React hooks (useMemo, useCallback) to prevent unnecessary recalculations
 
 **PDE UI Enhancements (2025-08-25)**:
 

@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-25 03:08:37 IST*
+*Last Updated: 2025-08-27 23:15:00 IST*
 
 ## Overview
 
@@ -448,6 +448,8 @@ UI implementation completed with comprehensive performance optimization:
 - **Store Consolidation**: Updated appStore.ts to use unified RandomWalkParams type with solver defaults
 - **Parameter Visibility Fix**: Removed equation selection dependency for parameter visibility in PDE controls
 - **Range Input Enhancement**: Changed step values from fixed to "any" for smoother parameter adjustment
+- **Log-Scale Particle Slider**: Added logarithmic scale option for particle count slider with synchronized numeric input
+- **Reusable UI Component**: Created generic LogNumberSlider component for any numeric parameter requiring log scale
 
 ## Success Criteria
 
@@ -457,3 +459,50 @@ UI implementation completed with comprehensive performance optimization:
 4. **Data Accessibility**: Easy export for further analysis
 5. ✅ **Session Continuity**: Reliable save/load functionality
 6. **Cross-platform**: Works on desktop and mobile browsers
+
+## Enhanced UI Components (2025-08-27)
+
+### Log-Scale Particle Slider
+
+- **Purpose**: Improve usability when adjusting particle counts across wide ranges (0-2000)
+- **Implementation**: Created reusable LogNumberSlider component with toggle between linear and logarithmic scales
+- **Features**:
+  - Log/linear toggle with persistent preference
+  - Direct numeric input field synchronized with slider
+  - Logarithmic mapping: slider position s → particles = round(10^s - 1)
+  - Linear mapping when log scale disabled
+  - Automatic clamping to min/max bounds
+  - Proper handling of edge cases (zero particles)
+
+### LogNumberSlider Component
+
+- **Location**: `frontend/src/components/common/LogNumberSlider.tsx`
+- **Props API**:
+  - `value`: number - Current value (source of truth)
+  - `onChange`: (v: number) => void - Value change handler
+  - `min`: number - Minimum allowed value
+  - `max`: number - Maximum allowed value
+  - `label?`: string - Optional label text
+  - `logScale?`: boolean - Controlled log scale state
+  - `onToggleLogScale?`: (v: boolean) => void - Log scale toggle handler
+  - `defaultLogScale?`: boolean - Default for uncontrolled mode
+  - `showNumberInput?`: boolean - Show/hide numeric input (default: true)
+  - Additional formatting and styling props
+
+### Integration
+
+- **Current Usage**: Particles slider in RandomWalkParameterPanel
+- **State Management**: Log scale preference stored in randomWalkUIState.particlesLogScale
+- **Persistence**: Log scale preference persists across page reloads via Zustand store
+- **Future Applications**: Can be applied to other numeric sliders (collision rate, velocity, jump length)
+
+### Technical Implementation
+
+- **Mapping Functions**:
+  - Linear → Log: `toLog = (p) => Math.log10((p ?? 0) + 1)`
+  - Log → Linear: `fromLog = (s) => Math.round(Math.pow(10, s) - 1)`
+- **Edge Case Handling**:
+  - Zero particles supported with "+1" offset in logarithm
+  - NaN/invalid inputs clamped to valid range
+  - Disabled when min ≥ max
+- **Performance**: Optimized with React hooks (useMemo, useCallback) to prevent unnecessary recalculations

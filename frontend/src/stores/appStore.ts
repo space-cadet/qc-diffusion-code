@@ -9,6 +9,8 @@ interface RandomWalkUIState {
   isBoundaryOpen: boolean
   isParametersOpen: boolean
   isDistributionOpen: boolean
+  // UI option: use log scale for particles slider
+  particlesLogScale: boolean
   // Observables Panel
   isObservablesExpanded: boolean
   showParticleCount: boolean
@@ -157,6 +159,8 @@ export const useAppStore = create<AppState>()(
       },
       gridLayoutParams: {
         particles: 1000,
+        minParticles: 0,
+        maxParticles: 2000,
         collisionRate: 2.5,
         jumpLength: 0.1,
         velocity: 1.0,
@@ -197,6 +201,7 @@ export const useAppStore = create<AppState>()(
         isBoundaryOpen: false,
         isParametersOpen: true,
         isDistributionOpen: false,
+        particlesLogScale: true,
         // Observables Panel
         isObservablesExpanded: true,
         showParticleCount: false,
@@ -260,6 +265,24 @@ export const useAppStore = create<AppState>()(
     }),
     { 
       name: 'qc-diffusion-app-state',
+      version: 1,
+      migrate: (state: any, version) => {
+        if (!state) return state;
+        const glp = state.gridLayoutParams || {};
+        if (glp.minParticles === undefined) glp.minParticles = 0;
+        if (glp.maxParticles === undefined) glp.maxParticles = 2000;
+        const ui = state.randomWalkUIState || {};
+        if (ui.particlesLogScale === undefined) ui.particlesLogScale = true;
+        return {
+          ...state,
+          gridLayoutParams: {
+            ...glp,
+          },
+          randomWalkUIState: {
+            ...ui,
+          },
+        };
+      },
       // Persist everything except runtime state
       partialize: (state) => ({
         activeTab: state.activeTab,

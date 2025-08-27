@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
+import { LogNumberSlider } from './common/LogNumberSlider';
 
 import type { SimulationState } from '../types/simulation';
 import type { RandomWalkParams } from '../types/simulationTypes';
@@ -33,6 +34,10 @@ export const RandomWalkParameterPanel = ({
   const updateUIState = (updates: Partial<typeof randomWalkUIState>) => {
     setRandomWalkUIState({ ...randomWalkUIState, ...updates });
   };
+
+  // Derived values and helpers for Particles control (kept outside JSX to reduce cognitive load)
+  const minP = useMemo(() => gridLayoutParams.minParticles ?? 0, [gridLayoutParams.minParticles]);
+  const maxP = useMemo(() => gridLayoutParams.maxParticles ?? 2000, [gridLayoutParams.maxParticles]);
   return (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
@@ -683,26 +688,16 @@ export const RandomWalkParameterPanel = ({
             <div className="space-y-4 ml-2">
               {/* Particle Count */}
               <div>
-                <label className="block text-sm font-medium mb-2">Particles:</label>
-                <input
-                  type="range"
-                  min="50"
-                  max="2000"
-                  step="1"
+                <LogNumberSlider
+                  label="Particles"
                   value={gridLayoutParams.particles}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      particles: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full"
+                  onChange={(v) => setGridLayoutParams({ ...gridLayoutParams, particles: v })}
+                  min={minP}
+                  max={maxP}
+                  logScale={randomWalkUIState.particlesLogScale}
+                  onToggleLogScale={(b) => updateUIState({ particlesLogScale: b })}
+                  defaultLogScale
                 />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>50</span>
-                  <span className="font-medium">{gridLayoutParams.particles}</span>
-                  <span>2000</span>
-                </div>
               </div>
 
               {/* Collision Rate */}
@@ -766,7 +761,7 @@ export const RandomWalkParameterPanel = ({
                 </label>
                 <input
                   type="range"
-                  min="0.1"
+                  min="0.001"
                   max="5.0"
                   step="any"
                   value={gridLayoutParams.velocity}

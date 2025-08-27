@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 15:03:12 IST_
+_Last Updated: 2025-08-27 23:15:00 IST_
 
 ### 2025-08-27
+
+#### 23:15 - C5b: Log-Scale Particle Slider Implementation
+- Created `frontend/src/components/common/LogNumberSlider.tsx` - Reusable slider component with logarithmic scale toggle, synchronized numeric input, internal clamping, and flexible props API
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Refactored particles slider to use LogNumberSlider component, removed redundant clamping and log mapping helpers
+- Updated `frontend/src/stores/appStore.ts` - Added particlesLogScale boolean flag to RandomWalkUIState with default true and migration for persisted state
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - added check for the case when particle number is 0.
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Added comprehensive documentation of log-scale slider implementation and component API
+- Updated `memory-bank/tasks/C5b.md` - Added log-scale particle slider enhancement section with implementation details
+- Updated `memory-bank/session_cache.md` - Changed focus task to log-scale slider implementation, updated session history
+- Created `memory-bank/sessions/2025-08-27-night.md` - New session documentation for log-scale slider implementation
+- Updated `memory-bank/edit_history.md` - Added log-scale slider implementation entries
 
 #### 15:03 - C13: 1D Random Walk Implementation - Density Visualization Fixes
 - Updated `frontend/src/hooks/useDensityVisualization.ts` - Replaced jagged 1D line chart with professional histogram bars featuring gradient fills, spacing, and particle-count-dependent scaling; added useCallback optimization to prevent infinite re-renders

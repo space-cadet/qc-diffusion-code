@@ -289,6 +289,9 @@ export class RandomWalkSimulator {
 
   getDensityField() {
     const particles = this.particleManager.getAllParticles();
+    if (particles.length === 0 || this.particleCount <= 0) {
+      return { error: 0, rho: [] as number[] };
+    }
     const positions = particles.map(p => p.position);
     const dx = 0.1;
     const xMin = Math.min(...positions.map(p => p.x)) - dx;

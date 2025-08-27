@@ -13,6 +13,8 @@ export interface RandomWalkParams {
   jumpLength: number;
   velocity: number;
   particles: number;
+  maxParticles: number;
+  minParticles: number;
   graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
   graphSize: number;
   isPeriodic: boolean;
