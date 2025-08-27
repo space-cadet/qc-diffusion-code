@@ -1,7 +1,21 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 10:04:13 IST_
+_Last Updated: 2025-08-27 11:57:06 IST_
+
+### 2025-08-27
+
+#### 11:57 - C2a/C2b: Dirichlet Boundary Conditions Implementation
+- Updated `frontend/src/PlotComponent.tsx` - Enhanced plot legend with solver name and parameters for each equation
+- Updated `frontend/src/hooks/useWebGLSolver.ts` - Passed boundary condition parameters through hook to WebGLSolver
+- Updated `frontend/src/stores/appStore.ts` - Added state management for boundary condition type and Dirichlet value
+- Updated `frontend/src/webgl/solvers/BaseSolver.ts` - Updated texture wrapping mode selection based on boundary condition type
+- Updated `frontend/src/webgl/solvers/ForwardEulerSolver.ts` - Fixed missing gl.drawArrays call for proper rendering
+- Updated `frontend/src/webgl/webgl-solver.d.ts` - Updated WebGLSolver.init method signature with BC parameters
+- Updated `frontend/src/webgl/webgl-solver.js` - Implemented solver-agnostic Dirichlet BC enforcement via post-processing
+- Created `memory-bank/active_context.md` - New active context file with current focus and next steps
+- Updated `memory-bank/session_cache.md` - Updated C2b status to in-progress
+- Updated `memory-bank/sessions/2025-08-27-morning.md` - Updated with Dirichlet BC implementation details
 
 ### 2025-08-27
 

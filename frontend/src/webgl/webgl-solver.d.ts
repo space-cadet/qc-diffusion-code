@@ -1,4 +1,5 @@
 // webgl-solver.d.ts - TypeScript declarations for WebGL solver
+import type { BoundaryConditionType } from '../types';
 
 export interface PlotData {
   x: number[];
@@ -16,7 +17,7 @@ export interface SolverParameters {
 export declare class WebGLSolver {
   constructor(canvas: HTMLCanvasElement);
   
-  init(width: number, height: number): void;
+  init(width: number, height: number, bcType?: BoundaryConditionType, dirichletValue?: number): void;
   
   setupEquation(
     equationType: 'telegraph' | 'diffusion', 

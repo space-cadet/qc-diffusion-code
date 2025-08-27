@@ -139,6 +139,8 @@ export const useAppStore = create<AppState>()(
         selectedEquations: ['telegraph', 'diffusion'],
         solver_config: { telegraph: 'lax-wendroff', diffusion: 'crank-nicolson' },
         solver_params: { dt_factor: 1.0, theta: 0.5, tolerance: 1e-6, max_iter: 100 },
+        boundaryCondition: 'neumann',
+        dirichlet_value: 0.0,
       },
       pdeState: {
         isRunning: false,

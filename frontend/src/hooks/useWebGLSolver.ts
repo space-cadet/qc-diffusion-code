@@ -52,7 +52,7 @@ export function useWebGLSolver() {
       
       selectedEquations.forEach(equationType => {
         const solver = new WebGLSolver(canvas);
-        solver.init(params.mesh_size, 1);
+        solver.init(params.mesh_size, 1, params.boundaryCondition || 'neumann', params.dirichlet_value || 0.0);
         
         // Set solver strategy based on configuration
         const solverType = params.solver_config?.[equationType as keyof typeof params.solver_config] || 'forward-euler';

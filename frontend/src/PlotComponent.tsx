@@ -89,6 +89,8 @@ export default function PlotComponent({
           ? { title: "Amplitude (u)", autorange: true as const }
           : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
         showlegend: true,
+        legend: { x: 1.02, y: 1, xanchor: 'left' as const },
+        margin: { r: 200 },
         height: 500,
         annotations: [
           {
@@ -174,6 +176,16 @@ export default function PlotComponent({
       });
     }
 
+    const solverLabel = (key: string | undefined) => {
+      switch (key) {
+        case 'forward-euler': return 'Forward Euler';
+        case 'crank-nicolson': return 'Crank-Nicolson';
+        case 'lax-wendroff': return 'Lax-Wendroff';
+        case 'rk4': return 'RK4';
+        default: return key || 'Forward Euler';
+      }
+    };
+
     const traces: PlotData[] = selectedEquations.map(equationType => {
       const frameData = data[equationType] as { x: number[], u: number[] };
       const metadata = equationMetadata[equationType];
@@ -182,13 +194,20 @@ export default function PlotComponent({
       if (!frameData || !frameData.x || !frameData.u) {
         return null;
       }
+
+      const solverKey = params.solver_config?.[equationType as keyof typeof params.solver_config] || 'forward-euler';
+      const solverName = solverLabel(solverKey);
+      let paramText = '';
+      if (equationType === 'telegraph') paramText = `a=${params.collision_rate.toFixed(2)}, v=${params.velocity.toFixed(2)}`;
+      else if (equationType === 'diffusion') paramText = `k=${params.diffusivity.toFixed(2)}`;
+      const legendSub = `${solverName}${paramText ? `, ${paramText}` : ''}`;
       
       return {
         x: frameData.x,
         y: frameData.u,
         type: "scatter",
         mode: "lines",
-        name: metadata.displayName,
+        name: `${metadata.displayName}<br><span style="font-size:11px;color:#666">${legendSub}</span>`,
         line: { color: metadata.color },
       };
     }).filter(trace => trace !== null) as PlotData[];
@@ -215,6 +234,8 @@ export default function PlotComponent({
         ? { title: "Amplitude (u)", autorange: true as const }
         : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
       showlegend: true,
+      legend: { x: 1.02, y: 1, xanchor: 'left' as const },
+      margin: { r: 200 },
       height: 500,
       annotations: [
         {

@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 10:04:13 IST_
+_Last Updated: 2025-08-27 11:53:16 IST_
 
 ## Active Tasks
 
@@ -108,16 +108,16 @@ _Last Updated: 2025-08-27 10:04:13 IST_
 **Notes**: Version 1.0.0 released with comprehensive documentation, git tagging, and release preparation completed
 
 ### C2a: PDE Solver Methods and Boundary Conditions
-**Description**: Implement boundary condition infrastructure with Neumann/Dirichlet support and clean separation from solver logic
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 10:04:13 IST
-**Files**: `frontend/src/webgl/boundary-conditions/BaseBoundaryCondition.ts`, `frontend/src/webgl/boundary-conditions/DirichletBC.ts`, `frontend/src/webgl/boundary-conditions/NeumannBC.ts`, `frontend/src/types.ts`
-**Notes**: Safe BC components imported from boundary-conditions branch - abstract interface, type definitions, and placeholder implementations created without problematic shader integration
+**Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements for WebGL PDE simulation
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 11:53:16 IST
+**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/webgl-solver.d.ts`, `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/hooks/useWebGLSolver.ts`, `frontend/src/stores/appStore.ts`
+**Notes**: Dirichlet boundary conditions implemented with solver-agnostic post-processing approach. Forward Euler solver fixed for proper rendering with Dirichlet BCs. Enhanced plot legend with solver and parameter information.
 
 ### C2b: PDE UI Implementation
-**Description**: Complete boundary conditions UI with parameter controls and plot annotations
-**Status**: ✅ COMPLETED **Last**: 2025-08-27 10:04:13 IST
-**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/types.ts`
-**Notes**: Boundary conditions UI fully implemented - dropdown selection, conditional Dirichlet value input, plot annotations showing current BC type and values
+**Description**: Enhance PDE parameter panel with advanced solver controls, boundary condition selection, and per-equation solver UI for comprehensive PDE simulation interface
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 11:53:16 IST
+**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/PlotComponent.tsx`, `frontend/src/ConservationDisplay.tsx`
+**Notes**: Enhanced plot legend with solver and parameter information. Conservation panel improvements with dt diagnostics, parameters section, and standardized number formatting. Animation speed slider implementation completed.
 
 ### C12: Interparticle Collisions and Obstacles Implementation
 **Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries

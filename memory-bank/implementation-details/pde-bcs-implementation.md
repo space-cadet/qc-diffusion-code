@@ -1,154 +1,166 @@
-# Boundary Conditions Safe Component Implementation
+# Boundary Conditions Implementation
 
 *Created: 2025-08-27 10:04:13 IST*
+*Last Updated: 2025-08-27 11:46:00 IST*
 
 ## Overview
 
-This document records the successful import of safe boundary condition components from the boundary-conditions branch (commit d1e4c) into the main branch, providing complete UI functionality while avoiding problematic WebGL shader integration issues.
+This document records the implementation of boundary conditions in the WebGL PDE solver, focusing on Dirichlet boundary conditions and solver-agnostic enforcement.
 
 ## Implementation Strategy
 
-### Safe Components Imported ✅
+### Dirichlet Boundary Conditions Implementation ✅
 
-1. **Type Definitions (`frontend/src/types.ts`)**
-   - Added `BoundaryConditionType` union type ('neumann' | 'dirichlet')
-   - Extended `SimulationParams` interface with `boundaryCondition` and `dirichlet_value` fields
-   - Clean, self-contained additions with no dependencies
+1. **Type Definitions**
+   - Used existing `BoundaryConditionType` union type ('neumann' | 'dirichlet')
+   - Used existing `SimulationParams` interface with `boundaryCondition` and `dirichlet_value` fields
 
-2. **Abstract Interface (`frontend/src/webgl/boundary-conditions/BaseBoundaryCondition.ts`)**
-   - Clean abstract base class with well-defined API
-   - Strategy pattern interface for pluggable BC implementations
-   - Includes utility methods for uniform setting and post-processing hooks
-   - No problematic shader code generation
+2. **WebGL Solver Integration**
+   - Updated `WebGLSolver.init` signature to include BC parameters:
+     ```typescript
+     init(width: number, height: number, bcType?: BoundaryConditionType, dirichletValue?: number): void;
+     ```
+   - Modified `createTextures()` to accept and use BC parameters
+   - Stored BC type and Dirichlet value on solver instance for later use
 
-3. **UI Components**
-   - **PdeParameterPanel.tsx**: Complete BC selection UI with dropdown and conditional Dirichlet value input
-   - **PlotComponent.tsx**: BC annotations on plots showing current type and values
-   - Full user interface functionality without backend dependencies
+3. **Solver-Agnostic Approach**
+   - Implemented post-processing pass after solver step to enforce Dirichlet BCs
+   - Created `getEnforceDirichletProgram()` with shader that overwrites boundary columns
+   - Applied after any solver step when `bcType === 'dirichlet'`
+   - This approach requires no changes to individual solvers
 
-4. **Test Infrastructure (`frontend/src/webgl/__tests__/boundaryConditions.test.ts`)**
-   - Comprehensive test suite for BC API validation
-   - Mock WebGL context setup for isolated testing
-   - Focus on BC interface compliance rather than shader behavior
+4. **Forward Euler Fix**
+   - Fixed Forward Euler solver by adding missing `gl.drawArrays` call
+   - Ensured proper rendering before Dirichlet enforcement pass
+   - Resolved issue where solution collapsed to zero except at boundaries
 
-### Placeholder Implementations ⚠️
+### UI Components ✅
 
-Created non-problematic placeholder implementations:
+- **PlotComponent.tsx**: 
+  - Enhanced plot with solver and parameter information in the legend
+  - Each equation's legend entry now includes solver name and parameters
+  - Format: `Equation Name<br><span style="font-size:11px;color:#666">Solver, params</span>`
+  - Moved legend to the right side of the plot for better visibility
 
-1. **DirichletBC.ts**: 
-   - Maintains correct interface compliance
-   - Placeholder shader code that compiles but doesn't enforce BCs
-   - TODO comments marking areas needing proper implementation
+### Technical Implementation
 
-2. **NeumannBC.ts**:
-   - Simple texture wrapping approach (CLAMP_TO_EDGE)
-   - Placeholder shader functions
-   - Safe fallback behavior
+1. **Dirichlet Enforcement Shader**
+   ```glsl
+   void main() {
+     vec2 texel = 1.0 / vec2(textureSize(textureSource, 0));
+     vec4 v = texture(textureSource, textureCoords);
+     if (textureCoords.x - texel.x < 0.0 || textureCoords.x + texel.x > 1.0) {
+       v.r = dirichlet_value;
+     }
+     fragColor = v;
+   }
+   ```
 
-### Problematic Components Avoided ❌
-
-Did NOT import these from boundary-conditions branch:
-- Solver modifications with BC integration
-- useWebGLSolver.ts BC switching logic  
-- webgl-solver.js BC injection code
-- Complex shader code generation that caused compilation errors
+2. **Post-Processing Approach**
+   ```javascript
+   // After solver step, if using Dirichlet BCs
+   if (this.bcType === 'dirichlet') {
+     const enforceProgram = this.getEnforceDirichletProgram();
+     // Bind framebuffer, program, textures
+     // Set dirichlet_value uniform
+     // Draw full-screen quad to enforce BCs
+     this.renderQuad();
+     // Update current texture index
+   }
+   ```
 
 ## Technical Architecture
 
-### Clean Separation of Concerns
+### Implemented Architecture
 
 ```
 UI Layer (✅ Complete)
-├── BoundaryConditionType selection
-├── Conditional parameter inputs
-└── Plot annotations
+├── BC type display in plot annotations
+└── Solver and parameter info in plot legend
 
-Interface Layer (✅ Complete)
-├── BaseBoundaryCondition abstract class
-├── Strategy pattern for BC implementations
-└── Clean API for shader integration
-
-Implementation Layer (⚠️ Placeholder)
-├── DirichletBC - needs proper enforcement
-├── NeumannBC - basic texture wrapping only
-└── Shader integration - TODO
-
-WebGL Integration (❌ Not Implemented)
-├── Proper boundary enforcement
-├── Shader code injection
-└── Runtime BC switching
+WebGL Integration (✅ Complete)
+├── WebGLSolver.init with BC parameters
+├── Texture wrapping based on BC type
+├── Post-processing pass for Dirichlet enforcement
+└── Forward Euler fix for proper rendering
 ```
 
 ### User Experience
 
 Users can now:
-- Select Neumann or Dirichlet boundary conditions via dropdown
-- Set Dirichlet boundary values with number input
 - See current BC settings displayed on plots
-- Have BC preferences persist in simulation parameters
+- View solver type and parameters in the legend
+- Run simulations with Dirichlet boundary conditions
+- Use any solver (Forward Euler, Crank-Nicolson, Lax-Wendroff) with Dirichlet BCs
 
-However, **boundary conditions are not actually enforced** in the PDE solution - this is just the UI layer.
+The boundary conditions are now properly enforced in the PDE solution through a post-processing pass.
 
-## Next Implementation Steps
+## Implementation Details
 
-### Phase 1: Simple Post-Processing Approach
-Based on pedagogical understanding of Dirichlet BCs, implement:
+### Dirichlet BC Enforcement
 
-```glsl
-// After each time step, enforce boundary values
-if (isBoundaryPixel(coord)) {
-    result.r = dirichlet_value;  // Override solution with BC value
-}
+The implementation uses a post-processing approach that runs after any solver step:
+
+1. Each solver performs its normal update step
+2. If using Dirichlet BCs, a post-processing pass runs that:
+   - Reads the current solution texture
+   - Overwrites boundary columns with the Dirichlet value
+   - Writes the result to a new texture
+3. This approach is solver-agnostic and cleanly separates BC enforcement
+
+### Forward Euler Fix
+
+The Forward Euler solver was fixed by adding a missing draw call:
+
+```typescript
+// In ForwardEulerSolver.step()
+gl.activeTexture(gl.TEXTURE0);
+gl.bindTexture(gl.TEXTURE_2D, readTexture);
+if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
+// Added missing draw call to render the updated field
+gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 ```
 
-### Phase 2: Proper Finite Difference Integration
-```glsl
-// During stencil computation, use BC values in neighbor sampling
-float u_left = isBoundaryLeft(coord) ? dirichlet_value : texture(tex, leftCoord).r;
-float laplacian = (u_right + u_left + u_top + u_bottom - 4.0 * u_center) / (dx*dx);
-```
+This ensures the solver actually renders its updated field before the Dirichlet enforcement pass.
 
-### Phase 3: Advanced BC Types
-- Robin (mixed) boundary conditions
-- Time-dependent boundary values
-- Spatially-varying boundary conditions
+### Future Enhancements
+
+- Extend Dirichlet enforcement to y-boundaries if needed
+- Optimize enforcement pass to avoid extra ping-pong if performance is critical
+- Add UI for boundary condition selection
+- Support additional BC types (Periodic, Absorbing)
 
 ## Implementation Benefits
 
-1. **Complete UI/UX**: Users have full boundary condition control interface
-2. **Clean Architecture**: Proper separation between interface and implementation
-3. **Safe Foundation**: No WebGL compilation errors or shader issues
-4. **Extensible Design**: Easy to add proper BC enforcement later
-5. **Testing Ready**: Comprehensive test infrastructure in place
-
-## Risk Mitigation
-
-- Avoided all problematic shader integration issues from boundary-conditions branch
-- Maintained backward compatibility with existing functionality
-- Created clear TODOs for future proper implementation
-- Established clean interface that won't need refactoring
+1. **Solver-Agnostic Design**: BC enforcement works with any solver implementation
+2. **Clean Separation**: BC enforcement is separate from solver logic
+3. **Minimal Changes**: No need to modify individual solver shaders
+4. **Improved Visualization**: Enhanced plot legend with solver and parameter info
+5. **Fixed Forward Euler**: Resolved issue with Forward Euler solver under Dirichlet BCs
 
 ## Files Modified
 
-### New Files
-- `frontend/src/webgl/boundary-conditions/BaseBoundaryCondition.ts`
-- `frontend/src/webgl/boundary-conditions/DirichletBC.ts` 
-- `frontend/src/webgl/boundary-conditions/NeumannBC.ts`
-- `frontend/src/webgl/__tests__/boundaryConditions.test.ts`
+### Modified Files
+- `frontend/src/webgl/webgl-solver.d.ts` - Updated init signature with BC parameters
+- `frontend/src/webgl/webgl-solver.js` - Implemented Dirichlet BC enforcement
+- `frontend/src/webgl/solvers/ForwardEulerSolver.ts` - Fixed missing draw call
+- `frontend/src/PlotComponent.tsx` - Enhanced plot legend with solver and parameter info
+- `frontend/src/hooks/useWebGLSolver.ts` - BC parameter passing
+- `frontend/src/stores/appStore.ts` - BC state management
+- `frontend/src/webgl/solvers/BaseSolver.ts` - BC texture wrapping
 
-### Modified Files  
-- `frontend/src/types.ts` - Added BC types and parameters
-- `frontend/src/PdeParameterPanel.tsx` - Added BC UI section
-- `frontend/src/PlotComponent.tsx` - Added BC plot annotations
+### Screenshots
+- `memory-bank/screenshots/diffusion-telegraph-dirichlet-bc.png` - Plot showing Dirichlet BCs
+- `memory-bank/screenshots/pde-simulation-parameters-panel.png` - Parameter panel UI
 
 ## Testing Status
 
 - ✅ TypeScript compilation successful
-- ✅ UI components render correctly
-- ✅ BC parameter persistence working
-- ✅ Plot annotations display current BC settings
-- ⚠️ Actual BC enforcement not implemented (placeholder only)
+- ✅ Forward Euler solver fixed and working with Dirichlet BCs
+- ✅ Crank-Nicolson and Lax-Wendroff solvers working with Dirichlet BCs
+- ✅ Plot legend shows solver and parameter information
+- ✅ Dirichlet boundary values properly enforced at x-boundaries
 
 ## Conclusion
 
-Successfully imported all safe boundary condition components, providing complete user interface functionality while maintaining system stability. The foundation is now in place for proper BC enforcement implementation without the risk of shader compilation errors that plagued the previous approach.
+Successfully implemented solver-agnostic Dirichlet boundary condition enforcement through a post-processing pass. Fixed the Forward Euler solver to properly render its updates before BC enforcement. Enhanced the plot visualization with solver and parameter information in the legend. This implementation provides a clean foundation for adding UI controls for boundary condition selection in the future.

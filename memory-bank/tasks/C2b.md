@@ -1,11 +1,11 @@
 # C2b: PDE UI Implementation
 *Created: 2025-08-25 12:49:41 IST*
-*Last Updated: 2025-08-25 14:41:42 IST*
+*Last Updated: 2025-08-27 11:46:00 IST*
 
 **Description**: Enhance PDE parameter panel with advanced solver controls, boundary condition selection, and per-equation solver UI for comprehensive PDE simulation interface
 **Status**: 🔄 IN PROGRESS **Priority**: MEDIUM
 **Started**: 2025-08-25
-**Last Active**: 2025-08-25 14:41:42 IST
+**Last Active**: 2025-08-27 11:46:00 IST
 **Dependencies**: C2, C2a
 
 ## Completion Criteria
@@ -15,6 +15,7 @@
 - ✅ dt diagnostics display in Conservation panel
 - ✅ Standardized number formatting with monospace fonts
 - ✅ Parameters section showing selected equations and values
+- ✅ Enhanced plot legend with solver and parameter information
 - ⬜ Per-equation solver selection interface (from C11 requirements)
 - ⬜ Boundary condition dropdown UI in parameter panel
 - ⬜ Solver parameter validation and feedback
@@ -35,9 +36,10 @@
 4. ✅ dt diagnostics panel implementation showing UI dt, effective dt, and stability limits
 5. ✅ Standardized monospace formatting for all numerical values
 6. ✅ Parameters section added showing selected equations and their values
-7. 🔄 Boundary condition UI design
-8. ⬜ BC selection dropdown implementation
-9. ⬜ Solver parameter validation UI
+7. ✅ Enhanced plot legend with solver and parameter information
+8. 🔄 Boundary condition UI design
+9. ⬜ BC selection dropdown implementation
+10. ⬜ Solver parameter validation UI
 
 ## Context
 **Session Updates (2025-08-25 14:41:42 IST):**

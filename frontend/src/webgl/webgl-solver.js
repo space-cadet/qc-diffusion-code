@@ -5,6 +5,7 @@ import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs.js';
 import { genericVertexShader } from './generic_shaders.js';
 import { ForwardEulerSolver } from './solvers/ForwardEulerSolver.ts';
 import { CrankNicolsonSolver } from './solvers/CrankNicolsonSolver.ts';
+import { createBoundaryTextures } from './solvers/BaseSolver.ts';
 
 /** @typedef {import('./solvers/BaseSolver').SolverStrategy} SolverStrategy */
 
@@ -56,6 +57,10 @@ export class WebGLSolver {
     this.initialized = false;
     this.solverStrategy = new ForwardEulerSolver(); // Default solver
     this.currentEquationType = null;
+    // Boundary condition config and post-pass program
+    this.bcType = 'neumann';
+    this.dirichletValue = 0.0;
+    this.enforceDirichletProgram = null;
   }
 
   /** @param {SolverStrategy} solverStrategy */
@@ -79,34 +84,51 @@ export class WebGLSolver {
     }
   }
 
-  init(width, height) {
+  init(width, height, bcType = 'neumann', dirichletValue = 0.0) {
     this.width = width;
     this.height = height;
+    this.bcType = bcType;
+    this.dirichletValue = dirichletValue;
     
-    // Create textures for double buffering
-    this.createTextures();
+    // Create textures for double buffering with boundary conditions
+    this.createTextures(bcType, dirichletValue);
     this.createFramebuffers();
     
     this.initialized = true;
   }
 
-  createTextures() {
+  createTextures(bcType = 'neumann', dirichletValue = 0.0) {
     const gl = this.gl;
+    
+    // Clear existing textures
+    this.textures.forEach(texture => gl.deleteTexture(texture));
+    this.textures = [];
     
     for (let i = 0; i < 2; i++) {
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
       
+      // Set texture format
       if (this.floatTextureSupported) {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
       } else {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       }
       
+      // Set boundary condition wrapping based on type
+      if (bcType === 'neumann') {
+        // Zero gradient: clamp to edge
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      } else if (bcType === 'dirichlet') {
+        // Fixed values: will handle in shader, but use CLAMP_TO_EDGE for sampling
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      }
+      
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      
       this.textures.push(texture);
     }
   }
@@ -160,6 +182,27 @@ export class WebGLSolver {
     return shader;
   }
 
+  // Create and cache program that enforces Dirichlet on x-boundaries by overwriting edge columns
+  getEnforceDirichletProgram() {
+    if (this.enforceDirichletProgram) return this.enforceDirichletProgram;
+    const frag = `#version 300 es\n
+precision highp float; precision highp sampler2D;\n
+in vec2 textureCoords;\n
+uniform sampler2D textureSource;\n
+uniform float dirichlet_value;\n
+out vec4 fragColor;\n
+void main(){\n
+  vec2 texel = 1.0 / vec2(textureSize(textureSource, 0));\n
+  vec4 v = texture(textureSource, textureCoords);\n
+  if (textureCoords.x - texel.x < 0.0 || textureCoords.x + texel.x > 1.0) {\n
+    v.r = dirichlet_value;\n
+  }\n
+  fragColor = v;\n
+}`;
+    this.enforceDirichletProgram = this.createProgram(frag);
+    return this.enforceDirichletProgram;
+  }
+
   step(dt, parameters, xMin = -5, xMax = 5) {
     if (!this.initialized) {
       throw new Error('Solver not initialized');
@@ -182,6 +225,32 @@ export class WebGLSolver {
       dt, dx, dy, parameters, this.currentTexture
     );
     
+    // Solver-agnostic Dirichlet enforcement on x-boundaries as a post-processing pass
+    if (this.bcType === 'dirichlet') {
+      const enforceProgram = this.getEnforceDirichletProgram();
+      const readIndex = this.currentTexture;
+      const writeIndex = 1 - this.currentTexture;
+      const writeFramebuffer = this.framebuffers[writeIndex];
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, writeFramebuffer);
+      gl.useProgram(enforceProgram);
+
+      // Bind source texture
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.textures[readIndex]);
+      const texLoc = gl.getUniformLocation(enforceProgram, 'textureSource');
+      if (texLoc) gl.uniform1i(texLoc, 0);
+
+      const valLoc = gl.getUniformLocation(enforceProgram, 'dirichlet_value');
+      if (valLoc) gl.uniform1f(valLoc, this.dirichletValue || 0.0);
+
+      // Draw full-screen quad
+      this.renderQuad();
+
+      // Now the latest result is in writeIndex
+      this.currentTexture = writeIndex;
+    }
+
     // Render quad
     this.renderQuad();
   }

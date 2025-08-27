@@ -95,6 +95,8 @@ export class ForwardEulerSolver implements SolverStrategy {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, readTexture);
     if (uniforms.textureSource) gl.uniform1i(uniforms.textureSource, 0);
+    // Draw full-screen quad to write the updated field
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     return 1 - currentTexture;
   }
