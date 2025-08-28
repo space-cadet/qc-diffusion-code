@@ -2,6 +2,7 @@ import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import { simTime } from '../core/GlobalTime';
 
 export class InterparticleCollisionStrategy implements RandomWalkStrategy {
   private boundaryConfig: BoundaryConfig;
@@ -75,8 +76,8 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
     return {
       dx: 0,
       dy: 0,
-      collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: Date.now() / 1000 },
-      timestamp: Date.now() / 1000,
+      collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: simTime() },
+      timestamp: simTime(),
       particleId: particle.id
     };
   }

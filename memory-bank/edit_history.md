@@ -5,6 +5,34 @@ _Last Updated: 2025-08-28 19:36:16 IST_
 
 ### 2025-08-28
 
+#### 21:28 - C15: Physics Engine Migration Step 3 Complete - Time Unification
+
+- Created `frontend/src/physics/core/GlobalTime.ts` - Centralized time utilities with simTime() and simDt() functions
+- Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Replaced Date.now()/1000 with simTime(), 0.01 with simDt(0.01)
+- Updated `frontend/src/physics/strategies/CTRWStrategy1D.ts` - Unified timestamps and dt using GlobalTime utilities
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Restored and completed GlobalTime integration after user rejection
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - Timestamps now use simTime()
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts` - Timestamps now use simTime()
+- Updated `frontend/src/physics/ParticleManager.ts` - Particle initialization and trajectory timestamps use simTime(), thermal velocity support
+- Updated `frontend/src/physics/PhysicsRandomWalk.ts` - Step generation and collision handling use simTime()/simDt()
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - PhysicsEngine timeStep aligned to 0.01, thermal velocity generation with Maxwell-Boltzmann distribution
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Temperature control UI enhancement (max 1000.0, step any)
+- Updated `memory-bank/implementation-details/physics-engine-rewrite/physics-engine-rewrite-migration-plan.md` - Phase 3 completion documentation
+- Updated `memory-bank/tasks.md` - C15 Phase 3 completion status and file references
+- Updated `memory-bank/session_cache.md` - Current session timestamp update
+- Updated `memory-bank/sessions/2025-08-28-evening.md` - Extended session with Phase 3 completion and thermal velocity integration
+
+#### 20:27 - C15: Physics Engine Migration Step 2 Complete
+
+- Created `frontend/src/physics/adapters/LegacyStrategyAdapter.ts` - Wraps RandomWalkStrategy as PhysicsStrategy without behavior change
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added feature-flagged PhysicsEngine initialization using adapter
+- Updated `frontend/src/physics/core/PhysicsEngine.ts` - Added performance timing marks around phases
+- Updated `memory-bank/implementation-details/physics-engine-rewrite/physics-engine-rewrite-migration-plan.md` - Recorded current migration status
+- Updated `memory-bank/tasks/C15.md` - Phase 2 completion, progress log update
+- Updated `memory-bank/tasks.md` - Master task registry C15 status update
+- Updated `memory-bank/session_cache.md` - Current session timestamp update
+- Updated `memory-bank/sessions/2025-08-28-evening.md` - Session notes with Step 2 completion
+
 #### 19:36 - C15: Physics Engine Architecture Migration - Memory Bank Restoration
 - Restored `memory-bank/tasks/C15.md` - Complete task file with Phase 1 completion, PR reference, and progress log
 - Updated `memory-bank/tasks.md` - Added C15 to active tasks registry and task details section
@@ -645,15 +673,3 @@ Updated - `edit_history.md` - Added this entry
 - Created `systemPatterns.md` - Architecture patterns
 - Created `techContext.md` - Technical implementation details
 - Created `changelog.md` - Project changelog
-
-#### 20:27 - C15: Physics Engine Migration Step 2 Complete
-
-- Created `frontend/src/physics/adapters/LegacyStrategyAdapter.ts` - Wraps RandomWalkStrategy as PhysicsStrategy without behavior change
-- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added feature-flagged PhysicsEngine initialization using adapter
-- Updated `frontend/src/physics/core/PhysicsEngine.ts` - Added performance timing marks around phases
-- Updated `memory-bank/implementation-details/physics-engine-rewrite/physics-engine-rewrite-migration-plan.md` - Recorded current migration status
-- Updated `memory-bank/tasks/C15.md` - Phase 2 completion, progress log update
-- Updated `memory-bank/tasks.md` - Master task registry C15 status update
-- Updated `memory-bank/session_cache.md` - Current session timestamp update
-- Updated `memory-bank/sessions/2025-08-28-evening.md` - Session notes with Step 2 completion
-

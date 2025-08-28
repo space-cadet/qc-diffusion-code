@@ -798,6 +798,26 @@ export const RandomWalkParameterPanel = ({
                   <span>5.0</span>
                 </div>
               </div>
+
+              {/* Temperature */}
+              <div>
+                <LogNumberSlider
+                  label="T (Temperature)"
+                  value={gridLayoutParams.temperature || 1.0}
+                  onChange={(v) => setGridLayoutParams({ ...gridLayoutParams, temperature: v })}
+                  min={0.01}
+                  max={1000.0}
+                  step="any"
+                  logScale={randomWalkUIState.temperatureLogScale}
+                  onToggleLogScale={(b) => updateUIState({ temperatureLogScale: b })}
+                  defaultLogScale={true}
+                  precision={2}
+                  format={(v) => v.toFixed(2)}
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Controls thermal velocity spread (Maxwell-Boltzmann distribution)
+                </div>
+              </div>
             </div>
           )}
         </div>

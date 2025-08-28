@@ -3,6 +3,7 @@ import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { simTime, simDt } from '../core/GlobalTime';
 
 export class CTRWStrategy1D implements RandomWalkStrategy {
   private collisionRate: number;
@@ -105,10 +106,10 @@ export class CTRWStrategy1D implements RandomWalkStrategy {
   }
 
   calculateStep(particle: Particle): Step {
-    const currentTime = Date.now() / 1000;
+    const currentTime = simTime();
     const collision = this.handleCollision(particle);
     
-    const timeStep = Math.min(collision.waitTime, 0.01);
+    const timeStep = Math.min(collision.waitTime, simDt(0.01));
     const dx = particle.velocity.vx * timeStep;
     
     return {
@@ -125,7 +126,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy {
   }
 
   private handleCollision(particle: Particle): CollisionEvent {
-    const currentTime = Date.now() / 1000;
+    const currentTime = simTime();
     const waitTime = this.generateCollisionTime();
     
     const shouldCollide = currentTime >= particle.nextCollisionTime;

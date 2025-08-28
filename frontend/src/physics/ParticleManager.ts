@@ -1,6 +1,7 @@
 import type { Particle, TrajectoryPoint } from "./types/Particle";
 import type { RandomWalkStrategy } from "./interfaces/RandomWalkStrategy";
 import { CircularBuffer } from "./utils/CircularBuffer";
+import { simTime } from "./core/GlobalTime";
 
 export class ParticleManager {
   private strategy: RandomWalkStrategy;
@@ -49,9 +50,12 @@ export class ParticleManager {
   }
 
   initializeParticle(tsParticle: any): Particle {
-    const angle = this.dimension === '1D' ? (Math.random() < 0.5 ? 0 : Math.PI) : Math.random() * 2 * Math.PI;
-    const speed = 50;
-    const currentTime = Date.now() / 1000;
+    // Use velocities passed from RandomWalkSimulator (thermal with momentum conservation)
+    // If no velocity provided, fall back to zero velocity for compatibility
+    const vx = tsParticle.velocity?.x ?? 0;
+    const vy = tsParticle.velocity?.y ?? 0;
+
+    const currentTime = simTime();
     // Convert initial canvas position to physics coordinates
     const physicsPos = this.mapToPhysics({
       x: tsParticle.position.x,
@@ -73,8 +77,8 @@ export class ParticleManager {
         y: physicsPos.y,
       },
       velocity: {
-        vx: speed * Math.cos(angle),
-        vy: speed * Math.sin(angle),
+        vx: vx,
+        vy: vy,
       },
       lastCollisionTime: currentTime,
       nextCollisionTime: currentTime + Math.random() * 0.5,
@@ -103,7 +107,7 @@ export class ParticleManager {
     // Update trajectory
     particle.trajectory.push({
       position: { x: particle.position.x, y: particle.position.y },
-      timestamp: Date.now() / 1000,
+      timestamp: simTime(),
     });
 
     // Map physics position to canvas coordinates for rendering
