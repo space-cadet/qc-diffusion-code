@@ -1,7 +1,7 @@
 # Inter-Particle Collision Implementation Plan
 
 *Created: 2025-08-27 09:34:31 IST*
-*Last Updated: 2025-08-28 00:14:17 IST*
+*Last Updated: 2025-08-28 13:36:51 IST*
 
 ## Current State Analysis
 
@@ -43,8 +43,15 @@ private elasticCollision2D(v1x: number, v1y: number, v2x: number, v2y: number, m
 }
 ```
 
+### Phase 1.1: Critical Bug Fixes ✅ COMPLETED (GPT5)
+- **Default Startup**: Fixed unintended CTRW scattering at initialization by clearing default strategies
+- **Collision Metrics**: Separated CTRW "scattering" from inter-particle "collisions" with distinct tracking
+- **1D Logic Issues**: Fixed double-counting, overlap persistence, and unnecessary pair processing
+- **Type Safety**: Added safe ID parsing for both string and numeric particle IDs
+- **UI Clarity**: Enhanced parameter panel with clear "Scattering" vs "Collisions" distinction
+
 ### Next Phase Goals
-- **Debugging**: Strategy effectiveness issues in 2D simulations
+- **Strategy Effectiveness**: Debug why CTRW and collisions may not be visibly affecting 2D behavior
 - **Matter.js Integration**: Replace basic collision detection with physics engine
 - **Obstacle System**: Add arbitrary obstacle creation and management
 

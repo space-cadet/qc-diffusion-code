@@ -18,7 +18,10 @@ export interface Particle {
   radius?: number;
   lastCollisionTime: number;
   nextCollisionTime: number;
+  // CTRW scattering count
   collisionCount: number;
+  // Actual inter-particle collisions (elastic swaps etc.)
+  interparticleCollisionCount?: number;
   waitingTime: number;
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;

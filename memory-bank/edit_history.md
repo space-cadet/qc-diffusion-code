@@ -1,9 +1,23 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 00:14:17 IST_
+_Last Updated: 2025-08-28 13:36:51 IST_
 
 ### 2025-08-28
+
+#### 13:36 - C12/C14: GPT5 Bug Fixes and Production Refinement
+- Updated `frontend/src/stores/appStore.ts` - Removed default CTRW from strategies array to prevent unintended scattering at startup
+- Updated `frontend/src/physics/types/Particle.ts` - Added interparticleCollisionCount property for separate collision tracking
+- Updated `frontend/src/physics/ParticleManager.ts` - Enhanced getCollisionStats to return both CTRW scattering and inter-particle collision totals with proper pair counting
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts` - Fixed double-counting by processing pairs once per frame, added velocity-based approach detection, implemented position separation, added safe ID parsing
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - Added consistent safe ID parsing for 2D strategy
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Added separate "Scattering" and "Collisions" display metrics with distinct labels
+- Updated `memory-bank/tasks/C12.md` - Added critical bug fixes session with GPT5 attribution
+- Updated `memory-bank/tasks/C14.md` - Added production refinement session with GPT5 attribution  
+- Updated `memory-bank/tasks.md` - Updated task notes with bug fix completion by GPT5
+- Updated `memory-bank/implementation-details/interparticle-collision-plan.md` - Added Phase 1.1 critical bug fixes section
+- Created `memory-bank/sessions/2025-08-28-afternoon.md` - Session documentation for GPT5 bug fixes
+- Updated `memory-bank/session_cache.md` - Updated current session to afternoon focus on bug fixes
 
 #### 00:14 - C14: Composite Strategy Framework Implementation
 - Created `frontend/src/physics/strategies/BallisticStrategy.ts` - Default ballistic motion physics with boundary conditions and trajectory recording

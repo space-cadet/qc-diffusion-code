@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-27 15:03:12 IST_
+_Last Updated: 2025-08-28 13:36:51 IST_
 
 ## Active Tasks
 
@@ -125,13 +125,13 @@ _Last Updated: 2025-08-27 15:03:12 IST_
 **Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 09:43:58 IST
 **Files**: `frontend/src/physics/strategies/`, `memory-bank/implementation-details/interparticle-collision-plan.md`
-**Notes**: Implementation plan completed - Matter.js recommended for initial phase, Rapier.js for performance upgrade, both have excellent built-in obstacle support
+**Notes**: Critical bug fixes completed by GPT5 - separated scattering vs collision metrics, fixed 1D collision overcounting, removed unintended CTRW at startup, added safe ID parsing
 
 ### C14: Composite Strategy Framework Implementation
 **Description**: Implement composite strategy framework allowing multiple physics strategies to work together simultaneously, with ballistic motion as default and 2D elastic collision support
 **Status**: ✅ COMPLETED **Last**: 2025-08-28 00:14:17 IST
 **Files**: `frontend/src/physics/strategies/CompositeStrategy.ts`, `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`
-**Notes**: Multi-select strategy UI with checkboxes, ballistic default physics, 2D elastic collisions with momentum conservation, canvas annotations showing active strategies
+**Notes**: Production refinement completed by GPT5 - bug fixes for collision metrics separation, default behavior correction, 1D collision logic improvements, UI polish with distinct labels
 
 ### C13: 1D Random Walk Implementation
 **Description**: Implement 1D random walk simulation with interparticle collision support, extending the existing 2D framework to support dimensional constraints and specialized physics

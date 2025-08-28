@@ -16,13 +16,17 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
     };
   }
 
-  updateParticle(particle: Particle, allParticles: Particle[]): void {
+  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
     this.handleInterparticleCollisions(particle, allParticles);
   }
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {
+    // Ensure each pair is processed only once per frame using numeric id ordering
+    const pid = parseInt(particle.id.replace(/\D+/g, ''), 10) || 0;
     for (const other of allParticles) {
       if (particle.id === other.id) continue;
+      const oid = parseInt(other.id.replace(/\D+/g, ''), 10) || 0;
+      if (!(pid < oid)) continue; // only handle pair once when pid < oid
 
       const dx = particle.position.x - other.position.x;
       const dy = particle.position.y - other.position.y;
@@ -34,7 +38,7 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
         const [v1x, v1y, v2x, v2y] = this.elasticCollision2D(
           particle.velocity.vx, particle.velocity.vy,
           other.velocity.vx, other.velocity.vy,
-          particle.mass || 1, other.mass || 1
+          1, 1
         );
         
         particle.velocity.vx = v1x;
@@ -49,6 +53,10 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
         particle.position.y += dy * separationFactor;
         other.position.x -= dx * separationFactor;
         other.position.y -= dy * separationFactor;
+
+        // Count actual inter-particle collisions on both participants
+        particle.interparticleCollisionCount = (particle.interparticleCollisionCount || 0) + 1;
+        other.interparticleCollisionCount = (other.interparticleCollisionCount || 0) + 1;
       }
     }
   }

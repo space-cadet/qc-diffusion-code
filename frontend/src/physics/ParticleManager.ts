@@ -160,15 +160,26 @@ export class ParticleManager {
   getCollisionStats() {
     const particles = this.getAllParticles();
     const totalCollisions = particles.reduce(
-      (sum, p) => sum + p.collisionCount,
+      (sum, p) => sum + (p.collisionCount || 0),
       0
     );
-    const avgCollisions =
-      particles.length > 0 ? totalCollisions / particles.length : 0;
+    const avgCollisions = particles.length > 0 ? totalCollisions / particles.length : 0;
+
+    const perParticleInter = particles.reduce(
+      (sum, p) => sum + (p.interparticleCollisionCount || 0),
+      0
+    );
+    // Each pair collision increments both particles once → divide by 2 for pair count
+    const totalInterparticleCollisions = Math.floor(perParticleInter / 2);
+    const avgInterparticleCollisions = particles.length > 0 ? perParticleInter / (2 * particles.length) : 0;
 
     return {
+      // CTRW scattering events (backward compatible)
       totalCollisions,
       avgCollisions,
+      // Actual inter-particle collisions (pair count)
+      totalInterparticleCollisions,
+      avgInterparticleCollisions,
       activeParticles: particles.filter((p) => p.isActive).length,
     };
   }

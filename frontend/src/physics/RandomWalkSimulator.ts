@@ -6,6 +6,7 @@ import { CTRWStrategy2D } from './strategies/CTRWStrategy2D';
 import { BallisticStrategy } from './strategies/BallisticStrategy';
 import { CompositeStrategy } from './strategies/CompositeStrategy';
 import { InterparticleCollisionStrategy } from './strategies/InterparticleCollisionStrategy';
+import { InterparticleCollisionStrategy1D } from './strategies/InterparticleCollisionStrategy1D';
 import { ObservableManager } from './ObservableManager';
 import type { Observable } from './interfaces/Observable';
 
@@ -101,15 +102,24 @@ export class RandomWalkSimulator {
     const strategies: RandomWalkStrategy[] = [];
     const selectedStrategies = params.strategies || [];
 
-    // For 1D, handle legacy interparticleCollisions parameter
+    // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
     if (params.dimension === '1D') {
-      return new CTRWStrategy1D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-        interparticleCollisions: params.interparticleCollisions || selectedStrategies.includes('collisions'),
-      });
+      const oneDStrategies: RandomWalkStrategy[] = [];
+      if (selectedStrategies.includes('ctrw')) {
+        oneDStrategies.push(new CTRWStrategy1D({
+          collisionRate: params.collisionRate,
+          jumpLength: params.jumpLength,
+          velocity: params.velocity,
+          boundaryConfig,
+          interparticleCollisions: false, // collisions handled via separate 1D strategy below
+        }));
+      } else {
+        oneDStrategies.push(new BallisticStrategy({ boundaryConfig }));
+      }
+      if (selectedStrategies.includes('collisions')) {
+        oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig }));
+      }
+      return oneDStrategies.length === 1 ? oneDStrategies[0] : new CompositeStrategy(oneDStrategies);
     }
 
     // For 2D, always start with ballistic motion as base

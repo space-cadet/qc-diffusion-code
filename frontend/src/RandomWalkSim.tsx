@@ -194,7 +194,7 @@ export default function RandomWalkSim() {
       particleCount: gridLayoutParams.particles,
       dimension: gridLayoutParams.dimension,
       interparticleCollisions: gridLayoutParams.interparticleCollisions,
-      strategy: gridLayoutParams.strategy,
+      strategies: gridLayoutParams.strategies,
       boundaryCondition: gridLayoutParams.boundaryCondition,
       canvasWidth,
       canvasHeight,
@@ -237,7 +237,7 @@ export default function RandomWalkSim() {
             canvas: { w, h },
             params: {
               particles: gridLayoutParams.particles,
-              strategy: gridLayoutParams.strategy,
+              strategies: gridLayoutParams.strategies,
               boundaryCondition: gridLayoutParams.boundaryCondition,
             },
             bounds,
@@ -261,7 +261,7 @@ export default function RandomWalkSim() {
     }
   }, [
     gridLayoutParams.simulationType,
-    gridLayoutParams.strategy,
+    gridLayoutParams.strategies,
     gridLayoutParams.boundaryCondition,
     gridLayoutParams.graphType,
     gridLayoutParams.graphSize,
@@ -277,6 +277,7 @@ export default function RandomWalkSim() {
         simulationType: gridLayoutParams.simulationType,
         dimension: gridLayoutParams.dimension,
         interparticleCollisions: gridLayoutParams.interparticleCollisions,
+        strategies: gridLayoutParams.strategies,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles,
@@ -405,7 +406,7 @@ export default function RandomWalkSim() {
         simulationType: gridLayoutParams.simulationType,
         dimension: gridLayoutParams.dimension,
         interparticleCollisions: gridLayoutParams.interparticleCollisions,
-        strategy: gridLayoutParams.strategy,
+        strategies: gridLayoutParams.strategies,
         boundaryCondition: gridLayoutParams.boundaryCondition,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
