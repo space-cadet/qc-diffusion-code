@@ -9,6 +9,10 @@ import { InterparticleCollisionStrategy } from './strategies/InterparticleCollis
 import { InterparticleCollisionStrategy1D } from './strategies/InterparticleCollisionStrategy1D';
 import { ObservableManager } from './ObservableManager';
 import type { Observable } from './interfaces/Observable';
+// New engine scaffolding (feature-flagged, no behavior change)
+import { USE_NEW_ENGINE } from './config/flags';
+import { PhysicsEngine } from './core/PhysicsEngine';
+import { LegacyStrategyAdapter } from './adapters/LegacyStrategyAdapter';
 
 interface SimulatorParams {
   collisionRate: number;
@@ -45,6 +49,9 @@ export class RandomWalkSimulator {
   private observableManager: ObservableManager;
   private canvasWidth: number = 800;
   private canvasHeight: number = 600;
+  // New engine fields (feature-flagged)
+  private readonly useNewEngine: boolean = USE_NEW_ENGINE === true;
+  private physicsEngine?: PhysicsEngine;
   private initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' = 'uniform';
   private distSigmaX: number = 80;
   private distSigmaY: number = 80;
@@ -68,6 +75,25 @@ export class RandomWalkSimulator {
     this.particleManager = new ParticleManager(this.strategy, params.dimension);
     this.particleCount = params.particleCount;
     this.observableManager = new ObservableManager();
+    // Initialize new engine (flagged). Behavior unchanged: engine not used in step() yet.
+    if (this.useNewEngine) {
+      try {
+        const adapter = new LegacyStrategyAdapter(
+          this.strategy,
+          () => this.particleManager.getAllParticles()
+        );
+        this.physicsEngine = new PhysicsEngine({
+          timeStep: 0.016,
+          boundaries: boundaryConfig,
+          canvasSize: { width: params.canvasWidth ?? this.canvasWidth, height: params.canvasHeight ?? this.canvasHeight },
+          dimension: params.dimension,
+          strategies: [adapter],
+        });
+      } catch (e) {
+        console.warn('[RandomWalkSimulator] Failed to initialize PhysicsEngine (fallback to legacy path):', e);
+        this.physicsEngine = undefined;
+      }
+    }
     // Ensure ParticleManager knows canvas size before seeding particles,
     // so that mapToPhysics() during initialization uses correct dimensions.
     if (params.canvasWidth && params.canvasHeight) {

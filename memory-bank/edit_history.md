@@ -646,3 +646,14 @@ Updated - `edit_history.md` - Added this entry
 - Created `techContext.md` - Technical implementation details
 - Created `changelog.md` - Project changelog
 
+#### 20:27 - C15: Physics Engine Migration Step 2 Complete
+
+- Created `frontend/src/physics/adapters/LegacyStrategyAdapter.ts` - Wraps RandomWalkStrategy as PhysicsStrategy without behavior change
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added feature-flagged PhysicsEngine initialization using adapter
+- Updated `frontend/src/physics/core/PhysicsEngine.ts` - Added performance timing marks around phases
+- Updated `memory-bank/implementation-details/physics-engine-rewrite/physics-engine-rewrite-migration-plan.md` - Recorded current migration status
+- Updated `memory-bank/tasks/C15.md` - Phase 2 completion, progress log update
+- Updated `memory-bank/tasks.md` - Master task registry C15 status update
+- Updated `memory-bank/session_cache.md` - Current session timestamp update
+- Updated `memory-bank/sessions/2025-08-28-evening.md` - Session notes with Step 2 completion
+
