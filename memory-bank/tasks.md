@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 19:33:28 IST_
+_Last Updated: 2025-08-28 20:27:23 IST_
 
 ## Active Tasks
 
@@ -149,9 +149,9 @@ _Last Updated: 2025-08-28 19:33:28 IST_
 
 ### C15: Physics Engine Architecture Migration
 **Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 19:33:28 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/`, `memory-bank/implementation-details/physics-engine-rewrite-implementation.md`
-**Notes**: Phase 1 scaffolding complete (TimeManager, CoordinateSystem, PhysicsStrategy, StrategyOrchestrator, PhysicsEngine, Vite flag). PR #1 merged.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 20:27:23 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/adapters/LegacyStrategyAdapter.ts`, `frontend/src/physics/core/PhysicsEngine.ts`, `memory-bank/implementation-details/physics-engine-rewrite-migration-plan.md`
+**Notes**: Phase 2 complete: LegacyStrategyAdapter created, feature-flagged engine init in RandomWalkSimulator, performance timing marks added. No behavior change, builds clean. Ready for PR.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

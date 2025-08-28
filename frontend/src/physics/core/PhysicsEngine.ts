@@ -37,11 +37,16 @@ export class PhysicsEngine {
       currentTime: this.timeManager.getCurrentTime(),
     };
 
+    const perf = (typeof performance !== 'undefined') ? performance : undefined as any;
+    try { perf?.mark?.('phys_phaseA_start'); } catch {}
     // Phase A: collision/scattering
     this.orchestrator.executePhaseA(particles, context);
+    try { perf?.mark?.('phys_phaseA_end'); perf?.measure?.('phys_phaseA', 'phys_phaseA_start', 'phys_phaseA_end'); } catch {}
 
+    try { perf?.mark?.('phys_phaseB_start'); } catch {}
     // Phase B: integration + boundaries
     this.orchestrator.executePhaseB(particles, dt, context);
+    try { perf?.mark?.('phys_phaseB_end'); perf?.measure?.('phys_phaseB', 'phys_phaseB_start', 'phys_phaseB_end'); } catch {}
 
     return dt;
   }
