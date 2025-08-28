@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 13:36:51 IST_
+_Last Updated: 2025-08-28 18:04:00 IST_
 
 ## Active Tasks
 
@@ -26,6 +26,7 @@ _Last Updated: 2025-08-28 13:36:51 IST_
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
+| META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
 ## Task Details
 
@@ -144,6 +145,12 @@ _Last Updated: 2025-08-28 13:36:51 IST_
 **Status**: 🔄 ACTIVE **Last**: 2025-08-24 11:16:39 IST
 **Files**: All memory bank files
 **Notes**: Ongoing maintenance to ensure documentation accuracy and system consistency
+
+### META-2: Document Indexing System
+**Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
+**Status**: 🔄 ACTIVE **Last**: 2025-08-28 18:04:00 IST
+**Files**: `memory-bank/implementation-details/index.md`, `memory-bank/implementation-details/prompts.md`, `scripts/index-query.js`
+**Notes**: Maintain inverse indexes and JSONL validity, keep prompts catalog in sync, and validate via `pnpm run index validate`; KIRSS approach without DB until needed
 
 ### C4: Fix Pause Button Functionality
 **Description**: Implement proper pause/resume functionality for simulation controls

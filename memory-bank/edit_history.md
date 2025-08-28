@@ -5,6 +5,20 @@ _Last Updated: 2025-08-28 13:36:51 IST_
 
 ### 2025-08-28
 
+### 2025-08-28 18:12 - META-2: Document Indexing System Implementation
+
+Created - `implementation-details/index.md` - Master document index with inverse indexes and JSONL entries
+Created - `implementation-details/prompts.md` - Query prompts catalog with template system
+Created - `implementation-details/README.md` - Generation and reading instructions
+Created - `implementation-details/document-indexing-system.md` - Complete system documentation
+Created - `scripts/index-query.js` - Node.js CLI query helper (tag, task, recent, export, validate)
+Created - `tasks/META-2.md` - Ongoing maintenance task for indexing system
+Updated - `package.json` - Added "index": "node scripts/index-query.js" script
+Updated - `tasks.md` - Added META-2 to Active Tasks table and Task Details section
+Updated - `session_cache.md` - Updated focus task to META-2, added to task registry
+Updated - `sessions/2025-08-28-afternoon.md` - Added indexing system implementation section
+Updated - `edit_history.md` - Added this entry
+
 #### 13:36 - C12/C14: GPT5 Bug Fixes and Production Refinement
 - Updated `frontend/src/stores/appStore.ts` - Removed default CTRW from strategies array to prevent unintended scattering at startup
 - Updated `frontend/src/physics/types/Particle.ts` - Added interparticleCollisionCount property for separate collision tracking
