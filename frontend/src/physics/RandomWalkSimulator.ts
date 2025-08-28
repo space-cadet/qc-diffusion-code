@@ -4,6 +4,7 @@ import { ParticleManager } from './ParticleManager';
 import { CTRWStrategy1D } from './strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from './strategies/CTRWStrategy2D';
 import { BallisticStrategy } from './strategies/BallisticStrategy';
+import { LegacyRandomWalkStrategy } from './strategies/LegacyRandomWalkStrategy';
 import { CompositeStrategy } from './strategies/CompositeStrategy';
 import { InterparticleCollisionStrategy } from './strategies/InterparticleCollisionStrategy';
 import { InterparticleCollisionStrategy1D } from './strategies/InterparticleCollisionStrategy1D';
@@ -13,6 +14,7 @@ import type { Observable } from './interfaces/Observable';
 import { USE_NEW_ENGINE } from './config/flags';
 import { PhysicsEngine } from './core/PhysicsEngine';
 import { LegacyStrategyAdapter } from './adapters/LegacyStrategyAdapter';
+import { CoordinateSystem } from './core/CoordinateSystem';
 
 interface SimulatorParams {
   collisionRate: number;
@@ -44,16 +46,17 @@ interface SimulatorParams {
 
 export class RandomWalkSimulator {
   private particleManager: ParticleManager;
-  private strategy: RandomWalkStrategy;
+  private strategies: RandomWalkStrategy[] = [];
+  private currentStrategy: RandomWalkStrategy;
+  private boundaryConfig: BoundaryConfig;
   private dimension: '1D' | '2D';
   private particleCount: number;
+  private physicsEngine?: PhysicsEngine;
   private time: number = 0;
   private observableManager: ObservableManager;
   private canvasWidth: number = 800;
   private canvasHeight: number = 600;
-  // New engine fields (feature-flagged)
   private readonly useNewEngine: boolean = USE_NEW_ENGINE === true;
-  private physicsEngine?: PhysicsEngine;
   private initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' = 'uniform';
   private distSigmaX: number = 80;
   private distSigmaY: number = 80;
@@ -70,26 +73,46 @@ export class RandomWalkSimulator {
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
   }> = [];
 
-  constructor(params: SimulatorParams) {
-    this.dimension = params.dimension;
-    const boundaryConfig = this.createBoundaryConfig(params);
-    this.strategy = this.createStrategy(params, boundaryConfig);
+  constructor(config: SimulatorParams) {
+    this.canvasWidth = config.canvasWidth || 800;
+    this.canvasHeight = config.canvasHeight || 600;
+    this.dimension = config.dimension || '2D';
+    this.particleCount = config.particleCount || 100;
     
-    this.particleManager = new ParticleManager(this.strategy, params.dimension);
-    this.particleCount = params.particleCount;
+    // Initialize boundary config
+    this.boundaryConfig = {
+      type: (config.boundaryCondition || 'reflective') as 'periodic' | 'reflective' | 'absorbing',
+      xMin: -200,
+      xMax: 200,
+      yMin: -200,
+      yMax: 200
+    };
+    
+    // Initialize strategies
+    this.initializeStrategies(config);
+    this.currentStrategy = this.strategies[0];
+    
+    // Initialize particle manager with coordinate system
+    const coordinateSystem = new CoordinateSystem(
+      this.boundaryConfig,
+      { width: this.canvasWidth, height: this.canvasHeight },
+      this.dimension
+    );
+    
+    this.particleManager = new ParticleManager(this.currentStrategy, this.dimension, coordinateSystem);
     this.observableManager = new ObservableManager();
     // Initialize new engine (flagged). Behavior unchanged: engine not used in step() yet.
     if (this.useNewEngine) {
       try {
         const adapter = new LegacyStrategyAdapter(
-          this.strategy,
+          this.currentStrategy,
           () => this.particleManager.getAllParticles()
         );
         this.physicsEngine = new PhysicsEngine({
           timeStep: 0.01,
-          boundaries: boundaryConfig,
-          canvasSize: { width: params.canvasWidth ?? this.canvasWidth, height: params.canvasHeight ?? this.canvasHeight },
-          dimension: params.dimension,
+          boundaries: this.boundaryConfig,
+          canvasSize: { width: this.canvasWidth, height: this.canvasHeight },
+          dimension: this.dimension,
           strategies: [adapter],
         });
       } catch (e) {
@@ -99,22 +122,7 @@ export class RandomWalkSimulator {
     }
     // Ensure ParticleManager knows canvas size before seeding particles,
     // so that mapToPhysics() during initialization uses correct dimensions.
-    if (params.canvasWidth && params.canvasHeight) {
-      this.canvasWidth = params.canvasWidth;
-      this.canvasHeight = params.canvasHeight;
-      this.particleManager.setCanvasSize(this.canvasWidth, this.canvasHeight);
-    }
-    // Store distribution params
-    if (params.initialDistType) this.initialDistType = params.initialDistType;
-    if (params.distSigmaX !== undefined) this.distSigmaX = params.distSigmaX;
-    if (params.distSigmaY !== undefined) this.distSigmaY = params.distSigmaY;
-    if (params.distR0 !== undefined) this.distR0 = params.distR0;
-    if (params.distDR !== undefined) this.distDR = params.distDR;
-    if (params.distThickness !== undefined) this.distThickness = params.distThickness;
-    if (params.distNx !== undefined) this.distNx = params.distNx;
-    if (params.distNy !== undefined) this.distNy = params.distNy;
-    if (params.distJitter !== undefined) this.distJitter = params.distJitter;
-    if (params.temperature !== undefined) this.temperature = params.temperature;
+    this.particleManager.setCanvasSize(this.canvasWidth, this.canvasHeight);
     this.initializeParticles();
   }
 
@@ -128,48 +136,47 @@ export class RandomWalkSimulator {
     };
   }
 
-  private createStrategy(params: SimulatorParams, boundaryConfig: BoundaryConfig): RandomWalkStrategy {
-    const strategies: RandomWalkStrategy[] = [];
-    const selectedStrategies = params.strategies || [];
+  private initializeStrategies(config: SimulatorParams): void {
+    const selectedStrategies = config.strategies || [];
 
     // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
-    if (params.dimension === '1D') {
+    if (config.dimension === '1D') {
       const oneDStrategies: RandomWalkStrategy[] = [];
       if (selectedStrategies.includes('ctrw')) {
         oneDStrategies.push(new CTRWStrategy1D({
-          collisionRate: params.collisionRate,
-          jumpLength: params.jumpLength,
-          velocity: params.velocity,
-          boundaryConfig,
+          collisionRate: 1,
+          jumpLength: 1,
+          velocity: 1,
+          boundaryConfig: this.boundaryConfig,
           interparticleCollisions: false, // collisions handled via separate 1D strategy below
         }));
       } else {
-        oneDStrategies.push(new BallisticStrategy({ boundaryConfig }));
+        oneDStrategies.push(new BallisticStrategy()); // Fix BallisticStrategy instantiation
       }
       if (selectedStrategies.includes('collisions')) {
-        oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig }));
+        oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: this.boundaryConfig }));
       }
-      return oneDStrategies.length === 1 ? oneDStrategies[0] : new CompositeStrategy(oneDStrategies);
+      this.strategies = oneDStrategies.length === 1 ? [oneDStrategies[0]] : [new CompositeStrategy(oneDStrategies)];
     }
 
     // For 2D, always start with ballistic motion as base
-    strategies.push(new BallisticStrategy({ boundaryConfig }));
+    else {
+      this.strategies.push(new BallisticStrategy()); // Fix BallisticStrategy instantiation
 
-    // Add selected strategies on top of ballistic motion
-    if (selectedStrategies.includes('ctrw')) {
-      strategies.push(new CTRWStrategy2D({
-        collisionRate: params.collisionRate,
-        jumpLength: params.jumpLength,
-        velocity: params.velocity,
-        boundaryConfig,
-      }));
+      // Add selected strategies on top of ballistic motion
+      if (selectedStrategies.includes('ctrw')) {
+        this.strategies.push(new CTRWStrategy2D({
+          collisionRate: 1,
+          jumpLength: 1,
+          velocity: 1,
+          boundaryConfig: this.boundaryConfig,
+        }));
+      }
+
+      if (selectedStrategies.includes('collisions')) {
+        this.strategies.push(new InterparticleCollisionStrategy({ boundaryConfig: this.boundaryConfig }));
+      }
     }
-
-    if (selectedStrategies.includes('collisions')) {
-      strategies.push(new InterparticleCollisionStrategy({ boundaryConfig }));
-    }
-
-    return strategies.length === 1 ? strategies[0] : new CompositeStrategy(strategies);
   }
 
   private sampleCanvasPosition(i: number): { x: number; y: number } {
@@ -270,6 +277,15 @@ export class RandomWalkSimulator {
     for (let i = 0; i < this.particleCount; i++) {
       const pos = this.sampleCanvasPosition(i);
       const thermalVelocity = thermalVelocities[i];
+      // DIAG: log first few assigned initial velocities
+      if (i < 3) {
+        console.log('[RWS] init particle', i, {
+          temperature: this.temperature,
+          vx: thermalVelocity.vx.toFixed(4),
+          vy: thermalVelocity.vy.toFixed(4),
+          canvasPos: pos,
+        });
+      }
       const tsParticle = {
         id: `p${i}`,
         position: {
@@ -294,6 +310,22 @@ export class RandomWalkSimulator {
       velocities.push({ vx, vy });
     }
 
+    // DIAG: stats before momentum correction
+    if (count > 0) {
+      const speeds = velocities.map(v => Math.hypot(v.vx, v.vy));
+      const avg = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+      const max = Math.max(...speeds);
+      const min = Math.min(...speeds);
+      console.log('[RWS] thermal pre-center stats', {
+        temperature: this.temperature,
+        thermalSpeed,
+        avg: avg.toFixed(4),
+        min: min.toFixed(4),
+        max: max.toFixed(4),
+        sample: velocities.slice(0, 3).map(v => ({ vx: v.vx.toFixed(4), vy: v.vy.toFixed(4) })),
+      });
+    }
+
     // Apply momentum conservation (center of mass velocity = 0)
     const totalVx = velocities.reduce((sum, v) => sum + v.vx, 0);
     const totalVy = velocities.reduce((sum, v) => sum + v.vy, 0);
@@ -305,6 +337,27 @@ export class RandomWalkSimulator {
       v.vx -= avgVx;
       v.vy -= avgVy;
     });
+
+    // DIAG: stats after momentum correction
+    if (count > 0) {
+      const speeds = velocities.map(v => Math.hypot(v.vx, v.vy));
+      const avg = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+      const max = Math.max(...speeds);
+      const min = Math.min(...speeds);
+      const cm = {
+        vx: avgVx.toFixed(6),
+        vy: avgVy.toFixed(6),
+      };
+      console.log('[RWS] thermal post-center stats', {
+        temperature: this.temperature,
+        thermalSpeed,
+        avg: avg.toFixed(4),
+        min: min.toFixed(4),
+        max: max.toFixed(4),
+        centerOfMass: cm,
+        sample: velocities.slice(0, 3).map(v => ({ vx: v.vx.toFixed(4), vy: v.vy.toFixed(4) })),
+      });
+    }
 
     return velocities;
   }
@@ -339,14 +392,14 @@ export class RandomWalkSimulator {
 
   updateParameters(params: SimulatorParams): void {
     const boundaryConfig = this.createBoundaryConfig(params);
-    const newStrategy = this.createStrategy(params, boundaryConfig);
+    this.initializeStrategies(params);
+    this.currentStrategy = this.strategies[0];
     
     // Check if dimension changed
     const dimensionChanged = this.dimension !== params.dimension;
     
-    this.strategy = newStrategy;
     this.dimension = params.dimension;
-    this.particleManager.updatePhysicsEngine(newStrategy);
+    this.particleManager.updatePhysicsEngine(this.currentStrategy);
     // Update canvas size if provided so future initializations/mappings are correct
     if (params.canvasWidth && params.canvasHeight) {
       this.canvasWidth = params.canvasWidth;
@@ -517,6 +570,18 @@ export class RandomWalkSimulator {
     return this.particleManager;
   }
 
+  getParticleCount(): number {
+    return this.particleCount;
+  }
+
+  getDimension(): '1D' | '2D' {
+    return this.dimension;
+  }
+
+  public getStrategy(): string {
+    return this.currentStrategy.constructor.name;
+  }
+
   // Observable management methods
   registerObservable(observable: Observable): void {
     this.observableManager.register(observable);
@@ -569,8 +634,9 @@ export class RandomWalkSimulator {
     }
 
     // Calculate theoretical speed: c = 1/√(τε) where τ is collision time, ε is jump length factor
-    const collisionRate = this.strategy.getParameters?.()?.collisionRate || 1;
-    const velocity = this.strategy.getParameters?.()?.velocity || 1;
+    const parameters = this.currentStrategy.getParameters ? this.currentStrategy.getParameters() : { collisionRate: 1, velocity: 1 };
+    const collisionRate = parameters?.collisionRate || 1;
+    const velocity = parameters?.velocity || 1;
     const theoreticalSpeed = velocity; // Simplified for now
 
     // Measure wavefront propagation from density history

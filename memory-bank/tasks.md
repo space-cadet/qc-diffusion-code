@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 20:27:23 IST_
+_Last Updated: 2025-08-28 23:05:36 IST_
 
 ## Active Tasks
 
@@ -149,9 +149,9 @@ _Last Updated: 2025-08-28 20:27:23 IST_
 
 ### C15: Physics Engine Architecture Migration
 **Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 21:28:20 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/adapters/LegacyStrategyAdapter.ts`, `frontend/src/physics/core/PhysicsEngine.ts`, `frontend/src/physics/core/GlobalTime.ts`, `memory-bank/implementation-details/physics-engine-rewrite-migration-plan.md`
-**Notes**: Phase 3 complete: Time unification implemented with GlobalTime utilities. All strategies now use simTime()/simDt() instead of Date.now()/0.01. PhysicsEngine timeStep aligned to 0.01. ParticleManager respects thermal velocities from RandomWalkSimulator. No remaining Date.now() usage in physics directory.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 23:05:36 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/physics/__tests__/integration.test.ts`, `frontend/src/physics/core/CoordinateSystem.ts`, `frontend/src/physics/ParticleManager.ts`, `memory-bank/implementation-details/physics-engine-rewrite-migration-plan.md`
+**Notes**: Phase 3.5 complete: Ballistic strategy rollout completed. BallisticStrategy migrated from PhysicsStrategy to RandomWalkStrategy interface. Fixed RandomWalkSimulator constructor with proper CoordinateSystem/ParticleManager instantiation. Added missing getter methods. Updated integration tests for new architecture. All modified files now use consistent constructor signatures and interface compliance.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

@@ -1,11 +1,11 @@
 # Physics Engine Migration Plan (Stepwise)
 
 Created: 2025-08-28 19:00:55 IST
-Last Updated: 2025-08-28 21:28:20 IST
+Last Updated: 2025-08-28 23:05:36 IST
 
 This file tracks the concrete migration steps from the current composite strategy loop to the two-phase PhysicsEngine architecture. Source references: `physics-engine-rewrite-final.md`, `physics-engine-rewrite-claude4.md`, `physics-engine-rewrite-deepseek.md`.
 
-## Current Status (as of 2025-08-28 21:28:20 IST)
+## Current Status (as of 2025-08-28 23:05:36 IST)
 
 - Step 1: COMPLETE
   - Files present: `core/TimeManager.ts`, `core/CoordinateSystem.ts`, `core/StrategyOrchestrator.ts`, `core/PhysicsEngine.ts`, `interfaces/PhysicsStrategy.ts`, `types/PhysicsContext.ts`
@@ -19,6 +19,12 @@ This file tracks the concrete migration steps from the current composite strateg
   - `ParticleManager` and `PhysicsRandomWalk` updated to use `simTime()`
   - `RandomWalkSimulator` PhysicsEngine timeStep aligned to 0.01 for parity
   - No remaining `Date.now() / 1000` usage in physics directory
+- Step 3.5: COMPLETE (ballistic strategy rollout)
+  - `BallisticStrategy` converted from `PhysicsStrategy` to `RandomWalkStrategy` interface
+  - Fixed constructor initialization and method signatures in `RandomWalkSimulator`
+  - Updated integration tests for new strategy architecture
+  - Fixed coordinate system instantiation with proper argument order
+  - Added missing getter methods: `getParticleCount()`, `getDimension()`, `getStrategy()`
 - Step 4: PENDING (boundary phase)
   - Boundary enforcement still inside strategies via `boundaryUtils`
 - Step 5: PENDING (coordinate centralization)
@@ -70,5 +76,36 @@ This file tracks the concrete migration steps from the current composite strateg
 ## Open Decisions
 - Boundary handling placement: Phase B via dedicated strategy (recommended)
 - Deterministic tests: mock random for visual parity
+
+## Recent Changes (2025-08-28 23:05:36 IST)
+
+### Ballistic Strategy Rollout
+- **BallisticStrategy Interface Migration**: Converted from `PhysicsStrategy` to `RandomWalkStrategy` interface
+  - Added required methods: `updateParticle()`, `calculateStep()`, `validateParameters()`, `getPhysicsParameters()`, `setBoundaries()`, `getBoundaries()`
+  - Removed legacy `preUpdate()` and `integrate()` methods
+  - Updated constructor to take no arguments (boundary config set via `setBoundaries()`)
+
+- **RandomWalkSimulator Constructor Fixes**: 
+  - Fixed `CoordinateSystem` instantiation with proper 3-argument constructor: `(boundaryConfig, canvasSize, dimension)`
+  - Fixed `ParticleManager` instantiation with proper 3-argument constructor: `(strategy, dimension, coordinateSystem)`
+  - Added missing getter methods: `getParticleCount()`, `getDimension()`, `getStrategy()`
+  - Fixed boundary config initialization to use proper `BoundaryConfig` type
+
+- **Integration Test Updates**:
+  - Updated test imports to include `CoordinateSystem` and `BoundaryConfig` types
+  - Fixed test instantiation patterns to match new constructor signatures
+  - Updated particle positioning to use canvas coordinates (200, 200) instead of physics coordinates (0, 0)
+
+- **Files Modified**:
+  - `frontend/src/physics/RandomWalkSimulator.ts` - constructor fixes, getter methods
+  - `frontend/src/physics/strategies/BallisticStrategy.ts` - interface migration
+  - `frontend/src/physics/__tests__/integration.test.ts` - test updates
+  - `frontend/src/RandomWalkSim.tsx` - minor updates
+  - `frontend/src/physics/ParticleManager.ts` - constructor signature updates
+  - `frontend/src/physics/core/CoordinateSystem.ts` - constructor validation
+  - `frontend/src/physics/core/StrategyOrchestrator.ts` - strategy handling
+  - `frontend/src/physics/strategies/CTRWStrategy2D.ts` - boundary config updates
+  - `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - interface compliance
+  - `frontend/src/physics/types/Particle.ts` - type definitions
 
 This plan is intentionally incremental to keep PRs small, reviewable, and reversible.

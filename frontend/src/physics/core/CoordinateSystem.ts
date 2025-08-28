@@ -61,4 +61,16 @@ export class CoordinateSystem {
   updateDimension(dimension: Dimension): void {
     this.dimension = dimension;
   }
+
+  getCanvasSize(): { width: number; height: number } {
+    return { ...this.canvasSize };
+  }
+
+  getBoundaries(): BoundaryConfig {
+    return { ...this.boundaries };
+  }
+
+  getDimension(): Dimension {
+    return this.dimension;
+  }
 }

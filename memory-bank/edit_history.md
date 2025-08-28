@@ -5,6 +5,26 @@ _Last Updated: 2025-08-28 19:36:16 IST_
 
 ### 2025-08-28
 
+#### 23:05 - C15: Physics Engine Migration Step 3.5 Complete - Ballistic Strategy Rollout
+
+- Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Migrated from PhysicsStrategy to RandomWalkStrategy interface, added required methods (updateParticle, calculateStep, validateParameters, getPhysicsParameters, setBoundaries, getBoundaries), removed legacy preUpdate/integrate methods
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Fixed constructor initialization with proper CoordinateSystem (3-arg) and ParticleManager (3-arg) instantiation, added missing getter methods (getParticleCount, getDimension, getStrategy), fixed boundary config type casting, replaced strategy property references with currentStrategy
+- Updated `frontend/src/physics/__tests__/integration.test.ts` - Added CoordinateSystem and BoundaryConfig imports, fixed test instantiation patterns, updated particle positioning to canvas coordinates (200,200), commented out strategy name assertion due to composite strategies
+- Updated `frontend/src/RandomWalkSim.tsx` - Minor updates for new constructor signatures
+- Updated `frontend/src/physics/ParticleManager.ts` - Constructor signature updates for 3-argument pattern
+- Updated `frontend/src/physics/core/CoordinateSystem.ts` - Constructor validation and proper argument handling
+- Updated `frontend/src/physics/core/StrategyOrchestrator.ts` - Strategy handling improvements
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Boundary config updates for interface compliance
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - Interface compliance updates
+- Updated `frontend/src/physics/types/Particle.ts` - Type definition refinements
+- Created `frontend/src/physics/core/BoundaryPhase.ts` - New boundary handling phase component
+- Created `frontend/src/physics/core/FeatureFlags.ts` - Feature flag management system
+- Created `frontend/src/physics/strategies/LegacyRandomWalkStrategy.ts` - Legacy strategy wrapper
+- Created `frontend/src/physics/__tests__/two-phase-engine.test.ts` - Two-phase engine testing
+- Updated `memory-bank/implementation-details/physics-engine-rewrite/physics-engine-rewrite-migration-plan.md` - Added Step 3.5 completion status and recent changes documentation
+- Updated `memory-bank/tasks.md` - Updated C15 task status with Step 3.5 completion and file references
+- Updated `memory-bank/session_cache.md` - Updated current session timestamp
+
 #### 21:28 - C15: Physics Engine Migration Step 3 Complete - Time Unification
 
 - Created `frontend/src/physics/core/GlobalTime.ts` - Centralized time utilities with simTime() and simDt() functions

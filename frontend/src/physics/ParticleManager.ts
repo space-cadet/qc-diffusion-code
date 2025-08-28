@@ -2,24 +2,24 @@ import type { Particle, TrajectoryPoint } from "./types/Particle";
 import type { RandomWalkStrategy } from "./interfaces/RandomWalkStrategy";
 import { CircularBuffer } from "./utils/CircularBuffer";
 import { simTime } from "./core/GlobalTime";
+import { CoordinateSystem } from "./core/CoordinateSystem";
 
 export class ParticleManager {
   private strategy: RandomWalkStrategy;
   private dimension: '1D' | '2D';
   private particles: Map<string, Particle> = new Map();
-  private canvasWidth: number = 800;
-  private canvasHeight: number = 600;
   private diagCounter: number = 0;
+  private coordSystem: CoordinateSystem;
 
-  constructor(strategy: RandomWalkStrategy, dimension: '1D' | '2D') {
+  constructor(strategy: RandomWalkStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem) {
     this.strategy = strategy;
     this.dimension = dimension;
+    this.coordSystem = coordSystem;
   }
 
   // Update the canvas size so we can convert physics coordinates -> canvas pixels
   setCanvasSize(width: number, height: number) {
-    this.canvasWidth = width;
-    this.canvasHeight = height;
+    this.coordSystem.updateCanvasSize({ width, height });
     try {
       const b = this.strategy.getBoundaries();
       console.log("[PM] setCanvasSize", { width, height, bounds: b });
@@ -30,23 +30,19 @@ export class ParticleManager {
 
   // Map physics coordinates (defined by strategy boundaries) to canvas pixel coordinates
   public mapToCanvas(pos: { x: number; y: number }): { x: number; y: number } {
-    const bounds = this.strategy.getBoundaries();
-    const widthPhysics = bounds.xMax - bounds.xMin || 1;
-
-    const x = ((pos.x - bounds.xMin) / widthPhysics) * this.canvasWidth;
-    const y = this.dimension === '1D' ? this.canvasHeight / 2 : ((pos.y - bounds.yMin) / (bounds.yMax - bounds.yMin || 1)) * this.canvasHeight;
-    return { x, y };
+    return this.coordSystem.toCanvas(pos);
   }
 
   // Inverse: map canvas pixel coordinates to physics coordinates within boundaries
   private mapToPhysics(pos: { x: number; y: number }) {
-    const bounds = this.strategy.getBoundaries();
-    const widthPhysics = bounds.xMax - bounds.xMin || 1;
+    return this.coordSystem.toPhysics(pos);
+  }
 
-    const x =
-      bounds.xMin + (pos.x / Math.max(this.canvasWidth, 1)) * widthPhysics;
-    const y = this.dimension === '1D' ? 0 : bounds.yMin + (pos.y / Math.max(this.canvasHeight, 1)) * (bounds.yMax - bounds.yMin || 1);
-    return { x, y };
+  private sampleCanvasPosition(i: number): { x: number; y: number } {
+    const canvasSize = this.coordSystem.getCanvasSize();
+    const cx = canvasSize.width / 2;
+    const cy = canvasSize.height / 2;
+    return { x: Math.random() * canvasSize.width, y: cy };
   }
 
   initializeParticle(tsParticle: any): Particle {
@@ -65,7 +61,7 @@ export class ParticleManager {
       console.log("[PM] initializeParticle p0", {
         canvasPos: { x: tsParticle.position.x, y: tsParticle.position.y },
         physicsPos,
-        canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
+        canvasSize: this.coordSystem.getCanvasSize(),
         bounds: this.strategy.getBoundaries(),
       });
     }
@@ -86,6 +82,7 @@ export class ParticleManager {
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
       waitingTime: 0,
       isActive: true,
+      lastUpdate: currentTime
     };
 
     tsParticle.velocity.x = particle.velocity.vx;
@@ -122,7 +119,7 @@ export class ParticleManager {
     //   console.log("[PM] updateParticle p0", {
     //     physicsPos: { ...particle.position },
     //     mappedPos: mapped,
-    //     canvasSize: { w: this.canvasWidth, h: this.canvasHeight },
+    //     canvasSize: this.coordSystem.getCanvasSize(),
     //     bounds: this.strategy.getBoundaries(),
     //     velocity: particle.velocity,
     //   });

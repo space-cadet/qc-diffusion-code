@@ -22,7 +22,8 @@ describe('CTRWStrategy2D', () => {
       collisionCount: 0,
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
       waitingTime: 0,
-      isActive: true
+      isActive: true,
+      lastUpdate: 0
     };
   });
 
