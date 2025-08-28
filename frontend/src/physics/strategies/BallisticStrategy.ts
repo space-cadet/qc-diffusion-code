@@ -3,6 +3,7 @@ import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { simTime, simDt } from '../core/GlobalTime';
 
 export class BallisticStrategy implements RandomWalkStrategy {
   private boundaryConfig: BoundaryConfig;
@@ -18,7 +19,7 @@ export class BallisticStrategy implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[]): void {
-    const timeStep = 0.01; // Fixed time step for ballistic motion
+    const timeStep = simDt(0.01); // unified timestep
     
     // Update position with current velocity
     particle.position.x += particle.velocity.vx * timeStep;
@@ -37,7 +38,7 @@ export class BallisticStrategy implements RandomWalkStrategy {
     // Record trajectory
     particle.trajectory.push({
       position: { ...particle.position },
-      timestamp: Date.now() / 1000
+      timestamp: simTime()
     });
   }
 
@@ -55,12 +56,12 @@ export class BallisticStrategy implements RandomWalkStrategy {
   }
 
   calculateStep(particle: Particle): Step {
-    const timeStep = 0.01;
+    const timeStep = simDt(0.01);
     return {
       dx: particle.velocity.vx * timeStep,
       dy: particle.velocity.vy * timeStep,
-      collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: Date.now() / 1000 },
-      timestamp: Date.now() / 1000,
+      collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: simTime() },
+      timestamp: simTime(),
       particleId: particle.id
     };
   }

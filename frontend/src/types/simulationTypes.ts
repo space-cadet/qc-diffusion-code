@@ -31,6 +31,7 @@ export interface RandomWalkParams {
   distNx: number;
   distNy: number;
   distJitter: number;
+  temperature?: number; // Thermal temperature for velocity distribution
   solverType: 'gpu_explicit' | 'gpu_explicit_substep' | 'cpu_crank_nicolson';
   solverParams: {
     substeps: number;

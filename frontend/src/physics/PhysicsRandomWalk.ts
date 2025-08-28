@@ -1,6 +1,7 @@
 import type { Particle, CollisionEvent, Step, ScalingParams } from './types';
 import type { IGraph, IGraphNode } from '@spin-network/graph-core';
 import { lattice1D, lattice2D, path, complete } from '@spin-network/graph-core';
+import { simTime, simDt } from './core/GlobalTime';
 
 export interface DensityField {
   error: number;
@@ -44,11 +45,11 @@ export class PhysicsRandomWalk {
   }
 
   generateStep(particle: Particle): Step {
-    const currentTime = Date.now() / 1000; // Convert to seconds
+    const currentTime = simTime(); // unified simulated time
     const collision = this.handleCollision(particle);
     
     // Calculate position change based on velocity and time step
-    const timeStep = Math.min(collision.waitTime, 0.01); // Max 10ms steps
+    const timeStep = Math.min(collision.waitTime, simDt(0.01)); // Max 10ms steps (feature-flag-resolved)
     const deltaX = particle.velocity.vx * timeStep;
     const deltaY = particle.velocity.vy * timeStep;
     
@@ -115,7 +116,7 @@ export class PhysicsRandomWalk {
   }
 
   private handleCollision(particle: Particle): CollisionEvent {
-    const currentTime = Date.now() / 1000;
+    const currentTime = simTime();
     const waitTime = this.generateCollisionTime();
     
     // Check if collision should occur based on timing

@@ -38,6 +38,8 @@ interface SimulatorParams {
   distNx?: number;
   distNy?: number;
   distJitter?: number;
+  // Temperature control for thermal velocity distribution
+  temperature?: number;
 }
 
 export class RandomWalkSimulator {
@@ -61,6 +63,7 @@ export class RandomWalkSimulator {
   private distNx: number = 20;
   private distNy: number = 15;
   private distJitter: number = 4;
+  private temperature: number = 1.0; // Thermal temperature parameter (default: 1.0)
   private densityHistory: Array<{
     time: number;
     density: number[][];
@@ -83,7 +86,7 @@ export class RandomWalkSimulator {
           () => this.particleManager.getAllParticles()
         );
         this.physicsEngine = new PhysicsEngine({
-          timeStep: 0.016,
+          timeStep: 0.01,
           boundaries: boundaryConfig,
           canvasSize: { width: params.canvasWidth ?? this.canvasWidth, height: params.canvasHeight ?? this.canvasHeight },
           dimension: params.dimension,
@@ -111,6 +114,7 @@ export class RandomWalkSimulator {
     if (params.distNx !== undefined) this.distNx = params.distNx;
     if (params.distNy !== undefined) this.distNy = params.distNy;
     if (params.distJitter !== undefined) this.distJitter = params.distJitter;
+    if (params.temperature !== undefined) this.temperature = params.temperature;
     this.initializeParticles();
   }
 
@@ -256,22 +260,61 @@ export class RandomWalkSimulator {
   private initializeParticles(): void {
     // Clear existing particles
     this.particleManager.clearAllParticles();
-    
-    // Create new particles with random positions
+
+    // Generate thermal velocities with momentum conservation
+    const thermalVelocities = this.generateThermalVelocities(this.particleCount, this.dimension);
+
+    // Create new particles with random positions and thermal velocities
     // IMPORTANT: pass positions in CANVAS coordinates here.
     // ParticleManager.initializeParticle() converts canvas -> physics via mapToPhysics().
     for (let i = 0; i < this.particleCount; i++) {
       const pos = this.sampleCanvasPosition(i);
+      const thermalVelocity = thermalVelocities[i];
       const tsParticle = {
         id: `p${i}`,
         position: {
           x: pos.x,
           y: pos.y,
         },
-        velocity: { x: 0, y: 0 },
+        velocity: { x: thermalVelocity.vx, y: thermalVelocity.vy },
       };
       this.particleManager.initializeParticle(tsParticle);
     }
+  }
+
+  private generateThermalVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
+    // Use temperature to scale thermal velocities (Maxwell-Boltzmann distribution)
+    const thermalSpeed = 50 * Math.sqrt(this.temperature); // Scale base speed by sqrt(T)
+    const velocities: Array<{vx: number, vy: number}> = [];
+
+    // Generate individual thermal velocities (Maxwell-Boltzmann-like)
+    for (let i = 0; i < count; i++) {
+      const vx = thermalSpeed * this.gaussianRandom();
+      const vy = dimension === '1D' ? 0 : thermalSpeed * this.gaussianRandom();
+      velocities.push({ vx, vy });
+    }
+
+    // Apply momentum conservation (center of mass velocity = 0)
+    const totalVx = velocities.reduce((sum, v) => sum + v.vx, 0);
+    const totalVy = velocities.reduce((sum, v) => sum + v.vy, 0);
+    const avgVx = totalVx / count;
+    const avgVy = totalVy / count;
+
+    // Subtract center-of-mass velocity from each particle
+    velocities.forEach(v => {
+      v.vx -= avgVx;
+      v.vy -= avgVy;
+    });
+
+    return velocities;
+  }
+
+  private gaussianRandom(): number {
+    // Box-Muller transform for Gaussian random numbers
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
   }
 
   step(dt: number): void {
@@ -320,6 +363,7 @@ export class RandomWalkSimulator {
     if (params.distNx !== undefined) this.distNx = params.distNx;
     if (params.distNy !== undefined) this.distNy = params.distNy;
     if (params.distJitter !== undefined) this.distJitter = params.distJitter;
+    if (params.temperature !== undefined) this.temperature = params.temperature;
     
     // Update particle count if changed or reinitialize if dimension changed
     if (this.particleCount !== params.particleCount || dimensionChanged) {

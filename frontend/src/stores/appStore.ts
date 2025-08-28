@@ -11,6 +11,8 @@ interface RandomWalkUIState {
   isDistributionOpen: boolean
   // UI option: use log scale for particles slider
   particlesLogScale: boolean
+  // UI option: use log scale for temperature slider
+  temperatureLogScale: boolean
   // Observables Panel
   isObservablesExpanded: boolean
   showParticleCount: boolean
@@ -174,6 +176,7 @@ export const useAppStore = create<AppState>()(
         isPeriodic: false,
         showEdgeWeights: false,
         showAnimation: true,
+        temperature: 1.0, // Default thermal temperature
         // Solver selection defaults
         solverType: 'gpu_explicit',
         solverParams: { substeps: 1, cnTheta: 0.5, tolerance: 1e-4, maxIter: 50 },
@@ -202,6 +205,7 @@ export const useAppStore = create<AppState>()(
         isParametersOpen: true,
         isDistributionOpen: false,
         particlesLogScale: true,
+        temperatureLogScale: true, // Default to log scale for temperature
         // Observables Panel
         isObservablesExpanded: true,
         showParticleCount: false,
