@@ -5,6 +5,7 @@ import type { PhysicsContext } from '../types/PhysicsContext';
 import { TimeManager } from './TimeManager';
 import { CoordinateSystem, type Dimension } from './CoordinateSystem';
 import { StrategyOrchestrator } from './StrategyOrchestrator';
+import { setSimTime } from './GlobalTime';
 
 export interface PhysicsEngineConfig {
   timeStep: number; // seconds
@@ -36,6 +37,9 @@ export class PhysicsEngine {
       coordinateSystem: this.coordinateSystem,
       currentTime: this.timeManager.getCurrentTime(),
     };
+
+    // Expose unified simulation time and dt to legacy-compatible utilities
+    setSimTime(context.currentTime, dt);
 
     const perf = (typeof performance !== 'undefined') ? performance : undefined as any;
     try { perf?.mark?.('phys_phaseA_start'); } catch {}
