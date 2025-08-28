@@ -3,11 +3,19 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 export type Dimension = '1D' | '2D';
 
 export class CoordinateSystem {
+  private boundaries: BoundaryConfig;
+  private canvasSize: { width: number; height: number };
+  private dimension: Dimension;
+
   constructor(
-    private boundaries: BoundaryConfig,
-    private canvasSize: { width: number; height: number },
-    private dimension: Dimension,
-  ) {}
+    boundaries: BoundaryConfig,
+    canvasSize: { width: number; height: number },
+    dimension: Dimension,
+  ) {
+    this.boundaries = boundaries;
+    this.canvasSize = canvasSize;
+    this.dimension = dimension;
+  }
 
   toCanvas(physics: { x: number; y: number }): { x: number; y: number } {
     const wPhys = this.boundaries.xMax - this.boundaries.xMin || 1;

@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 18:04:00 IST_
+_Last Updated: 2025-08-28 19:33:28 IST_
 
 ## Active Tasks
 
@@ -23,6 +23,7 @@ _Last Updated: 2025-08-28 18:04:00 IST_
 | C2a | PDE Solver Methods and Boundary Conditions           | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C2              |
 | C2b | PDE UI Implementation                                 | 🔄 IN PROGRESS | MEDIUM   | 2025-08-25 | C2, C2a         |
 | C12 | Interparticle Collisions and Obstacles Implementation | 🔄 IN PROGRESS | HIGH     | 2025-08-27 | C5c             |
+| C15 | Physics Engine Architecture Migration              | 🔄 IN PROGRESS | HIGH     | 2025-08-28 | C5c, C12, C14   |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
@@ -145,6 +146,12 @@ _Last Updated: 2025-08-28 18:04:00 IST_
 **Status**: 🔄 ACTIVE **Last**: 2025-08-24 11:16:39 IST
 **Files**: All memory bank files
 **Notes**: Ongoing maintenance to ensure documentation accuracy and system consistency
+
+### C15: Physics Engine Architecture Migration
+**Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 19:33:28 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/`, `memory-bank/implementation-details/physics-engine-rewrite-implementation.md`
+**Notes**: Phase 1 scaffolding complete (TimeManager, CoordinateSystem, PhysicsStrategy, StrategyOrchestrator, PhysicsEngine, Vite flag). PR #1 merged.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
