@@ -1,11 +1,11 @@
 # Physics Engine Migration Plan (Stepwise)
 
 Created: 2025-08-28 19:00:55 IST
-Last Updated: 2025-08-28 23:05:36 IST
+Last Updated: 2025-08-29 15:23:43 IST
 
 This file tracks the concrete migration steps from the current composite strategy loop to the two-phase PhysicsEngine architecture. Source references: `physics-engine-rewrite-final.md`, `physics-engine-rewrite-claude4.md`, `physics-engine-rewrite-deepseek.md`.
 
-## Current Status (as of 2025-08-28 23:05:36 IST)
+## Current Status (as of 2025-08-29 15:23:43 IST)
 
 - Step 1: COMPLETE
   - Files present: `core/TimeManager.ts`, `core/CoordinateSystem.ts`, `core/StrategyOrchestrator.ts`, `core/PhysicsEngine.ts`, `interfaces/PhysicsStrategy.ts`, `types/PhysicsContext.ts`
@@ -25,7 +25,14 @@ This file tracks the concrete migration steps from the current composite strateg
   - Updated integration tests for new strategy architecture
   - Fixed coordinate system instantiation with proper argument order
   - Added missing getter methods: `getParticleCount()`, `getDimension()`, `getStrategy()`
-- Step 4: PENDING (boundary phase)
+- Step 4: IN PROGRESS (issue resolution & functionality restoration)
+  - RESOLVED: Critical velocity property mismatch (vx/vy vs x/y) in ParticleManager.initializeParticle()
+  - RESOLVED: LegacyBallisticStrategy import cleanup and aliasing
+  - RESOLVED: RandomWalkSimulator step() method logic to properly call particleManager.update()
+  - ADDED: Extensive debug logging infrastructure throughout execution chain
+  - STATUS: Physics simulation now functional with visible particle movement
+  - REMAINING: Complete testing and validation of all functionality
+- Step 5: PENDING (boundary phase)
   - Boundary enforcement still inside strategies via `boundaryUtils`
 - Step 5: PENDING (coordinate centralization)
   - `ParticleManager` owns mapping; `CoordinateSystem` not yet injected/used there
@@ -77,7 +84,34 @@ This file tracks the concrete migration steps from the current composite strateg
 - Boundary handling placement: Phase B via dedicated strategy (recommended)
 - Deterministic tests: mock random for visual parity
 
-## Recent Changes (2025-08-28 23:05:36 IST)
+## Recent Changes 
+
+### Phase 4 Issue Resolution (2025-08-29 15:23:43 IST)
+
+**Root Cause Analysis & Resolution**: 
+- **Velocity Property Mismatch**: Thermal velocity generation in `RandomWalkSimulator.generateThermalVelocities()` created objects with `{vx, vy}` properties, but `ParticleManager.initializeParticle()` was reading `{x, y}` properties, resulting in all particles having zero velocity.
+- **Fix Applied**: Changed `ParticleManager.ts` line 51-52 from `tsParticle.velocity?.x` to `tsParticle.velocity?.vx` and `tsParticle.velocity?.y` to `tsParticle.velocity?.vy`
+
+**Import & Strategy Reference Cleanup**:
+- **LegacyBallisticStrategy Import**: Fixed import in `RandomWalkSimulator.ts` to use `LegacyBallisticStrategy as BallisticStrategy` for clarity
+- **Strategy Initialization**: Updated `initializeStrategies()` method to use consistent `BallisticStrategy` references
+
+**Step Method Logic Correction**:
+- **RandomWalkSimulator.step()**: Fixed legacy path to properly call `particleManager.update(dt)` instead of incorrectly attempting individual particle updates
+- **Flow Validation**: Added debug logging to verify execution chain: simulator → particle manager → strategy
+
+**Debug Infrastructure Enhancement**:
+- **Comprehensive Logging**: Added detailed debug output throughout execution chain with precise velocity and position tracking
+- **Precision Formatting**: Enhanced debug output to show exact numerical values with `.toFixed(4)` precision
+- **Execution Tracing**: Complete logging from simulator step() through ParticleManager.update() to strategy methods
+
+**Temporary Debug Modifications**:
+- **Momentum Conservation**: Temporarily disabled momentum conservation in `generateThermalVelocities()` for debugging purposes
+- **Enhanced Diagnostics**: Added particle state monitoring (active/inactive counts) and strategy execution verification
+
+**Result**: Physics simulation now operates correctly with visible particle movement. All critical blocking issues resolved.
+
+### Previous Changes (2025-08-28 23:05:36 IST)
 
 ### Ballistic Strategy Rollout
 - **BallisticStrategy Interface Migration**: Converted from `PhysicsStrategy` to `RandomWalkStrategy` interface

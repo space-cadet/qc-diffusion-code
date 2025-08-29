@@ -72,4 +72,8 @@ export class PhysicsEngine {
       this.orchestrator.setStrategies(partial.strategies);
     }
   }
+
+  getCoordinateSystem(): CoordinateSystem {
+    return this.coordinateSystem;
+  }
 }

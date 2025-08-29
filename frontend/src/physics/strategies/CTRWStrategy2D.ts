@@ -37,12 +37,22 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
     const collision = this.handleCollision(particle);
+    const dt = simDt(0.01);
     
     if (collision.occurred && collision.newVelocity) {
       particle.velocity = collision.newVelocity;
       particle.lastCollisionTime = collision.timestamp;
       particle.nextCollisionTime = collision.timestamp + collision.waitTime;
       particle.collisionCount++;
+    }
+
+    particle.position.x += particle.velocity.vx * dt;
+    particle.position.y += particle.velocity.vy * dt;
+
+    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    particle.position = newPosition;
+    if (newVelocity) {
+      particle.velocity = newVelocity;
     }
     
     // Record trajectory point

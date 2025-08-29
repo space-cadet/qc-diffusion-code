@@ -48,8 +48,8 @@ export class ParticleManager {
   initializeParticle(tsParticle: any): Particle {
     // Use velocities passed from RandomWalkSimulator (thermal with momentum conservation)
     // If no velocity provided, fall back to zero velocity for compatibility
-    const vx = tsParticle.velocity?.x ?? 0;
-    const vy = tsParticle.velocity?.y ?? 0;
+    const vx = tsParticle.velocity?.vx ?? 0;
+    const vy = tsParticle.velocity?.vy ?? 0;
 
     const currentTime = simTime();
     // Convert initial canvas position to physics coordinates
@@ -92,39 +92,49 @@ export class ParticleManager {
     return particle;
   }
 
-  updateParticle(tsParticle: any): void {
-    let particle = this.particles.get(tsParticle.id);
-
-    if (!particle) {
-      particle = this.initializeParticle(tsParticle);
+  updateParticle(particleData: {
+    id: string;
+    position: {x: number, y: number};
+    velocity: {x: number, y: number};
+  }): void {
+    const particle = this.particles.get(particleData.id);
+    if (particle) {
+      particle.position = particleData.position;
+      particle.velocity = {
+        vx: particleData.velocity.x,
+        vy: particleData.velocity.y
+      };
+      particle.lastUpdate = simTime();
     }
+  }
 
-    this.strategy.updateParticle(particle, this.getAllParticles());
+  update(dt: number): void {
+    console.log('[PM] update called', { dt, particleCount: this.particles.size, strategy: this.strategy.constructor.name });
+    const allParticles = this.getAllParticles();
+    const activeParticles = allParticles.filter(p => p.isActive);
+    console.log('[PM] particles status', { total: allParticles.length, active: activeParticles.length });
+    
+    for (const particle of allParticles) {
+      if (particle.isActive) {
+        // console.log('[PM] updating particle', particle.id);
+        // Use updateParticleWithDt if available, otherwise fallback to updateParticle
+        if ('updateParticleWithDt' in this.strategy && typeof this.strategy.updateParticleWithDt === 'function') {
+          // console.log('[PM] calling updateParticleWithDt');
+          this.strategy.updateParticleWithDt(particle, allParticles, dt);
+        } else {
+          // console.log('[PM] calling updateParticle');
+          this.strategy.updateParticle(particle, allParticles);
+        }
 
-    // Update trajectory
-    particle.trajectory.push({
-      position: { x: particle.position.x, y: particle.position.y },
-      timestamp: simTime(),
-    });
-
-    // Map physics position to canvas coordinates for rendering
-    const mapped = this.mapToCanvas(particle.position);
-    tsParticle.position.x = mapped.x;
-    tsParticle.position.y = mapped.y;
-    tsParticle.velocity.x = particle.velocity.vx;
-    tsParticle.velocity.y = particle.velocity.vy;
-
-    // Periodic diagnostics for one representative particle
-    // if (tsParticle.id === "p0" && this.diagCounter % 30 === 0) {
-    //   console.log("[PM] updateParticle p0", {
-    //     physicsPos: { ...particle.position },
-    //     mappedPos: mapped,
-    //     canvasSize: this.coordSystem.getCanvasSize(),
-    //     bounds: this.strategy.getBoundaries(),
-    //     velocity: particle.velocity,
-    //   });
-    // }
-    this.diagCounter++;
+        // Update trajectory
+        particle.trajectory.push({
+          position: { x: particle.position.x, y: particle.position.y },
+          timestamp: simTime(),
+        });
+      } else {
+        console.log('[PM] particle inactive', particle.id);
+      }
+    }
   }
 
   getAllParticles(): Particle[] {

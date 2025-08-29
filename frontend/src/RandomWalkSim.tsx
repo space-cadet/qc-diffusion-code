@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
+import type { Particle } from "./physics/types/Particle";
 import { Rnd } from "react-rnd";
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanel } from "./components/RandomWalkParameterPanel";
@@ -15,10 +16,11 @@ import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "./physics/observables/ParticleCountObservable";
 import {
-  updateParticlesWithCTRW,
+  updateParticlesFromStrategies,
   setParticleManager,
 } from "./config/tsParticlesConfig";
 import type { SimulationState } from "./types/simulation";
+import { PhysicsEngine } from "./physics/core/PhysicsEngine";
 
 // CSS imports
 import "react-grid-layout/css/styles.css";
@@ -46,7 +48,7 @@ export default function RandomWalkSim() {
   } = useAppStore();
 
   // Physics simulation ref
-  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+  const physicsEngineRef = useRef<PhysicsEngine | null>(null);
   const tsParticlesContainerRef = useRef<any>(null);
   const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   // UI prompt for temperature reseed
@@ -201,7 +203,7 @@ export default function RandomWalkSim() {
         // Sync one frame and resume rendering
         try {
           // Internal RAF stays disabled; draw a single frame to sync
-          updateParticlesWithCTRW(container, true);
+          updateParticlesFromStrategies(container, true);
         } catch {}
       }
     };
@@ -231,7 +233,7 @@ export default function RandomWalkSim() {
     const saveInterval = setInterval(() => {
       if (simulatorRef.current) {
         const particles = simulatorRef.current.getParticleManager().getAllParticles();
-        const particleData = particles.map(p => ({
+        const particleData = particles.map((p: Particle) => ({
           id: p.id,
           position: p.position,
           velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -241,7 +243,6 @@ export default function RandomWalkSim() {
         }));
         
         const densityHistory = simulatorRef.current.getDensityHistory();
-        
         saveSimulationSnapshot(particleData, densityHistory, {});
       }
     }, 2000); // Save every 2 seconds
@@ -396,7 +397,7 @@ export default function RandomWalkSim() {
     // Save state when pausing
     if (simulationState.isRunning && simulatorRef.current) {
       const particles = simulatorRef.current.getParticleManager().getAllParticles();
-      const particleData = particles.map(p => ({
+      const particleData = particles.map((p: Particle) => ({
         id: p.id,
         position: p.position,
         velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -525,7 +526,7 @@ export default function RandomWalkSim() {
       }
 
       // Save the initialized particle state
-      const particleData = particles.map(p => ({
+      const particleData = particles.map((p: Particle) => ({
         id: p.id,
         position: p.position,
         velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -579,7 +580,6 @@ export default function RandomWalkSim() {
       const pm = simulatorRef.current.getParticleManager();
       const w = container.canvas.size.width;
       const h = container.canvas.size.height;
-      // setCanvasSize is optional-safe in case of older builds
       (pm as any).setCanvasSize?.(w, h);
 
       // Restore previous simulation state if available and sync with canvas
@@ -653,7 +653,7 @@ export default function RandomWalkSim() {
 
         // Render only if animation/visibility conditions are met and running
         if (canRender) {
-          updateParticlesWithCTRW(container, true);
+          updateParticlesFromStrategies(container, true);
         }
       }
 
@@ -663,6 +663,8 @@ export default function RandomWalkSim() {
     };
     requestAnimationFrame(updateLoop);
   }, []);
+
+  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -718,7 +720,7 @@ export default function RandomWalkSim() {
               tsParticlesContainerRef={tsParticlesContainerRef}
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
-              boundaryRect={boundaryRect || undefined}
+              
               dimension={gridLayoutParams.dimension}
             />
           </div>
@@ -832,4 +834,4 @@ export default function RandomWalkSim() {
       </div>
     </div>
   );
-};
+}

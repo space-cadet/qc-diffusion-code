@@ -3,7 +3,7 @@ import type { BoundaryConfig } from './types/BoundaryConfig';
 import { ParticleManager } from './ParticleManager';
 import { CTRWStrategy1D } from './strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from './strategies/CTRWStrategy2D';
-import { BallisticStrategy } from './strategies/BallisticStrategy';
+import { LegacyBallisticStrategy as BallisticStrategy } from './strategies/LegacyBallisticStrategy';
 import { LegacyRandomWalkStrategy } from './strategies/LegacyRandomWalkStrategy';
 import { CompositeStrategy } from './strategies/CompositeStrategy';
 import { InterparticleCollisionStrategy } from './strategies/InterparticleCollisionStrategy';
@@ -92,15 +92,9 @@ export class RandomWalkSimulator {
     this.initializeStrategies(config);
     this.currentStrategy = this.strategies[0];
     
-    // Initialize particle manager with coordinate system
-    const coordinateSystem = new CoordinateSystem(
-      this.boundaryConfig,
-      { width: this.canvasWidth, height: this.canvasHeight },
-      this.dimension
-    );
+    // Initialize coordinate system (centralized or fallback)
+    let coordinateSystem: CoordinateSystem;
     
-    this.particleManager = new ParticleManager(this.currentStrategy, this.dimension, coordinateSystem);
-    this.observableManager = new ObservableManager();
     // Initialize new engine (flagged). Behavior unchanged: engine not used in step() yet.
     if (this.useNewEngine) {
       try {
@@ -115,14 +109,29 @@ export class RandomWalkSimulator {
           dimension: this.dimension,
           strategies: [adapter],
         });
+        // Use centralized coordinate system from PhysicsEngine
+        coordinateSystem = this.physicsEngine.getCoordinateSystem();
       } catch (e) {
         console.warn('[RandomWalkSimulator] Failed to initialize PhysicsEngine (fallback to legacy path):', e);
         this.physicsEngine = undefined;
+        // Fallback: create local coordinate system
+        coordinateSystem = new CoordinateSystem(
+          this.boundaryConfig,
+          { width: this.canvasWidth, height: this.canvasHeight },
+          this.dimension
+        );
       }
+    } else {
+      // Legacy path: create local coordinate system
+      coordinateSystem = new CoordinateSystem(
+        this.boundaryConfig,
+        { width: this.canvasWidth, height: this.canvasHeight },
+        this.dimension
+      );
     }
-    // Ensure ParticleManager knows canvas size before seeding particles,
-    // so that mapToPhysics() during initialization uses correct dimensions.
-    this.particleManager.setCanvasSize(this.canvasWidth, this.canvasHeight);
+    
+    this.particleManager = new ParticleManager(this.currentStrategy, this.dimension, coordinateSystem);
+    this.observableManager = new ObservableManager();
     this.initializeParticles();
   }
 
@@ -151,7 +160,7 @@ export class RandomWalkSimulator {
           interparticleCollisions: false, // collisions handled via separate 1D strategy below
         }));
       } else {
-        oneDStrategies.push(new BallisticStrategy()); // Fix BallisticStrategy instantiation
+        oneDStrategies.push(new BallisticStrategy({ boundaryConfig: this.boundaryConfig }));
       }
       if (selectedStrategies.includes('collisions')) {
         oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: this.boundaryConfig }));
@@ -159,13 +168,12 @@ export class RandomWalkSimulator {
       this.strategies = oneDStrategies.length === 1 ? [oneDStrategies[0]] : [new CompositeStrategy(oneDStrategies)];
     }
 
-    // For 2D, always start with ballistic motion as base
+    // For 2D, compose strategies: base is Ballistic; others are added if selected
     else {
-      this.strategies.push(new BallisticStrategy()); // Fix BallisticStrategy instantiation
+      const twoDStrategies: RandomWalkStrategy[] = [new BallisticStrategy({ boundaryConfig: this.boundaryConfig })];
 
-      // Add selected strategies on top of ballistic motion
       if (selectedStrategies.includes('ctrw')) {
-        this.strategies.push(new CTRWStrategy2D({
+        twoDStrategies.push(new CTRWStrategy2D({
           collisionRate: 1,
           jumpLength: 1,
           velocity: 1,
@@ -174,8 +182,10 @@ export class RandomWalkSimulator {
       }
 
       if (selectedStrategies.includes('collisions')) {
-        this.strategies.push(new InterparticleCollisionStrategy({ boundaryConfig: this.boundaryConfig }));
+        twoDStrategies.push(new InterparticleCollisionStrategy({ boundaryConfig: this.boundaryConfig }));
       }
+
+      this.strategies = twoDStrategies.length === 1 ? [twoDStrategies[0]] : [new CompositeStrategy(twoDStrategies)];
     }
   }
 
@@ -274,28 +284,47 @@ export class RandomWalkSimulator {
     // Create new particles with random positions and thermal velocities
     // IMPORTANT: pass positions in CANVAS coordinates here.
     // ParticleManager.initializeParticle() converts canvas -> physics via mapToPhysics().
+    const positions: {x: number, y: number}[] = [];
+    
+    // Clear any existing particles first
+    this.particleManager.clearAllParticles();
+    
     for (let i = 0; i < this.particleCount; i++) {
       const pos = this.sampleCanvasPosition(i);
+      positions.push(pos);
       const thermalVelocity = thermalVelocities[i];
-      // DIAG: log first few assigned initial velocities
+      
+      // Log first few particle positions and velocities
       if (i < 3) {
         console.log('[RWS] init particle', i, {
-          temperature: this.temperature,
-          vx: thermalVelocity.vx.toFixed(4),
-          vy: thermalVelocity.vy.toFixed(4),
-          canvasPos: pos,
+          position: pos,
+          velocity: thermalVelocity,
+          canvasSize: { width: this.canvasWidth, height: this.canvasHeight }
         });
       }
+      
       const tsParticle = {
         id: `p${i}`,
-        position: {
-          x: pos.x,
-          y: pos.y,
-        },
-        velocity: { x: thermalVelocity.vx, y: thermalVelocity.vy },
+        position: pos,
+        velocity: thermalVelocity
       };
       this.particleManager.initializeParticle(tsParticle);
     }
+    
+    // Log detailed coordinate statistics
+    const xCoords = positions.map(p => p.x);
+    const yCoords = positions.map(p => p.y);
+    console.log('[RWS] Initial particle coordinate statistics:', {
+      xMin: Math.min(...xCoords),
+      xMax: Math.max(...xCoords),
+      yMin: Math.min(...yCoords),
+      yMax: Math.max(...yCoords),
+      hasNaN: xCoords.some(isNaN) || yCoords.some(isNaN),
+      hasInfinity: xCoords.some(x => !isFinite(x)) || yCoords.some(y => !isFinite(y)),
+      particleCount: this.particleCount,
+      positionsSample: positions.slice(0, 3),
+      canvasSize: { width: this.canvasWidth, height: this.canvasHeight }
+    });
   }
 
   private generateThermalVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
@@ -326,17 +355,19 @@ export class RandomWalkSimulator {
       });
     }
 
+    // TEMPORARILY DISABLE momentum conservation for debugging
     // Apply momentum conservation (center of mass velocity = 0)
     const totalVx = velocities.reduce((sum, v) => sum + v.vx, 0);
     const totalVy = velocities.reduce((sum, v) => sum + v.vy, 0);
     const avgVx = totalVx / count;
     const avgVy = totalVy / count;
 
-    // Subtract center-of-mass velocity from each particle
-    velocities.forEach(v => {
-      v.vx -= avgVx;
-      v.vy -= avgVy;
-    });
+    console.log('[RWS] momentum conservation disabled for debugging');
+    // // Subtract center-of-mass velocity from each particle
+    // velocities.forEach(v => {
+    //   v.vx -= avgVx;
+    //   v.vy -= avgVy;
+    // });
 
     // DIAG: stats after momentum correction
     if (count > 0) {
@@ -371,17 +402,23 @@ export class RandomWalkSimulator {
   }
 
   step(dt: number): void {
-    this.time += dt;
-    const particles = this.particleManager.getAllParticles();
-    particles.forEach(particle => {
-      this.particleManager.updateParticle({
-        id: particle.id,
-        position: particle.position,
-        velocity: { x: particle.velocity.vx, y: particle.velocity.vy }
-      });
-    });
+    console.log('[RWS] step called', { dt, time: this.time, useNewEngine: this.useNewEngine });
+    
+    if (this.useNewEngine && this.physicsEngine) {
+      // New engine path
+      console.log('[RWS] using new engine path');
+      const particles = this.particleManager.getAllParticles();
+      const engineDt = this.physicsEngine.step(particles);
+      this.time += engineDt;
+    } else {
+      // Legacy path (current implementation)
+      console.log('[RWS] using legacy path, calling particleManager.update');
+      this.time += dt;
+      this.particleManager.update(dt);
+    }
     
     // Update observable snapshot after physics step
+    const particles = this.particleManager.getAllParticles();
     this.observableManager.updateSnapshot(particles, this.time);
   }
 
@@ -430,15 +467,24 @@ export class RandomWalkSimulator {
     if (particles.length === 0 || this.particleCount <= 0) {
       return { error: 0, rho: [] as number[] };
     }
+    
     const positions = particles.map(p => p.position);
     const dx = 0.1;
-    const xMin = Math.min(...positions.map(p => p.x)) - dx;
-    const xMax = Math.max(...positions.map(p => p.x)) + dx;
-    const bins = Math.ceil((xMax - xMin) / dx);
+    const xMin = Math.min(...positions.map(p => p.x));
+    const xMax = Math.max(...positions.map(p => p.x));
+    
+    // Validate bounds before creating array
+    if (!isFinite(xMin) || !isFinite(xMax) || xMin >= xMax) {
+      console.error('[DensityField] Invalid bounds:', {xMin, xMax, positions});
+      return { error: 0, rho: [] as number[] };
+    }
+    
+    const range = xMax - xMin;
+    const bins = Math.min(1000, Math.max(1, Math.ceil(range / dx))); // Limit bins to 1000 maximum
     
     const rho = new Array(bins).fill(0);
     positions.forEach(pos => {
-      const bin = Math.floor((pos.x - xMin) / dx);
+      const bin = Math.floor(((pos.x - xMin) / range) * bins);
       if (bin >= 0 && bin < bins) {
         rho[bin]++;
       }
@@ -570,6 +616,11 @@ export class RandomWalkSimulator {
     return this.particleManager;
   }
 
+  // Expose physics engine (feature-flagged); may be undefined if flag is off or init failed
+  getPhysicsEngine(): PhysicsEngine | undefined {
+    return this.physicsEngine;
+  }
+
   getParticleCount(): number {
     return this.particleCount;
   }
@@ -609,8 +660,9 @@ export class RandomWalkSimulator {
         }
       });
       
-      // Keep only last 100 snapshots to manage memory
-      if (this.densityHistory.length > 100) {
+      // Keep only last 10 snapshots to prevent memory leaks
+      // Reduced from 100 to 10 to prevent GB-level memory usage
+      if (this.densityHistory.length > 10) {
         this.densityHistory.shift();
       }
     }
@@ -627,6 +679,20 @@ export class RandomWalkSimulator {
   clearDensityHistory(): void {
     this.densityHistory = [];
   }
+
+  // Memory cleanup method to prevent leaks
+  dispose(): void {
+    this.clearDensityHistory();
+    // Clear all observables using available methods
+    this.observableManager.reset();
+    // Clear any other potential memory references
+    if (this.physicsEngine) {
+      // Note: PhysicsEngine disposal would need to be implemented there
+      this.physicsEngine = undefined;
+    }
+  }
+
+
 
   analyzeWaveFrontSpeed(): { measuredSpeed: number; theoreticalSpeed: number; error: number } {
     if (this.densityHistory.length < 2) {

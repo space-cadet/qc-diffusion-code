@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
+import type { Particle } from '../physics/types/Particle';
+import { getDensityProfile1D, getDensityProfile2D } from '../physics/utils/density';
 
 interface DensityData2D {
   density: number[][];
@@ -15,13 +16,20 @@ interface DensityData1D {
 }
 
 export const useDensityVisualization = (
-  simulatorRef: React.RefObject<RandomWalkSimulator>,
+  particles: Particle[],
+  particleCount: number,
   binSize?: number,
   dimension: '1D' | '2D' = '2D'
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
   const [densityData1D, setDensityData1D] = useState<DensityData1D | null>(null);
+
+  // Keep particles in a ref to avoid dependency churn on array identity
+  const particlesRef = useRef<Particle[]>(particles);
+  useEffect(() => {
+    particlesRef.current = particles;
+  }, [particles]);
 
   const drawDensityHeatmap = useCallback((data: DensityData2D) => {
     const canvas = canvasRef.current;
@@ -42,7 +50,8 @@ export const useDensityVisualization = (
     const yScale = canvas.height / density.length;
 
     // Find max density for normalization
-    const maxDensity = Math.max(...(density.flat() as number[]));
+    const flatDensity = density.flat() as number[];
+    const maxDensity = flatDensity.reduce((max, val) => Math.max(max, val), 0);
     
     if (maxDensity === 0) return;
 
@@ -98,7 +107,7 @@ export const useDensityVisualization = (
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Find max density for normalization
-    const maxDensity = Math.max(...density);
+    const maxDensity = density.reduce((max, val) => Math.max(max, val), 0);
     
     if (maxDensity === 0) return;
 
@@ -106,18 +115,18 @@ export const useDensityVisualization = (
     const barSpacing = Math.max(1, barWidth * 0.1); // 10% spacing
     const actualBarWidth = barWidth - barSpacing;
 
+    // Create single gradient once, not per bar (prevents memory leak)
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#f59e0b'); // Orange top
+    gradient.addColorStop(1, '#d97706'); // Darker orange bottom
+
     // Draw histogram bars
     for (let i = 0; i < density.length; i++) {
       const barHeight = (density[i] / maxDensity) * canvas.height * 0.85;
       const x = i * barWidth + barSpacing / 2;
       const y = canvas.height - barHeight;
 
-      // Create gradient for each bar
-      const gradient = ctx.createLinearGradient(0, y, 0, canvas.height);
-      gradient.addColorStop(0, '#f59e0b'); // Orange top
-      gradient.addColorStop(1, '#d97706'); // Darker orange bottom
-
-      // Draw bar
+      // Use the same gradient for all bars (no memory leak)
       ctx.fillStyle = gradient;
       ctx.fillRect(x, y, actualBarWidth, barHeight);
 
@@ -129,22 +138,34 @@ export const useDensityVisualization = (
   }, []);
 
   const updateDensity = useCallback(() => {
-    if (!simulatorRef.current) return;
-    
+    const currentParticles = particlesRef.current;
     if (dimension === '1D') {
-      const data = simulatorRef.current.getDensityProfile1D(binSize || 20);
+      const data = getDensityProfile1D(currentParticles, particleCount, binSize || 20);
       setDensityData1D(data);
       drawDensity1D(data);
     } else {
-      const data = simulatorRef.current.getDensityProfile2D(binSize || 20);
+      const data = getDensityProfile2D(currentParticles, particleCount, binSize || 20);
       setDensityData2D(data);
       drawDensityHeatmap(data);
     }
-  }, [simulatorRef, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
+  }, [particleCount, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
 
   useEffect(() => {
     updateDensity();
-  }, [binSize, dimension]);
+    
+    // Cleanup function to prevent memory leaks
+    return () => {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Clear canvas and reset context
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.reset?.(); // Reset context if available (modern browsers)
+        }
+      }
+    };
+  }, [binSize, dimension, particleCount]);
 
   return {
     canvasRef,

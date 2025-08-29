@@ -20,9 +20,20 @@ export class LegacyStrategyAdapter implements PhysicsStrategy {
     // no-op
   }
 
-  integrate?(particle: Particle, _dt: number, _context: PhysicsContext): void {
+  integrate?(particle: Particle, dt: number, _context: PhysicsContext): void {
     const all = this.getAllParticles();
-    this.wrapped.updateParticle(particle, all);
+    // Pass dt to the wrapped strategy if it supports it
+    if (typeof (this.wrapped as any).updateParticleWithDt === 'function') {
+      (this.wrapped as any).updateParticleWithDt(particle, all, dt);
+    } else {
+      this.wrapped.updateParticle(particle, all);
+      // For strategies that don't integrate position (like CTRWStrategy2D),
+      // manually integrate position using current velocity
+      if (this.wrapped.constructor.name.includes('CTRW')) {
+        particle.position.x += particle.velocity.vx * dt;
+        particle.position.y += particle.velocity.vy * dt;
+      }
+    }
   }
 
   setBoundaries?(config: BoundaryConfig): void {

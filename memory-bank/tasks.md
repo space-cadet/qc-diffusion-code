@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-28 23:05:36 IST_
+_Last Updated: 2025-08-29 15:23:43 IST_
 
 ## Active Tasks
 
@@ -148,10 +148,10 @@ _Last Updated: 2025-08-28 23:05:36 IST_
 **Notes**: Ongoing maintenance to ensure documentation accuracy and system consistency
 
 ### C15: Physics Engine Architecture Migration
-**Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-28 23:05:36 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/physics/__tests__/integration.test.ts`, `frontend/src/physics/core/CoordinateSystem.ts`, `frontend/src/physics/ParticleManager.ts`, `memory-bank/implementation-details/physics-engine-rewrite-migration-plan.md`
-**Notes**: Phase 3.5 complete: Ballistic strategy rollout completed. BallisticStrategy migrated from PhysicsStrategy to RandomWalkStrategy interface. Fixed RandomWalkSimulator constructor with proper CoordinateSystem/ParticleManager instantiation. Added missing getter methods. Updated integration tests for new architecture. All modified files now use consistent constructor signatures and interface compliance.
+**Description**: Migrate existing physics engine to new architecture with velocity property fixes and debug infrastructure
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-29 15:23:43 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/strategies/LegacyBallisticStrategy.ts`
+**Notes**: Phase 4 progress: Critical velocity property mismatch resolved (vx/vy vs x/y properties). Step method logic fixed to properly call particleManager.update(). LegacyBallisticStrategy import cleanup completed. Physics simulation now functional with visible particle movement. Extensive debug logging infrastructure added throughout execution chain.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

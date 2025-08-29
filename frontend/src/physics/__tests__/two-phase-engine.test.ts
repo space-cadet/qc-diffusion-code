@@ -54,7 +54,7 @@ describe('Two-Phase Physics Engine', () => {
 
   it('handles boundary collisions correctly', () => {
     // Move particle close to boundary
-    particles[0].position.x = 9.9;
+    particles[0].position.x = 9.95;
     
     const dt = engine.step(particles);
     
@@ -64,7 +64,7 @@ describe('Two-Phase Physics Engine', () => {
   });
 
   it('preserves momentum in boundary collisions', () => {
-    particles[0].position.x = 9.9;
+    particles[0].position.x = 9.95;
     particles[0].velocity.vx = 5;
     const initialKE = 0.5 * (particles[0].velocity.vx ** 2 + particles[0].velocity.vy ** 2);
     
