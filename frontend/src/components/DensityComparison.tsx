@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAppStore } from '../stores/appStore';
-import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 import { useDensityVisualization } from '../hooks/useDensityVisualization';
+import type { Particle } from "../physics/types/Particle";
+import { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
 
 interface DensityComparisonProps {
   simulatorRef: React.RefObject<RandomWalkSimulator>;
+  particles?: Particle[];
+  particleCount?: number;
   gridLayoutParams: {
     simulationType: "continuum" | "graph";
     velocity: number;
@@ -14,6 +17,8 @@ interface DensityComparisonProps {
 }
 
 export const DensityComparison: React.FC<DensityComparisonProps> = ({
+  particles,
+  particleCount,
   simulatorRef,
   gridLayoutParams,
 }) => {
@@ -22,9 +27,16 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     setRandomWalkUIState 
   } = useAppStore();
   
-  const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(simulatorRef, undefined, gridLayoutParams.dimension);
+  // Stable empty particles array to avoid identity changes each render
+  const EMPTY_PARTICLES = React.useRef<Particle[]>([]).current;
+
+  const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(
+    particles ?? EMPTY_PARTICLES,
+    particleCount || 0,
+    undefined,
+    gridLayoutParams.dimension
+  );
   const [recordHistory, setRecordHistory] = useState(false);
-  const [waveFrontAnalysis, setWaveFrontAnalysis] = useState({ measuredSpeed: 0, theoreticalSpeed: 0, error: 0 });
 
   // Helper function to update persistent autoUpdate state
   const setAutoUpdate = (autoUpdate: boolean) => {
@@ -37,8 +49,6 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   // Calculate theoretical values
   const diffusionCoefficient =
     gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate);
-  const convergenceError =
-    simulatorRef.current?.getDensityField()?.error || 0.023;
 
   // Calculate effective values from density data
   const densityData = gridLayoutParams.dimension === '1D' ? densityData1D : densityData2D;
@@ -47,28 +57,16 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   const occupiedBins = densityData ? (densityData.density as number[] | number[][]).flat().filter((d: number) => d > 0).length : 0;
   const spreadRatio = totalBins > 0 ? occupiedBins / totalBins : 0;
 
-  // Telegraph equation verification
-  const updateWaveFrontAnalysis = () => {
-    if (simulatorRef.current) {
-      const analysis = simulatorRef.current.analyzeWaveFrontSpeed();
-      setWaveFrontAnalysis(analysis);
-    }
-  };
-
   // Auto-update density when simulation is running
   useEffect(() => {
     if (!randomWalkUIState.densityAutoUpdate) return;
     
     const interval = setInterval(() => {
       updateDensity();
-      if (recordHistory && simulatorRef.current) {
-        simulatorRef.current.recordDensitySnapshot(15);
-      }
-      updateWaveFrontAnalysis();
     }, 100);
 
     return () => clearInterval(interval);
-  }, [randomWalkUIState.densityAutoUpdate, recordHistory, updateDensity]);
+  }, [randomWalkUIState.densityAutoUpdate]);
 
   // Redraw when dimension changes
   useEffect(() => {
@@ -97,21 +95,6 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
             }`}
           >
             {randomWalkUIState.densityAutoUpdate ? 'Auto ON' : 'Auto OFF'}
-          </button>
-          <button
-            onClick={() => {
-              setRecordHistory(!recordHistory);
-              if (!recordHistory && simulatorRef.current) {
-                simulatorRef.current.clearDensityHistory();
-              }
-            }}
-            className={`px-3 py-1 text-xs rounded ${
-              recordHistory 
-                ? 'bg-purple-500 text-white hover:bg-purple-600' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            {recordHistory ? 'Rec ON' : 'Rec OFF'}
           </button>
         </div>
       </div>
@@ -148,18 +131,6 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
             {densityData && gridLayoutParams.dimension === '1D' && densityData.density && (
               <div>Size: {(densityData.density as number[]).length}</div>
             )}
-          </div>
-          
-          <div className="bg-blue-50 p-2 rounded">
-            <div className="font-semibold mb-1">Telegraph Eq.</div>
-            <div>Error: {convergenceError.toFixed(3)}</div>
-            <div>v_meas: {waveFrontAnalysis.measuredSpeed.toFixed(3)}</div>
-            <div>v_theo: {waveFrontAnalysis.theoreticalSpeed.toFixed(3)}</div>
-            <div>Wave Error: {(waveFrontAnalysis.error * 100).toFixed(1)}%</div>
-            <div className="text-xs text-gray-600 mt-1">
-              Blue = Low density<br/>
-              Red = High density
-            </div>
           </div>
         </div>
       </div>

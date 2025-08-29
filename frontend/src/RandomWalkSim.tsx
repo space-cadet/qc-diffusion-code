@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
+import type { Particle } from "./physics/types/Particle";
 import { Rnd } from "react-rnd";
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanel } from "./components/RandomWalkParameterPanel";
@@ -15,10 +16,11 @@ import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "./physics/observables/ParticleCountObservable";
 import {
-  updateParticlesWithCTRW,
+  updateParticlesFromStrategies,
   setParticleManager,
 } from "./config/tsParticlesConfig";
 import type { SimulationState } from "./types/simulation";
+import { PhysicsEngine } from "./physics/core/PhysicsEngine";
 
 // CSS imports
 import "react-grid-layout/css/styles.css";
@@ -46,9 +48,11 @@ export default function RandomWalkSim() {
   } = useAppStore();
 
   // Physics simulation ref
-  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+  const physicsEngineRef = useRef<PhysicsEngine | null>(null);
   const tsParticlesContainerRef = useRef<any>(null);
   const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  // UI prompt for temperature reseed
+  const [tempNotice, setTempNotice] = useState<string | null>(null);
 
   // Runtime state (non-persistent)
   const [isRunning, setIsRunning] = useState(false);
@@ -99,6 +103,7 @@ export default function RandomWalkSim() {
   const gridLayoutParamsRef = useRef(gridLayoutParams);
   // Control rendering independently from physics
   const renderEnabledRef = useRef(true);
+  const lastTempRef = useRef<number | undefined>(undefined);
 
   // Update refs when state changes
   useEffect(() => {
@@ -108,6 +113,80 @@ export default function RandomWalkSim() {
   useEffect(() => {
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
+
+  // Auto-reseed when temperature changes, and show a small UI prompt
+  useEffect(() => {
+    const newT = gridLayoutParams.temperature;
+    const prevT = lastTempRef.current;
+    lastTempRef.current = newT;
+    // Skip on first mount when prevT is undefined
+    if (prevT === undefined) return;
+
+    if (simulatorRef.current && typeof newT === 'number' && newT !== prevT) {
+      const sim = simulatorRef.current;
+      const container = tsParticlesContainerRef.current;
+      try {
+        // Update parameters (ensure canvas size is available for mappings)
+        const w = container?.canvas?.size?.width || 800;
+        const h = container?.canvas?.size?.height || 600;
+        sim.updateParameters({
+          temperature: newT,
+          canvasWidth: w,
+          canvasHeight: h,
+          // keep other params unchanged; updateParameters merges selectively
+          collisionRate: gridLayoutParams.collisionRate,
+          jumpLength: gridLayoutParams.jumpLength,
+          velocity: gridLayoutParams.velocity,
+          simulationType: gridLayoutParams.simulationType,
+          dimension: gridLayoutParams.dimension,
+          interparticleCollisions: gridLayoutParams.interparticleCollisions,
+          strategies: gridLayoutParams.strategies,
+          graphType: gridLayoutParams.graphType,
+          graphSize: gridLayoutParams.graphSize,
+          particleCount: gridLayoutParams.particles,
+          // distribution params (so reseed uses current selection)
+          initialDistType: gridLayoutParams.initialDistType,
+          distSigmaX: gridLayoutParams.distSigmaX,
+          distSigmaY: gridLayoutParams.distSigmaY,
+          distR0: gridLayoutParams.distR0,
+          distDR: gridLayoutParams.distDR,
+          distThickness: gridLayoutParams.distThickness,
+          distNx: gridLayoutParams.distNx,
+          distNy: gridLayoutParams.distNy,
+          distJitter: gridLayoutParams.distJitter,
+        });
+
+        // Clear canvas particles and reseed physics particles
+        if (container?.particles) {
+          container.particles.clear();
+        }
+
+        // Reset simulation state (re-initialize particles with new temperature)
+        sim.reset();
+
+        // Sync canvas with new physics particles
+        const pm = sim.getParticleManager();
+        (pm as any).setCanvasSize?.(w, h);
+        const particles = pm.getAllParticles();
+        if (container?.particles && particles?.length) {
+          for (const p of particles) {
+            const canvasPos = pm.mapToCanvas(p.position);
+            container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
+          }
+          // Force one draw
+          try { (container as any).draw?.(false); } catch {}
+        }
+
+        // Show UI prompt briefly
+        setTempNotice(`Temperature changed to ${newT.toFixed(2)} — particles reseeded`);
+        const t = setTimeout(() => setTempNotice(null), 2000);
+        return () => clearTimeout(t);
+      } catch (e) {
+        console.warn("Auto-reseed on temperature change failed:", e);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gridLayoutParams.temperature]);
 
   // Manage rendering when tab/window visibility changes
   useEffect(() => {
@@ -124,7 +203,7 @@ export default function RandomWalkSim() {
         // Sync one frame and resume rendering
         try {
           // Internal RAF stays disabled; draw a single frame to sync
-          updateParticlesWithCTRW(container, true);
+          updateParticlesFromStrategies(container, true);
         } catch {}
       }
     };
@@ -154,7 +233,7 @@ export default function RandomWalkSim() {
     const saveInterval = setInterval(() => {
       if (simulatorRef.current) {
         const particles = simulatorRef.current.getParticleManager().getAllParticles();
-        const particleData = particles.map(p => ({
+        const particleData = particles.map((p: Particle) => ({
           id: p.id,
           position: p.position,
           velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -164,7 +243,6 @@ export default function RandomWalkSim() {
         }));
         
         const densityHistory = simulatorRef.current.getDensityHistory();
-        
         saveSimulationSnapshot(particleData, densityHistory, {});
       }
     }, 2000); // Save every 2 seconds
@@ -198,6 +276,7 @@ export default function RandomWalkSim() {
       boundaryCondition: gridLayoutParams.boundaryCondition,
       canvasWidth,
       canvasHeight,
+      temperature: gridLayoutParams.temperature,
       // initial distribution wiring
       initialDistType: gridLayoutParams.initialDistType,
       distSigmaX: gridLayoutParams.distSigmaX,
@@ -281,6 +360,7 @@ export default function RandomWalkSim() {
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles,
+        temperature: gridLayoutParams.temperature,
         // pass through distribution params as they change
         initialDistType: gridLayoutParams.initialDistType,
         distSigmaX: gridLayoutParams.distSigmaX,
@@ -317,7 +397,7 @@ export default function RandomWalkSim() {
     // Save state when pausing
     if (simulationState.isRunning && simulatorRef.current) {
       const particles = simulatorRef.current.getParticleManager().getAllParticles();
-      const particleData = particles.map(p => ({
+      const particleData = particles.map((p: Particle) => ({
         id: p.id,
         position: p.position,
         velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -412,6 +492,7 @@ export default function RandomWalkSim() {
         graphSize: gridLayoutParams.graphSize,
         canvasWidth: container.canvas.size.width,
         canvasHeight: container.canvas.size.height,
+        temperature: gridLayoutParams.temperature,
         // ensure distribution used for reseeding
         initialDistType: gridLayoutParams.initialDistType,
         distSigmaX: gridLayoutParams.distSigmaX,
@@ -445,7 +526,7 @@ export default function RandomWalkSim() {
       }
 
       // Save the initialized particle state
-      const particleData = particles.map(p => ({
+      const particleData = particles.map((p: Particle) => ({
         id: p.id,
         position: p.position,
         velocity: { vx: p.velocity.vx, vy: p.velocity.vy },
@@ -499,7 +580,6 @@ export default function RandomWalkSim() {
       const pm = simulatorRef.current.getParticleManager();
       const w = container.canvas.size.width;
       const h = container.canvas.size.height;
-      // setCanvasSize is optional-safe in case of older builds
       (pm as any).setCanvasSize?.(w, h);
 
       // Restore previous simulation state if available and sync with canvas
@@ -573,7 +653,7 @@ export default function RandomWalkSim() {
 
         // Render only if animation/visibility conditions are met and running
         if (canRender) {
-          updateParticlesWithCTRW(container, true);
+          updateParticlesFromStrategies(container, true);
         }
       }
 
@@ -584,8 +664,16 @@ export default function RandomWalkSim() {
     requestAnimationFrame(updateLoop);
   }, []);
 
+  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
+      {/* Temperature change prompt */}
+      {tempNotice && (
+        <div className="fixed top-4 right-4 z-50 bg-amber-100 border border-amber-300 text-amber-900 px-3 py-2 rounded shadow">
+          {tempNotice}
+        </div>
+      )}
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-2">
           Random Walk → Telegraph Equation
@@ -632,7 +720,7 @@ export default function RandomWalkSim() {
               tsParticlesContainerRef={tsParticlesContainerRef}
               particlesLoaded={particlesLoaded}
               graphPhysicsRef={graphPhysicsRef}
-              boundaryRect={boundaryRect || undefined}
+              
               dimension={gridLayoutParams.dimension}
             />
           </div>
@@ -746,4 +834,4 @@ export default function RandomWalkSim() {
       </div>
     </div>
   );
-};
+}

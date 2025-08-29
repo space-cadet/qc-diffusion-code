@@ -9,6 +9,7 @@ import {
   initializeEngine,
   createParticleContainer,
   destroyContainer,
+  updateParticlesFromStrategies,
 } from "../config/tsParticlesConfig";
 
 interface NodeAttributes {
@@ -275,10 +276,31 @@ const ParticleCanvasComponent: React.FC<{
         });
         (animate as any)._logged = true;
       }
+      // Sync visual particles from physics via active strategy
+      updateParticlesFromStrategies(container, true);
       // Do not update positions here; parent (RandomWalkSim) controls physics
       (container as any).draw?.(false);
       if (drawCount % 120 === 0) {
-        console.log("[PC] animate tick", { drawCount });
+        const particlesContainer: any = (container as any).particles;
+        const particlesArray: any[] = (particlesContainer?.array ?? particlesContainer?._array ?? []) as any[];
+
+        const xPositions = particlesArray.map((p: any) => p?.position?.x ?? 0);
+        const yPositions = particlesArray.map((p: any) => p?.position?.y ?? 0);
+        const xVelocities = particlesArray.map((p: any) => p?.velocity?.x ?? 0);
+        const yVelocities = particlesArray.map((p: any) => p?.velocity?.y ?? 0);
+
+        console.log("[PC] animate tick", {
+          drawCount,
+          xMin: xPositions.length > 0 ? Math.min(...xPositions) : 0,
+          xMax: xPositions.length > 0 ? Math.max(...xPositions) : 0,
+          yMin: yPositions.length > 0 ? Math.min(...yPositions) : 0,
+          yMax: yPositions.length > 0 ? Math.max(...yPositions) : 0,
+          vxMin: xVelocities.length > 0 ? Math.min(...xVelocities) : 0,
+          vxMax: xVelocities.length > 0 ? Math.max(...xVelocities) : 0,
+          vyMin: yVelocities.length > 0 ? Math.min(...yVelocities) : 0,
+          vyMax: yVelocities.length > 0 ? Math.max(...yVelocities) : 0,
+          particleCount: (container as any).particles?.count ?? particlesArray.length
+        });
       }
       animationFrameRef.current = requestAnimationFrame(animate);
     };

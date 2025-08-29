@@ -1,6 +1,7 @@
 import type { Particle } from '../types/Particle';
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { PhysicsContext } from '../types/PhysicsContext';
+import { BoundaryPhase } from './BoundaryPhase';
 
 export class StrategyOrchestrator {
   private collisionStrategies: PhysicsStrategy[] = [];
@@ -8,7 +9,9 @@ export class StrategyOrchestrator {
   private boundaryStrategies: PhysicsStrategy[] = [];
 
   constructor(strategies: PhysicsStrategy[] = []) {
-    this.categorizeStrategies(strategies);
+    // Always add BoundaryPhase as the final boundary handler
+    const withBoundary = [...strategies, new BoundaryPhase()];
+    this.categorizeStrategies(withBoundary);
   }
 
   setStrategies(strategies: PhysicsStrategy[]): void {
@@ -19,14 +22,18 @@ export class StrategyOrchestrator {
   }
 
   private categorizeStrategies(strategies: PhysicsStrategy[]): void {
-    // Simple default classification: rely on method presence.
+    // Simple default classification: rely on method presence and instance type.
     // Callers can control order by the input array ordering within each phase.
     for (const s of strategies) {
       if (typeof s.preUpdate === 'function') {
         this.collisionStrategies.push(s);
       }
       if (typeof s.integrate === 'function') {
-        this.motionStrategies.push(s);
+        if (s instanceof BoundaryPhase) {
+          this.boundaryStrategies.push(s);
+        } else {
+          this.motionStrategies.push(s);
+        }
       }
     }
   }

@@ -14,6 +14,7 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    VITE_USE_NEW_PHYSICS_ENGINE: JSON.stringify(process.env.VITE_USE_NEW_PHYSICS_ENGINE || 'false'),
   },
   resolve: {
     alias: {

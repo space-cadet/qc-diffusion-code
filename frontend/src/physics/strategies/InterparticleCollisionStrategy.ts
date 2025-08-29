@@ -23,10 +23,10 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {
     // Ensure each pair is processed only once per frame using numeric id ordering
-    const pid = parseInt(particle.id.replace(/\D+/g, ''), 10) || 0;
+    const pid = parseInt(String(particle.id).replace(/\D+/g, ''), 10) || 0;
     for (const other of allParticles) {
       if (particle.id === other.id) continue;
-      const oid = parseInt(other.id.replace(/\D+/g, ''), 10) || 0;
+      const oid = parseInt(String(other.id).replace(/\D+/g, ''), 10) || 0;
       if (!(pid < oid)) continue; // only handle pair once when pid < oid
 
       const dx = particle.position.x - other.position.x;

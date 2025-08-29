@@ -25,4 +25,5 @@ export interface Particle {
   waitingTime: number;
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;
+  lastUpdate: number;
 }

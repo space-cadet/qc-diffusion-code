@@ -37,12 +37,22 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
     const collision = this.handleCollision(particle);
+    const dt = simDt(0.01);
     
     if (collision.occurred && collision.newVelocity) {
       particle.velocity = collision.newVelocity;
       particle.lastCollisionTime = collision.timestamp;
       particle.nextCollisionTime = collision.timestamp + collision.waitTime;
       particle.collisionCount++;
+    }
+
+    particle.position.x += particle.velocity.vx * dt;
+    particle.position.y += particle.velocity.vy * dt;
+
+    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    particle.position = newPosition;
+    if (newVelocity) {
+      particle.velocity = newVelocity;
     }
     
     // Record trajectory point
@@ -80,15 +90,31 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
     const timeStep = Math.min(collision.waitTime, simDt(0.01));
     const dx = particle.velocity.vx * timeStep;
     const dy = particle.velocity.vy * timeStep;
-    
-    return {
-      dx,
-      dy,
-      collision,
-      timestamp: currentTime,
-      particleId: particle.id
-    };
-  }
+
+    // DIAG: occasional log for p0 to inspect CTRW2D motion inputs
+    if ((particle.id === 'p0') && (Math.floor(currentTime / Math.max(timeStep, 1e-6)) % 60 === 0)) {
+      const speed = Math.hypot(particle.velocity.vx, particle.velocity.vy);
+      console.log('[CTRW2D] p0', {
+        simTime: currentTime.toFixed(3),
+        dt: timeStep.toExponential(3),
+        vx: particle.velocity.vx.toFixed(4),
+        vy: particle.velocity.vy.toFixed(4),
+        speed: speed.toFixed(4),
+        dx: dx.toExponential(3),
+        dy: dy.toExponential(3),
+        nextCollisionTime: particle.nextCollisionTime.toFixed(3),
+        collided: collision.occurred,
+      });
+    }
+     
+     return {
+       dx,
+       dy,
+       collision,
+       timestamp: currentTime,
+       particleId: particle.id
+     };
+   }
 
   private generateCollisionTime(): number {
     return -Math.log(Math.random()) / this.collisionRate;
