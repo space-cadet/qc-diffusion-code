@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 00:35:27 IST_
+_Last Updated: 2025-08-31 01:01:23 IST_
 
 ## Active Tasks
 
@@ -149,9 +149,9 @@ _Last Updated: 2025-08-31 00:35:27 IST_
 
 ### C15: Physics Engine Architecture Migration
 **Description**: Migrate existing physics engine to new architecture with velocity property fixes and debug infrastructure
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-31 00:35:27 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/strategies/LegacyBallisticStrategy.ts`, `frontend/src/physics/utils/density.ts`, `frontend/src/physics/utils/ThermalVelocities.ts`, `frontend/src/physics/utils/InitDistributions.ts`
-**Notes**: RandomWalkSimulator refactoring: Extracted density profile and field computation to utils/density.ts; extracted thermal velocity generation to utils/ThermalVelocities.ts; extracted initial position sampling to utils/InitDistributions.ts; preserved existing behavior and APIs while improving modularity. Phase 4 progress: Critical velocity property mismatch resolved (vx/vy vs x/y properties). Step method logic fixed to properly call particleManager.update(). LegacyBallisticStrategy import cleanup completed. Physics simulation now functional with visible particle movement. Extensive debug logging infrastructure added throughout execution chain.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-08-31 01:01:23 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/strategies/LegacyBallisticStrategy.ts`, `frontend/src/physics/utils/density.ts`, `frontend/src/physics/utils/ThermalVelocities.ts`, `frontend/src/physics/utils/InitDistributions.ts`, `frontend/src/physics/analysis/WavefrontAnalysis.ts`, `frontend/src/physics/core/SimulationRunner.ts`, `frontend/src/physics/core/ParameterManager.ts`
+**Notes**: RandomWalkSimulator refactoring: Completed all three phases - (1) Extracted density profile and field computation to utils/density.ts; (2) extracted thermal velocity generation to utils/ThermalVelocities.ts and initial position sampling to utils/InitDistributions.ts; (3) extracted analysis utilities to analysis/WavefrontAnalysis.ts. Fixed TypeScript errors in SimulationRunner.ts by replacing shorthand constructor syntax with explicit property declarations to comply with 'erasableSyntaxOnly' compiler option. Fixed RandomWalkSimulator.ts type-only imports and added definite assignment assertions to uninitialized properties. Preserved existing behavior and APIs while improving modularity and code organization.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
