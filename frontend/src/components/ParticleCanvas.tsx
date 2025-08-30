@@ -266,7 +266,13 @@ const ParticleCanvasComponent: React.FC<{
     }
 
     let drawCount = 0;
+    let lastTime = performance.now();
+
     const animate = () => {
+      const currentTime = performance.now();
+      const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+      lastTime = currentTime;
+
       drawCount++;
       // Log once at start of animation loop
       if ((animate as any)._logged !== true) {
@@ -276,10 +282,16 @@ const ParticleCanvasComponent: React.FC<{
         });
         (animate as any)._logged = true;
       }
+
+      // Step physics simulation forward if simulator is available
+      // Note: Physics stepping is now handled by useParticlesLoader hook
+      // This animation loop focuses on rendering/syncing visual particles
+
       // Sync visual particles from physics via active strategy
-      updateParticlesFromStrategies(container, true);
+      updateParticlesFromStrategies(container, true, simulationStatus === "running");
       // Do not update positions here; parent (RandomWalkSim) controls physics
       (container as any).draw?.(false);
+
       if (drawCount % 120 === 0) {
         const particlesContainer: any = (container as any).particles;
         const particlesArray: any[] = (particlesContainer?.array ?? particlesContainer?._array ?? []) as any[];
@@ -291,6 +303,7 @@ const ParticleCanvasComponent: React.FC<{
 
         console.log("[PC] animate tick", {
           drawCount,
+          deltaTime: deltaTime.toFixed(4) + 's',
           xMin: xPositions.length > 0 ? Math.min(...xPositions) : 0,
           xMax: xPositions.length > 0 ? Math.max(...xPositions) : 0,
           yMin: yPositions.length > 0 ? Math.min(...yPositions) : 0,

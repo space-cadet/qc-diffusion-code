@@ -17,16 +17,48 @@ export const useParticlesLoader = ({
 }) => {
   return useCallback((container: Container) => {
     tsParticlesContainerRef.current = container;
-    
-    // Rest of particlesLoaded implementation...
-    // [Previous lines 567-665 would go here]
-    
-    const updateLoop = () => {
-      if (simulatorRef.current) {
-        // Physics update and rendering logic
+
+    // Store previous time for delta calculation (render timing)
+    let lastRenderTime = performance.now();
+    let accumulatedTime = 0; // For fixed physics timestep
+
+    const animate = () => {
+      const currentRenderTime = performance.now();
+      const renderDeltaTime = (currentRenderTime - lastRenderTime) / 1000;
+      lastRenderTime = currentRenderTime;
+
+      // Accumulate time for physics steps (migration plan: unified time)
+      accumulatedTime += renderDeltaTime;
+
+      // PHASE A: Physics Simulation (migration plan: controlled by simulation state)
+      // Only step physics when simulation is actually running
+      if (simulatorRef.current && simulationStateRef.current?.isRunning) {
+        // Use fixed physics timestep for stability (migration plan: parity with 0.01)
+        const physicsTimeStep = 0.01;
+
+        // Step physics multiple times if accumulated time allows
+        while (accumulatedTime >= physicsTimeStep) {
+          simulatorRef.current.step(physicsTimeStep);
+          accumulatedTime -= physicsTimeStep;
+        }
+      } else {
+        // Reset accumulator when simulation not running
+        accumulatedTime = 0;
       }
-      requestAnimationFrame(updateLoop);
+
+      // PHASE B: Rendering (migration plan: controlled by visibility)
+      // Only render when tab is visible (can pause when hidden)
+      if (renderEnabledRef.current && container) {
+        // Sync visual particles from physics state
+        updateParticlesFromStrategies(container, true, simulationStateRef.current?.isRunning || false);
+
+        // Render to canvas
+        (container as any).draw?.(false);
+      }
+
+      requestAnimationFrame(animate);
     };
-    requestAnimationFrame(updateLoop);
+
+    requestAnimationFrame(animate);
   }, []);
 };

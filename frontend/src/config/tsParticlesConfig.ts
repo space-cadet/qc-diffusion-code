@@ -102,7 +102,8 @@ export const createParticleContainer = async (
 // Update particles with physics simulation data
 export const updateParticlesFromStrategies = (
   container: Container,
-  showAnimation: boolean = true
+  showAnimation: boolean = true,
+  isSimulationRunning: boolean = false
 ): void => {
   if (!particleManager || !showAnimation) {
     return;
@@ -138,7 +139,8 @@ export const updateParticlesFromStrategies = (
       }
     }
 
-    if (_diagFrameCounter % 60 === 0) {
+    // Only log diagnostics when simulation is actually running
+    if (_diagFrameCounter % 60 === 0 && isSimulationRunning) {
       // Diagnostic logging
       const firstPhysicsParticle = physicsParticles[0];
       const firstTsParticle = (container.particles as any).get(0) as TsParticle | undefined;

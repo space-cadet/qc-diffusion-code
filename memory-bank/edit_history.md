@@ -1,9 +1,22 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 01:04:23 IST_
+_Last Updated: 2025-08-31 02:43:12 IST_
 
 ### 2025-08-31
+
+#### 02:43 - C15: Animation Loop Architecture Fix and Console Logging Cleanup
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Fixed critical state path bug (simulationStateRef.current?.current?.isRunning → simulationStateRef.current?.isRunning), implemented proper two-phase animation loop with Phase A (physics controlled by simulation state) and Phase B (rendering controlled by visibility), added fixed physics timestep (0.01s) with time accumulation
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Added isSimulationRunning parameter to updateParticlesFromStrategies function, gated diagnostic logging with isSimulationRunning && (_diagFrameCounter % 60 === 0) to eliminate console flooding
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Updated updateParticlesFromStrategies call to pass simulationStatus === "running", maintained separation between physics stepping and rendering
+- Updated `frontend/src/RandomWalkSim.tsx` - Updated visibility change handler and pause/play effects to pass correct simulation running state to updateParticlesFromStrategies
+- Updated `frontend/src/physics/utils/ParticleInitializer.ts` - Fixed ReferenceError by removing erroneous top-level updateParticlesFromStrategies call
+- Investigated `frontend/src/physics/factories/StrategyFactory.ts` - Found interface incompatibility between new BallisticStrategy (PhysicsStrategy) and current system (RandomWalkStrategy), confirmed continued use of LegacyBallisticStrategy
+- Updated `memory-bank/sessions/2025-08-31-morning.md` - Comprehensive session documentation with technical details, animation loop flow diagrams, and results summary
+- Updated `memory-bank/tasks/C15.md` - Added Phase 4.6 progress entry and updated current phase description
+- Updated `memory-bank/tasks.md` - Updated C15 task status and last active timestamp
+- Updated `memory-bank/session_cache.md` - Updated current session focus and timestamps
+- Updated `memory-bank/edit_history.md` - Added this entry
 
 #### 01:04 - C15: RandomWalkSimulator Refactoring Phase 3 and TypeScript Error Fixes
 - Updated `frontend/src/physics/RandomWalkSimulator.ts` - Fixed type-only imports for SimulatorParams and SimulationRunner, added definite assignment assertions to uninitialized properties, fixed duplicate identifier issue with SimulationRunner import

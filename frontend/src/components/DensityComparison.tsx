@@ -29,14 +29,33 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   
   // Stable empty particles array to avoid identity changes each render
   const EMPTY_PARTICLES = React.useRef<Particle[]>([]).current;
+  // Use live particles from simulatorRef when available; fall back to props
+  const liveParticles = React.useMemo(() => {
+    try {
+      return (
+        particles ??
+        simulatorRef.current?.getParticleManager().getAllParticles() ??
+        EMPTY_PARTICLES
+      );
+    } catch {
+      return EMPTY_PARTICLES;
+    }
+  }, [particles, simulatorRef]);
+  const liveCount = liveParticles.length;
 
   const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(
-    particles ?? EMPTY_PARTICLES,
-    particleCount || 0,
+    liveParticles,
+    liveCount,
     undefined,
     gridLayoutParams.dimension
   );
   const [recordHistory, setRecordHistory] = useState(false);
+
+  // Trigger an initial density draw once on mount
+  useEffect(() => {
+    updateDensity();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Helper function to update persistent autoUpdate state
   const setAutoUpdate = (autoUpdate: boolean) => {
@@ -81,7 +100,10 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
         </h3>
         <div className="flex gap-2">
           <button
-            onClick={updateDensity}
+            onClick={() => {
+              console.log('[Density] Manual update', { particleCount: liveCount });
+              updateDensity();
+            }}
             className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Update

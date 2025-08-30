@@ -143,7 +143,7 @@ export default function RandomWalkSim() {
         // Sync one frame and resume rendering
         try {
           // Internal RAF stays disabled; draw a single frame to sync
-          updateParticlesFromStrategies(container, true);
+          updateParticlesFromStrategies(container, true, false);
         } catch {}
       }
     };
@@ -159,10 +159,16 @@ export default function RandomWalkSim() {
 
     if (isRunning) {
       // Keep tsParticles internal RAF disabled; our own loop drives rendering
-    } else {
+    } else if (!isRunning) {
       // Draw one last frame then pause internal RAF
       try { (container as any).draw?.(false); } catch {}
       container.pause?.();
+    } else {
+      // Keep tsParticles internal RAF disabled; our own loop drives rendering
+      // Draw a frame to sync particle positions
+      try {
+        updateParticlesFromStrategies(container, true, isRunning);
+      } catch {}
     }
   }, [isRunning]);
 
