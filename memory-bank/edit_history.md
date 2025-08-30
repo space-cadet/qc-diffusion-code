@@ -1,7 +1,19 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-29 15:23:43 IST_
+_Last Updated: 2025-08-31 00:39:57 IST_
+
+### 2025-08-30
+
+#### 00:35 - C15: RandomWalkSimulator Refactoring - Density and Initialization Utilities
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Delegated density profile and density field computations to utils/density.ts; delegated gaussianRandom, generateThermalVelocities, and sampleCanvasPosition to new utils; fixed lint error by defining thermalSpeed constant in generateThermalVelocities and using it in logs
+- Updated `frontend/src/physics/utils/density.ts` - Added getDensityField1D utility function implementing the 1D density field calculation logic extracted from RandomWalkSimulator
+- Created `frontend/src/physics/utils/ThermalVelocities.ts` - New utility module for thermal velocity generation and gaussian random number generation (Box-Muller transform)
+- Created `frontend/src/physics/utils/InitDistributions.ts` - New utility module for sampling initial particle positions on canvas with various distribution types, including 1D and 2D support and clamping
+- Created `memory-bank/implementation-details/random-walk-simulator-refactor.md` - Comprehensive documentation of the refactoring plan with phases, design decisions, and implementation status
+- Created `memory-bank/sessions/2025-08-30-night.md` - Session documentation for RandomWalkSimulator refactoring work
+- Updated `memory-bank/session_cache.md` - Updated current session and session history with RandomWalkSimulator refactoring focus
+- Updated `memory-bank/tasks.md` - Enhanced C15 task details to include RandomWalkSimulator refactoring work
 
 ### 2025-08-29
 

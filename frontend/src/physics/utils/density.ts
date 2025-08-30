@@ -105,3 +105,39 @@ export function getDensityProfile1D(particles: Particle[], particleCount: number
     binSize: effectiveBinSize
   };
 }
+
+export function getDensityField1D(
+  particles: Particle[],
+  particleCount: number,
+  dx: number = 0.1,
+  maxBins: number = 1000
+): { error: number; rho: number[] } {
+  const positions = particles.map(p => p.position);
+
+  if (positions.length === 0 || particleCount <= 0) {
+    return { error: 0, rho: [] as number[] };
+  }
+
+  const xMin = Math.min(...positions.map(p => p.x));
+  const xMax = Math.max(...positions.map(p => p.x));
+
+  // Validate bounds before creating array
+  if (!isFinite(xMin) || !isFinite(xMax) || xMin >= xMax) {
+    return { error: 0, rho: [] as number[] };
+  }
+
+  const range = xMax - xMin;
+  const bins = Math.min(maxBins, Math.max(1, Math.ceil(range / dx)));
+
+  const counts = new Array(bins).fill(0);
+  positions.forEach(pos => {
+    const bin = Math.floor(((pos.x - xMin) / range) * bins);
+    if (bin >= 0 && bin < bins) {
+      counts[bin]++;
+    }
+  });
+
+  // Normalize by particle count and bin width
+  const rho = counts.map(count => count / (particleCount * dx));
+  return { error: 0.01, rho };
+}

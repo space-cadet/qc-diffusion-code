@@ -14,7 +14,7 @@ The project is well-structured and uses modern tools like `pnpm` for monorepo ma
 
 ### 2D Random Walk
 
-The frontend application implements a 2D random walk simulation on the "Random Walk Sim" page. The core logic is located in `frontend/src/physics/strategies/CTRWStrategy.ts`. In this file, the `handleCollision` function calculates a new, random 2D direction for each particle, and the `updateParticle` function updates the particle's position based on its velocity components.
+The frontend application implements a 2D random walk simulation on the "Random Walk Sim" page. The core logic for the random walk is located in the `frontend/src/physics/strategies/` directory. For example, `CTRWStrategy2D.ts` implements a 2D Continuous Time Random Walk. In this file, the `handleCollision` function calculates a new, random 2D direction for each particle, and the `updateParticle` function updates the particle's position based on its velocity components.
 
 ### 1D PDE Solvers
 

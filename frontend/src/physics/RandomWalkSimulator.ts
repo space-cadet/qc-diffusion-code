@@ -15,6 +15,9 @@ import { USE_NEW_ENGINE } from './config/flags';
 import { PhysicsEngine } from './core/PhysicsEngine';
 import { LegacyStrategyAdapter } from './adapters/LegacyStrategyAdapter';
 import { CoordinateSystem } from './core/CoordinateSystem';
+import { getDensityProfile1D as densityProfile1DUtil, getDensityProfile2D as densityProfile2DUtil, getDensityField1D as densityField1DUtil } from './utils/density';
+import { gaussianRandom as gaussianRandUtil, generateThermalVelocities as genThermalUtil } from './utils/ThermalVelocities';
+import { sampleCanvasPosition as samplePosUtil } from './utils/InitDistributions';
 
 interface SimulatorParams {
   collisionRate: number;
@@ -190,88 +193,20 @@ export class RandomWalkSimulator {
   }
 
   private sampleCanvasPosition(i: number): { x: number; y: number } {
-    const cx = this.canvasWidth / 2;
-    const cy = this.canvasHeight / 2;
-
-    if (this.dimension === '1D') {
-      // For 1D, we only care about the x-coordinate.
-      // We can use the existing logic for the x-coordinate and set y to a constant.
-      switch (this.initialDistType) {
-        case 'gaussian': {
-          const bm = () => {
-            let u = 0, v = 0;
-            while (u === 0) u = Math.random();
-            while (v === 0) v = Math.random();
-            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-          };
-          const x = cx + bm() * this.distSigmaX;
-          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
-        }
-        case 'stripe': {
-          const half = this.distThickness / 2;
-          const x = cx + (Math.random() * 2 - 1) * half;
-          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
-        }
-        case 'grid': {
-          const nx = Math.max(1, this.distNx);
-          const gx = i % nx;
-          const cellW = this.canvasWidth / nx;
-          const jitterX = (Math.random() * 2 - 1) * this.distJitter;
-          const x = (gx + 0.5) * cellW + jitterX;
-          return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: cy };
-        }
-        case 'uniform':
-        default:
-          return { x: Math.random() * this.canvasWidth, y: cy };
-      }
-    }
-
-    switch (this.initialDistType) {
-      case 'gaussian': {
-        // Box-Muller
-        const bm = () => {
-          let u = 0, v = 0;
-          while (u === 0) u = Math.random();
-          while (v === 0) v = Math.random();
-          return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-        };
-        const x = cx + bm() * this.distSigmaX;
-        const y = cy + bm() * this.distSigmaY;
-        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
-      }
-      case 'ring': {
-        const r0 = this.distR0;
-        const dr = this.distDR;
-        const r = r0 + (Math.random() - 0.5) * 2 * dr;
-        const theta = Math.random() * 2 * Math.PI;
-        const x = cx + r * Math.cos(theta);
-        const y = cy + r * Math.sin(theta);
-        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
-      }
-      case 'stripe': {
-        // vertical stripe centered at cx
-        const half = this.distThickness / 2;
-        const x = cx + (Math.random() * 2 - 1) * half;
-        const y = Math.random() * this.canvasHeight;
-        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y };
-      }
-      case 'grid': {
-        const nx = Math.max(1, this.distNx);
-        const ny = Math.max(1, this.distNy);
-        const gx = i % nx;
-        const gy = Math.floor(i / nx) % ny;
-        const cellW = this.canvasWidth / nx;
-        const cellH = this.canvasHeight / ny;
-        const jitterX = (Math.random() * 2 - 1) * this.distJitter;
-        const jitterY = (Math.random() * 2 - 1) * this.distJitter;
-        const x = (gx + 0.5) * cellW + jitterX;
-        const y = (gy + 0.5) * cellH + jitterY;
-        return { x: Math.max(0, Math.min(this.canvasWidth, x)), y: Math.max(0, Math.min(this.canvasHeight, y)) };
-      }
-      case 'uniform':
-      default:
-        return { x: Math.random() * this.canvasWidth, y: Math.random() * this.canvasHeight };
-    }
+    return samplePosUtil(i, {
+      canvasWidth: this.canvasWidth,
+      canvasHeight: this.canvasHeight,
+      dimension: this.dimension,
+      initialDistType: this.initialDistType,
+      distSigmaX: this.distSigmaX,
+      distSigmaY: this.distSigmaY,
+      distR0: this.distR0,
+      distDR: this.distDR,
+      distThickness: this.distThickness,
+      distNx: this.distNx,
+      distNy: this.distNy,
+      distJitter: this.distJitter,
+    });
   }
 
   private initializeParticles(): void {
@@ -328,16 +263,9 @@ export class RandomWalkSimulator {
   }
 
   private generateThermalVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
-    // Use temperature to scale thermal velocities (Maxwell-Boltzmann distribution)
-    const thermalSpeed = 50 * Math.sqrt(this.temperature); // Scale base speed by sqrt(T)
-    const velocities: Array<{vx: number, vy: number}> = [];
-
-    // Generate individual thermal velocities (Maxwell-Boltzmann-like)
-    for (let i = 0; i < count; i++) {
-      const vx = thermalSpeed * this.gaussianRandom();
-      const vy = dimension === '1D' ? 0 : thermalSpeed * this.gaussianRandom();
-      velocities.push({ vx, vy });
-    }
+    // Generate individual thermal velocities via util (Maxwell-Boltzmann-like)
+    const velocities: Array<{vx: number, vy: number}> = genThermalUtil(count, dimension, this.temperature);
+    const thermalSpeed = 50 * Math.sqrt(this.temperature);
 
     // DIAG: stats before momentum correction
     if (count > 0) {
@@ -394,11 +322,7 @@ export class RandomWalkSimulator {
   }
 
   private gaussianRandom(): number {
-    // Box-Muller transform for Gaussian random numbers
-    let u = 0, v = 0;
-    while (u === 0) u = Math.random();
-    while (v === 0) v = Math.random();
-    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return gaussianRandUtil();
   }
 
   step(dt: number): void {
@@ -464,36 +388,7 @@ export class RandomWalkSimulator {
 
   getDensityField() {
     const particles = this.particleManager.getAllParticles();
-    if (particles.length === 0 || this.particleCount <= 0) {
-      return { error: 0, rho: [] as number[] };
-    }
-    
-    const positions = particles.map(p => p.position);
-    const dx = 0.1;
-    const xMin = Math.min(...positions.map(p => p.x));
-    const xMax = Math.max(...positions.map(p => p.x));
-    
-    // Validate bounds before creating array
-    if (!isFinite(xMin) || !isFinite(xMax) || xMin >= xMax) {
-      console.error('[DensityField] Invalid bounds:', {xMin, xMax, positions});
-      return { error: 0, rho: [] as number[] };
-    }
-    
-    const range = xMax - xMin;
-    const bins = Math.min(1000, Math.max(1, Math.ceil(range / dx))); // Limit bins to 1000 maximum
-    
-    const rho = new Array(bins).fill(0);
-    positions.forEach(pos => {
-      const bin = Math.floor(((pos.x - xMin) / range) * bins);
-      if (bin >= 0 && bin < bins) {
-        rho[bin]++;
-      }
-    });
-    
-    return {
-      error: 0.01,
-      rho: rho.map(count => count / (this.particleCount * dx))
-    };
+    return densityField1DUtil(particles as any, this.particleCount, 0.1, 1000);
   }
 
   getDensityProfile2D(binSize: number = 10): {
@@ -503,52 +398,7 @@ export class RandomWalkSimulator {
     binSize: number;
   } {
     const particles = this.particleManager.getAllParticles();
-    const positions = particles.map(p => p.position);
-    
-    if (positions.length === 0) {
-      return {
-        density: [],
-        xBounds: { min: 0, max: 0 },
-        yBounds: { min: 0, max: 0 },
-        binSize
-      };
-    }
-    
-    // Calculate bounds
-    const xMin = Math.min(...positions.map(p => p.x));
-    const xMax = Math.max(...positions.map(p => p.x));
-    const yMin = Math.min(...positions.map(p => p.y));
-    const yMax = Math.max(...positions.map(p => p.y));
-    
-    // Calculate grid dimensions
-    const xBins = Math.ceil((xMax - xMin) / binSize) + 1;
-    const yBins = Math.ceil((yMax - yMin) / binSize) + 1;
-    
-    // Initialize 2D density array
-    const density: number[][] = Array(yBins).fill(null).map(() => Array(xBins).fill(0));
-    
-    // Bin particles
-    positions.forEach(pos => {
-      const xBin = Math.floor((pos.x - xMin) / binSize);
-      const yBin = Math.floor((pos.y - yMin) / binSize);
-      
-      if (xBin >= 0 && xBin < xBins && yBin >= 0 && yBin < yBins) {
-        density[yBin][xBin]++;
-      }
-    });
-    
-    // Normalize by bin area and total particles
-    const binArea = binSize * binSize;
-    const normalizedDensity = density.map(row => 
-      row.map(count => count / (this.particleCount * binArea))
-    );
-    
-    return {
-      density: normalizedDensity,
-      xBounds: { min: xMin, max: xMax },
-      yBounds: { min: yMin, max: yMax },
-      binSize
-    };
+    return densityProfile2DUtil(particles as any, this.particleCount, binSize);
   }
 
   getDensityProfile1D(binSize: number = 10): {
@@ -557,51 +407,7 @@ export class RandomWalkSimulator {
     binSize: number;
   } {
     const particles = this.particleManager.getAllParticles();
-    const positions = particles.map(p => p.position);
-    
-    if (positions.length === 0) {
-      return {
-        density: [],
-        xBounds: { min: 0, max: 0 },
-        binSize
-      };
-    }
-    
-    // Calculate bounds
-    const xMin = Math.min(...positions.map(p => p.x));
-    const xMax = Math.max(...positions.map(p => p.x));
-    const spatialRange = xMax - xMin;
-    
-    // Adaptive bin count based on particle count (smooth scaling)
-    // Use square root scaling with a reasonable range: 15-60 bins
-    const minBins = 15;
-    const maxBins = 60;
-    const optimalBins = Math.sqrt(this.particleCount) * 1.5;
-    const xBins = Math.max(minBins, Math.min(maxBins, Math.round(optimalBins)));
-    
-    // Calculate effective bin size from adaptive bin count
-    const effectiveBinSize = spatialRange / xBins;
-    
-    // Initialize 1D density array
-    const density: number[] = Array(xBins).fill(0);
-    
-    // Bin particles
-    positions.forEach(pos => {
-      const xBin = Math.floor((pos.x - xMin) / effectiveBinSize);
-      
-      if (xBin >= 0 && xBin < xBins) {
-        density[xBin]++;
-      }
-    });
-    
-    // Normalize by bin area and total particles
-    const normalizedDensity = density.map(count => count / (this.particleCount * effectiveBinSize));
-    
-    return {
-      density: normalizedDensity,
-      xBounds: { min: xMin, max: xMax },
-      binSize: effectiveBinSize
-    };
+    return densityProfile1DUtil(particles as any, this.particleCount, binSize);
   }
 
   getCollisionStats() {

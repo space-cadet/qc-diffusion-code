@@ -21,6 +21,9 @@ import {
 } from "./config/tsParticlesConfig";
 import type { SimulationState } from "./types/simulation";
 import { PhysicsEngine } from "./physics/core/PhysicsEngine";
+import { useParticlesLoader } from './hooks/useParticlesLoader';
+import { ParticleInitializer } from './physics/utils/ParticleInitializer';
+import { useTemperatureHandler } from './hooks/useTemperatureHandler';
 
 // CSS imports
 import "react-grid-layout/css/styles.css";
@@ -47,29 +50,50 @@ export default function RandomWalkSim() {
     setObservablesCollapsed
   } = useAppStore();
 
-  // Physics simulation ref
-  const physicsEngineRef = useRef<PhysicsEngine | null>(null);
-  const tsParticlesContainerRef = useRef<any>(null);
+  // State declarations should come before refs
   const [boundaryRect, setBoundaryRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
-  // UI prompt for temperature reseed
   const [tempNotice, setTempNotice] = useState<string | null>(null);
-
-  // Runtime state (non-persistent)
   const [isRunning, setIsRunning] = useState(false);
-  // Signal to children that simulatorRef is ready
   const [simReady, setSimReady] = useState(false);
-  // Collapsed state persisted in store (observablesCollapsed)
   
-  // Refs for time/collision tracking
-  const timeRef = useRef(0);
-  const collisionsRef = useRef(0);
-  
-  // Create combined simulation state for compatibility
+  // Create combined simulation state
   const simulationState: SimulationState = useMemo(() => ({
     isRunning,
     ...randomWalkSimulationState,
   }), [isRunning, randomWalkSimulationState]);
   
+  // Then declare refs
+  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+  const tsParticlesContainerRef = useRef<any>(null);
+  const physicsEngineRef = useRef<PhysicsEngine | null>(null);
+  const graphPhysicsRef = useRef<PhysicsRandomWalk | null>(null);
+  
+  // Runtime state refs
+  const timeRef = useRef(0);
+  const collisionsRef = useRef(0);
+  const simulationStateRef = useRef(simulationState);
+  const gridLayoutParamsRef = useRef(gridLayoutParams);
+  const renderEnabledRef = useRef(true);
+
+  // Move this function before its usage
+  const onLayoutChange = (layout: Layout[]) => {
+    setRandomWalkSimLayouts(layout);
+  };
+
+  // Fix ReactGridLayout props - remove enableResizing as it's already covered by isResizable
+  const gridLayoutProps = {
+    className: "layout",
+    layout: randomWalkSimLayouts,
+    onLayoutChange,
+    cols: 12,
+    rowHeight: 50,
+    isDraggable: true,
+    isResizable: true,
+    margin: [10, 10] as [number, number],
+    containerPadding: [0, 0] as [number, number],
+    draggableHandle: ".drag-handle"
+  };
+
   const setSimulationState = (state: SimulationState | ((prev: SimulationState) => SimulationState)) => {
     if (typeof state === 'function') {
       const newState = state(simulationState);
@@ -95,16 +119,6 @@ export default function RandomWalkSim() {
     }
   };
 
-  // Graph physics reference
-  const graphPhysicsRef = useRef<PhysicsRandomWalk | null>(null);
-
-  // Refs to track current values for animation loop
-  const simulationStateRef = useRef(simulationState);
-  const gridLayoutParamsRef = useRef(gridLayoutParams);
-  // Control rendering independently from physics
-  const renderEnabledRef = useRef(true);
-  const lastTempRef = useRef<number | undefined>(undefined);
-
   // Update refs when state changes
   useEffect(() => {
     simulationStateRef.current = simulationState;
@@ -113,80 +127,6 @@ export default function RandomWalkSim() {
   useEffect(() => {
     gridLayoutParamsRef.current = gridLayoutParams;
   }, [gridLayoutParams]);
-
-  // Auto-reseed when temperature changes, and show a small UI prompt
-  useEffect(() => {
-    const newT = gridLayoutParams.temperature;
-    const prevT = lastTempRef.current;
-    lastTempRef.current = newT;
-    // Skip on first mount when prevT is undefined
-    if (prevT === undefined) return;
-
-    if (simulatorRef.current && typeof newT === 'number' && newT !== prevT) {
-      const sim = simulatorRef.current;
-      const container = tsParticlesContainerRef.current;
-      try {
-        // Update parameters (ensure canvas size is available for mappings)
-        const w = container?.canvas?.size?.width || 800;
-        const h = container?.canvas?.size?.height || 600;
-        sim.updateParameters({
-          temperature: newT,
-          canvasWidth: w,
-          canvasHeight: h,
-          // keep other params unchanged; updateParameters merges selectively
-          collisionRate: gridLayoutParams.collisionRate,
-          jumpLength: gridLayoutParams.jumpLength,
-          velocity: gridLayoutParams.velocity,
-          simulationType: gridLayoutParams.simulationType,
-          dimension: gridLayoutParams.dimension,
-          interparticleCollisions: gridLayoutParams.interparticleCollisions,
-          strategies: gridLayoutParams.strategies,
-          graphType: gridLayoutParams.graphType,
-          graphSize: gridLayoutParams.graphSize,
-          particleCount: gridLayoutParams.particles,
-          // distribution params (so reseed uses current selection)
-          initialDistType: gridLayoutParams.initialDistType,
-          distSigmaX: gridLayoutParams.distSigmaX,
-          distSigmaY: gridLayoutParams.distSigmaY,
-          distR0: gridLayoutParams.distR0,
-          distDR: gridLayoutParams.distDR,
-          distThickness: gridLayoutParams.distThickness,
-          distNx: gridLayoutParams.distNx,
-          distNy: gridLayoutParams.distNy,
-          distJitter: gridLayoutParams.distJitter,
-        });
-
-        // Clear canvas particles and reseed physics particles
-        if (container?.particles) {
-          container.particles.clear();
-        }
-
-        // Reset simulation state (re-initialize particles with new temperature)
-        sim.reset();
-
-        // Sync canvas with new physics particles
-        const pm = sim.getParticleManager();
-        (pm as any).setCanvasSize?.(w, h);
-        const particles = pm.getAllParticles();
-        if (container?.particles && particles?.length) {
-          for (const p of particles) {
-            const canvasPos = pm.mapToCanvas(p.position);
-            container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
-          }
-          // Force one draw
-          try { (container as any).draw?.(false); } catch {}
-        }
-
-        // Show UI prompt briefly
-        setTempNotice(`Temperature changed to ${newT.toFixed(2)} — particles reseeded`);
-        const t = setTimeout(() => setTempNotice(null), 2000);
-        return () => clearTimeout(t);
-      } catch (e) {
-        console.warn("Auto-reseed on temperature change failed:", e);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gridLayoutParams.temperature]);
 
   // Manage rendering when tab/window visibility changes
   useEffect(() => {
@@ -378,10 +318,6 @@ export default function RandomWalkSim() {
     }
   }, [gridLayoutParams]);
 
-  const onLayoutChange = (layout: Layout[]) => {
-    setRandomWalkSimLayouts(layout);
-  };
-
   const handleStart = () => {
     setSimulationState((prev) => ({
       ...prev,
@@ -564,107 +500,21 @@ export default function RandomWalkSim() {
     });
   };
 
-  const particlesLoaded = useCallback((container: Container) => {
-    console.log("particlesLoaded: container check passed", {
-      hasSimulator: !!simulatorRef.current,
-      particleManager: simulatorRef.current?.getParticleManager(),
-      containerParticles: !!container.particles,
-    });
+  // Replace particlesLoaded with hook
+  const particlesLoaded = useParticlesLoader({
+    simulatorRef,
+    tsParticlesContainerRef,
+    gridLayoutParamsRef,
+    simulationStateRef,
+    renderEnabledRef
+  });
 
-    tsParticlesContainerRef.current = container;
-
-    // Connect particle manager on container load
-    if (simulatorRef.current) {
-      setParticleManager(simulatorRef.current.getParticleManager());
-      // Provide canvas size to particle manager for coordinate mapping
-      const pm = simulatorRef.current.getParticleManager();
-      const w = container.canvas.size.width;
-      const h = container.canvas.size.height;
-      (pm as any).setCanvasSize?.(w, h);
-
-      // Restore previous simulation state if available and sync with canvas
-      if (randomWalkSimulationState.particleData && randomWalkSimulationState.particleData.length > 0) {
-        console.log("Restoring particle positions to canvas");
-        
-        // Clear existing canvas particles
-        container.particles.clear();
-        
-        // Restore particle positions and velocities in physics engine
-        pm.clearAllParticles();
-        randomWalkSimulationState.particleData.forEach(particle => {
-          const tsParticle = {
-            id: particle.id,
-            position: particle.position,
-            velocity: { x: particle.velocity.vx, y: particle.velocity.vy }
-          };
-          pm.initializeParticle(tsParticle);
-        });
-        
-        // Restore simulation time
-        (simulatorRef.current as any).time = randomWalkSimulationState.time;
-        
-        // Get restored particles from physics engine and add to canvas
-        const restoredParticles = pm.getAllParticles();
-        restoredParticles.forEach(p => {
-          const canvasPos = pm.mapToCanvas(p.position);
-          container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
-        });
-        
-        // Force canvas redraw
-        (container as any).draw?.(false);
-        console.log(`Restored ${restoredParticles.length} particles to canvas`);
-      }
-
-      // Compute boundary rectangle in canvas pixels from physics bounds
-      const bounds = (pm as any).getBoundaries?.();
-      if (bounds) {
-        const widthPhysics = Math.max(bounds.xMax - bounds.xMin, 1);
-        const heightPhysics = Math.max(bounds.yMax - bounds.yMin, 1);
-        const x = ((bounds.xMin - bounds.xMin) / widthPhysics) * w; // typically 0
-        const y = ((bounds.yMin - bounds.yMin) / heightPhysics) * h; // typically 0
-        const rectW = (widthPhysics / widthPhysics) * w; // typically w
-        const rectH = (heightPhysics / heightPhysics) * h; // typically h
-        setBoundaryRect({ x, y, w: rectW, h: rectH });
-        console.log("[RWS] particlesLoaded", {
-          canvas: { w, h },
-          bounds,
-          overlay: { x, y, w: rectW, h: rectH },
-          restoredParticles: randomWalkSimulationState.particleData?.length || 0
-        });
-      }
-    }
-
-    // Start CTRW physics updates
-    const updateLoop = () => {
-      const isRunning = simulationStateRef.current.isRunning;
-      const showAnim = gridLayoutParamsRef.current.showAnimation;
-      const canRender = showAnim && renderEnabledRef.current && !document.hidden && isRunning;
-
-      if (simulatorRef.current) {
-        // Always advance physics when running, regardless of animation toggle
-        if (isRunning) {
-          simulatorRef.current.step(0.016);
-          
-          // Update refs with current time and collisions (no state updates)
-          timeRef.current = simulatorRef.current.getTime();
-          const collisionStats = simulatorRef.current.getCollisionStats();
-          collisionsRef.current = collisionStats.totalCollisions || 0;
-        }
-
-        // Render only if animation/visibility conditions are met and running
-        if (canRender) {
-          updateParticlesFromStrategies(container, true);
-        }
-      }
-
-      if (simulationStateRef.current.isRunning || renderEnabledRef.current) {
-        requestAnimationFrame(updateLoop);
-      }
-    };
-    requestAnimationFrame(updateLoop);
-  }, []);
-
-  const simulatorRef = useRef<RandomWalkSimulator | null>(null);
+  const lastTempRef = useTemperatureHandler({
+    gridLayoutParams,
+    simulatorRef,
+    tsParticlesContainerRef,
+    setTempNotice
+  });
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -693,8 +543,8 @@ export default function RandomWalkSim() {
           rowHeight={50}
           isDraggable={true}
           isResizable={true}
-          margin={[10, 10]}
-          containerPadding={[0, 0]}
+          margin={[10, 10] as [number, number]}
+          containerPadding={[0, 0] as [number, number]}
           draggableHandle=".drag-handle"
         >
           {/* Parameters Panel */}
