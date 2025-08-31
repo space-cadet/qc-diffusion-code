@@ -9,12 +9,16 @@ import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCol
 import { getNewEngineFlag } from '../config/flags';
 import { BallisticStrategy } from '../strategies/BallisticStrategy';
 
+import { ParameterManager } from '../core/ParameterManager';
+
 interface SimulatorParams {
   dimension: '1D' | '2D';
   strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
 }
 
-export function createStrategies(config: SimulatorParams, boundaryConfig: BoundaryConfig): RandomWalkStrategy[] {
+export function createStrategies(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig): RandomWalkStrategy[] {
+  const config = { dimension: parameterManager.dimension, strategies: parameterManager.strategies };
+  const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
 
   // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
@@ -22,9 +26,9 @@ export function createStrategies(config: SimulatorParams, boundaryConfig: Bounda
     const oneDStrategies: RandomWalkStrategy[] = [];
     if (selectedStrategies.includes('ctrw')) {
       oneDStrategies.push(new CTRWStrategy1D({
-        collisionRate: 1,
-        jumpLength: 1,
-        velocity: 1,
+        collisionRate: physicsParams.collisionRate,
+        jumpLength: physicsParams.jumpLength,
+        velocity: physicsParams.velocity,
         boundaryConfig: boundaryConfig,
         interparticleCollisions: false, // collisions handled via separate 1D strategy below
       }));
@@ -49,9 +53,9 @@ export function createStrategies(config: SimulatorParams, boundaryConfig: Bounda
 
     if (selectedStrategies.includes('ctrw')) {
       twoDStrategies.push(new CTRWStrategy2D({
-        collisionRate: 1,
-        jumpLength: 1,
-        velocity: 1,
+        collisionRate: physicsParams.collisionRate,
+        jumpLength: physicsParams.jumpLength,
+        velocity: physicsParams.velocity,
         boundaryConfig: boundaryConfig,
       }));
     }

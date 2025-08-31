@@ -37,12 +37,24 @@ export class CTRWStrategy1D implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[]): void {
+    this.updateParticleWithDt(particle, allParticles, simDt(0.01));
+  }
+
+  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
     if (this.interparticleCollisions) {
       this.handleInterparticleCollisions(particle, allParticles);
     }
 
-    const step = this.calculateStep(particle);
-    particle.position.x += step.dx;
+    const collision = this.handleCollision(particle);
+    
+    if (collision.occurred && collision.newVelocity) {
+      particle.velocity = collision.newVelocity;
+      particle.lastCollisionTime = collision.timestamp;
+      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
+      particle.collisionCount++;
+    }
+
+    particle.position.x += particle.velocity.vx * dt;
     
     // Apply boundary conditions
     const boundaryResult = this.applyBoundaryCondition(particle);
@@ -57,17 +69,8 @@ export class CTRWStrategy1D implements RandomWalkStrategy {
     // Record trajectory point for every update
     particle.trajectory.push({
       position: { ...particle.position },
-      timestamp: step.timestamp
+      timestamp: simTime()
     });
-    
-    if (step.collision?.occurred) {
-      if (step.collision.newVelocity) {
-        particle.velocity = step.collision.newVelocity;
-      }
-      particle.lastCollisionTime = step.collision.timestamp;
-      particle.nextCollisionTime = step.collision.timestamp + step.collision.waitTime;
-      particle.collisionCount++;
-    }
   }
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {

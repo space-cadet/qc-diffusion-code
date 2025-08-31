@@ -38,12 +38,7 @@ export class ParticleManager {
     return this.coordSystem.toPhysics(pos);
   }
 
-  private sampleCanvasPosition(i: number): { x: number; y: number } {
-    const canvasSize = this.coordSystem.getCanvasSize();
-    const cx = canvasSize.width / 2;
-    const cy = canvasSize.height / 2;
-    return { x: Math.random() * canvasSize.width, y: cy };
-  }
+
 
   initializeParticle(tsParticle: any): Particle {
     // Use velocities passed from RandomWalkSimulator (thermal with momentum conservation)
@@ -116,21 +111,11 @@ export class ParticleManager {
     
     for (const particle of allParticles) {
       if (particle.isActive) {
-        // console.log('[PM] updating particle', particle.id);
-        // Use updateParticleWithDt if available, otherwise fallback to updateParticle
-        if ('updateParticleWithDt' in this.strategy && typeof this.strategy.updateParticleWithDt === 'function') {
-          // console.log('[PM] calling updateParticleWithDt');
+        if (this.strategy.updateParticleWithDt) {
           this.strategy.updateParticleWithDt(particle, allParticles, dt);
         } else {
-          // console.log('[PM] calling updateParticle');
           this.strategy.updateParticle(particle, allParticles);
         }
-
-        // Update trajectory
-        particle.trajectory.push({
-          position: { x: particle.position.x, y: particle.position.y },
-          timestamp: simTime(),
-        });
       } else {
         console.log('[PM] particle inactive', particle.id);
       }

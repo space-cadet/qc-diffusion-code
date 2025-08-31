@@ -137,13 +137,27 @@ export class ParameterManager {
     return needsReinitialization;
   }
 
+  public getPhysicsParameters(): { collisionRate: number; jumpLength: number; velocity: number } {
+    return {
+      collisionRate: this.collisionRate,
+      jumpLength: this.jumpLength,
+      velocity: this.velocity
+    };
+  }
+
+  public validatePhysicsParameters(): boolean {
+    return this.collisionRate > 0 && this.jumpLength > 0 && this.velocity > 0;
+  }
+
   public getBoundaryConfig(): BoundaryConfig {
+    const halfWidth = this.canvasWidth / 2;
+    const halfHeight = this.canvasHeight / 2;
     return {
       type: (this.boundaryCondition || 'periodic') as 'periodic' | 'reflective' | 'absorbing',
-      xMin: -200,
-      xMax: 200,
-      yMin: -200,
-      yMax: 200
+      xMin: -halfWidth,
+      xMax: halfWidth,
+      yMin: -halfHeight,
+      yMax: halfHeight
     };
   }
 }

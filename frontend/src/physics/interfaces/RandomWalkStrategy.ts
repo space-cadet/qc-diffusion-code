@@ -4,6 +4,7 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 
 export interface RandomWalkStrategy {
   updateParticle(particle: Particle, allParticles?: Particle[]): void;
+  updateParticleWithDt?(particle: Particle, allParticles: Particle[], dt: number): void;
   calculateStep(particle: Particle): Step;
   validateParameters(params: any): boolean;
   getPhysicsParameters(): Record<string, number>;
