@@ -7,13 +7,17 @@ export const useParticlesLoader = ({
   tsParticlesContainerRef,
   gridLayoutParamsRef,
   simulationStateRef,
-  renderEnabledRef
+  renderEnabledRef,
+  timeRef,
+  collisionsRef
 }: {
   simulatorRef: React.MutableRefObject<any>,
   tsParticlesContainerRef: React.MutableRefObject<Container | null>,
   gridLayoutParamsRef: React.MutableRefObject<any>,
   simulationStateRef: React.MutableRefObject<any>,
-  renderEnabledRef: React.MutableRefObject<boolean>
+  renderEnabledRef: React.MutableRefObject<boolean>,
+  timeRef: React.MutableRefObject<number>,
+  collisionsRef: React.MutableRefObject<number>
 }) => {
   return useCallback((container: Container) => {
     tsParticlesContainerRef.current = container;
@@ -40,6 +44,15 @@ export const useParticlesLoader = ({
         while (accumulatedTime >= physicsTimeStep) {
           simulatorRef.current.step(physicsTimeStep);
           accumulatedTime -= physicsTimeStep;
+          
+          // Update time ref
+          timeRef.current += physicsTimeStep;
+        }
+        
+        // Sync collision count from physics engine
+        const collisionStats = simulatorRef.current.getCollisionStats();
+        if (collisionStats) {
+          collisionsRef.current = collisionStats.totalCollisions || 0;
         }
       } else {
         // Reset accumulator when simulation not running
@@ -60,5 +73,5 @@ export const useParticlesLoader = ({
     };
 
     requestAnimationFrame(animate);
-  }, []);
+  }, [timeRef, collisionsRef]);
 };

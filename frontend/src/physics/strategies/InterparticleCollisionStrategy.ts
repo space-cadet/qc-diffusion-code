@@ -18,6 +18,21 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
+    // Basic ballistic movement before handling collisions
+    const dt = 0.01; // simDt(0.01) would require import
+    particle.position.x += particle.velocity.vx * dt;
+    particle.position.y += particle.velocity.vy * dt;
+    
+    // Handle inter-particle collisions
+    this.handleInterparticleCollisions(particle, allParticles);
+  }
+
+  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
+    // Basic ballistic movement before handling collisions
+    particle.position.x += particle.velocity.vx * dt;
+    particle.position.y += particle.velocity.vy * dt;
+    
+    // Handle inter-particle collisions
     this.handleInterparticleCollisions(particle, allParticles);
   }
 

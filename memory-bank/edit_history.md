@@ -1,9 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 20:18:34 IST_
+_Last Updated: 2025-08-31 20:59:44 IST_
 
 ### 2025-08-31
+
+#### 20:59 - C15a: Phase 3 completion - strategy movement and UI metrics fixes
+- Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Added position integration with proper velocity application and boundary handling
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - Added movement before collision detection and proper timestep handling
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Added collision stats synchronization with proper time tracking
+- Updated `frontend/src/RandomWalkSim.tsx` - Updated animation loop with metrics tracking
+- Updated `memory-bank/sessions/2025-08-31-evening.md` - Added Phase 3 implementation details and results
+- Updated `memory-bank/session_cache.md` - Updated session focus and C15a progress with Phase 3 completion
+- Updated `memory-bank/edit_history.md` - Added this entry
 
 #### 20:18 - C15a: Phase 2 completion - physics update flow fixes
 - Fixed `frontend/src/physics/core/SimulationRunner.ts` - Added ParticleManager.update() call to NewEngineSimulationRunner.step()

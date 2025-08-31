@@ -3,6 +3,8 @@ import type { Particle } from '../types/Particle';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { Step } from '../types/CollisionEvent';
+import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { simDt, simTime } from '../core/GlobalTime';
 
 export class BallisticStrategy implements RandomWalkStrategy {
   private boundaryConfig: BoundaryConfig = {
@@ -23,7 +25,41 @@ export class BallisticStrategy implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles?: Particle[]): void {
-    // Not used in ballistic strategy
+    // Use default global timestep when no dt provided
+    const dt = simDt(0.01);
+    this.updateParticleWithDt(particle, allParticles || [], dt);
+  }
+
+  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
+    // Ballistic motion - straight line movement using provided timestep
+    particle.position.x += particle.velocity.vx * dt;
+    particle.position.y += particle.velocity.vy * dt;
+    
+    // Apply boundary conditions
+    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    particle.position = newPosition;
+    if (newVelocity) {
+      particle.velocity = newVelocity;
+    }
+    
+    // Record trajectory point
+    particle.trajectory.push({
+      position: { ...particle.position },
+      timestamp: simTime()
+    });
+  }
+
+  private applyBoundaryCondition(particle: Particle) {
+    switch (this.boundaryConfig.type) {
+      case 'periodic':
+        return applyPeriodicBoundary(particle.position, this.boundaryConfig);
+      case 'reflective':
+        return applyReflectiveBoundary(particle.position, particle.velocity, this.boundaryConfig);
+      case 'absorbing':
+        return applyAbsorbingBoundary(particle.position, this.boundaryConfig);
+      default:
+        return { position: particle.position };
+    }
   }
 
   calculateStep(particle: Particle): Step {

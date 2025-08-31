@@ -512,7 +512,9 @@ export default function RandomWalkSim() {
     tsParticlesContainerRef,
     gridLayoutParamsRef,
     simulationStateRef,
-    renderEnabledRef
+    renderEnabledRef,
+    timeRef,
+    collisionsRef
   });
 
   const lastTempRef = useTemperatureHandler({

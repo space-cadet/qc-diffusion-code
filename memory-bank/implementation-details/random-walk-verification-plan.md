@@ -4,7 +4,7 @@ description: Systematic verification of random walk simulation components throug
 
 # Random Walk Component Verification Plan
 *Created: 2025-08-31 19:30:01 IST*
-*Last Updated: 2025-08-31 20:18:34 IST*
+*Last Updated: 2025-08-31 20:53:55 IST*
 
 ## Verification Objectives
 - Examine code for logical correctness and implementation errors
@@ -132,21 +132,17 @@ description: Systematic verification of random walk simulation components throug
 - [x] **Remove duck typing**: Replace duck typing check in ParticleManager with proper interface methods
 - [x] **Add interface compliance tests**: Verify all strategies properly implement required interface
 
-**Phase 1 Results**: Parameter propagation now functional - physics parameters showing real values in logs. However, particles locked at y=427.27 (coordinate system issues) and missing `[PM] update called` during animation (physics execution problems). These were addressed in Phase 2.
-
-**Phase 2 Results**: NewEngineSimulationRunner fixed to call ParticleManager.update() - particles now moving and physics updates working. Console logs show `[NESR] step called` and `[PM] update called` during animation. Coordinate system issues resolved.
-
 ### **Phase 2: Coordinate and Boundary System Fixes (MEDIUM PRIORITY) - COMPLETED 2025-08-31 20:18:34 IST**
 
 #### 2.1 Fix Boundary Configuration System - COMPLETED
-- [x] **Dynamic boundary calculation**: Already implemented - uses canvas dimensions instead of hardcoded values
+- [x] **Dynamic boundary calculation**: Uses canvas dimensions instead of hardcoded values
 - [x] **User-configurable boundaries**: Working through parameter system
-- [x] **Boundary-canvas coordination**: Verified - boundary config matches rendering space
+- [x] **Boundary-canvas coordination**: Boundary config matches rendering space
 - [x] **Update boundary visualization**: Working correctly
 - [x] **Test boundary edge cases**: Verified through console logs
 
 #### 2.2 Clarify Coordinate Systems - COMPLETED
-- [x] **Remove dead code**: Already resolved - `sampleCanvasPosition()` properly located in utilities
+- [x] **Remove dead code**: `sampleCanvasPosition()` properly located in utilities
 - [x] **Document coordinate transforms**: CoordinateSystem class handles transformations correctly
 - [x] **Standardize coordinate usage**: Consistent usage verified
 - [x] **Add coordinate validation**: Working through CoordinateSystem class
@@ -158,27 +154,56 @@ description: Systematic verification of random walk simulation components throug
 - [x] **Verify update chain**: Confirmed `[NESR] step called` and `[PM] update called` appear in logs
 - [x] **Test particle movement**: Particles now move instead of being locked at y=427.27
 
-### **Phase 3: Physics Implementation Consistency (MEDIUM PRIORITY) - IN PROGRESS**
+### **Phase 3: Core Strategy Movement Fixes (HIGH PRIORITY) - COMPLETED 2025-08-31 20:53:55 IST**
 
-#### 3.1 Strategy Implementation Issues (NEW ISSUES IDENTIFIED 2025-08-31 20:18:34 IST)
-- [ ] **1D Ballistic Strategy Issue**: Ballistic strategy (default when no strategy selected) shows no movement in 1D mode
-- [ ] **Collisions Strategy Not Working**: Collisions strategy does not appear to function - particles show no collision behavior
-- [ ] **CTRW UI Metrics Issue**: CTRW strategy works for particle movement but Scattering count not updating in parameter panel UI
-- [ ] **UI-Physics Metrics Sync**: Investigate disconnect between ParticleManager collision stats and UI display
+#### 3.1 Fix BallisticStrategy Position Integration - COMPLETED
+- [x] **Add position updates**: Implemented position integration in updateParticle() and updateParticleWithDt()
+- [x] **Add boundary conditions**: Applied proper boundary condition handling to ballistic movement
+- [x] **Fix timestep handling**: Use provided dt parameter instead of hardcoded simDt(0.01)
+- [x] **Add trajectory recording**: Record particle trajectory points for visualization
+- [x] **Test ballistic movement**: Verified particles move in both 1D and 2D modes when no strategies selected
 
-#### 3.2 Original CTRW Strategy Implementation Issues
+#### 3.2 Fix InterparticleCollisionStrategy Movement - COMPLETED
+- [x] **Add basic movement**: Added ballistic position updates before collision detection
+- [x] **Implement updateParticleWithDt**: Added proper timestep-aware movement method
+- [x] **Preserve collision logic**: Maintained existing collision detection and response
+- [x] **Test collision movement**: Verified particles move before collision processing
+
+#### 3.3 Fix UI Metrics Synchronization - COMPLETED
+- [x] **Update animation loop**: Modified useParticlesLoader to sync collision stats from physics
+- [x] **Add time tracking**: Update timeRef.current in physics stepping loop
+- [x] **Connect collision stats**: Read totalCollisions from ParticleManager.getCollisionStats()
+- [x] **Fix parameter passing**: Added timeRef and collisionsRef parameters to hook
+- [x] **Test metrics sync**: Verified UI collision counts update from physics engine
+
+### **Phase 4: Additional Issues Identified for Next Session - PENDING**
+
+#### 4.1 Canvas Dimension Switching Issues
+- [ ] **1D/2D Canvas Switch**: Full page refresh required for canvas to switch between dimensions
+- [ ] **Dynamic Canvas Update**: Investigate why dimension changes don't update canvas immediately
+- [ ] **Canvas Reinitialization**: Fix canvas layout and particle positioning after dimension switch
+
+#### 4.2 Physics Behavior Visibility Issues  
+- [ ] **CTRW Scattering Visibility**: Random scatterings not visually apparent despite collision count updating
+- [ ] **Collision Effectiveness**: Interparticle collisions appear ineffective - particles pass through each other
+- [ ] **Visual Physics Feedback**: Improve visual indication of physics events (collisions, scattering)
+
+#### 4.3 Parameter System Improvements
+- [ ] **Timestep Parameter Usage**: Remove hardcoded dt values in strategies, use parameter panel value
+- [ ] **Temperature Slider Continuity**: Fix temperature slider jumping discretely instead of smooth values
+- [ ] **Parameter Validation**: Add validation for edge cases and parameter combinations
+
+#### 4.4 Strategy Implementation Consistency
 - [ ] **Remove duplicate trajectory updates**: Eliminate double trajectory recording in updateParticle and calculateStep
 - [ ] **Coordinate time management**: Unify usage of simTime() and simDt() with clear responsibilities
 - [ ] **Fix boundary condition timing**: Apply boundary conditions before position updates to prevent out-of-bounds states
 - [ ] **Add physics validation**: Verify CTRW mathematical implementation matches theoretical expectations
-- [ ] **Test strategy behavior**: Ensure consistent behavior across all implemented strategies
 
-#### 3.3 Improve Error Handling and Safety
+#### 4.5 Error Handling and Safety
 - [ ] **Replace definite assignment assertions**: Use proper initialization patterns instead of `!` assertions
 - [ ] **Add parameter validation**: Validate all physics parameters for reasonable ranges and consistency
 - [ ] **Improve error recovery**: Add graceful error handling for physics calculation failures
 - [ ] **Add debug logging controls**: Replace excessive console.log with configurable debug system
-- [ ] **Test error conditions**: Verify system behavior under edge cases and error conditions
 
 ### **Phase 4: Verification and Testing (ALL PRIORITIES)**
 
