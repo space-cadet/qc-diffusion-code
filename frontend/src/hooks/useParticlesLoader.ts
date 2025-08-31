@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import type { Container } from '@tsparticles/engine';
 import { updateParticlesFromStrategies } from '../config/tsParticlesConfig';
 
@@ -19,7 +19,23 @@ export const useParticlesLoader = ({
   timeRef: React.MutableRefObject<number>,
   collisionsRef: React.MutableRefObject<number>
 }) => {
+  const animationFrameId = useRef<number>();
+
+  const cleanup = useCallback(() => {
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+      animationFrameId.current = undefined;
+    }
+    // Do NOT destroy the container here. The owner (ParticleCanvas) manages its lifecycle.
+  }, []);
+
+  useEffect(() => {
+    return () => cleanup();
+  }, [cleanup]);
+
   return useCallback((container: Container) => {
+    // Stop any previous animation loop but keep the container intact
+    cleanup();
     tsParticlesContainerRef.current = container;
 
     // Store previous time for delta calculation (render timing)
@@ -27,6 +43,8 @@ export const useParticlesLoader = ({
     let accumulatedTime = 0; // For fixed physics timestep
 
     const animate = () => {
+      animationFrameId.current = requestAnimationFrame(animate);
+      
       const currentRenderTime = performance.now();
       const renderDeltaTime = (currentRenderTime - lastRenderTime) / 1000;
       lastRenderTime = currentRenderTime;
@@ -62,16 +80,11 @@ export const useParticlesLoader = ({
       // PHASE B: Rendering (migration plan: controlled by visibility)
       // Only render when tab is visible (can pause when hidden)
       if (renderEnabledRef.current && container) {
-        // Sync visual particles from physics state
         updateParticlesFromStrategies(container, true, simulationStateRef.current?.isRunning || false);
-
-        // Render to canvas
         (container as any).draw?.(false);
       }
-
-      requestAnimationFrame(animate);
     };
 
-    requestAnimationFrame(animate);
-  }, [timeRef, collisionsRef]);
+    animationFrameId.current = requestAnimationFrame(animate);
+  }, [timeRef, collisionsRef, cleanup]);
 };

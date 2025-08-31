@@ -104,10 +104,10 @@ export class ParticleManager {
   }
 
   update(dt: number): void {
-    console.log('[PM] update called', { dt, particleCount: this.particles.size, strategy: this.strategy.constructor.name });
+    // console.log('[PM] update called', { dt, particleCount: this.particles.size, strategy: this.strategy.constructor.name });
     const allParticles = this.getAllParticles();
     const activeParticles = allParticles.filter(p => p.isActive);
-    console.log('[PM] particles status', { total: allParticles.length, active: activeParticles.length });
+    // console.log('[PM] particles status', { total: allParticles.length, active: activeParticles.length });
     
     for (const particle of allParticles) {
       if (particle.isActive) {

@@ -15,7 +15,15 @@ export interface PhysicsEngineConfig {
   strategies: PhysicsStrategy[];
 }
 
-export class PhysicsEngine {
+export interface PhysicsEngine {
+  step(particles: Particle[]): number;
+  reset(): void;
+  updateConfiguration(partial: Partial<Omit<PhysicsEngineConfig, 'strategies'>> & { strategies?: PhysicsStrategy[] }): void;
+  getCoordinateSystem(): CoordinateSystem;
+  dispose(): void;
+}
+
+export class PhysicsEngine implements PhysicsEngine {
   private timeManager: TimeManager;
   private coordinateSystem: CoordinateSystem;
   private orchestrator: StrategyOrchestrator;
@@ -75,5 +83,9 @@ export class PhysicsEngine {
 
   getCoordinateSystem(): CoordinateSystem {
     return this.coordinateSystem;
+  }
+
+  dispose(): void {
+    // Clean up resources
   }
 }

@@ -1,9 +1,23 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 21:44:48 IST_
+_Last Updated: 2025-08-31 22:50:17 IST_
 
 ### 2025-08-31
+
+#### 22:50 - C15a: UI Control and Rendering Fixes - dt propagation and LogNumberSlider responsiveness
+- Updated `frontend/src/RandomWalkSim.tsx` - Added dt: gridLayoutParams.dt to RandomWalkSimulator constructor and all updateParameters calls (effects and handleInitialize)
+- Updated `frontend/src/components/common/LogNumberSlider.tsx` - Fixed log mapping (removed +1 hacks, use proper log10(min..max)), removed forced rounding for continuous sliders, added discrete?: boolean prop for integer-only outputs, enhanced number input with raw numeric values and step support, improved min/max label formatting with precision
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Removed logScale={true} from dt slider to allow checkbox toggle, added discrete prop to Particles slider for integer values, kept dt and Temperature sliders continuous
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Fixed cleanup to only cancel requestAnimationFrame, removed container.destroy() call that was causing blank canvas, limited cleanup scope to preserve container lifecycle
+- Updated `memory-bank/tasks/C15.md` - Added Phase 4.8 completion entry with timestamp 2025-08-31 22:41:47 IST documenting dt propagation and UI fixes
+- Updated `memory-bank/tasks/C5b.md` - Added UI Control Enhancements section documenting dt parameter propagation, LogNumberSlider improvements, and container lifecycle fixes
+- Updated `memory-bank/tasks.md` - Updated timestamps for completed tasks
+- Updated `memory-bank/implementation-details/random-walk-verification-plan.md` - Added Phase 4 UI control fixes completion, updated timestamps
+- Updated `memory-bank/implementation-details/random-walk-ui-interface.md` - Added UI Control Enhancements section with 2025-08-31 improvements
+- Updated `memory-bank/sessions/2025-08-31-night.md` - Comprehensive update with session summary, changes made, next steps, results, and issues resolved
+- Updated `memory-bank/session_cache.md` - Updated session focus and timestamps
+- Updated `memory-bank/edit_history.md` - Added this entry
 
 #### 21:50 - C15a: Phase 4 progress - dt plumbing and memory leak tracking
 - Updated `frontend/src/physics/core/ParameterManager.ts` - Added dt property to SimulatorParams interface, added dt field to class, added initialization in constructor, added update in updateParameters, added getTimeStep() and setTimeStep() methods, included dt in getPhysicsParameters() return value

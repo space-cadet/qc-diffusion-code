@@ -4,7 +4,7 @@ description: Systematic verification of random walk simulation components throug
 
 # Random Walk Component Verification Plan
 *Created: 2025-08-31 19:30:01 IST*
-*Last Updated: 2025-08-31 21:44:48 IST*
+*Last Updated: 2025-08-31 22:41:47 IST*
 
 ## Verification Objectives
 - Examine code for logical correctness and implementation errors
@@ -74,7 +74,6 @@ description: Systematic verification of random walk simulation components throug
 - Extended simulation runtime reliability
 - Rapid parameter change resilience
 - Browser compatibility across different engines
-=======
 
 ## Critical Issues Discovered (2025-08-31)
 
@@ -176,45 +175,66 @@ description: Systematic verification of random walk simulation components throug
 - [x] **Fix parameter passing**: Added timeRef and collisionsRef parameters to hook
 - [x] **Test metrics sync**: Verified UI collision counts update from physics engine
 
-### **Phase 4: Additional Issues Identified for Next Session - PENDING**
+### **Phase 4: UI Control and Rendering Fixes (HIGH PRIORITY) - COMPLETED 2025-08-31 22:41:47 IST**
 
-#### 4.1 Canvas Dimension Switching Issues
+#### 4.1 Fix dt Parameter Propagation - COMPLETED
+- [x] **Add dt to RandomWalkSimulator constructor**: Pass dt from gridLayoutParams to simulator initialization
+- [x] **Add dt to updateParameters calls**: Include dt in all parameter update paths (effects and handleInitialize)
+- [x] **Verify dt reaches PhysicsEngine**: Confirm ParameterManager.dt propagates to TimeManager
+- [x] **Test dt control from UI**: Verify UI dt slider changes affect physics timestep
+
+#### 4.2 Fix LogNumberSlider Responsiveness - COMPLETED
+- [x] **Fix log mapping**: Remove +1 hacks, use proper log10(min..max) mapping
+- [x] **Remove forced rounding**: Allow continuous values for non-discrete sliders
+- [x] **Fix checkbox toggle**: Make log-scale uncontrolled when not explicitly controlled
+- [x] **Add discrete mode**: Support integer-only outputs for particle count slider
+- [x] **Test slider movement**: Verify smooth slider movement and checkbox responsiveness
+
+#### 4.3 Fix Container Lifecycle - COMPLETED
+- [x] **Fix useParticlesLoader cleanup**: Stop destroying active tsParticles container
+- [x] **Limit cleanup scope**: Only cancel requestAnimationFrame, preserve container
+- [x] **Test particle visibility**: Verify particles render correctly after fixes
+- [x] **Verify container reuse**: Confirm container survives parameter changes
+
+### **Phase 5: Additional Issues Identified for Next Session - PENDING**
+
+#### 5.1 Canvas Dimension Switching Issues
 - [ ] **1D/2D Canvas Switch**: Full page refresh required for canvas to switch between dimensions
 - [ ] **Dynamic Canvas Update**: Investigate why dimension changes don't update canvas immediately
 - [ ] **Canvas Reinitialization**: Fix canvas layout and particle positioning after dimension switch
 
-#### 4.2 Physics Behavior Visibility Issues  
+#### 5.2 Physics Behavior Visibility Issues  
 - [ ] **CTRW Scattering Visibility**: Random scatterings not visually apparent despite collision count updating
 - [ ] **Collision Effectiveness**: Interparticle collisions appear ineffective - particles pass through each other
 - [ ] **Visual Physics Feedback**: Improve visual indication of physics events (collisions, scattering)
 
-#### 4.3 Parameter System Improvements
-- [x] **Timestep Parameter Usage**: Remove hardcoded dt values in strategies, use parameter panel value - COMPLETED 2025-08-31 21:44:48 IST
+#### 5.3 Parameter System Improvements
+- [x] **Timestep Parameter Usage**: Remove hardcoded dt values in strategies, use parameter panel value - COMPLETED 2025-08-31 22:41:47 IST
 - [ ] **Temperature Slider Continuity**: Fix temperature slider jumping discretely instead of smooth values
 - [ ] **Parameter Validation**: Add validation for edge cases and parameter combinations
 
-#### 4.4 Strategy Implementation Consistency
+#### 5.4 Strategy Implementation Consistency
 - [ ] **Remove duplicate trajectory updates**: Eliminate double trajectory recording in updateParticle and calculateStep
 - [ ] **Coordinate time management**: Unify usage of simTime() and simDt() with clear responsibilities
 - [ ] **Fix boundary condition timing**: Apply boundary conditions before position updates to prevent out-of-bounds states
 - [ ] **Add physics validation**: Verify CTRW mathematical implementation matches theoretical expectations
 
-#### 4.5 Error Handling and Safety
+#### 5.5 Error Handling and Safety
 - [ ] **Replace definite assignment assertions**: Use proper initialization patterns instead of `!` assertions
 - [ ] **Add parameter validation**: Validate all physics parameters for reasonable ranges and consistency
 - [ ] **Improve error recovery**: Add graceful error handling for physics calculation failures
 - [ ] **Add debug logging controls**: Replace excessive console.log with configurable debug system
 
-### **Phase 4: Verification and Testing (ALL PRIORITIES)**
+### **Phase 6: Verification and Testing (ALL PRIORITIES)**
 
-#### 4.1 Integration Testing
+#### 6.1 Integration Testing
 - [ ] **End-to-end parameter flow test**: Verify UI changes propagate correctly to physics engine
 - [ ] **Cross-strategy consistency test**: Ensure all strategies behave consistently with same parameters
 - [ ] **Boundary condition test suite**: Verify correct behavior at all boundary types and edge cases
 - [ ] **Coordinate system test suite**: Verify correct particle positioning across different configurations
 - [ ] **Performance regression testing**: Ensure fixes don't negatively impact simulation performance
 
-#### 4.2 Physics Validation
+#### 6.2 Physics Validation
 - [ ] **Telegraph equation convergence test**: Verify CTRW properly converges to telegraph equation in appropriate limits  
 - [ ] **Conservation law verification**: Check energy/momentum conservation where applicable
 - [ ] **Statistical behavior validation**: Verify particle distributions match theoretical expectations
@@ -246,7 +266,6 @@ description: Systematic verification of random walk simulation components throug
 - [x] Null/undefined cases handled with proper guards - **PARTIAL: Some areas unsafe**
 - [x] Edge cases (zero values, extremes) managed safely - **FAILED: No parameter validation**
 - [x] Error recovery doesn't leave system in inconsistent state - **FAILED: Poor error handling**
-=======
 
 ## Legacy Test Areas (Preserved)
 

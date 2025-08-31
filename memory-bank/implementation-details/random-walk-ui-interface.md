@@ -1,7 +1,7 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-27 23:15:00 IST*
+*Last Updated: 2025-08-31 22:41:47 IST*
 
 ## Overview
 
@@ -499,10 +499,29 @@ UI implementation completed with comprehensive performance optimization:
 ### Technical Implementation
 
 - **Mapping Functions**:
-  - Linear → Log: `toLog = (p) => Math.log10((p ?? 0) + 1)`
-  - Log → Linear: `fromLog = (s) => Math.round(Math.pow(10, s) - 1)`
+  - Linear → Log: `toLog = (p) => Math.log10(Math.max(min, p))`
+  - Log → Linear: `fromLog = (s) => Math.pow(10, s)`
 - **Edge Case Handling**:
-  - Zero particles supported with "+1" offset in logarithm
+  - Proper log mapping without +1 hacks for smooth slider movement
   - NaN/invalid inputs clamped to valid range
   - Disabled when min ≥ max
 - **Performance**: Optimized with React hooks (useMemo, useCallback) to prevent unnecessary recalculations
+
+## UI Control Enhancements (2025-08-31)
+
+### dt Parameter Control
+- **dt Propagation**: Fixed missing dt parameter propagation from UI slider to RandomWalkSimulator constructor and updateParameters calls
+- **Timestep Control**: UI dt slider now properly controls physics engine timestep via ParameterManager
+- **Real-time Updates**: Changes to dt affect simulation speed immediately during runtime
+
+### LogNumberSlider Improvements
+- **Slider Responsiveness**: Fixed slider not moving by correcting log mapping and removing forced rounding
+- **Checkbox Toggle**: Fixed unresponsive log-scale checkbox by making it uncontrolled when not explicitly controlled
+- **Discrete Mode**: Added discrete boolean prop for integer-only outputs while preserving log-scale mapping
+- **Continuous vs Discrete**: Particle count uses discrete mode (integers), dt and temperature use continuous mode
+- **Precision Handling**: Enhanced number input with proper step support and min/max label formatting
+
+### Container Lifecycle
+- **Rendering Fix**: Fixed useParticlesLoader destroying active tsParticles container causing blank canvas
+- **Container Reuse**: Limited cleanup to requestAnimationFrame cancellation only, preserving container lifecycle
+- **Particle Visibility**: Particles now render correctly after parameter changes and initialization

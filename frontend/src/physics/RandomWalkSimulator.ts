@@ -23,7 +23,7 @@ export class RandomWalkSimulator {
   private physicsEngine?: PhysicsEngine;
   private time: number = 0;
   private observableManager: ObservableManager;
-  private simulationRunner!: SimulationRunner;
+  private simulationRunner: SimulationRunner | undefined;
   private parameterManager: ParameterManager;
   private readonly useNewEngine: boolean = USE_NEW_ENGINE === true;
   private densityHistory: Array<{
@@ -136,10 +136,11 @@ export class RandomWalkSimulator {
   }
 
   step(dt: number): void {
-    console.log('[RWS] step called', { dt, hasSimulationRunner: !!this.simulationRunner, currentTime: this.time });
+    if (!this.simulationRunner) return;
+    // console.log('[RWS] step called', { dt, hasSimulationRunner: !!this.simulationRunner, currentTime: this.time });
     const timeStep = this.simulationRunner.step(dt);
     this.time += timeStep;
-    console.log('[RWS] step completed', { timeStep, newTime: this.time });
+    // console.log('[RWS] step completed', { timeStep, newTime: this.time });
     
     const particles = this.particleManager.getAllParticles();
     this.observableManager.updateSnapshot(particles, this.time);
@@ -280,9 +281,12 @@ export class RandomWalkSimulator {
   dispose(): void {
     this.clearDensityHistory();
     this.observableManager.reset();
+    this.particleManager.clearAllParticles();
     if (this.physicsEngine) {
+      this.physicsEngine.dispose();
       this.physicsEngine = undefined;
     }
+    this.simulationRunner = undefined;
   }
 
   analyzeWaveFrontSpeed(): { measuredSpeed: number; theoreticalSpeed: number; error: number } {

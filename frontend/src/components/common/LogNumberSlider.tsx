@@ -18,6 +18,8 @@ export interface LogNumberSliderProps {
   className?: string;
   id?: string;
   dataTestId?: string;
+  /** When true, emitted values are rounded to integers (useful for counts). */
+  discrete?: boolean;
 }
 
 export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
@@ -38,6 +40,7 @@ export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
   className,
   id,
   dataTestId,
+  discrete = false,
 }) => {
   // Allow both controlled and uncontrolled log scale
   const [internalLog, setInternalLog] = useState(defaultLogScale);
@@ -49,18 +52,21 @@ export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
   }, [onToggleLogScale]);
 
   const clamp = useCallback((v: number) => Math.max(min, Math.min(max, v)), [min, max]);
-  const toLog = useCallback((p: number) => Math.log10((p ?? 0) + 1), []);
-  const fromLog = useCallback((s: number) => Math.round(Math.pow(10, s) - 1), []);
+  // Map between value space [min,max] and slider space [log10(min), log10(max)]
+  const toLog = useCallback((p: number) => Math.log10(Math.max(min, p)), [min]);
+  const fromLog = useCallback((s: number) => Math.pow(10, s), []);
 
-  const sliderMin = useMemo(() => (isLog ? Math.log10(min + 1) : min), [isLog, min]);
-  const sliderMax = useMemo(() => (isLog ? Math.log10(max + 1) : max), [isLog, max]);
+  const sliderMin = useMemo(() => (isLog ? Math.log10(min) : min), [isLog, min]);
+  const sliderMax = useMemo(() => (isLog ? Math.log10(max) : max), [isLog, max]);
   const sliderValue = useMemo(() => (isLog ? toLog(value) : value), [isLog, toLog, value]);
 
   const onSliderChange = useCallback((raw: string) => {
-    const v = isLog ? fromLog(parseFloat(raw)) : parseFloat(raw);
-    const next = clamp(Number.isFinite(v) ? Math.round(v) : min);
+    const rawNum = parseFloat(raw);
+    const v = isLog ? fromLog(rawNum) : rawNum;
+    const base = Number.isFinite(v) ? v : min;
+    const next = clamp(discrete ? Math.round(base) : base);
     onChange(next);
-  }, [isLog, fromLog, clamp, onChange, min]);
+  }, [isLog, fromLog, clamp, onChange, min, discrete]);
 
   const formatter = useCallback((v: number) => {
     if (format) return format(v);
@@ -75,9 +81,9 @@ export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
 
   const onNumberChange = useCallback((raw: string) => {
     const v = parser(raw);
-    const next = clamp(Math.round(v));
+    const next = clamp(discrete ? Math.round(v) : v);
     onChange(next);
-  }, [parser, clamp, onChange]);
+  }, [parser, clamp, onChange, discrete]);
 
   const isDisabled = disabled || !(max > min);
 
@@ -99,7 +105,8 @@ export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
             type="number"
             min={min}
             max={max}
-            value={formatter(value)}
+            step={discrete ? 1 : (step === 'any' ? 'any' : step)}
+            value={value}
             onChange={(e) => onNumberChange(e.target.value)}
             className="w-28 border rounded px-2 py-1 text-sm"
             disabled={isDisabled}
@@ -118,9 +125,9 @@ export const LogNumberSlider: React.FC<LogNumberSliderProps> = ({
         disabled={isDisabled}
       />
       <div className="flex justify-between text-xs text-gray-500">
-        <span>{min}</span>
-        <span className="font-medium">{value}</span>
-        <span>{max}</span>
+        <span>{precision > 0 ? min.toFixed(precision) : String(min)}</span>
+        <span className="font-medium">{formatter(value)}</span>
+        <span>{precision > 0 ? max.toFixed(precision) : String(max)}</span>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-31 19:10:02 IST_
+_Last Updated: 2025-08-31 22:41:47 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -236,3 +236,11 @@ This task implements the complete UI framework for the random walk simulation ba
 
 - ✅ **tsParticles Logging Suppression**: Fixed persistent console log messages from tsParticles when simulation paused by modifying animation loop in ParticleCanvas.tsx to skip particle updates and logging when paused/stopped while maintaining static frame rendering
 - ✅ **Physics Engine Boundary Integration**: Completed boundary condition integration for new physics engine with centralized enforcement via BoundaryPhase and consistent BoundaryConfig propagation through StrategyFactory
+
+**UI Control Enhancements (2025-08-31)**:
+
+- ✅ **dt Parameter Propagation**: Fixed missing dt parameter propagation from UI slider to RandomWalkSimulator constructor and updateParameters calls, enabling proper timestep control from UI
+- ✅ **LogNumberSlider Responsiveness**: Fixed slider not moving and checkbox not responding by correcting log mapping (removed +1 hacks), eliminating forced rounding for continuous sliders, and making log-scale toggle uncontrolled
+- ✅ **Discrete/Continuous Mode**: Added discrete boolean prop to LogNumberSlider for integer-only outputs while preserving log-scale mapping; enabled discrete mode for particle count slider, kept dt and temperature continuous
+- ✅ **Container Lifecycle Fix**: Fixed useParticlesLoader destroying active tsParticles container by limiting cleanup to requestAnimationFrame cancellation only, allowing proper particle rendering
+- ✅ **Slider Precision**: Enhanced number input to use raw numeric values with proper step support, improved min/max label formatting with precision handling

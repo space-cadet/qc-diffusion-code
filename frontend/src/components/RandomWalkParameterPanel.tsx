@@ -716,6 +716,7 @@ export const RandomWalkParameterPanel = ({
                   logScale={randomWalkUIState.particlesLogScale}
                   onToggleLogScale={(b) => updateUIState({ particlesLogScale: b })}
                   defaultLogScale
+                  discrete
                 />
               </div>
 
@@ -808,7 +809,6 @@ export const RandomWalkParameterPanel = ({
                   min={0.0001}
                   max={0.1}
                   step="any"
-                  logScale={true}
                   defaultLogScale={true}
                   precision={4}
                   format={(v) => v.toExponential(2)}
