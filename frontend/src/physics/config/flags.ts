@@ -5,7 +5,7 @@
 declare const VITE_USE_NEW_PHYSICS_ENGINE: string | undefined;
 
 // Use different approaches for Vite vs Jest environments
-function getNewEngineFlag(): boolean {
+export function getNewEngineFlag(): boolean {
   // Jest/Node environment - check process.env
   if (typeof process !== 'undefined' && process.env) {
     return process.env.VITE_USE_NEW_PHYSICS_ENGINE === 'true';

@@ -1,7 +1,7 @@
 # Physics Engine Migration Plan (Stepwise)
 
 Created: 2025-08-28 19:00:55 IST
-Last Updated: 2025-08-29 15:23:43 IST
+Last Updated: 2025-08-31 19:10:02 IST
 
 This file tracks the concrete migration steps from the current composite strategy loop to the two-phase PhysicsEngine architecture. Source references: `physics-engine-rewrite-final.md`, `physics-engine-rewrite-claude4.md`, `physics-engine-rewrite-deepseek.md`.
 
@@ -141,5 +141,14 @@ This file tracks the concrete migration steps from the current composite strateg
   - `frontend/src/physics/strategies/CTRWStrategy2D.ts` - boundary config updates
   - `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` - interface compliance
   - `frontend/src/physics/types/Particle.ts` - type definitions
+
+## Recent Updates (2025-08-31)
+
+- **Step 4.7: Boundary Integration Completed**
+  - Updated `StrategyFactory.ts` to pass `BoundaryConfig` to new `BallisticStrategy` for consistency with legacy strategies
+  - Added lightweight boundary update path in `RandomWalkSimulator.updateParameters()` using `PhysicsEngine.updateConfiguration()`
+  - Boundary enforcement now centralized via `BoundaryPhase` in new engine architecture
+  - Eliminated engine rebuilds when only boundary conditions change
+  - Fixed animation loop in `ParticleCanvas.tsx` to suppress tsParticles logging when paused/stopped
 
 This plan is intentionally incremental to keep PRs small, reviewable, and reversible.

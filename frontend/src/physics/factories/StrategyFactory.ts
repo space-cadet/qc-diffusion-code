@@ -1,12 +1,13 @@
-
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import { CTRWStrategy1D } from '../strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
-import { LegacyBallisticStrategy as BallisticStrategy } from '../strategies/LegacyBallisticStrategy';
+import { LegacyBallisticStrategy } from '../strategies/LegacyBallisticStrategy';
 import { CompositeStrategy } from '../strategies/CompositeStrategy';
 import { InterparticleCollisionStrategy } from '../strategies/InterparticleCollisionStrategy';
 import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCollisionStrategy1D';
+import { getNewEngineFlag } from '../config/flags';
+import { BallisticStrategy } from '../strategies/BallisticStrategy';
 
 interface SimulatorParams {
   dimension: '1D' | '2D';
@@ -28,7 +29,9 @@ export function createStrategies(config: SimulatorParams, boundaryConfig: Bounda
         interparticleCollisions: false, // collisions handled via separate 1D strategy below
       }));
     } else {
-      oneDStrategies.push(new BallisticStrategy({ boundaryConfig: boundaryConfig }));
+      oneDStrategies.push(getNewEngineFlag() 
+        ? new BallisticStrategy({ boundaryConfig })
+        : new LegacyBallisticStrategy({ boundaryConfig: boundaryConfig }));
     }
     if (selectedStrategies.includes('collisions')) {
       oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: boundaryConfig }));
@@ -38,7 +41,11 @@ export function createStrategies(config: SimulatorParams, boundaryConfig: Bounda
 
   // For 2D, compose strategies: base is Ballistic; others are added if selected
   else {
-    const twoDStrategies: RandomWalkStrategy[] = [new BallisticStrategy({ boundaryConfig: boundaryConfig })];
+    const twoDStrategies: RandomWalkStrategy[] = [
+      getNewEngineFlag()
+        ? new BallisticStrategy({ boundaryConfig })
+        : new LegacyBallisticStrategy({ boundaryConfig: boundaryConfig })
+    ];
 
     if (selectedStrategies.includes('ctrw')) {
       twoDStrategies.push(new CTRWStrategy2D({

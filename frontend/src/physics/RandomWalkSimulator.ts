@@ -149,7 +149,21 @@ export class RandomWalkSimulator {
     this.setupStrategies();
     this.particleManager.updatePhysicsEngine(this.currentStrategy);
     this.particleManager.setCanvasSize(this.parameterManager.canvasWidth, this.parameterManager.canvasHeight);
-    this.setupSimulationRunner();
+
+    // Lightweight path: if only boundaries changed and the new engine is active, update in place
+    const boundaryChanged = params.boundaryCondition !== undefined;
+    const onlyBoundaryChanged = boundaryChanged && Object.keys(params).every(
+      (k) => k === 'boundaryCondition'
+    );
+
+    if (this.useNewEngine && this.physicsEngine && onlyBoundaryChanged && !needsReinitialization) {
+      this.physicsEngine.updateConfiguration({
+        boundaries: this.parameterManager.getBoundaryConfig()
+      });
+      // Keep existing runner; no rebuild necessary
+    } else {
+      this.setupSimulationRunner();
+    }
 
     if (needsReinitialization) {
       this.initializeParticles();

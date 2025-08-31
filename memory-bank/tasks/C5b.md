@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-08-27 23:15:00 IST_
+_Last Updated: 2025-08-31 19:10:02 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
 
@@ -231,3 +231,8 @@ This task implements the complete UI framework for the random walk simulation ba
 - ✅ **Import Updates**: Updated App.tsx to use PdeParameterPanel, RandomWalkSim.tsx to use RandomWalkParameterPanel
 - ✅ **Store Integration**: Updated appStore.ts to use consolidated RandomWalkParams type, added solver parameters to defaults
 - ✅ **Parameter Visibility Fix**: Removed equation selection dependency for parameter panel visibility in Controls logic
+
+**Animation Loop and Pause Control Fixes (2025-08-31)**:
+
+- ✅ **tsParticles Logging Suppression**: Fixed persistent console log messages from tsParticles when simulation paused by modifying animation loop in ParticleCanvas.tsx to skip particle updates and logging when paused/stopped while maintaining static frame rendering
+- ✅ **Physics Engine Boundary Integration**: Completed boundary condition integration for new physics engine with centralized enforcement via BoundaryPhase and consistent BoundaryConfig propagation through StrategyFactory

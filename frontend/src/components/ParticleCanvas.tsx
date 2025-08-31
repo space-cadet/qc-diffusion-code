@@ -287,10 +287,13 @@ const ParticleCanvasComponent: React.FC<{
       // Note: Physics stepping is now handled by useParticlesLoader hook
       // This animation loop focuses on rendering/syncing visual particles
 
-      // Sync visual particles from physics via active strategy
-      updateParticlesFromStrategies(container, true, simulationStatus === "running");
-      // Do not update positions here; parent (RandomWalkSim) controls physics
-      (container as any).draw?.(false);
+      if (isRunningStatus) {
+        updateParticlesFromStrategies(container, true, true);
+        (container as any).draw?.(false);
+      } else {
+        // When paused/stopped, just draw static frame without updates
+        (container as any).draw?.(false);
+      }
 
       if (drawCount % 120 === 0) {
         const particlesContainer: any = (container as any).particles;
