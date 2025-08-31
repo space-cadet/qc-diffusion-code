@@ -1,9 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 19:59:11 IST_
+_Last Updated: 2025-08-31 20:18:34 IST_
 
 ### 2025-08-31
+
+#### 20:18 - C15a: Phase 2 completion - physics update flow fixes
+- Fixed `frontend/src/physics/core/SimulationRunner.ts` - Added ParticleManager.update() call to NewEngineSimulationRunner.step()
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added debug logging to step method
+- Updated `memory-bank/tasks/C15a.md` - Added Phase 2 completion, updated progress tracking
+- Updated `memory-bank/tasks.md` - Updated C15a status with Phase 2 completion and Phase 3 issues
+- Updated `memory-bank/implementation-details/random-walk-verification-plan.md` - Added Phase 2 results, Phase 3 new issues
+- Updated `memory-bank/sessions/2025-08-31-evening.md` - Added Phase 2 implementation details and Phase 3 issue identification
+- Updated `memory-bank/session_cache.md` - Updated current session focus and C15a progress
 
 #### 19:59 - C15a: Phase 1 Critical Parameter Flow Fixes Implementation
 - Updated `frontend/src/physics/core/ParameterManager.ts` - Added getPhysicsParameters() method for parameter extraction and validatePhysicsParameters() for validation, fixed getBoundaryConfig() to use canvas dimensions instead of hardcoded (-200,200) values

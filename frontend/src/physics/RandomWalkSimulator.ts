@@ -58,6 +58,7 @@ export class RandomWalkSimulator {
   }
 
   private setupSimulationRunner(): void {
+    console.log('[RWS] setupSimulationRunner', { useNewEngine: this.useNewEngine });
     if (this.useNewEngine) {
       try {
         const adapter = new LegacyStrategyAdapter(
@@ -72,13 +73,16 @@ export class RandomWalkSimulator {
           strategies: [adapter],
         });
         this.simulationRunner = new NewEngineSimulationRunner(this.physicsEngine, this.particleManager);
+        console.log('[RWS] Using NewEngineSimulationRunner');
       } catch (e) {
         console.warn('[RandomWalkSimulator] Failed to initialize PhysicsEngine (fallback to legacy path):', e);
         this.physicsEngine = undefined;
         this.simulationRunner = new LegacySimulationRunner(this.particleManager);
+        console.log('[RWS] Fallback to LegacySimulationRunner');
       }
     } else {
       this.simulationRunner = new LegacySimulationRunner(this.particleManager);
+      console.log('[RWS] Using LegacySimulationRunner (flag disabled)');
     }
   }
 
@@ -132,8 +136,10 @@ export class RandomWalkSimulator {
   }
 
   step(dt: number): void {
+    console.log('[RWS] step called', { dt, hasSimulationRunner: !!this.simulationRunner, currentTime: this.time });
     const timeStep = this.simulationRunner.step(dt);
     this.time += timeStep;
+    console.log('[RWS] step completed', { timeStep, newTime: this.time });
     
     const particles = this.particleManager.getAllParticles();
     this.observableManager.updateSnapshot(particles, this.time);
