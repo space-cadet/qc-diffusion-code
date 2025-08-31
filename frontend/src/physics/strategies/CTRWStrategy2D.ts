@@ -36,7 +36,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    this.updateParticleWithDt(particle, allParticles, simDt(0.01));
+    this.updateParticleWithDt(particle, allParticles, simDt());
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
@@ -90,7 +90,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
     const currentTime = simTime();
     const collision = this.handleCollision(particle);
     
-    const timeStep = Math.min(collision.waitTime, simDt(0.01));
+    const timeStep = Math.min(collision.waitTime, simDt());
     const dx = particle.velocity.vx * timeStep;
     const dy = particle.velocity.vy * timeStep;
 

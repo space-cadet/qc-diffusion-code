@@ -288,6 +288,7 @@ export default function RandomWalkSim() {
     gridLayoutParams.simulationType,
     gridLayoutParams.strategies,
     gridLayoutParams.boundaryCondition,
+    gridLayoutParams.dimension,
     gridLayoutParams.graphType,
     gridLayoutParams.graphSize,
   ]);
@@ -573,6 +574,7 @@ export default function RandomWalkSim() {
           {/* Canvas Panel */}
           <div key="canvas">
             <ParticleCanvas
+              key={`canvas-${gridLayoutParams.dimension}`}
               gridLayoutParams={gridLayoutParams}
               simulationStatus={simulationState.status}
               tsParticlesContainerRef={tsParticlesContainerRef}

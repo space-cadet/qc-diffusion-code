@@ -1,9 +1,24 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 20:59:44 IST_
+_Last Updated: 2025-08-31 21:44:48 IST_
 
 ### 2025-08-31
+
+#### 21:50 - C15a: Phase 4 progress - dt plumbing and memory leak tracking
+- Updated `frontend/src/physics/core/ParameterManager.ts` - Added dt property to SimulatorParams interface, added dt field to class, added initialization in constructor, added update in updateParameters, added getTimeStep() and setTimeStep() methods, included dt in getPhysicsParameters() return value
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Replaced hardcoded timeStep: 0.01 with parameterManager.dt, enhanced updateConfiguration to handle dt changes without engine rebuild, added dtChanged detection and partial configuration updates
+- Updated `frontend/src/RandomWalkSim.tsx` - Added key={`canvas-${gridLayoutParams.dimension}`} to ParticleCanvas component to force remount on dimension change, added gridLayoutParams.dimension to useEffect dependency array for canvas initialization
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Replaced hardcoded physicsTimeStep = 0.01 with store value, added fallback with Math.max(1e-6, gridLayoutParamsRef.current?.dt ?? 0.01)
+- Updated `frontend/src/physics/strategies/CTRWStrategy1D.ts` and `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Replaced simDt(0.01) calls with simDt() to use global time settings
+- Updated `frontend/src/stores/appStore.ts` - Added dt: 0.01 to initial state, added dt migration for persisted state
+- Updated `frontend/src/types/simulationTypes.ts` - Added dt field to RandomWalkParams interface
+- Updated `memory-bank/tasks/C15a.md` - Updated Phase 4 progress, marked dt plumbing as completed, added memory leak issue
+- Updated `memory-bank/tasks.md` - Updated C15a status with dt plumbing completion and memory leak issue
+- Updated `memory-bank/implementation-details/random-walk-verification-plan.md` - Marked timestep parameter usage as completed, added memory leak issue to performance analysis
+- Created `memory-bank/sessions/2025-08-31-night.md` - New session file documenting dt plumbing work and memory leak issue
+- Updated `memory-bank/session_cache.md` - Updated current session and C15a progress with dt plumbing completion
+- Updated `memory-bank/edit_history.md` - Added this entry
 
 #### 20:59 - C15a: Phase 3 completion - strategy movement and UI metrics fixes
 - Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Added position integration with proper velocity application and boundary handling

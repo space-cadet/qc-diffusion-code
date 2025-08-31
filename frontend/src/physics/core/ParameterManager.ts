@@ -1,10 +1,10 @@
-
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 
 export interface SimulatorParams {
   collisionRate: number;
   jumpLength: number;
   velocity: number;
+  dt?: number;
   particleCount: number;
   dimension: '1D' | '2D';
   interparticleCollisions: boolean;
@@ -31,6 +31,7 @@ export class ParameterManager {
   public collisionRate: number;
   public jumpLength: number;
   public velocity: number;
+  public dt: number;
   public particleCount: number;
   public dimension: '1D' | '2D';
   public interparticleCollisions: boolean;
@@ -56,6 +57,7 @@ export class ParameterManager {
     this.collisionRate = params.collisionRate;
     this.jumpLength = params.jumpLength;
     this.velocity = params.velocity;
+    this.dt = params.dt ?? 0.01;
     this.particleCount = params.particleCount;
     this.dimension = params.dimension;
     this.interparticleCollisions = params.interparticleCollisions;
@@ -89,6 +91,10 @@ export class ParameterManager {
     if (params.particleCount && params.particleCount !== this.particleCount) {
       this.particleCount = params.particleCount;
       needsReinitialization = true;
+    }
+
+    if (params.dt !== undefined) {
+      this.dt = params.dt;
     }
 
     if (params.canvasWidth) {
@@ -137,12 +143,21 @@ export class ParameterManager {
     return needsReinitialization;
   }
 
-  public getPhysicsParameters(): { collisionRate: number; jumpLength: number; velocity: number } {
+  public getPhysicsParameters(): { collisionRate: number; jumpLength: number; velocity: number; dt: number } {
     return {
       collisionRate: this.collisionRate,
       jumpLength: this.jumpLength,
-      velocity: this.velocity
+      velocity: this.velocity,
+      dt: this.dt
     };
+  }
+
+  public getTimeStep(): number {
+    return this.dt;
+  }
+
+  public setTimeStep(dt: number): void {
+    this.dt = dt;
   }
 
   public validatePhysicsParameters(): boolean {

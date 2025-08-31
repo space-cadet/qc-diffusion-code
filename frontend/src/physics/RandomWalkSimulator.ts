@@ -66,7 +66,7 @@ export class RandomWalkSimulator {
           () => this.particleManager.getAllParticles()
         );
         this.physicsEngine = new PhysicsEngine({
-          timeStep: 0.01,
+          timeStep: this.parameterManager.dt,
           boundaries: this.parameterManager.getBoundaryConfig(),
           canvasSize: { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
           dimension: this.parameterManager.dimension,
@@ -158,14 +158,19 @@ export class RandomWalkSimulator {
 
     // Lightweight path: if only boundaries changed and the new engine is active, update in place
     const boundaryChanged = params.boundaryCondition !== undefined;
+    const dtChanged = params.dt !== undefined;
     const onlyBoundaryChanged = boundaryChanged && Object.keys(params).every(
       (k) => k === 'boundaryCondition'
     );
 
-    if (this.useNewEngine && this.physicsEngine && onlyBoundaryChanged && !needsReinitialization) {
-      this.physicsEngine.updateConfiguration({
-        boundaries: this.parameterManager.getBoundaryConfig()
-      });
+    if (this.useNewEngine && this.physicsEngine && !needsReinitialization) {
+      // Update boundaries and/or timestep in place when possible
+      const partial: any = {};
+      if (boundaryChanged) partial.boundaries = this.parameterManager.getBoundaryConfig();
+      if (dtChanged) partial.timeStep = this.parameterManager.dt;
+      if (Object.keys(partial).length > 0) {
+        this.physicsEngine.updateConfiguration(partial);
+      }
       // Keep existing runner; no rebuild necessary
     } else {
       this.setupSimulationRunner();

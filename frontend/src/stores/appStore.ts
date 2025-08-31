@@ -166,6 +166,7 @@ export const useAppStore = create<AppState>()(
         collisionRate: 2.5,
         jumpLength: 0.1,
         velocity: 1.0,
+        dt: 0.01,
         simulationType: 'continuum',
         dimension: '2D',
         interparticleCollisions: false,
@@ -275,6 +276,7 @@ export const useAppStore = create<AppState>()(
         const glp = state.gridLayoutParams || {};
         if (glp.minParticles === undefined) glp.minParticles = 0;
         if (glp.maxParticles === undefined) glp.maxParticles = 2000;
+        if (glp.dt === undefined) glp.dt = 0.01;
         const ui = state.randomWalkUIState || {};
         if (ui.particlesLogScale === undefined) ui.particlesLogScale = true;
         return {

@@ -37,8 +37,8 @@ export const useParticlesLoader = ({
       // PHASE A: Physics Simulation (migration plan: controlled by simulation state)
       // Only step physics when simulation is actually running
       if (simulatorRef.current && simulationStateRef.current?.isRunning) {
-        // Use fixed physics timestep for stability (migration plan: parity with 0.01)
-        const physicsTimeStep = 0.01;
+        // Use fixed physics timestep from store for stability
+        const physicsTimeStep = Math.max(1e-6, gridLayoutParamsRef.current?.dt ?? 0.01);
 
         // Step physics multiple times if accumulated time allows
         while (accumulatedTime >= physicsTimeStep) {

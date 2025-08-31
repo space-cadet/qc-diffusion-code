@@ -799,6 +799,25 @@ export const RandomWalkParameterPanel = ({
                 </div>
               </div>
 
+              {/* Time Step dt */}
+              <div>
+                <LogNumberSlider
+                  label="dt (timestep, s)"
+                  value={gridLayoutParams.dt ?? 0.01}
+                  onChange={(v) => setGridLayoutParams({ ...gridLayoutParams, dt: v })}
+                  min={0.0001}
+                  max={0.1}
+                  step="any"
+                  logScale={true}
+                  defaultLogScale={true}
+                  precision={4}
+                  format={(v) => v.toExponential(2)}
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Controls simulation timestep used by the physics engine
+                </div>
+              </div>
+
               {/* Temperature */}
               <div>
                 <LogNumberSlider

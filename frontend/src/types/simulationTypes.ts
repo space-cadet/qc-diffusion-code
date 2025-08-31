@@ -12,6 +12,7 @@ export interface RandomWalkParams {
   collisionRate: number;
   jumpLength: number;
   velocity: number;
+  dt: number;
   particles: number;
   maxParticles: number;
   minParticles: number;

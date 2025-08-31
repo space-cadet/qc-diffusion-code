@@ -1,14 +1,14 @@
 # Session Cache
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 20:59:44 IST_
+_Last Updated: 2025-08-31 21:44:48 IST_
 
 ## Current Session
 
-**Session**: 2025-08-31-evening.md
-**Started**: 2025-08-31 19:11:51 IST
-**Updated**: 2025-08-31 20:59:44 IST
-**Focus**: C15a Phase 3 strategy movement and UI metrics synchronization fixes
+**Session**: 2025-08-31-night.md
+**Started**: 2025-08-31 21:44:48 IST
+**Updated**: 2025-08-31 21:44:48 IST
+**Focus**: C15a Random Walk Physics Engine Implementation Verification - dt plumbing and memory leak tracking
 **Status**: Active
 
 ## Overview
@@ -190,9 +190,9 @@ _Last Updated: 2025-08-31 20:59:44 IST_
 ### C15a: Random Walk Physics Engine Implementation Verification
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-31 **Last**: 2025-08-31 20:59:44 IST
-**Context**: Phase 3 completed - fixed strategy movement and UI metrics synchronization. Ballistic and collision strategies now working properly.
-**Files**: `frontend/src/physics/core/SimulationRunner.ts`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/`, `frontend/src/hooks/useParticlesLoader.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
+**Started:** 2025-08-31 **Last**: 2025-08-31 21:44:48 IST
+**Context**: Phase 4 started - fixed dt plumbing from UI through ParameterManager, TimeManager, and physics strategies. Identified memory leak causing high browser memory usage during simulation runs.
+**Files**: `frontend/src/physics/core/SimulationRunner.ts`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/physics/core/ParameterManager.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
 **Progress**:
 1. ✅ Comprehensive code examination completed - 6 critical issues identified
 2. ✅ Systematic fix checklist created with 4-phase approach
@@ -207,9 +207,10 @@ _Last Updated: 2025-08-31 20:59:44 IST_
    - ✅ Fixed InterparticleCollisionStrategy with proper movement and collision detection
    - ✅ Fixed CTRW scattering count UI synchronization in useParticlesLoader hook
 7. 🔄 Phase 4: Verification and testing (ALL PRIORITIES)
+   - ✅ Timestep parameter usage - removed hardcoded dt values - COMPLETED 2025-08-31 21:44:48 IST
    - ⬜ Canvas dimension switching issues (1D/2D transitions)
+   - ⬜ Memory leak investigation - browser tab consuming several GB during simulation
    - ⬜ Parameter validation and error handling improvements
-   - ⬜ Flexible boundary condition system with UI control
 
 ### C2: VisualPDE GPU Solver Integration
 
@@ -220,9 +221,8 @@ _Last Updated: 2025-08-31 20:59:44 IST_
 
 ## Session History (Last 5)
 
-1. `sessions/2025-08-31-evening.md` - C15 Boundary integration completion and memory bank updates
-2. `sessions/2025-08-31-morning.md` - C15 Particle sync logging fix and ballistic strategy migration investigation
-2. `sessions/2025-08-30-night.md` - C15 RandomWalkSimulator refactoring - density and initialization utilities extraction
-3. `sessions/2025-08-29-afternoon.md` - C15 Phase 4 Issue Resolution - velocity property fix and debug infrastructure
-4. `sessions/2025-08-28-evening.md` - C15 Physics Engine Migration Phase 3 - time unification and thermal velocities
-5. `sessions/2025-08-28-afternoon.md` - C12 & C14 collision system bug fixes and production refinement (GPT5)
+1. `sessions/2025-08-31-night.md` - C15a dt plumbing and memory leak tracking
+2. `sessions/2025-08-31-evening.md` - C15a Phase 3 strategy movement and UI metrics synchronization fixes
+3. `sessions/2025-08-31-morning.md` - C15 Particle sync logging fix and ballistic strategy migration investigation
+4. `sessions/2025-08-30-night.md` - C15 RandomWalkSimulator refactoring - density and initialization utilities extraction
+5. `sessions/2025-08-29-afternoon.md` - C15 Phase 4 Issue Resolution - velocity property fix and debug infrastructure
