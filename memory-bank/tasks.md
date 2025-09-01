@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 23:36:43 IST_
+_Last Updated: 2025-09-02 00:20:52 IST_
 
 ## Active Tasks
 
@@ -99,9 +99,9 @@ _Last Updated: 2025-09-01 23:36:43 IST_
 
 ### C7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture with real-time time-series visualization
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 23:36:43 IST
-**Files**: `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/components/ObservablesPanel.tsx`
-**Notes**: Phase 0 implementation completed - text-based observable system with expr-eval integration, UI for custom observable creation/management, and persistent storage via Zustand. Users can now define observables using simple text format. Next: Analysis page integration for time-series plotting.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-02 00:16:10 IST
+**Files**: `frontend/src/components/observablesConfig.ts`, `frontend/src/components/useObservablesPolling.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`
+**Notes**: Phase 0 COMPLETED (2025-09-02) - Text-based observable system with per-observable polling intervals. Unified polling architecture replaces 4 separate useEffect hooks, configurable intervals (momentum: 50ms, kinetic energy: 100ms, particle count: 200ms, MSD: 500ms), generic UI rendering, and ID mapping fixes. Reduced ObservablesPanel by 49% while maintaining full backward compatibility. Ready for Phase 1 query system development.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

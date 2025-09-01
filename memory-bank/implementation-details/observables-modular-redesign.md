@@ -1,11 +1,13 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-01 23:36:43 IST*
+*Updated: 2025-09-02 00:16:10 IST*
 
 ## Executive Summary
 
 This document outlines a phased redesign of the observables system to achieve full transparency, modularity, and real-time visualization capabilities. The implementation follows an incremental approach starting with Phase 0 (middle-path enhancements) to provide immediate benefits while building foundation for the complete query-based system.
+
+**PHASE 0 COMPLETED**: Text-based observable system with per-observable polling intervals successfully implemented in single session (2025-09-02).
 
 ## Current System Issues
 
@@ -191,12 +193,79 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 
 ## Implementation Plan
 
-### Phase 0: Middle-Path Enhancement (2-3 days) - **COMPLETED**
+### Phase 0: Text-Based Observable System (COMPLETED 2025-09-02)
 
-**Objective**: Add flexibility and modularity while maintaining existing architecture
-**Strategy**: Text-based observable definitions + expr-eval integration + UI management
+**Objective**: Replace hardcoded observable polling with unified text-based system
+**Strategy**: Configuration-driven observables + per-observable polling intervals + generic UI rendering
 
-**COMPLETED SESSION: 2025-09-01 23:36:43 IST**
+**COMPLETED SESSION: 2025-09-02 00:16:10 IST**
+
+#### Implementation Summary
+
+**Files Created**:
+- `observablesConfig.ts` (73 lines) - Configuration-driven observable definitions with polling intervals
+- `useObservablesPolling.ts` (117 lines) - Unified polling hook with configurable intervals per observable
+
+**Files Modified**:
+- `ObservablesPanel.tsx` (262 lines, -251 lines) - Complete refactor using text-based system with generic renderer
+
+#### Key Achievements
+
+1. **Unified Polling Architecture**
+   - Single polling system replaces 4 separate useEffect hooks
+   - Eliminated 8+ individual state variables for observable data
+   - 50ms polling resolution with per-observable interval checking
+   - Configurable intervals: momentum (50ms), kinetic energy (100ms), particle count (200ms), MSD (500ms)
+
+2. **Text-Based Observable Integration**
+   - Built-in observables now use same text definition system as custom observables
+   - Consistent observable registration through TextObservable system
+   - Fixed ID mapping issue between registration (`text_particleCount`) and retrieval (`particleCount`)
+
+3. **Generic UI Rendering**
+   - ObservableDisplay component handles any observable type through configuration
+   - Field definitions specify formatting, precision, and color coding
+   - Eliminated repetitive JSX patterns across observable types
+
+4. **Performance Optimizations**
+   - Reduced ObservablesPanel from 513 to 262 lines (~49% reduction)
+   - Eliminated redundant polling logic and state management
+   - Improved memory management with unified data flow
+
+#### Technical Implementation
+
+**Configuration Structure**:
+```typescript
+interface ObservableConfig {
+  id: string;
+  name: string;
+  text: string;
+  pollingInterval: number;
+  fields: ObservableField[];
+}
+```
+
+**Polling System**:
+- 50ms resolution timer checks each observable's individual interval
+- State management through useRef for polling coordination
+- Automatic cleanup and registration lifecycle management
+
+**Results Achieved**:
+- ✅ Console errors about unregistered observers resolved
+- ✅ Observables display actual data instead of "No data"
+- ✅ Different polling frequencies working correctly per observable type
+- ✅ Text-based observables properly integrated with built-in observables
+- ✅ Maintained full backward compatibility with existing UI state management
+
+#### Architecture Benefits
+
+1. **Maintainability**: Single source of truth for observable configuration
+2. **Extensibility**: New observables added through configuration, not code changes
+3. **Performance**: Optimized polling prevents unnecessary updates
+4. **Consistency**: Unified system for both built-in and custom observables
+5. **Debugging**: Clear separation between configuration, polling, and rendering
+
+This implementation provides the foundation for Phase 1 query system development while delivering immediate benefits in code maintainability and system performance.
 
 #### Core Components
 
