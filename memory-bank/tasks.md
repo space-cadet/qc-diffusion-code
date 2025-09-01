@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-02 00:20:52 IST_
+_Last Updated: 2025-09-02 01:13:01 IST_
 
 ## Active Tasks
 
@@ -29,7 +29,7 @@ _Last Updated: 2025-09-02 00:20:52 IST_
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
-| C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
+| C7a | Modular Transparent Observable System Redesign    | ✅ COMPLETED   | HIGH     | 2025-09-01 | C7              |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
@@ -99,9 +99,9 @@ _Last Updated: 2025-09-02 00:20:52 IST_
 
 ### C7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture with real-time time-series visualization
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-02 00:16:10 IST
+**Status**: ✅ COMPLETED **Last**: 2025-09-02 01:13:01 IST
 **Files**: `frontend/src/components/observablesConfig.ts`, `frontend/src/components/useObservablesPolling.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`
-**Notes**: Phase 0 COMPLETED (2025-09-02) - Text-based observable system with per-observable polling intervals. Unified polling architecture replaces 4 separate useEffect hooks, configurable intervals (momentum: 50ms, kinetic energy: 100ms, particle count: 200ms, MSD: 500ms), generic UI rendering, and ID mapping fixes. Reduced ObservablesPanel by 49% while maintaining full backward compatibility. Ready for Phase 1 query system development.
+**Notes**: SYSTEM COMPLETED (2025-09-02 01:13:01 IST) - All critical bugs resolved: data shape mismatch fixed by using concrete observables instead of TextObservable scalars, MSD initialization reset prevented through idempotent registration, infinite re-render loop eliminated via memoized dependencies, and ID resolution updated for exact ID matching. Observable system now fully functional with live updating values for all built-in observables (Particle Count, Kinetic Energy, Momentum, MSD) while preserving custom TextObservable support.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

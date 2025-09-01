@@ -30,24 +30,24 @@ export class LegacyBallisticStrategy implements RandomWalkStrategy {
     this.applyBoundaryConditions(particle);
     
     // Debug after boundary conditions
-    if (particle.id === 'p0') {
-      console.log('[Ballistic] p0 after boundaries', {
-        afterPos: { x: particle.position.x.toFixed(4), y: particle.position.y.toFixed(4) },
-        boundaryType: this.boundaryConfig.type
-      });
-    }
+    // if (particle.id === 'p0') {
+    //   console.log('[Ballistic] p0 after boundaries', {
+    //     afterPos: { x: particle.position.x.toFixed(4), y: particle.position.y.toFixed(4) },
+    //     boundaryType: this.boundaryConfig.type
+    //   });
+    // }
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
     // Debug first particle velocity
-    if (particle.id === 'p0') {
-      console.log('[Ballistic] p0 updateParticleWithDt', {
-        beforePos: { x: particle.position.x.toFixed(4), y: particle.position.y.toFixed(4) },
-        velocity: { vx: particle.velocity.vx.toFixed(4), vy: particle.velocity.vy.toFixed(4) },
-        dt,
-        deltaPos: { dx: (particle.velocity.vx * dt).toFixed(4), dy: (particle.velocity.vy * dt).toFixed(4) }
-      });
-    }
+    // if (particle.id === 'p0') {
+    //   console.log('[Ballistic] p0 updateParticleWithDt', {
+    //     beforePos: { x: particle.position.x.toFixed(4), y: particle.position.y.toFixed(4) },
+    //     velocity: { vx: particle.velocity.vx.toFixed(4), vy: particle.velocity.vy.toFixed(4) },
+    //     dt,
+    //     deltaPos: { dx: (particle.velocity.vx * dt).toFixed(4), dy: (particle.velocity.vy * dt).toFixed(4) }
+    //   });
+    // }
     
     // Ballistic motion with proper dt from physics engine
     particle.position.x += particle.velocity.vx * dt;
@@ -57,11 +57,11 @@ export class LegacyBallisticStrategy implements RandomWalkStrategy {
     this.applyBoundaryConditions(particle);
     
     // Debug after boundary conditions
-    if (particle.id === 'p0') {
-      console.log('[Ballistic] p0 after boundaries', {
-        afterPos: { x: particle.position.x, y: particle.position.y }
-      });
-    }
+    // if (particle.id === 'p0') {
+    //   console.log('[Ballistic] p0 after boundaries', {
+    //     afterPos: { x: particle.position.x, y: particle.position.y }
+    //   });
+    // }
   }
 
   private applyBoundaryConditions(particle: Particle): void {

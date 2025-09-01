@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
 import { TextObservable } from "../physics/observables/TextObservable";
+import { ParticleCountObservable } from "../physics/observables/ParticleCountObservable";
+import { KineticEnergyObservable } from "../physics/observables/KineticEnergyObservable";
+import { MomentumObservable } from "../physics/observables/MomentumObservable";
+import { MSDObservable } from "../physics/observables/MSDObservable";
 import { BUILT_IN_OBSERVABLES, type ObservableConfig, type ObservableField } from "./observablesConfig";
 import { useObservablesPolling } from "./useObservablesPolling";
 
@@ -84,8 +88,8 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
   const [newObservableText, setNewObservableText] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  // Determine which built-in observables are visible
-  const visibleObservables = Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
+  // Determine which built-in observables are visible (memoized to prevent re-renders)
+  const visibleObservables = useMemo(() => Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
     switch (id) {
       case 'particleCount': return randomWalkUIState.showParticleCount;
       case 'kineticEnergy': return randomWalkUIState.showKineticEnergy;
@@ -93,7 +97,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
       case 'msd': return randomWalkUIState.showMSD;
       default: return false;
     }
-  });
+  }), [randomWalkUIState.showParticleCount, randomWalkUIState.showKineticEnergy, randomWalkUIState.showTotalMomentum, randomWalkUIState.showMSD]);
 
   // Use unified polling hook
   const observableData = useObservablesPolling(
@@ -133,34 +137,62 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     }
   };
 
-  // Register/unregister built-in observables based on visibility
+  // Register/unregister built-in observables based on visibility (idempotent)
+  const prevVisibleRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!simReady || !simulatorRef.current) return;
 
-    visibleObservables.forEach(observableId => {
+    const manager = simulatorRef.current.getObservableManager();
+    const current = new Set(visibleObservables);
+    const prev = prevVisibleRef.current;
+
+    // Register newly visible
+    current.forEach(observableId => {
+      if (prev.has(observableId)) return;
       const config = BUILT_IN_OBSERVABLES[observableId];
-      if (config && simulatorRef.current) {
-        // Load the text-based observable
-        const validation = TextObservable.validate(config.text);
-        if (validation.valid) {
-          simulatorRef.current.getObservableManager().registerTextObservable(config.text);
-          console.log(`[ObservablesPanel] Registered ${observableId}`);
-        } else {
-          console.error(`[ObservablesPanel] Failed to register ${observableId}:`, validation.errors);
+      if (!config) return;
+      try {
+        switch (observableId) {
+          case 'particleCount':
+            if (!manager.hasObserver('particleCount')) manager.register(new ParticleCountObservable());
+            break;
+          case 'kineticEnergy':
+            if (!manager.hasObserver('kineticEnergy')) manager.register(new KineticEnergyObservable());
+            break;
+          case 'momentum':
+            if (!manager.hasObserver('momentum')) manager.register(new MomentumObservable());
+            break;
+          case 'msd':
+            if (!manager.hasObserver('msd')) manager.register(new MSDObservable());
+            break;
+          default:
+            const validation = TextObservable.validate(config.text);
+            if (validation.valid) {
+              manager.registerTextObservable(config.text);
+            } else {
+              console.error(`[ObservablesPanel] Failed to register ${observableId}:`, validation.errors);
+            }
         }
+        console.log(`[ObservablesPanel] Registered ${observableId}`);
+      } catch (e) {
+        console.error(`[ObservablesPanel] Error registering ${observableId}:`, e);
       }
     });
 
-    // Cleanup function to unregister when visibility changes
-    return () => {
-      if (simulatorRef.current) {
-        visibleObservables.forEach(observableId => {
-          simulatorRef.current!.getObservableManager().unregisterTextObservable(observableId);
-          console.log(`[ObservablesPanel] Unregistered ${observableId}`);
-        });
+    // Unregister those no longer visible
+    prev.forEach(observableId => {
+      if (current.has(observableId)) return;
+      try {
+        manager.unregister(observableId);
+        console.log(`[ObservablesPanel] Unregistered ${observableId}`);
+      } catch (e) {
+        console.error(`[ObservablesPanel] Error unregistering ${observableId}:`, e);
       }
-    };
-  }, [visibleObservables, simReady]);
+    });
+
+    // Update prev ref
+    prevVisibleRef.current = current;
+  }, [simReady, visibleObservables]);
 
   // Load custom observables when simulator is ready
   useEffect(() => {

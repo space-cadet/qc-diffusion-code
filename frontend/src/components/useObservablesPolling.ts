@@ -40,9 +40,19 @@ export function useObservablesPolling(
   const pollObservable = useCallback((observableId: string) => {
     if (!simulatorRef.current) return;
 
-    // Use text_ prefixed ID for built-in observables
-    const managerId = BUILT_IN_OBSERVABLES[observableId] ? `text_${observableId}` : observableId;
-    const data = simulatorRef.current.getObservableData(managerId);
+    let data: ObservableData | null = null;
+
+    if (BUILT_IN_OBSERVABLES[observableId]) {
+      // Try exact ID first (concrete observables), then fallback to text_ prefix
+      data = simulatorRef.current.getObservableData(observableId);
+      if (!data) {
+        data = simulatorRef.current.getObservableData(`text_${observableId}`);
+      }
+    } else {
+      // Custom observables use their own ID
+      data = simulatorRef.current.getObservableData(observableId);
+    }
+
     if (data) {
       setObservableData(prev => ({
         ...prev,

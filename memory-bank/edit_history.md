@@ -1,9 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-02 00:21:30 IST_
+_Last Updated: 2025-09-02 01:16:23 IST_
 
 ### 2025-09-02
+
+#### 01:16 - C7a: Observable System Critical Bug Fixes COMPLETED
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Fixed data shape mismatch by replacing TextObservable registration with concrete observables (ParticleCountObservable, KineticEnergyObservable, MomentumObservable, MSDObservable), made registration idempotent to prevent MSD re-initialization, memoized visibleObservables with specific dependencies to eliminate infinite re-render loop
+- Updated `frontend/src/components/useObservablesPolling.ts` - Updated ID resolution to try exact IDs first (particleCount, kineticEnergy, momentum, msd) then fallback to text_ prefixed IDs for backward compatibility
+- Updated `frontend/src/physics/config/flags.ts` - Updated flags to use exact IDs for observable registration
+- Updated `memory-bank/tasks/C7a.md` - Marked task as completed, updated status and timestamps, added final implementation section documenting critical bug fixes and system completion
+- Updated `memory-bank/implementation-details/observables-modular-redesign.md` - Added final system fixes section with comprehensive bug resolution documentation, technical implementation details, and system status confirmation
+- Updated `memory-bank/tasks.md` - Updated C7a status to completed, updated timestamps and task notes with system completion details
+- Updated `memory-bank/sessions/2025-09-01-night.md` - Extended session with critical bug fixes documentation, updated focus task and time spent, added final system status and results achieved
+- Updated `memory-bank/session_cache.md` - Updated session focus, timestamps, and C7a task registry status to completed
+- Updated `memory-bank/edit_history.md` - Added this entry
 
 #### 00:21 - C7a: Phase 0 Per-Observable Polling System Implementation COMPLETED
 - Created `frontend/src/components/observablesConfig.ts` - Configuration-driven observable definitions with per-observable polling intervals (momentum: 50ms, kinetic energy: 100ms, particle count: 200ms, MSD: 500ms)

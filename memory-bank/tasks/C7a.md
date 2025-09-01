@@ -1,13 +1,13 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-02 00:16:10 IST*
+*Last Updated: 2025-09-02 01:13:01 IST*
 
 **Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Phase 0 implements plugin-style loading with template and composite observables as foundation for full query-based system.
 
-**Status**: 🔄 Active - Phase 0 Complete
+**Status**: ✅ Complete - Observable System Fixed
 **Priority**: HIGH
 **Started**: 2025-09-01
-**Last Active**: 2025-09-02 00:16:10 IST
+**Last Active**: 2025-09-02 01:13:01 IST
 **Dependencies**: C7
 
 ## Completion Criteria
@@ -129,9 +129,35 @@ These changes lay groundwork for the modular observable system by establishing c
 - ✅ Different polling frequencies working correctly
 - ✅ Text-based observables properly integrated with built-in observables
 
+## Final Implementation (2025-09-02 01:13:01 IST)
+
+### Observable System Bug Fixes and Completion
+**Files Modified**:
+- `frontend/src/components/ObservablesPanel.tsx` - Fixed data shape mismatch and infinite re-render loop
+- `frontend/src/components/useObservablesPolling.ts` - Updated ID resolution for concrete observables
+
+**Critical Fixes Applied**:
+1. **Data Shape Mismatch Resolution**: Replaced TextObservable (returns scalar) with concrete observables (ParticleCountObservable, KineticEnergyObservable, MomentumObservable, MSDObservable) that return structured objects matching UI expectations
+2. **MSD Zero Values Fix**: Made observable registration idempotent to prevent MSDObservable re-initialization that was resetting reference positions
+3. **Infinite Re-render Fix**: Memoized visibleObservables array with specific dependencies to prevent useEffect dependency array changes on every render
+4. **ID Resolution**: Updated polling to try exact IDs first (particleCount, kineticEnergy, momentum, msd) then fallback to text_ prefixed IDs
+
+**Technical Details**:
+- MSDObservable now properly accumulates displacement from initial positions without reset
+- Console flooding eliminated by preventing Maximum update depth exceeded warnings
+- All built-in observables display live updating values during simulation
+- Maintained backward compatibility with custom TextObservable system
+
+**Results**:
+- ✅ All observables (Particle Count, Kinetic Energy, Momentum, MSD) display live updating values
+- ✅ MSD properly calculates mean squared displacement from reference positions
+- ✅ No console errors or infinite re-render warnings
+- ✅ Smooth UI performance with proper memoization
+
 ## Implementation Timeline
 - **Phase 0 (Complete)**: Text-based system with configurable polling - COMPLETED 2025-09-02
-- **Phase 1 (Week 1-2)**: Core query system and particle selection
-- **Phase 2 (Week 2-3)**: Time series infrastructure and data collection  
-- **Phase 3 (Week 3-4)**: Live Plotly integration and UI controls
-- **Phase 4 (Week 4-5)**: Advanced features and optimization
+- **Observable System Fixes (Complete)**: Data shape and performance fixes - COMPLETED 2025-09-02 01:13:01 IST
+- **Phase 1 (Future)**: Core query system and particle selection
+- **Phase 2 (Future)**: Time series infrastructure and data collection  
+- **Phase 3 (Future)**: Live Plotly integration and UI controls
+- **Phase 4 (Future)**: Advanced features and optimization
