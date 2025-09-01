@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 13:12:23 IST_
+_Last Updated: 2025-09-01 13:23:07 IST_
 
 ## Active Tasks
 
@@ -25,6 +25,7 @@ _Last Updated: 2025-09-01 13:12:23 IST_
 | C12 | Interparticle Collisions and Obstacles Implementation | 🔄 IN PROGRESS | HIGH     | 2025-08-27 | C5c             |
 | C15 | Physics Engine Architecture Migration              | 🔄 IN PROGRESS | HIGH     | 2025-08-28 | C5c, C12, C14   |
 | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
+| C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
@@ -164,6 +165,12 @@ _Last Updated: 2025-09-01 13:12:23 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 08:29:30 IST
 **Files**: `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/physics/core/ParameterManager.ts`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
 **Notes**: Claude 4 partial fixes applied: Memory leak addressed through rAF lifecycle control and tsParticles ticker management. Collision improvements include larger radius (3x3 vs 1x1), visual red flash feedback, timestamp tracking. Parameter flow enhanced with conditional strategy rebuilding. Core issues partially resolved but CPU usage, collision effectiveness, and CTRW scattering visibility still need work.
+
+### C16: GPU.IO Framework Implementation with Rendering Engine Abstraction
+**Description**: Implement GPU.IO-based particle physics framework with complete backend agnosticism and on-the-fly switching between tsParticles and GPU.IO rendering engines
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 13:23:07 IST
+**Files**: `memory-bank/implementation-details/gpu-io-implementation-plan.md`, `memory-bank/tasks/C16.md` (planned: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/rendering/RenderingEngine.ts`, `frontend/src/simulation/SimulationEngine.ts`)
+**Notes**: Comprehensive migration plan created for GPU.IO integration. Target: 100x performance improvement (1K→100K particles) through GPU collision detection. Includes rendering engine abstraction, backend-agnostic architecture, and seamless engine switching capabilities.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
