@@ -33,28 +33,39 @@ export const useParticlesLoader = ({
     return () => cleanup();
   }, [cleanup]);
 
-  return useCallback((container: Container) => {
-    // Stop any previous animation loop but keep the container intact
-    cleanup();
-    tsParticlesContainerRef.current = container;
+  const startAnimation = useCallback((container: Container) => {
+    // Stop any previous animation loop
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+      animationFrameId.current = undefined;
+    }
 
     // Store previous time for delta calculation (render timing)
     let lastRenderTime = performance.now();
     let accumulatedTime = 0; // For fixed physics timestep
 
     const animate = () => {
-      animationFrameId.current = requestAnimationFrame(animate);
+      const isRunning = simulationStateRef.current?.isRunning;
+      const shouldRender = renderEnabledRef.current;
+      
+      // Only continue animation loop if simulation is running
+      if (isRunning) {
+        animationFrameId.current = requestAnimationFrame(animate);
+      } else {
+        // Stop the animation loop when simulation is paused
+        animationFrameId.current = undefined;
+        return;
+      }
       
       const currentRenderTime = performance.now();
       const renderDeltaTime = (currentRenderTime - lastRenderTime) / 1000;
       lastRenderTime = currentRenderTime;
 
-      // Accumulate time for physics steps (migration plan: unified time)
-      accumulatedTime += renderDeltaTime;
-
-      // PHASE A: Physics Simulation (migration plan: controlled by simulation state)
-      // Only step physics when simulation is actually running
-      if (simulatorRef.current && simulationStateRef.current?.isRunning) {
+      // PHASE A: Physics Simulation - only when running
+      if (simulatorRef.current && isRunning) {
+        // Accumulate time for physics steps
+        accumulatedTime += renderDeltaTime;
+        
         // Use fixed physics timestep from store for stability
         const physicsTimeStep = Math.max(1e-6, gridLayoutParamsRef.current?.dt ?? 0.01);
 
@@ -77,14 +88,35 @@ export const useParticlesLoader = ({
         accumulatedTime = 0;
       }
 
-      // PHASE B: Rendering (migration plan: controlled by visibility)
-      // Only render when tab is visible (can pause when hidden)
-      if (renderEnabledRef.current && container) {
-        updateParticlesFromStrategies(container, true, simulationStateRef.current?.isRunning || false);
+      // PHASE B: Rendering - only when needed and visible
+      if (shouldRender && container) {
+        updateParticlesFromStrategies(container, true, isRunning || false);
         (container as any).draw?.(false);
       }
     };
 
+    // Start animation loop - it will check isRunning state internally
     animationFrameId.current = requestAnimationFrame(animate);
-  }, [timeRef, collisionsRef, cleanup]);
+  }, []);
+
+  // Create restart function for when simulation resumes
+  const restartAnimation = useCallback(() => {
+    const container = tsParticlesContainerRef.current;
+    if (container && !animationFrameId.current) {
+      startAnimation(container);
+    }
+  }, [startAnimation]);
+
+  // Expose restart function and return the main loader
+  return useCallback((container: Container) => {
+    // Stop any previous animation loop but keep the container intact
+    cleanup();
+    tsParticlesContainerRef.current = container;
+    
+    // Always start animation loop - it will check isRunning internally
+    startAnimation(container);
+    
+    // Add restart method to the container reference for external access
+    (container as any)._restartAnimation = restartAnimation;
+  }, [cleanup, startAnimation, restartAnimation]);
 };

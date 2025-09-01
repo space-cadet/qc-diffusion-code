@@ -334,6 +334,12 @@ export default function RandomWalkSim() {
       status: "Running",
     }));
     
+    // Restart animation loop when simulation resumes
+    const container = tsParticlesContainerRef.current;
+    if (container && (container as any)._restartAnimation) {
+      (container as any)._restartAnimation();
+    }
+    
     // Update state when starting
     updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running');
   };
@@ -361,6 +367,14 @@ export default function RandomWalkSim() {
       isRunning: !prev.isRunning,
       status: newStatus,
     }));
+    
+    // Restart animation loop if resuming
+    if (!simulationState.isRunning) {
+      const container = tsParticlesContainerRef.current;
+      if (container && (container as any)._restartAnimation) {
+        (container as any)._restartAnimation();
+      }
+    }
     
     // Update metrics when pausing/resuming
     updateSimulationMetrics(timeRef.current, collisionsRef.current, newStatus);

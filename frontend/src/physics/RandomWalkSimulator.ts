@@ -153,8 +153,17 @@ export class RandomWalkSimulator {
 
   updateParameters(params: Partial<SimulatorParams>): void {
     const needsReinitialization = this.parameterManager.updateParameters(params);
-    this.setupStrategies();
-    this.particleManager.updatePhysicsEngine(this.currentStrategy);
+    
+    // Always recreate strategies when strategies, physics parameters, or interparticle collisions change
+    const needsStrategyUpdate = params.strategies || params.collisionRate !== undefined || 
+                               params.jumpLength !== undefined || params.velocity !== undefined ||
+                               params.interparticleCollisions !== undefined;
+    
+    if (needsStrategyUpdate) {
+      this.setupStrategies();
+      this.particleManager.updatePhysicsEngine(this.currentStrategy);
+    }
+    
     this.particleManager.setCanvasSize(this.parameterManager.canvasWidth, this.parameterManager.canvasHeight);
 
     // Lightweight path: if only boundaries changed and the new engine is active, update in place

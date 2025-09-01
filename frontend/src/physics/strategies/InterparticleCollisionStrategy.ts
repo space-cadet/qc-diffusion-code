@@ -47,7 +47,7 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
       const dx = particle.position.x - other.position.x;
       const dy = particle.position.y - other.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const collisionRadius = (particle.radius || 1) + (other.radius || 1);
+      const collisionRadius = (particle.radius || 3) + (other.radius || 3);
 
       if (dist < collisionRadius && dist > 0) {
         // 2D elastic collision with momentum conservation
@@ -73,6 +73,11 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
         // Count actual inter-particle collisions on both participants
         particle.interparticleCollisionCount = (particle.interparticleCollisionCount || 0) + 1;
         other.interparticleCollisionCount = (other.interparticleCollisionCount || 0) + 1;
+
+        // Mark collision timestamp for visual indicator
+        const currentTime = simTime();
+        particle.lastInterparticleCollisionTime = currentTime;
+        other.lastInterparticleCollisionTime = currentTime;
       }
     }
   }

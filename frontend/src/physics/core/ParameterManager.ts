@@ -93,8 +93,21 @@ export class ParameterManager {
       needsReinitialization = true;
     }
 
+    // Update physics parameters
+    if (params.collisionRate !== undefined) {
+      this.collisionRate = params.collisionRate;
+    }
+    if (params.jumpLength !== undefined) {
+      this.jumpLength = params.jumpLength;
+    }
+    if (params.velocity !== undefined) {
+      this.velocity = params.velocity;
+    }
     if (params.dt !== undefined) {
       this.dt = params.dt;
+    }
+    if (params.interparticleCollisions !== undefined) {
+      this.interparticleCollisions = params.interparticleCollisions;
     }
 
     if (params.canvasWidth) {

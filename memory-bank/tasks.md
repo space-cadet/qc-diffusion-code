@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-08-31 21:44:48 IST_
+_Last Updated: 2025-09-01 08:29:30 IST_
 
 ## Active Tasks
 
@@ -161,9 +161,9 @@ _Last Updated: 2025-08-31 21:44:48 IST_
 
 ### C15a: Random Walk Physics Engine Implementation Verification
 **Description**: Systematic verification and correction of critical logical errors and architectural problems discovered in random walk physics engine through comprehensive code examination
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-31 21:44:48 IST
-**Files**: `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/physics/core/ParameterManager.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
-**Notes**: Phase 4 started - fixed dt plumbing from UI through ParameterManager, TimeManager, and physics strategies. Identified memory leak causing high browser memory usage during simulation runs. Remaining issues: 1D/2D switching, CTRW visual behavior, collision effectiveness, temperature slider continuity
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 08:29:30 IST
+**Files**: `frontend/src/physics/strategies/BallisticStrategy.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/physics/core/ParameterManager.ts`, `frontend/src/config/tsParticlesConfig.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
+**Notes**: Claude 4 partial fixes applied: Memory leak addressed through rAF lifecycle control and tsParticles ticker management. Collision improvements include larger radius (3x3 vs 1x1), visual red flash feedback, timestamp tracking. Parameter flow enhanced with conditional strategy rebuilding. Core issues partially resolved but CPU usage, collision effectiveness, and CTRW scattering visibility still need work.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

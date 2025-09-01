@@ -3,10 +3,35 @@ import { loadSlim } from "@tsparticles/slim";
 import type { Container, Engine, Particle as TsParticle } from "@tsparticles/engine";
 import type { ParticleManager } from "../physics/ParticleManager";
 import type { Particle as PhysicsParticle } from "../physics/types/Particle";
+import { simTime } from "../physics/core/GlobalTime";
 
 let particleManager: ParticleManager | null = null;
 let engine: Engine | null = null;
 let _diagFrameCounter = 0; // throttle diagnostics
+
+// Helper function to convert hex color to HSL
+const hexToHsl = (hex: string): { h: number; s: number; l: number } => {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+};
 
 export const setParticleManager = (manager: ParticleManager) => {
   particleManager = manager;
@@ -136,6 +161,29 @@ export const updateParticlesFromStrategies = (
 
         tsParticle.position.x = safeX;
         tsParticle.position.y = safeY;
+
+        // Visual collision indicator - flash red for 200ms after collision
+        const currentTime = simTime();
+        const timeSinceCollision = physicsParticle.lastInterparticleCollisionTime 
+          ? currentTime - physicsParticle.lastInterparticleCollisionTime 
+          : Infinity;
+        
+        // Update particle color properly for tsParticles
+        if (timeSinceCollision < 0.2) { // Flash for 200ms
+          if (tsParticle.color) {
+            const hslColor = hexToHsl("#ff4444"); // Red flash
+            tsParticle.color.h.value = hslColor.h;
+            tsParticle.color.s.value = hslColor.s;
+            tsParticle.color.l.value = hslColor.l;
+          }
+        } else {
+          if (tsParticle.color) {
+            const hslColor = hexToHsl("#3b82f6"); // Default blue
+            tsParticle.color.h.value = hslColor.h;
+            tsParticle.color.s.value = hslColor.s;
+            tsParticle.color.l.value = hslColor.l;
+          }
+        }
       }
     }
 

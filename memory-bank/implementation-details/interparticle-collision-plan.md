@@ -1,7 +1,7 @@
 # Inter-Particle Collision Implementation Plan
 
 *Created: 2025-08-27 09:34:31 IST*
-*Last Updated: 2025-08-28 13:36:51 IST*
+*Last Updated: 2025-09-01 08:29:30 IST*
 
 ## Current State Analysis
 
@@ -42,6 +42,14 @@ private elasticCollision2D(v1x: number, v1y: number, v2x: number, v2y: number, m
   return [newV1x, newV1y, newV2x, newV2y];
 }
 ```
+
+### Phase 1.2: Collision System Enhancements ✅ COMPLETED (Claude 4 - 2025-09-01)
+- **Collision Radius Enhancement**: Increased effective collision radius from `(r||1)+(r||1)` to `(r||3)+(r||3)` for more reliable collision detection
+- **Visual Feedback System**: Added red flash indicator lasting 200ms after interparticle collisions using HSL color updates in tsParticlesConfig
+- **Collision Timestamp Tracking**: Added `lastInterparticleCollisionTime` field to Particle interface for visual effects timing
+- **Elastic Physics Preserved**: Maintained momentum-conserving elastic collision mechanics with overlap separation
+- **Pairwise Processing**: Preserved collision pair processing with numeric ID ordering to prevent double-counting per frame
+- **Status**: Collision detection improved but effectiveness and visual feedback still require validation
 
 ### Phase 1.1: Critical Bug Fixes ✅ COMPLETED (GPT5)
 - **Default Startup**: Fixed unintended CTRW scattering at initialization by clearing default strategies

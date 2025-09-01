@@ -22,6 +22,8 @@ export interface Particle {
   collisionCount: number;
   // Actual inter-particle collisions (elastic swaps etc.)
   interparticleCollisionCount?: number;
+  // Timestamp of last interparticle collision for visual effects
+  lastInterparticleCollisionTime?: number;
   waitingTime: number;
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;

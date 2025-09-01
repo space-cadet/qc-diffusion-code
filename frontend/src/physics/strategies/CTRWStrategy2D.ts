@@ -58,7 +58,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
       particle.velocity = newVelocity;
     }
     
-    // Record trajectory point
+    // Record trajectory point (CircularBuffer auto-manages capacity)
     particle.trajectory.push({
       position: { ...particle.position },
       timestamp: simTime()
