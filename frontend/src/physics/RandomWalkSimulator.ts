@@ -272,6 +272,10 @@ export class RandomWalkSimulator {
     return this.observableManager.getResult(id);
   }
 
+  getObservableManager(): ObservableManager {
+    return this.observableManager;
+  }
+
   recordDensitySnapshot(binSize: number = 15): void {
     const profile = this.getDensityProfile2D(binSize);
     if (profile.density.length > 0) {

@@ -81,6 +81,8 @@ interface AppState {
   observablesWindow: WindowRect
   zCounter: number
   observablesCollapsed: boolean
+  // Custom text observables storage
+  customObservables: string[]
   // PDE persistent state
   pdeState: PdeState
   // PDE UI fold states for Controls panel
@@ -100,6 +102,9 @@ interface AppState {
   setObservablesWindow: (rect: WindowRect) => void
   setZCounter: (value: number) => void
   setObservablesCollapsed: (collapsed: boolean) => void
+  setCustomObservables: (observables: string[]) => void
+  addCustomObservable: (observable: string) => void
+  removeCustomObservable: (index: number) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -238,6 +243,7 @@ export const useAppStore = create<AppState>()(
       },
       zCounter: 1,
       observablesCollapsed: false,
+      customObservables: [],
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
@@ -247,6 +253,13 @@ export const useAppStore = create<AppState>()(
       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
       setZCounter: (value) => set({ zCounter: value }),
       setObservablesCollapsed: (collapsed) => set({ observablesCollapsed: collapsed }),
+      setCustomObservables: (observables) => set({ customObservables: observables }),
+      addCustomObservable: (observable) => set((state) => ({ 
+        customObservables: [...state.customObservables, observable] 
+      })),
+      removeCustomObservable: (index) => set((state) => ({
+        customObservables: state.customObservables.filter((_, i) => i !== index)
+      })),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -305,6 +318,7 @@ export const useAppStore = create<AppState>()(
         observablesWindow: state.observablesWindow,
         zCounter: state.zCounter,
         observablesCollapsed: state.observablesCollapsed,
+        customObservables: state.customObservables,
       }),
     }
   )

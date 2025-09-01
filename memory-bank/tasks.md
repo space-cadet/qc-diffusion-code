@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 22:48:47 IST_
+_Last Updated: 2025-09-01 23:36:43 IST_
 
 ## Active Tasks
 
@@ -29,7 +29,7 @@ _Last Updated: 2025-09-01 22:48:47 IST_
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
-| C7a | Modular Transparent Observable System Redesign    | ⬜ NOT STARTED | HIGH     | 2025-09-01 | C7              |
+| C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
@@ -99,9 +99,9 @@ _Last Updated: 2025-09-01 22:48:47 IST_
 
 ### C7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture with real-time time-series visualization
-**Status**: ⬜ NOT STARTED **Last**: 2025-09-01 15:04:07 IST
-**Files**: `memory-bank/implementation-details/observables-modular-redesign.md`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulation.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`
-**Notes**: Comprehensive redesign specification created - enables user-defined observables, transparent particle property access, and live Plotly integration. 4-phase implementation plan over 4-5 weeks. Interparticle collision metrics integration and ObservablesPanel UI improvements completed as groundwork.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 23:36:43 IST
+**Files**: `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/components/ObservablesPanel.tsx`
+**Notes**: Phase 0 implementation completed - text-based observable system with expr-eval integration, UI for custom observable creation/management, and persistent storage via Zustand. Users can now define observables using simple text format. Next: Analysis page integration for time-series plotting.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

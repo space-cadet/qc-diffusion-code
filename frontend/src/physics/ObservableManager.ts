@@ -1,8 +1,10 @@
 import type { Observable, CachedResult } from './interfaces/Observable';
 import type { Particle } from './types/Particle';
+import { TextObservable } from './observables/TextObservable';
 
 export class ObservableManager {
   private observers: Map<string, Observable> = new Map();
+  private textObservables: TextObservable[] = [];
   private particleSnapshot: Particle[] = [];
   private currentTimestamp: number = 0;
   private cachedResults: Map<string, CachedResult> = new Map();
@@ -16,7 +18,55 @@ export class ObservableManager {
   unregister(id: string): void {
     this.observers.delete(id);
     this.cachedResults.delete(id);
+    // Also remove from text observables if it's a text observable
+    this.textObservables = this.textObservables.filter(obs => obs.id !== id);
     console.log(`[ObservableManager] Unregistered observer: ${id}`);
+  }
+
+  loadTextObservables(textDefinitions: string[]): void {
+    // Clear existing text observables
+    this.textObservables.forEach(obs => this.unregister(obs.id));
+    this.textObservables = [];
+
+    // Load new text observables
+    textDefinitions.forEach(text => {
+      try {
+        const observables = TextObservable.fromText(text);
+        observables.forEach(obs => {
+          this.textObservables.push(obs);
+          this.register(obs);
+        });
+      } catch (error) {
+        console.error(`[ObservableManager] Failed to load text observable:`, error);
+      }
+    });
+  }
+
+  registerTextObservable(text: string): { success: boolean; errors: string[] } {
+    const validation = TextObservable.validate(text);
+    if (!validation.valid) {
+      return { success: false, errors: validation.errors };
+    }
+
+    try {
+      const observables = TextObservable.fromText(text);
+      observables.forEach(obs => {
+        this.textObservables.push(obs);
+        this.register(obs);
+      });
+      return { success: true, errors: [] };
+    } catch (error) {
+      return { success: false, errors: [(error as Error).message] };
+    }
+  }
+
+  unregisterTextObservable(name: string): void {
+    const textObsId = `text_${name}`;
+    this.unregister(textObsId);
+  }
+
+  getTextObservables(): TextObservable[] {
+    return [...this.textObservables];
   }
 
   updateSnapshot(particles: Particle[], timestamp: number): void {
