@@ -31,8 +31,8 @@ export class PhysicsEngine implements PhysicsEngine {
   constructor(config: PhysicsEngineConfig) {
     this.timeManager = new TimeManager(config.timeStep);
     this.coordinateSystem = new CoordinateSystem(
-      config.boundaries,
       config.canvasSize,
+      config.boundaries,
       config.dimension,
     );
     this.orchestrator = new StrategyOrchestrator(config.strategies);

@@ -1,16 +1,37 @@
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { CircularBuffer } from '../utils/CircularBuffer';
 import type { Particle, TrajectoryPoint } from '../types/Particle';
+import { CoordinateSystem } from '../core/CoordinateSystem';
 
 describe('CTRWStrategy2D', () => {
   let strategy: CTRWStrategy2D;
   let mockParticle: Particle;
 
   beforeEach(() => {
+    const coordSystem = new CoordinateSystem(
+      { width: 800, height: 600 },
+      {
+        type: 'periodic',
+        xMin: -200,
+        xMax: 200,
+        yMin: -200,
+        yMax: 200
+      },
+      '2D'
+    );
+
     strategy = new CTRWStrategy2D({
       collisionRate: 1.0,
       jumpLength: 1.0,
-      velocity: 50.0
+      velocity: 50.0,
+      boundaryConfig: {
+        type: 'periodic',
+        xMin: -200,
+        xMax: 200,
+        yMin: -200,
+        yMax: 200
+      },
+      coordSystem
     });
 
     mockParticle = {

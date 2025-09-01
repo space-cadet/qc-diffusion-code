@@ -1,15 +1,26 @@
-import type { BoundaryConfig } from '../types/BoundaryConfig';
+import type { BoundaryConfig, Position, BoundaryResult } from '../types/BoundaryConfig';
+import type { Particle, Vector, Velocity } from '../types/Particle';
+import { 
+  applyPeriodicBoundary,
+  applyReflectiveBoundary,
+  applyAbsorbingBoundary 
+} from '../utils/boundaryUtils';
+
+interface CanvasSize {
+  width: number;
+  height: number;
+}
 
 export type Dimension = '1D' | '2D';
 
 export class CoordinateSystem {
   private boundaries: BoundaryConfig;
-  private canvasSize: { width: number; height: number };
+  private canvasSize: CanvasSize;
   private dimension: Dimension;
 
   constructor(
+    canvasSize: CanvasSize,
     boundaries: BoundaryConfig,
-    canvasSize: { width: number; height: number },
     dimension: Dimension,
   ) {
     this.boundaries = boundaries;
@@ -72,5 +83,50 @@ export class CoordinateSystem {
 
   getDimension(): Dimension {
     return this.dimension;
+  }
+
+  calculateDisplacement(pos1: Position, pos2: Position): Vector {
+    return {
+      x: pos2.x - pos1.x,
+      y: this.dimension === '1D' ? 0 : pos2.y - pos1.y
+    };
+  }
+
+  calculateVelocity(pos1: Position, pos2: Position, dt: number): Velocity {
+    return this.toVelocity({
+      x: (pos2.x - pos1.x) / dt,
+      y: this.dimension === '1D' ? 0 : (pos2.y - pos1.y) / dt
+    });
+  }
+
+  toVelocity(vector: Vector): Velocity {
+    return { vx: vector.x, vy: vector.y };
+  }
+
+  toVector(velocity: Velocity): Vector {
+    return { x: velocity.vx, y: velocity.vy };
+  }
+
+  applyBoundaryConditions(pos: Position, vel?: Velocity): BoundaryResult {
+    // Implementation depends on boundary type from this.boundaries
+    switch(this.boundaries.type) {
+      case 'periodic':
+        return applyPeriodicBoundary(pos, this.boundaries);
+      case 'reflective':
+        return vel ? applyReflectiveBoundary(pos, vel, this.boundaries) : 
+                    { position: pos };
+      case 'absorbing':
+        return applyAbsorbingBoundary(pos, this.boundaries);
+      default:
+        return { position: pos };
+    }
+  }
+
+  getRandomPosition(): Position {
+    return {
+      x: this.boundaries.xMin + Math.random() * (this.boundaries.xMax - this.boundaries.xMin),
+      y: this.dimension === '1D' ? 0 : 
+         this.boundaries.yMin + Math.random() * (this.boundaries.yMax - this.boundaries.yMin)
+    };
   }
 }

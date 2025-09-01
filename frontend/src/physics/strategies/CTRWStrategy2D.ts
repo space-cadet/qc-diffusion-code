@@ -3,6 +3,7 @@ import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { IGraph } from '@spin-network/graph-core';
+import type { CoordinateSystem } from '../core/CoordinateSystem';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
 import { simTime, simDt } from '../core/GlobalTime';
 
@@ -14,12 +15,14 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
   private meanWaitTime: number;
   private graph?: IGraph;
   private boundaryConfig: BoundaryConfig;
+  private coordSystem: CoordinateSystem;
 
   constructor(params: {
     collisionRate: number;
     jumpLength: number;
     velocity?: number;
     boundaryConfig?: BoundaryConfig;
+    coordSystem: CoordinateSystem;
   }) {
     this.collisionRate = params.collisionRate;
     this.jumpLength = params.jumpLength;
@@ -33,6 +36,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
       yMin: -200,
       yMax: 200
     };
+    this.coordSystem = params.coordSystem;
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
@@ -49,8 +53,9 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
       particle.collisionCount++;
     }
 
-    particle.position.x += particle.velocity.vx * dt;
-    particle.position.y += particle.velocity.vy * dt;
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    particle.position.x += velocity.x * dt;
+    particle.position.y += velocity.y * dt;
 
     const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
     particle.position = newPosition;
@@ -91,17 +96,18 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
     const collision = this.handleCollision(particle);
     
     const timeStep = Math.min(collision.waitTime, simDt());
-    const dx = particle.velocity.vx * timeStep;
-    const dy = particle.velocity.vy * timeStep;
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const dx = velocity.x * timeStep;
+    const dy = velocity.y * timeStep;
 
     // DIAG: occasional log for p0 to inspect CTRW2D motion inputs
     if ((particle.id === 'p0') && (Math.floor(currentTime / Math.max(timeStep, 1e-6)) % 60 === 0)) {
-      const speed = Math.hypot(particle.velocity.vx, particle.velocity.vy);
+      const speed = Math.hypot(velocity.x, velocity.y);
       console.log('[CTRW2D] p0', {
         simTime: currentTime.toFixed(3),
         dt: timeStep.toExponential(3),
-        vx: particle.velocity.vx.toFixed(4),
-        vy: particle.velocity.vy.toFixed(4),
+        vx: velocity.x.toFixed(4),
+        vy: velocity.y.toFixed(4),
         speed: speed.toFixed(4),
         dx: dx.toExponential(3),
         dy: dy.toExponential(3),
@@ -140,8 +146,14 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
     }
     
     const newDirection = Math.random() * 2 * Math.PI;
-    const speed = Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2);
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const speed = Math.sqrt(velocity.x ** 2 + velocity.y ** 2);
     
+    const newVelocity = {
+      x: speed * Math.cos(newDirection),
+      y: speed * Math.sin(newDirection)
+    };
+
     return {
       occurred: true,
       newDirection,
@@ -150,10 +162,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
       timestamp: currentTime,
       position: { ...particle.position },
       oldVelocity: { ...particle.velocity },
-      newVelocity: {
-        vx: speed * Math.cos(newDirection),
-        vy: speed * Math.sin(newDirection)
-      }
+      newVelocity: this.coordSystem.toVelocity(newVelocity)
     };
   }
 

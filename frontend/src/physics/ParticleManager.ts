@@ -33,13 +33,6 @@ export class ParticleManager {
     return this.coordSystem.toCanvas(pos);
   }
 
-  // Inverse: map canvas pixel coordinates to physics coordinates within boundaries
-  private mapToPhysics(pos: { x: number; y: number }) {
-    return this.coordSystem.toPhysics(pos);
-  }
-
-
-
   initializeParticle(tsParticle: any): Particle {
     // Use velocities passed from RandomWalkSimulator (thermal with momentum conservation)
     // If no velocity provided, fall back to zero velocity for compatibility
@@ -48,7 +41,7 @@ export class ParticleManager {
 
     const currentTime = simTime();
     // Convert initial canvas position to physics coordinates
-    const physicsPos = this.mapToPhysics({
+    const physicsPos = this.coordSystem.toPhysics({
       x: tsParticle.position.x,
       y: tsParticle.position.y,
     });
@@ -94,7 +87,9 @@ export class ParticleManager {
   }): void {
     const particle = this.particles.get(particleData.id);
     if (particle) {
-      particle.position = particleData.position;
+      // Use coordinate system for all position/velocity updates
+      const physicsPos = this.coordSystem.toPhysics(particleData.position);
+      particle.position = physicsPos;
       particle.velocity = {
         vx: particleData.velocity.x,
         vy: particleData.velocity.y

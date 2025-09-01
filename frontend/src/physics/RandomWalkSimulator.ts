@@ -50,8 +50,8 @@ export class RandomWalkSimulator {
   private setupParticleManager(): void {
     const boundaryConfig = this.parameterManager.getBoundaryConfig();
     const coordinateSystem = new CoordinateSystem(
-      boundaryConfig,
       { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
+      boundaryConfig,
       this.parameterManager.dimension
     );
     this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem);

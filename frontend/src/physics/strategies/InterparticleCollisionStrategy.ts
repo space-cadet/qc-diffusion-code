@@ -1,36 +1,61 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
-import type { Particle } from '../types/Particle';
+import type { Particle, Vector, Velocity } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import type { CoordinateSystem } from '../core/CoordinateSystem';
 import { simTime } from '../core/GlobalTime';
 
 export class InterparticleCollisionStrategy implements RandomWalkStrategy {
   private boundaryConfig: BoundaryConfig;
+  private coordSystem: CoordinateSystem;
 
-  constructor(params: { boundaryConfig?: BoundaryConfig }) {
-    this.boundaryConfig = params.boundaryConfig || {
-      type: 'periodic',
-      xMin: -200,
-      xMax: 200,
-      yMin: -200,
-      yMax: 200
+  constructor(boundaryConfig: BoundaryConfig, coordSystem: CoordinateSystem) {
+    this.boundaryConfig = boundaryConfig;
+    this.coordSystem = coordSystem;
+  }
+
+  private detectCollision(p1: Particle, p2: Particle): boolean {
+    const dx = p1.position.x - p2.position.x;
+    const dy = p1.position.y - p2.position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < 1.0; // Collision radius
+  }
+
+  private resolveCollision(v1: Vector, v2: Vector): Vector {
+    // Elastic collision in 2D
+    return {
+      x: v2.x,
+      y: v2.y
     };
   }
 
-  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    // Basic ballistic movement before handling collisions
-    const dt = 0.01; // simDt(0.01) would require import
-    particle.position.x += particle.velocity.vx * dt;
-    particle.position.y += particle.velocity.vy * dt;
+  updateParticle(particle: Particle, allParticles: Particle[]): void {
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const position = { x: particle.position.x, y: particle.position.y };
     
-    // Handle inter-particle collisions
-    this.handleInterparticleCollisions(particle, allParticles);
+    for (const other of allParticles) {
+      if (other !== particle) {
+        const otherVel = this.coordSystem.toVector(other.velocity);
+        
+        if (this.detectCollision(particle, other)) {
+          const newVel = this.resolveCollision(velocity, otherVel);
+          particle.velocity = this.coordSystem.toVelocity(newVel);
+          break;
+        }
+      }
+    }
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    // Basic ballistic movement before handling collisions
-    particle.position.x += particle.velocity.vx * dt;
-    particle.position.y += particle.velocity.vy * dt;
+    // Convert velocity to Vector for calculations
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const position = { x: particle.position.x, y: particle.position.y };
+    position.x += velocity.x * dt;
+    position.y += velocity.y * dt;
+    particle.position = position;
+    
+    // Convert back to Velocity for storage
+    particle.velocity = this.coordSystem.toVelocity(velocity);
     
     // Handle inter-particle collisions
     this.handleInterparticleCollisions(particle, allParticles);
@@ -44,31 +69,38 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
       const oid = parseInt(String(other.id).replace(/\D+/g, ''), 10) || 0;
       if (!(pid < oid)) continue; // only handle pair once when pid < oid
 
-      const dx = particle.position.x - other.position.x;
-      const dy = particle.position.y - other.position.y;
+      const particlePosition = { x: particle.position.x, y: particle.position.y };
+      const otherPosition = { x: other.position.x, y: other.position.y };
+      const dx = particlePosition.x - otherPosition.x;
+      const dy = particlePosition.y - otherPosition.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const collisionRadius = (particle.radius || 3) + (other.radius || 3);
 
       if (dist < collisionRadius && dist > 0) {
+        // Convert velocity to Vector for calculations
+        const particleVelocity = this.coordSystem.toVector(particle.velocity);
+        const otherVelocity = this.coordSystem.toVector(other.velocity);
+        
         // 2D elastic collision with momentum conservation
         const [v1x, v1y, v2x, v2y] = this.elasticCollision2D(
-          particle.velocity.vx, particle.velocity.vy,
-          other.velocity.vx, other.velocity.vy,
+          particleVelocity.x, particleVelocity.y,
+          otherVelocity.x, otherVelocity.y,
           1, 1
         );
         
-        particle.velocity.vx = v1x;
-        particle.velocity.vy = v1y;
-        other.velocity.vx = v2x;
-        other.velocity.vy = v2y;
+        // Convert back to Velocity for storage
+        particle.velocity = this.coordSystem.toVelocity({ x: v1x, y: v1y });
+        other.velocity = this.coordSystem.toVelocity({ x: v2x, y: v2y });
 
         // Separate particles to prevent overlap
         const overlap = collisionRadius - dist;
         const separationFactor = overlap / (2 * dist);
-        particle.position.x += dx * separationFactor;
-        particle.position.y += dy * separationFactor;
-        other.position.x -= dx * separationFactor;
-        other.position.y -= dy * separationFactor;
+        particlePosition.x += dx * separationFactor;
+        particlePosition.y += dy * separationFactor;
+        otherPosition.x -= dx * separationFactor;
+        otherPosition.y -= dy * separationFactor;
+        particle.position = particlePosition;
+        other.position = otherPosition;
 
         // Count actual inter-particle collisions on both participants
         particle.interparticleCollisionCount = (particle.interparticleCollisionCount || 0) + 1;

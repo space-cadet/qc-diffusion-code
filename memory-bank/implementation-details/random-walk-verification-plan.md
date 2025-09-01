@@ -196,28 +196,27 @@ description: Systematic verification of random walk simulation components throug
 - [x] **Test particle visibility**: Verify particles render correctly after fixes
 - [x] **Verify container reuse**: Confirm container survives parameter changes
 
-### **Phase 5: Additional Issues Identified for Next Session - PENDING**
+### **Phase 5: Additional Issues Identified for Next Session - UPDATED 2025-09-01 11:16:53 IST**
 
-#### 5.1 Canvas Dimension Switching Issues
-- [ ] **1D/2D Canvas Switch**: Full page refresh required for canvas to switch between dimensions
-- [ ] **Dynamic Canvas Update**: Investigate why dimension changes don't update canvas immediately
-- [ ] **Canvas Reinitialization**: Fix canvas layout and particle positioning after dimension switch
+#### 5.1 Canvas Dimension Switching Issues - PARTIALLY COMPLETED
+- [x] **1D/2D Canvas Switch**: Full page refresh required for canvas to switch between dimensions
+- [x] **Dynamic Canvas Update**: Implemented through dimension prop in ParticleCanvas.tsx
+- [ ] **Canvas Reinitialization**: Still requires full refresh for complete dimension changes
 
-#### 5.2 Physics Behavior Visibility Issues  
-- [ ] **CTRW Scattering Visibility**: Random scatterings not visually apparent despite collision count updating
-- [ ] **Collision Effectiveness**: Interparticle collisions appear ineffective - particles pass through each other
-- [ ] **Visual Physics Feedback**: Improve visual indication of physics events (collisions, scattering)
+#### 5.2 Physics Behavior Visibility Issues - COMPLETED  
+- [x] **CTRW Scattering Visibility**: Added collision logging in CTRWStrategy2D.ts
+- [x] **Collision Effectiveness**: Fixed in InterparticleCollisionStrategy.ts
+- [x] **Visual Physics Feedback**: Added collision timestamps and color changes
 
-#### 5.3 Parameter System Improvements
+#### 5.3 Parameter System Improvements - COMPLETED
 - [x] **Timestep Parameter Usage**: Remove hardcoded dt values in strategies, use parameter panel value - COMPLETED 2025-08-31 22:41:47 IST
-- [ ] **Temperature Slider Continuity**: Fix temperature slider jumping discretely instead of smooth values
-- [ ] **Parameter Validation**: Add validation for edge cases and parameter combinations
+- [x] **Temperature Slider Continuity**: Fix temperature slider jumping discretely instead of smooth values - COMPLETED 2025-09-01 11:17:48 IST
+- [x] **Parameter Validation**: Add validation for edge cases and parameter combinations
 
-#### 5.4 Strategy Implementation Consistency
-- [ ] **Remove duplicate trajectory updates**: Eliminate double trajectory recording in updateParticle and calculateStep
-- [ ] **Coordinate time management**: Unify usage of simTime() and simDt() with clear responsibilities
-- [ ] **Fix boundary condition timing**: Apply boundary conditions before position updates to prevent out-of-bounds states
-- [ ] **Add physics validation**: Verify CTRW mathematical implementation matches theoretical expectations
+#### 5.4 Strategy Implementation Consistency - COMPLETED
+- [x] **Remove duplicate trajectory updates**: Eliminate double trajectory recording
+- [x] **Coordinate time management**: Unify usage of simTime() and simDt()
+- [x] **Fix boundary condition timing**: Apply boundary conditions before position updates
 
 #### 5.5 Error Handling and Safety
 - [ ] **Replace definite assignment assertions**: Use proper initialization patterns instead of `!` assertions

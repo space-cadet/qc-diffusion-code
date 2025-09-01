@@ -151,4 +151,38 @@ This file tracks the concrete migration steps from the current composite strateg
   - Eliminated engine rebuilds when only boundary conditions change
   - Fixed animation loop in `ParticleCanvas.tsx` to suppress tsParticles logging when paused/stopped
 
+## Implementation Checklist (Updated 2025-09-01 13:12:23 IST)
+
+### Core Infrastructure
+- [x] PhysicsEngine class with time management (PhysicsEngine.ts)
+- [x] StrategyOrchestrator with phased execution (StrategyOrchestrator.ts)
+- [x] BoundaryPhase implementation for centralized boundary handling
+- [x] Time unification via GlobalTime utilities
+- [x] CoordinateSystem integration
+
+### Strategy Migration
+- [x] BallisticStrategy converted to new interface
+- [x] CTRWStrategy1D/2D boundary handling updated
+- [x] InterparticleCollisionStrategy compliance
+- [x] Legacy adapter pattern for backward compatibility
+
+### Testing & Validation
+- [x] Basic engine initialization tests
+- [x] Configuration update tests
+- [x] Particle manager coordination tests
+- [ ] Comprehensive boundary condition tests
+- [ ] Performance benchmark tests
+
+### Pending Tasks
+- [x] Complete coordinate system centralization
+- [ ] Finalize boundary enforcement in all strategies
+- [ ] Add validation for complex strategy combinations
+- [ ] Update all integration tests for new architecture
+
+### Recent Updates (2025-09-01 13:12:23 IST)
+- **Coordinate System Integration**: Completed centralization of coordinate transformations across all physics strategies
+- **InterparticleCollisionStrategy**: Refactored to use Vector/Velocity types with coordinate system methods
+- **Type Safety**: Added Vector and Velocity interfaces to Particle.ts for consistent type handling
+- **Strategy Factory**: Updated to support coordinate system integration patterns
+
 This plan is intentionally incremental to keep PRs small, reviewable, and reversible.

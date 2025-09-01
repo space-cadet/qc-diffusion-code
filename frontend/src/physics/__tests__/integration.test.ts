@@ -48,15 +48,27 @@ describe('Physics Engine Integration', () => {
   });
 
   test('particle manager and strategy coordination', () => {
+    const coordSystem = new CoordinateSystem(
+      { width: 800, height: 600 },
+      { type: 'periodic', xMin: 0, xMax: 100, yMin: 0, yMax: 100 },
+      '2D'
+    );
+    
     const strategy = new CTRWStrategy2D({
-      collisionRate: 1.0,
-      jumpLength: 1.0,
-      velocity: 50.0,
-      boundaryConfig: { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 }
+      collisionRate: 0.1,
+      jumpLength: 1,
+      velocity: 1,
+      boundaryConfig: {
+        type: 'periodic',
+        xMin: 0,
+        xMax: 100,
+        yMin: 0,
+        yMax: 100
+      },
+      coordSystem
     });
     
     const boundaryConfig: BoundaryConfig = { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 };
-    const coordSystem = new CoordinateSystem(boundaryConfig, { width: 400, height: 400 }, '2D');
     const manager = new ParticleManager(strategy, '2D', coordSystem);
     const mockTsParticle = {
       id: 'test-1',

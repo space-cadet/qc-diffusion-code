@@ -1,5 +1,6 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import { CoordinateSystem } from '../core/CoordinateSystem';
 import { CTRWStrategy1D } from '../strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { LegacyBallisticStrategy } from '../strategies/LegacyBallisticStrategy';
@@ -20,6 +21,13 @@ export function createStrategies(parameterManager: ParameterManager, boundaryCon
   const config = { dimension: parameterManager.dimension, strategies: parameterManager.strategies };
   const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
+
+  // Create coordinate system instance for strategies that need it
+  const coordSystem = new CoordinateSystem(
+    { width: 800, height: 600 }, // Default canvas size
+    boundaryConfig,
+    config.dimension
+  );
 
   // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
   if (config.dimension === '1D') {
@@ -57,11 +65,12 @@ export function createStrategies(parameterManager: ParameterManager, boundaryCon
         jumpLength: physicsParams.jumpLength,
         velocity: physicsParams.velocity,
         boundaryConfig: boundaryConfig,
+        coordSystem
       }));
     }
 
     if (selectedStrategies.includes('collisions')) {
-      twoDStrategies.push(new InterparticleCollisionStrategy({ boundaryConfig: boundaryConfig }));
+      twoDStrategies.push(new InterparticleCollisionStrategy(boundaryConfig, coordSystem));
     }
 
     return twoDStrategies.length === 1 ? [twoDStrategies[0]] : [new CompositeStrategy(twoDStrategies)];
