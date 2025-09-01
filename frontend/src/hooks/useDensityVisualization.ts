@@ -25,22 +25,35 @@ export const useDensityVisualization = (
   const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
   const [densityData1D, setDensityData1D] = useState<DensityData1D | null>(null);
 
-  // Keep particles in a ref to avoid dependency churn on array identity
-  const particlesRef = useRef<Particle[]>(particles);
-  useEffect(() => {
-    particlesRef.current = particles;
-  }, [particles]);
+  // Remove particlesRef pattern - use particles directly for proper reactivity
 
   const drawDensityHeatmap = useCallback((data: DensityData2D) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    console.log('[drawDensityHeatmap] Starting render:', {
+      canvasExists: !!canvas,
+      canvasWidth: canvas?.width,
+      canvasHeight: canvas?.height,
+      densityRows: data.density.length,
+      densityCols: data.density[0]?.length || 0
+    });
+
+    if (!canvas) {
+      console.error('[drawDensityHeatmap] Canvas ref is null');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('[drawDensityHeatmap] Could not get 2D context');
+      return;
+    }
 
     const { density, xBounds, yBounds } = data;
     
-    if (density.length === 0) return;
+    if (density.length === 0) {
+      console.warn('[drawDensityHeatmap] Density array is empty, skipping render');
+      return;
+    }
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -49,11 +62,27 @@ export const useDensityVisualization = (
     const xScale = canvas.width / density[0].length;
     const yScale = canvas.height / density.length;
 
+    console.log('[drawDensityHeatmap] Scaling calculated:', {
+      xScale, yScale,
+      canvasSize: { width: canvas.width, height: canvas.height },
+      densitySize: { rows: density.length, cols: density[0].length }
+    });
+
     // Find max density for normalization
     const flatDensity = density.flat() as number[];
     const maxDensity = flatDensity.reduce((max, val) => Math.max(max, val), 0);
     
-    if (maxDensity === 0) return;
+    console.log('[drawDensityHeatmap] Density stats:', {
+      maxDensity,
+      minDensity: Math.min(...flatDensity),
+      totalValues: flatDensity.length,
+      zeroValues: flatDensity.filter(v => v === 0).length
+    });
+    
+    if (maxDensity === 0) {
+      console.warn('[drawDensityHeatmap] All density values are 0, skipping render');
+      return;
+    }
 
     // Draw heatmap
     for (let y = 0; y < density.length; y++) {
@@ -72,6 +101,8 @@ export const useDensityVisualization = (
         );
       }
     }
+
+    console.log('[drawDensityHeatmap] Heatmap rendering complete');
 
     // Draw grid lines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
@@ -138,17 +169,41 @@ export const useDensityVisualization = (
   }, []);
 
   const updateDensity = useCallback(() => {
-    const currentParticles = particlesRef.current;
+    // console.log('[useDensityVisualization] updateDensity called:', {
+    //   particleCount: particles.length,
+    //   dimension,
+    //   binSize,
+    //   hasParticles: particles.length > 0
+    // });
+
     if (dimension === '1D') {
-      const data = getDensityProfile1D(currentParticles, particleCount, binSize || 20);
+      const data = getDensityProfile1D(particles, particleCount, binSize || 20);
+      // console.log('[useDensityVisualization] 1D density data:', {
+      //   densityLength: data.density.length,
+      //   xBounds: data.xBounds,
+      //   binSize: data.binSize,
+      //   maxDensity: Math.max(...data.density),
+      //   minDensity: Math.min(...data.density),
+      //   hasValidData: data.density.length > 0
+      // });
       setDensityData1D(data);
       drawDensity1D(data);
     } else {
-      const data = getDensityProfile2D(currentParticles, particleCount, binSize || 20);
+      const data = getDensityProfile2D(particles, particleCount, binSize || 20);
+      // console.log('[useDensityVisualization] 2D density data:', {
+      //   densityRows: data.density.length,
+      //   densityCols: data.density[0]?.length || 0,
+      //   xBounds: data.xBounds,
+      //   yBounds: data.yBounds,
+      //   binSize: data.binSize,
+      //   maxDensity: Math.max(...data.density.flat()),
+      //   minDensity: Math.min(...data.density.flat()),
+      //   hasValidData: data.density.length > 0
+      // });
       setDensityData2D(data);
       drawDensityHeatmap(data);
     }
-  }, [particleCount, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
+  }, [particles, particleCount, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
 
   useEffect(() => {
     updateDensity();
@@ -165,7 +220,7 @@ export const useDensityVisualization = (
         }
       }
     };
-  }, [binSize, dimension, particleCount]);
+  }, [binSize, dimension, particleCount, particles, updateDensity]);
 
   return {
     canvasRef,

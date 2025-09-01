@@ -14,6 +14,9 @@ interface DensityComparisonProps {
     collisionRate: number;
     dimension: '1D' | '2D';
   };
+  simulationState: {
+    status: 'Running' | 'Paused' | 'Stopped' | 'Initialized';
+  };
 }
 
 export const DensityComparison: React.FC<DensityComparisonProps> = ({
@@ -21,6 +24,7 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   particleCount,
   simulatorRef,
   gridLayoutParams,
+  simulationState,
 }) => {
   const { 
     randomWalkUIState, 
@@ -32,15 +36,24 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   // Use live particles from simulatorRef when available; fall back to props
   const liveParticles = React.useMemo(() => {
     try {
+      const particlesFromSim = simulatorRef.current?.getParticleManager().getAllParticles();
+      // console.log('[DensityComparison] Getting live particles:', {
+      //   fromSim: !!particlesFromSim,
+      //   particleCount: particlesFromSim?.length || 0,
+      //   simulatorExists: !!simulatorRef.current,
+      //   hasParticleManager: !!simulatorRef.current?.getParticleManager?.(),
+      //   simulationState: simulationState.status
+      // });
       return (
         particles ??
-        simulatorRef.current?.getParticleManager().getAllParticles() ??
+        particlesFromSim ??
         EMPTY_PARTICLES
       );
-    } catch {
+    } catch (error) {
+      // console.error('[DensityComparison] Error getting particles:', error);
       return EMPTY_PARTICLES;
     }
-  }, [particles, simulatorRef]);
+  }, [particles, simulatorRef, simulationState.status]);
   const liveCount = liveParticles.length;
 
   const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(
@@ -78,14 +91,25 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
 
   // Auto-update density when simulation is running
   useEffect(() => {
-    if (!randomWalkUIState.densityAutoUpdate) return;
+    if (!randomWalkUIState.densityAutoUpdate || simulationState.status !== 'Running') {
+      // console.log('[DensityComparison] Auto-update disabled or simulation not running:', {
+      //   autoUpdateEnabled: randomWalkUIState.densityAutoUpdate,
+      //   simulationStatus: simulationState.status
+      // });
+      return;
+    }
     
+    // console.log('[DensityComparison] Starting auto-update interval');
     const interval = setInterval(() => {
+      // console.log('[DensityComparison] Auto-update tick, updating density');
       updateDensity();
     }, 100);
 
-    return () => clearInterval(interval);
-  }, [randomWalkUIState.densityAutoUpdate]);
+    return () => {
+      // console.log('[DensityComparison] Clearing auto-update interval');
+      clearInterval(interval);
+    };
+  }, [randomWalkUIState.densityAutoUpdate, simulationState.status, updateDensity]);
 
   // Redraw when dimension changes
   useEffect(() => {

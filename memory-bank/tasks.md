@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 13:23:07 IST_
+_Last Updated: 2025-09-01 15:04:07 IST_
 
 ## Active Tasks
 
@@ -17,7 +17,7 @@ _Last Updated: 2025-09-01 13:23:07 IST_
 | C6  | Random Walk Physics Engine Redesign                  | ✅ COMPLETED   | HIGH     | 2025-08-22 | C5c          |
 | C6a | Rewrite ts-particles Component Using Low-Level API   | ✅ COMPLETED   | HIGH     | 2025-08-22 | C5b, C6      |
 | C7  | Observer Design and Implementation                    | 🔄 IN PROGRESS | HIGH     | 2025-08-22 | C5c          |
-| C8  | Density Profile Calculation Implementation            | ✅ COMPLETED   | HIGH     | 2025-08-23 | C5c, C7      |
+| C8  | Density Profile Calculation Implementation            | 🔄 IN PROGRESS | HIGH     | 2025-08-23 | C5c, C7      |
 | C9  | Standalone Repository Setup and Vercel Deployment    | ✅ COMPLETED   | HIGH     | 2025-08-23 | C1, C5b, C7, C8 |
 | C10 | GitHub App Release v1.0.0                            | ✅ COMPLETED   | HIGH     | 2025-08-24 | C9, C5b, C8     |
 | C2a | PDE Solver Methods and Boundary Conditions           | 🔄 IN PROGRESS | HIGH     | 2025-08-25 | C2              |
@@ -28,6 +28,7 @@ _Last Updated: 2025-09-01 13:23:07 IST_
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
+| C7a | Modular Transparent Observable System Redesign    | ⬜ NOT STARTED | HIGH     | 2025-09-01 | C7              |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
@@ -95,11 +96,17 @@ _Last Updated: 2025-09-01 13:23:07 IST_
 **Files**: `frontend/src/physics/observables/KineticEnergyObservable.ts`, `frontend/src/physics/observables/MomentumObservable.ts`, `frontend/src/physics/observables/MSDObservable.ts`, `frontend/src/components/ObservablesPanel.tsx`
 **Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
 
+### C7a: Modular Transparent Observable System Redesign
+**Description**: Redesign hardcoded observable system into flexible query-based architecture with real-time time-series visualization
+**Status**: ⬜ NOT STARTED **Last**: 2025-09-01 15:04:07 IST
+**Files**: `memory-bank/implementation-details/observables-modular-redesign.md`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulation.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`
+**Notes**: Comprehensive redesign specification created - enables user-defined observables, transparent particle property access, and live Plotly integration. 4-phase implementation plan over 4-5 weeks. Interparticle collision metrics integration and ObservablesPanel UI improvements completed as groundwork.
+
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification
-**Status**: ✅ COMPLETED **Last**: 2025-08-23 17:05:57 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/hooks/useDensityVisualization.ts`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/physics/ParticleManager.ts`
-**Notes**: Coordinate system clustering issue fixed by GPT5 - corrected physics-canvas coordinate mapping, proper density calculation now shows uniform distribution instead of corner artifacts
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 15:04:07 IST
+**Files**: `frontend/src/hooks/useDensityVisualization.ts`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/physics/utils/density.ts`
+**Notes**: Comprehensive diagnostics and dependency fixes implemented. Enhanced logging pipeline for density calculation debugging. Simulation status integration completed. Zero particle retrieval issue remains under investigation with improved error tracking.
 
 ### C9: Standalone Repository Setup and Vercel Deployment
 **Description**: Extract code subproject to standalone repository and deploy to Vercel with proper monorepo configuration

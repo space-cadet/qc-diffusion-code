@@ -8,7 +8,15 @@ export function getDensityProfile2D(particles: Particle[], particleCount: number
 } {
   const positions = particles.map(p => p.position);
   
+  console.log('[getDensityProfile2D] Input:', {
+    particleCount,
+    positionsLength: positions.length,
+    binSize,
+    firstFewPositions: positions.slice(0, 3)
+  });
+  
   if (positions.length === 0) {
+    console.warn('[getDensityProfile2D] No positions provided, returning empty result');
     return {
       density: [],
       xBounds: { min: 0, max: 0 },
@@ -23,9 +31,20 @@ export function getDensityProfile2D(particles: Particle[], particleCount: number
   const yMin = Math.min(...positions.map(p => p.y));
   const yMax = Math.max(...positions.map(p => p.y));
   
+  console.log('[getDensityProfile2D] Bounds calculated:', {
+    xMin, xMax, yMin, yMax,
+    xRange: xMax - xMin,
+    yRange: yMax - yMin
+  });
+  
   // Calculate grid dimensions
   const xBins = Math.ceil((xMax - xMin) / binSize) + 1;
   const yBins = Math.ceil((yMax - yMin) / binSize) + 1;
+  
+  console.log('[getDensityProfile2D] Grid dimensions:', {
+    xBins, yBins,
+    totalBins: xBins * yBins
+  });
   
   // Initialize 2D density array
   const density: number[][] = Array(yBins).fill(null).map(() => Array(xBins).fill(0));
@@ -40,11 +59,24 @@ export function getDensityProfile2D(particles: Particle[], particleCount: number
     }
   });
   
+  console.log('[getDensityProfile2D] Binning complete:', {
+    totalParticlesBinned: density.flat().reduce((sum, val) => sum + val, 0),
+    maxDensityInBin: Math.max(...density.flat()),
+    occupiedBins: density.flat().filter(count => count > 0).length
+  });
+  
   // Normalize by bin area and total particles
   const binArea = binSize * binSize;
   const normalizedDensity = density.map(row => 
     row.map(count => count / (particleCount * binArea))
   );
+  
+  console.log('[getDensityProfile2D] Normalization complete:', {
+    binArea,
+    normalizationFactor: 1 / (particleCount * binArea),
+    finalMaxDensity: Math.max(...normalizedDensity.flat()),
+    finalMinDensity: Math.min(...normalizedDensity.flat())
+  });
   
   return {
     density: normalizedDensity,

@@ -181,6 +181,18 @@ interface CachedResult {
 - GPU-accelerated observable computation
 - Distributed calculation for multi-threaded physics
 
+## Modular System Redesign
+
+**Note**: The current hardcoded observable system has limitations in transparency and modularity. A comprehensive redesign is planned to enable user-defined observables and real-time time-series visualization.
+
+**See**: [`observables-modular-redesign.md`](./observables-modular-redesign.md) for detailed plans on:
+- Transparent query-based observable system  
+- Real-time time-series plotting with Plotly
+- Modular architecture for custom observables
+- Performance optimizations for live visualization
+
+This redesign will transform the current rigid system into a flexible, transparent analytics platform suitable for both interactive exploration and quantitative analysis.
+
 ## Risk Mitigation
 
 ### Potential Issues

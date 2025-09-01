@@ -131,7 +131,7 @@ export const RandomWalkParameterPanel = ({
           </div>
           <div className="flex justify-between">
             <span>Collisions:</span>
-            <span className="font-mono">{(simulatorRef.current?.getCollisionStats()?.totalInterparticleCollisions || 0).toLocaleString()}</span>
+            <span className="font-mono">{(simulationState as any).interparticleCollisions?.toLocaleString?.() ?? (Number((simulationState as any).interparticleCollisions || 0)).toLocaleString()}</span>
           </div>
         </div>
       </div>

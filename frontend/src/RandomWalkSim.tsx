@@ -101,6 +101,7 @@ export default function RandomWalkSim() {
       setRandomWalkSimulationState({
         time: newState.time,
         collisions: newState.collisions,
+        interparticleCollisions: (newState as any).interparticleCollisions ?? 0,
         status: newState.status,
         particleData: newState.particleData || [],
         densityHistory: newState.densityHistory || [],
@@ -111,6 +112,7 @@ export default function RandomWalkSim() {
       setRandomWalkSimulationState({
         time: state.time,
         collisions: state.collisions,
+        interparticleCollisions: (state as any).interparticleCollisions ?? 0,
         status: state.status,
         particleData: state.particleData || [],
         densityHistory: state.densityHistory || [],
@@ -194,8 +196,11 @@ export default function RandomWalkSim() {
     }, 2000); // Save every 2 seconds
     
     const metricsInterval = setInterval(() => {
-      // Sync refs to state every 1 second
-      updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running');
+      // Sync metrics every 1 second
+      const stats = simulatorRef.current?.getCollisionStats?.();
+      const totalColl = stats?.totalCollisions ?? collisionsRef.current ?? 0;
+      const interColl = stats?.totalInterparticleCollisions ?? 0;
+      updateSimulationMetrics(timeRef.current, totalColl, 'Running', interColl);
     }, 1000);
     
     return () => {
@@ -203,6 +208,15 @@ export default function RandomWalkSim() {
       clearInterval(metricsInterval);
     };
   }, [isRunning, saveSimulationSnapshot, updateSimulationMetrics]);
+
+  // On pause/stop, perform a one-time metrics sync so last values are visible
+  useEffect(() => {
+    if (isRunning) return;
+    const stats = simulatorRef.current?.getCollisionStats?.();
+    const totalColl = stats?.totalCollisions ?? collisionsRef.current ?? 0;
+    const interColl = stats?.totalInterparticleCollisions ?? (randomWalkSimulationState as any).interparticleCollisions ?? 0;
+    updateSimulationMetrics(timeRef.current, totalColl, randomWalkSimulationState.status, interColl);
+  }, [isRunning, updateSimulationMetrics, randomWalkSimulationState.status]);
 
   // Initialize physics simulator
   useEffect(() => {
@@ -341,7 +355,11 @@ export default function RandomWalkSim() {
     }
     
     // Update state when starting
-    updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running');
+    {
+      const stats = simulatorRef.current?.getCollisionStats?.();
+      const interColl = stats?.totalInterparticleCollisions ?? (randomWalkSimulationState as any).interparticleCollisions ?? 0;
+      updateSimulationMetrics(timeRef.current, collisionsRef.current, 'Running', interColl);
+    }
   };
 
   const handlePause = () => {
@@ -377,7 +395,11 @@ export default function RandomWalkSim() {
     }
     
     // Update metrics when pausing/resuming
-    updateSimulationMetrics(timeRef.current, collisionsRef.current, newStatus);
+    {
+      const stats = simulatorRef.current?.getCollisionStats?.();
+      const interColl = stats?.totalInterparticleCollisions ?? (randomWalkSimulationState as any).interparticleCollisions ?? 0;
+      updateSimulationMetrics(timeRef.current, collisionsRef.current, newStatus, interColl);
+    }
   };
 
   const handleReset = () => {
@@ -398,6 +420,7 @@ export default function RandomWalkSim() {
       isRunning: false,
       time: 0,
       collisions: 0,
+      interparticleCollisions: 0 as any,
       status: "Stopped",
       particleData: [],
       densityHistory: [],
@@ -405,7 +428,7 @@ export default function RandomWalkSim() {
     });
     
     // Update metrics when resetting
-    updateSimulationMetrics(0, 0, 'Stopped');
+    updateSimulationMetrics(0, 0, 'Stopped', 0);
   };
 
   const handleInitialize = () => {
@@ -509,6 +532,7 @@ export default function RandomWalkSim() {
       isRunning: false,
       time: 0,
       collisions: 0,
+      interparticleCollisions: 0 as any,
       status: "Initialized",
       particleData: [],
       densityHistory: [],
@@ -615,6 +639,9 @@ export default function RandomWalkSim() {
             <DensityComparison
               simulatorRef={simulatorRef}
               gridLayoutParams={gridLayoutParams}
+              simulationState={{
+                status: randomWalkSimulationState.status
+              }}
             />
           </div>
 

@@ -37,6 +37,7 @@ interface WindowRect {
 interface RandomWalkSimulationState {
   time: number
   collisions: number
+  interparticleCollisions: number
   status: 'Running' | 'Paused' | 'Stopped' | 'Initialized'
   particleData: Array<{
     id: string
@@ -99,7 +100,7 @@ interface AppState {
   setObservablesWindow: (rect: WindowRect) => void
   setZCounter: (value: number) => void
   setObservablesCollapsed: (collapsed: boolean) => void
-  updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status']) => void
+  updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
     densityHistory: RandomWalkSimulationState['densityHistory'],
@@ -221,6 +222,7 @@ export const useAppStore = create<AppState>()(
       randomWalkSimulationState: {
         time: 0,
         collisions: 0,
+        interparticleCollisions: 0,
         status: 'Stopped',
         particleData: null,
         densityHistory: [],
@@ -245,13 +247,14 @@ export const useAppStore = create<AppState>()(
       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
       setZCounter: (value) => set({ zCounter: value }),
       setObservablesCollapsed: (collapsed) => set({ observablesCollapsed: collapsed }),
-      updateSimulationMetrics: (time, collisions, status) => 
+      updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
             ...state.randomWalkSimulationState,
             time,
             collisions,
-            status
+            status,
+            interparticleCollisions
           }
         })),
       saveSimulationSnapshot: (particleData, densityHistory, observableData) =>

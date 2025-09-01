@@ -271,34 +271,22 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
         {randomWalkUIState.showParticleCount && (
           <div className="text-sm space-y-1">
-            {particleCountData ? (
-              <>
-                <div className="flex justify-between">
-                  <span>Total:</span>
-                  <span className="font-mono">{particleCountData?.totalCount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Active:</span>
-                  <span className="font-mono text-green-600">{particleCountData?.activeCount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Inactive:</span>
-                  <span className="font-mono text-red-600">{particleCountData?.inactiveCount}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Time:</span>
-                  <span className="font-mono">{particleCountData?.timestamp.toFixed(2)}s</span>
-                </div>
-              </>
-            ) : (
-              <div className="text-gray-500 text-xs">
-                {simulationStatus === "Stopped"
-                  ? "Start simulation to see data"
-                  : simulationStatus === "Paused"
-                  ? "Paused - showing last data"
-                  : "Calculating..."}
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span>Total:</span>
+              <span className="font-mono">{particleCountData?.totalCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Active:</span>
+              <span className="font-mono text-green-600">{particleCountData?.activeCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Inactive:</span>
+              <span className="font-mono text-red-600">{particleCountData?.inactiveCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Time:</span>
+              <span className="font-mono">{particleCountData?.timestamp?.toFixed(2) ?? 'No data'}</span>
+            </div>
           </div>
         )}
       </div>
@@ -317,42 +305,30 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
         {randomWalkUIState.showKineticEnergy && (
           <div className="text-sm space-y-1">
-            {kineticEnergyData ? (
-              <>
-                <div className="flex justify-between">
-                  <span>Total KE:</span>
-                  <span className="font-mono">{kineticEnergyData?.totalKineticEnergy.toFixed(3)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Average KE:</span>
-                  <span className="font-mono">{kineticEnergyData?.averageKineticEnergy.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Max KE:</span>
-                  <span className="font-mono text-orange-600">{kineticEnergyData?.maxKineticEnergy.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Min KE:</span>
-                  <span className="font-mono text-blue-600">{kineticEnergyData?.minKineticEnergy.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Active particles:</span>
-                  <span className="font-mono">{kineticEnergyData?.activeParticleCount}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Time:</span>
-                  <span className="font-mono">{kineticEnergyData?.timestamp.toFixed(2)}s</span>
-                </div>
-              </>
-            ) : (
-              <div className="text-gray-500 text-xs">
-                {simulationStatus === "Stopped"
-                  ? "Start simulation to see data"
-                  : simulationStatus === "Paused"
-                  ? "Paused - showing last data"
-                  : "Calculating..."}
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span>Total KE:</span>
+              <span className="font-mono">{kineticEnergyData?.totalKineticEnergy?.toFixed(3) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Average KE:</span>
+              <span className="font-mono">{kineticEnergyData?.averageKineticEnergy?.toFixed(6) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Max KE:</span>
+              <span className="font-mono text-orange-600">{kineticEnergyData?.maxKineticEnergy?.toFixed(6) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Min KE:</span>
+              <span className="font-mono text-blue-600">{kineticEnergyData?.minKineticEnergy?.toFixed(6) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Active particles:</span>
+              <span className="font-mono">{kineticEnergyData?.activeParticleCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Time:</span>
+              <span className="font-mono">{kineticEnergyData?.timestamp?.toFixed(2) ?? 'No data'}</span>
+            </div>
           </div>
         )}
       </div>
@@ -371,42 +347,30 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
         {randomWalkUIState.showTotalMomentum && (
           <div className="text-sm space-y-1">
-            {momentumData ? (
-              <>
-                <div className="flex justify-between">
-                  <span>|P| total:</span>
-                  <span className="font-mono">{momentumData?.totalMomentumMagnitude.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Px:</span>
-                  <span className="font-mono text-red-600">{momentumData?.totalMomentumX.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Py:</span>
-                  <span className="font-mono text-green-600">{momentumData?.totalMomentumY.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>|P| avg:</span>
-                  <span className="font-mono">{momentumData?.averageMomentumMagnitude.toFixed(4)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Active particles:</span>
-                  <span className="font-mono">{momentumData?.activeParticleCount}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Time:</span>
-                  <span className="font-mono">{momentumData?.timestamp.toFixed(2)}s</span>
-                </div>
-              </>
-            ) : (
-              <div className="text-gray-500 text-xs">
-                {simulationStatus === "Stopped"
-                  ? "Start simulation to see data"
-                  : simulationStatus === "Paused"
-                  ? "Paused - showing last data"
-                  : "Calculating..."}
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span>|P| total:</span>
+              <span className="font-mono">{momentumData?.totalMomentumMagnitude?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Px:</span>
+              <span className="font-mono text-red-600">{momentumData?.totalMomentumX?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Py:</span>
+              <span className="font-mono text-green-600">{momentumData?.totalMomentumY?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>|P| avg:</span>
+              <span className="font-mono">{momentumData?.averageMomentumMagnitude?.toFixed(4) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Active particles:</span>
+              <span className="font-mono">{momentumData?.activeParticleCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Time:</span>
+              <span className="font-mono">{momentumData?.timestamp?.toFixed(2) ?? 'No data'}</span>
+            </div>
           </div>
         )}
       </div>
@@ -425,42 +389,30 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
         {randomWalkUIState.showMSD && (
           <div className="text-sm space-y-1">
-            {msdData ? (
-              <>
-                <div className="flex justify-between">
-                  <span>MSD:</span>
-                  <span className="font-mono">{msdData?.meanSquaredDisplacement.toFixed(1)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>RMSD:</span>
-                  <span className="font-mono">{msdData?.rootMeanSquaredDisplacement.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Max disp:</span>
-                  <span className="font-mono text-orange-600">{msdData?.maxDisplacement.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Min disp:</span>
-                  <span className="font-mono text-blue-600">{msdData?.minDisplacement.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Active particles:</span>
-                  <span className="font-mono">{msdData?.activeParticleCount}</span>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Time:</span>
-                  <span className="font-mono">{msdData?.timestamp.toFixed(2)}s</span>
-                </div>
-              </>
-            ) : (
-              <div className="text-gray-500 text-xs">
-                {simulationStatus === "Stopped"
-                  ? "Start simulation to see data"
-                  : simulationStatus === "Paused"
-                  ? "Paused - showing last data"
-                  : "Calculating..."}
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span>MSD:</span>
+              <span className="font-mono">{msdData?.meanSquaredDisplacement?.toFixed(1) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>RMSD:</span>
+              <span className="font-mono">{msdData?.rootMeanSquaredDisplacement?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Max disp:</span>
+              <span className="font-mono text-orange-600">{msdData?.maxDisplacement?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Min disp:</span>
+              <span className="font-mono text-blue-600">{msdData?.minDisplacement?.toFixed(2) ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Active particles:</span>
+              <span className="font-mono">{msdData?.activeParticleCount ?? 'No data'}</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Time:</span>
+              <span className="font-mono">{msdData?.timestamp?.toFixed(2) ?? 'No data'}</span>
+            </div>
           </div>
         )}
       </div>
