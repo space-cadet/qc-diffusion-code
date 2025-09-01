@@ -53,6 +53,9 @@ importers:
       mathjs:
         specifier: 14.6.0
         version: 14.6.0
+      plotly:
+        specifier: 1.0.6
+        version: 1.0.6
       plotly.js:
         specifier: ^2.27.0
         version: 2.35.3(mapbox-gl@1.13.3)(webpack@5.101.3)
@@ -65,9 +68,15 @@ importers:
       react-grid-layout:
         specifier: 1.5.2
         version: 1.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-plotly:
+        specifier: 1.0.0
+        version: 1.0.0(react@18.3.1)
       react-resizable:
         specifier: 3.0.5
         version: 3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-rnd:
+        specifier: ^10.4.1
+        version: 10.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sigma:
         specifier: 3.0.2
         version: 3.0.2(graphology-types@0.24.8)
@@ -1469,6 +1478,10 @@ packages:
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
+
+  clsx@1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -2958,6 +2971,10 @@ packages:
   mj-context-menu@0.6.1:
     resolution: {integrity: sha512-7NO5s6n10TIV96d4g2uDpG7ZDpIhMh0QNfGdJw/W47JswFcosz457wqz/b5sAKvl12sxINGFCn80NZHKwxQEXA==}
 
+  mkdirp@0.5.6:
+    resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
+    hasBin: true
+
   mnemonist@0.39.8:
     resolution: {integrity: sha512-vyWo2K3fjrUw8YeeZ1zF0fy6Mu59RHokURlld8ymdUPjMlD9EC9ov1/YPqTgqRvUN9nTr3Gqfz29LYAmu0PHPQ==}
 
@@ -3161,6 +3178,9 @@ packages:
   plotly.js@2.35.3:
     resolution: {integrity: sha512-7RaC6FxmCUhpD6H4MpD+QLUu3hCn76I11rotRefrh3m1iDvWqGnVqVk9dSaKmRAhFD3vsNsYea0OxnR1rc2IzQ==}
 
+  plotly@1.0.6:
+    resolution: {integrity: sha512-9DoPWfLJWxqXg6omu1Oj7qkvyOce0Nv+X+2SOoI9lG9mbvA7S/qGVHypwrGMV3r53ruW1Fl1A9a7ZIPt22FrpA==}
+
   point-in-polygon@1.1.0:
     resolution: {integrity: sha512-3ojrFwjnnw8Q9242TzgXuTD+eKiutbzyslcq1ydfu82Db2y+Ogbmyrkpv0Hgj31qwT3lbS9+QAAO/pIQM35XRw==}
 
@@ -3311,6 +3331,12 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
+  re-resizable@6.11.2:
+    resolution: {integrity: sha512-2xI2P3OHs5qw7K0Ud1aLILK6MQxW50TcO+DetD9eIV58j84TqYeHoZcL9H4GXFXXIh7afhH8mv5iUCXII7OW7A==}
+    peerDependencies:
+      react: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   react-base16-styling@0.10.0:
     resolution: {integrity: sha512-H1k2eFB6M45OaiRru3PBXkuCcn2qNmx+gzLb4a9IPMR7tMH8oBRXU5jGbPDYG1Hz+82d88ED0vjR8BmqU3pQdg==}
 
@@ -3318,6 +3344,12 @@ packages:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
       react: ^18.3.1
+
+  react-draggable@4.4.6:
+    resolution: {integrity: sha512-LtY5Xw1zTPqHkVmtM3X8MUOxNDOUhv/khTgBgrUvwaS064bwVvxT+q5El0uUFNx5IEPKXuRejr7UqLwBIg5pdw==}
+    peerDependencies:
+      react: '>= 16.3.0'
+      react-dom: '>= 16.3.0'
 
   react-draggable@4.5.0:
     resolution: {integrity: sha512-VC+HBLEZ0XJxnOxVAZsdRi8rD04Iz3SiiKOoYzamjylUcju/hP9np/aZdLHf/7WOD268WMoNJMvYfB5yAK45cw==}
@@ -3354,6 +3386,12 @@ packages:
       '@types/react': '>=18'
       react: '>=18'
 
+  react-plotly@1.0.0:
+    resolution: {integrity: sha512-vVwqUePJ9gIdezCrT3dQDT4r6sL5bDGwdkhy/yR3cuXt9BWlwwyQ5wst5ouTdK6xCGSBB324Ok+EjcWTRo9qQQ==}
+    deprecated: deprecated in favor of official react-plotly package https://github.com/plotly/react-plotly.js
+    peerDependencies:
+      react: ^0.14.2
+
   react-refresh@0.17.0:
     resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
     engines: {node: '>=0.10.0'}
@@ -3362,6 +3400,12 @@ packages:
     resolution: {integrity: sha512-vKpeHhI5OZvYn82kXOs1bC8aOXktGU5AmKAgaZS4F5JPburCtbmDPqE7Pzp+1kN4+Wb81LlF33VpGwWwtXem+w==}
     peerDependencies:
       react: '>= 16.3'
+
+  react-rnd@10.5.2:
+    resolution: {integrity: sha512-0Tm4x7k7pfHf2snewJA8x7Nwgt3LV+58MVEWOVsFjk51eYruFEa6Wy7BNdxt4/lH0wIRsu7Gm3KjSXY2w7YaNw==}
+    peerDependencies:
+      react: '>=16.3.0'
+      react-dom: '>=16.3.0'
 
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
@@ -3855,6 +3899,9 @@ packages:
         optional: true
       jest-util:
         optional: true
+
+  tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -5702,6 +5749,8 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
+
+  clsx@1.2.1: {}
 
   clsx@2.1.1: {}
 
@@ -7790,6 +7839,10 @@ snapshots:
 
   mj-context-menu@0.6.1: {}
 
+  mkdirp@0.5.6:
+    dependencies:
+      minimist: 1.2.8
+
   mnemonist@0.39.8:
     dependencies:
       obliterator: 2.0.5
@@ -8031,6 +8084,10 @@ snapshots:
       - supports-color
       - webpack
 
+  plotly@1.0.6:
+    dependencies:
+      mkdirp: 0.5.6
+
   point-in-polygon@1.1.0: {}
 
   polybooljs@1.2.2: {}
@@ -8170,6 +8227,11 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
+  re-resizable@6.11.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   react-base16-styling@0.10.0:
     dependencies:
       '@types/lodash': 4.17.20
@@ -8182,6 +8244,13 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-draggable@4.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      clsx: 1.2.1
+      prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-draggable@4.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -8234,6 +8303,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  react-plotly@1.0.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
   react-refresh@0.17.0: {}
 
   react-resizable@3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
@@ -8243,6 +8316,14 @@ snapshots:
       react-draggable: 4.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
       - react-dom
+
+  react-rnd@10.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      re-resizable: 6.11.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-draggable: 4.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib: 2.6.2
 
   react-transition-group@4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -8863,6 +8944,8 @@ snapshots:
       '@jest/types': 29.6.3
       babel-jest: 29.7.0(@babel/core@7.28.3)
       jest-util: 29.7.0
+
+  tslib@2.6.2: {}
 
   tslib@2.8.1: {}
 

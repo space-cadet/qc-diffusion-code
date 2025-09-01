@@ -1,13 +1,13 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-01 15:04:07 IST*
+*Last Updated: 2025-09-01 22:43:09 IST*
 
-**Description**: Redesign the current hardcoded observable system into a flexible, modular, query-based architecture that enables user-defined observables, transparent particle property access, and real-time time-series visualization with Plotly integration.
+**Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Phase 0 implements plugin-style loading with template and composite observables as foundation for full query-based system.
 
-**Status**: ⬜ Not Started
+**Status**: 🔄 Active - Phase 0
 **Priority**: HIGH
 **Started**: 2025-09-01
-**Last Active**: 2025-09-01 15:04:07 IST
+**Last Active**: 2025-09-01 22:43:09 IST
 **Dependencies**: C7
 
 ## Completion Criteria
@@ -32,10 +32,26 @@
 
 ## Progress
 1. ✅ Created comprehensive redesign specification document
-2. ⬜ Phase 1: Core query system with ParticleSelector/AggregationFunction
-3. ⬜ Phase 2: Time series infrastructure with CircularBuffer
-4. ⬜ Phase 3: Live Plotly.js visualization integration
-5. ⬜ Phase 4: Advanced features and performance optimization
+2. 🔄 Phase 0: Middle-path incremental enhancement (Plugin + Template + Composite)
+3. ⬜ Phase 1: Core query system with ParticleSelector/AggregationFunction
+4. ⬜ Phase 2: Time series infrastructure with CircularBuffer
+5. ⬜ Phase 3: Live Plotly.js visualization integration
+6. ⬜ Phase 4: Advanced features and performance optimization
+
+### Phase 0 Implementation Plan (Active)
+**Scope**: Plugin-style loading + Template observables + Composite system + Formula fields
+**Files**: 8 files, ~800-1200 lines total
+**Timeline**: 2-3 days focused work
+
+**Key Files**:
+- NEW: `ObservableRegistry.ts` (~200 lines) - Central plugin system
+- NEW: `TemplateObservable.ts` (~150 lines) - Generic particle property observables
+- NEW: `CompositeObservable.ts` (~120 lines) - Observable combination system
+- MODIFY: `ObservablesPanel.tsx` (~300 lines) - Generic rendering from registry
+- MODIFY: `ObservableManager.ts` (~100 lines) - Registry integration
+- Others: interfaces, config, store updates
+
+**Benefits**: Backward compatible, configuration-driven, foundation for full system
 
 ## Context
 Current system issues identified: lack of transparency (hardcoded observables), limited modularity (tight coupling), and correctness problems (cache invalidation, memory leaks). New system will provide:
@@ -83,7 +99,8 @@ The redesign transforms the rigid, hardcoded approach into a flexible analytics 
 These changes lay groundwork for the modular observable system by establishing consistent data flow patterns and improving UI reliability.
 
 ## Implementation Timeline
-- **Week 1-2**: Core query system and particle selection
-- **Week 2-3**: Time series infrastructure and data collection
-- **Week 3-4**: Live Plotly integration and UI controls
-- **Week 4-5**: Advanced features and optimization
+- **Phase 0 (2-3 days)**: Plugin system, template observables, composite system - ACTIVE
+- **Phase 1 (Week 1-2)**: Core query system and particle selection
+- **Phase 2 (Week 2-3)**: Time series infrastructure and data collection  
+- **Phase 3 (Week 3-4)**: Live Plotly integration and UI controls
+- **Phase 4 (Week 4-5)**: Advanced features and optimization

@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 18:41:54 IST_
+_Last Updated: 2025-09-01 22:48:47 IST_
 
 ## Active Tasks
 
@@ -26,6 +26,7 @@ _Last Updated: 2025-09-01 18:41:54 IST_
 | C15 | Physics Engine Architecture Migration              | 🔄 IN PROGRESS | HIGH     | 2025-08-28 | C5c, C12, C14   |
 | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
+| C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | C7a | Modular Transparent Observable System Redesign    | ⬜ NOT STARTED | HIGH     | 2025-09-01 | C7              |
@@ -178,6 +179,12 @@ _Last Updated: 2025-09-01 18:41:54 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 13:23:07 IST
 **Files**: `memory-bank/implementation-details/gpu-io-implementation-plan.md`, `memory-bank/tasks/C16.md` (planned: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/rendering/RenderingEngine.ts`, `frontend/src/simulation/SimulationEngine.ts`)
 **Notes**: Comprehensive migration plan created for GPU.IO integration. Target: 100x performance improvement (1K→100K particles) through GPU collision detection. Includes rendering engine abstraction, backend-agnostic architecture, and seamless engine switching capabilities.
+
+### C17: Analysis Dashboard and Plotly Integration
+**Description**: Implement dedicated Analysis tab with Plotly.js integration, React Grid Layout interface, and data pipeline connecting simulation results to advanced plotting capabilities
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 22:48:47 IST
+**Files**: `frontend/src/components/AnalysisPage.tsx`, `frontend/src/components/PlotlyChart.tsx`, `frontend/src/App.tsx`, `memory-bank/implementation-details/analysis-component-plan.md`
+**Notes**: Basic infrastructure completed - Analysis tab with grid layout, Plotly.js integration, and sample data visualization. Next: data pipeline connection to simulation stores.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

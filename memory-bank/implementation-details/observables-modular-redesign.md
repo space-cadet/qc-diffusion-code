@@ -1,10 +1,11 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
+*Updated: 2025-09-01 22:43:09 IST*
 
 ## Executive Summary
 
-This document outlines a comprehensive redesign of the observables system to achieve full transparency, modularity, and real-time visualization capabilities. The current system uses hardcoded observable classes and lacks flexibility for user-defined queries or live time-series plotting.
+This document outlines a phased redesign of the observables system to achieve full transparency, modularity, and real-time visualization capabilities. The implementation follows an incremental approach starting with Phase 0 (middle-path enhancements) to provide immediate benefits while building foundation for the complete query-based system.
 
 ## Current System Issues
 
@@ -190,10 +191,100 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 
 ## Implementation Plan
 
+### Phase 0: Middle-Path Enhancement (2-3 days) - **ACTIVE**
+
+**Objective**: Add flexibility and modularity while maintaining existing architecture
+**Strategy**: Plugin-style loading + Template observables + Composite system + Formula fields
+
+#### Core Components
+
+**1. Observable Registry System** (`ObservableRegistry.ts`, ~200 lines)
+- Central registry for all observable types
+- Dynamic loading based on configuration
+- Plugin-style architecture for easy extension
+- Dependency management between observables
+
+```typescript
+interface ObservableConfig {
+  id: string;
+  type: 'builtin' | 'template' | 'composite';
+  enabled: boolean;
+  config?: any;
+  dependencies?: string[];
+}
+
+class ObservableRegistry {
+  register(config: ObservableConfig): void;
+  create(id: string): Observable;
+  getDependencies(id: string): string[];
+}
+```
+
+**2. Template Observable System** (`TemplateObservable.ts`, ~150 lines)
+- Generic observables for particle properties
+- Configurable aggregation functions
+- Common patterns: mean, sum, max, min, distribution
+
+```typescript
+interface TemplateConfig {
+  property: string; // 'velocity.magnitude', 'position.x', etc.
+  aggregation: 'mean' | 'sum' | 'max' | 'min' | 'count';
+  filter?: (particle: Particle) => boolean;
+}
+
+class TemplateObservable implements Observable {
+  constructor(private config: TemplateConfig) {}
+}
+```
+
+**3. Composite Observable System** (`CompositeObservable.ts`, ~120 lines)
+- Combines results from existing observables
+- Simple expression evaluation for basic math
+- Dependencies automatically managed
+
+```typescript
+interface CompositeConfig {
+  formula: string; // 'kineticEnergy.total / particleCount.active'
+  dependencies: string[];
+}
+
+class CompositeObservable implements Observable {
+  constructor(private config: CompositeConfig) {}
+}
+```
+
+**4. Generic UI System** (`ObservablesPanel.tsx`, ~300 lines modified)
+- Remove hardcoded imports and state management
+- Generic rendering based on registry
+- Configuration-driven observable display
+- Backward compatibility with existing observables
+
+#### Implementation Files
+
+| File | Type | Lines | Description |
+|------|------|-------|-------------|
+| `Observable.ts` | MODIFY | ~50 | Add template/composite interfaces |
+| `TemplateObservable.ts` | NEW | ~150 | Generic particle property observables |
+| `CompositeObservable.ts` | NEW | ~120 | Observable combination system |
+| `ObservableRegistry.ts` | NEW | ~200 | Central plugin system |
+| `ObservableManager.ts` | MODIFY | ~100 | Registry integration |
+| `ObservablesPanel.tsx` | MODIFY | ~300 | Generic rendering |
+| `observableConfig.ts` | NEW | ~80 | Default configurations |
+| `appStore.ts` | MODIFY | ~50 | Generic state management |
+
+**Total Estimated Changes**: 800-1200 lines across 8 files
+
+#### Benefits of Phase 0
+- **Immediate Flexibility**: Users can configure observables without code changes
+- **Backward Compatibility**: Existing observables continue working unchanged  
+- **Foundation Building**: Plugin architecture enables future query system
+- **Low Risk**: Incremental changes with fallback to current system
+- **Quick Wins**: Template observables provide 80% of user-requested functionality
+
 ### Phase 1: Core Query System (Week 1-2)
 1. Implement ParticleSelector and AggregationFunction interfaces
 2. Create ModularObservableManager with query registration
-3. Migrate existing observables to new system
+3. Migrate template observables to full query system
 4. Add basic particle filtering and selection capabilities
 
 ### Phase 2: Time Series Infrastructure (Week 2-3)
@@ -237,10 +328,17 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 
 ## Migration Strategy
 
-### Backward Compatibility
-- Existing ObservablesPanel continues to work unchanged
+### Phase 0 Migration (Active)
+- **Backward Compatibility**: Existing ObservablesPanel continues working during transition
+- **Incremental Adoption**: Observables migrated one-by-one to registry system
+- **Configuration Override**: Hard-coded observables can be disabled/replaced via config
+- **Fallback System**: Registry falls back to direct instantiation if config missing
+- **Risk Mitigation**: All changes are additive, existing functionality preserved
+
+### Full System Migration (Phases 1-4)
 - Current observable classes wrapped in new query system
 - Gradual migration of hardcoded observables to modular system
+- Template observables become query system presets
 
 ### Testing Strategy
 - Unit tests for all new observable query components
