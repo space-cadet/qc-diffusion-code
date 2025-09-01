@@ -1,7 +1,7 @@
 # Coordinate System Centralization Design
 
 Created: 2025-09-01 11:25:39 IST  
-Last Updated: 2025-09-01 13:12:23 IST
+Last Updated: 2025-09-01 18:41:54 IST
 
 ## Current Architecture Analysis
 - **CoordinateSystem.ts** handles basic canvas↔physics mapping
@@ -31,13 +31,17 @@ class CoordinateSystem {
 1. ✅ Move physics calculations from strategies → CoordinateSystem
 2. ✅ Update ParticleManager to use centralized methods  
 3. ✅ Modify strategies to delegate to CoordinateSystem
-4. ⬜ Add comprehensive tests
+4. ✅ Implement PhysicsStrategy interface in collision strategies
+5. ⬜ Add comprehensive tests
 
-## Implementation Progress (2025-09-01 13:12:23 IST)
+## Implementation Progress (2025-09-01 18:41:54 IST)
 - **InterparticleCollisionStrategy**: Refactored to use coordinate system transformations
 - **Type System**: Added Vector/Velocity interfaces for better type safety
 - **Strategy Integration**: Updated all physics strategies to use coordinate system abstractions
 - **Boundary Conditions**: Unified coordinate transformations across strategies
+- **PhysicsStrategy Interface**: Updated InterparticleCollisionStrategy and InterparticleCollisionStrategy1D to implement PhysicsStrategy interface
+- **Method Separation**: Added preUpdate() and integrate() methods to separate collision detection from position integration
+- **Trajectory Recording**: Added proper trajectory point recording with simTime() timestamps
 
 ## Test Plan
 - Boundary condition verification

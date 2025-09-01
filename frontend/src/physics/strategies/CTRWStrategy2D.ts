@@ -1,13 +1,15 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { IGraph } from '@spin-network/graph-core';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
+import type { PhysicsContext } from '../types/PhysicsContext';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
 import { simTime, simDt } from '../core/GlobalTime';
 
-export class CTRWStrategy2D implements RandomWalkStrategy {
+export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
   private collisionRate: number;
   private jumpLength: number;
   private velocity: number;
@@ -41,6 +43,35 @@ export class CTRWStrategy2D implements RandomWalkStrategy {
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
     this.updateParticleWithDt(particle, allParticles, simDt());
+  }
+
+  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
+    const collision = this.handleCollision(particle);
+    
+    if (collision.occurred && collision.newVelocity) {
+      particle.velocity = collision.newVelocity;
+      particle.lastCollisionTime = collision.timestamp;
+      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
+      particle.collisionCount++;
+    }
+  }
+
+  integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    particle.position.x += velocity.x * dt;
+    particle.position.y += velocity.y * dt;
+
+    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    particle.position = newPosition;
+    if (newVelocity) {
+      particle.velocity = newVelocity;
+    }
+    
+    // Record trajectory point (CircularBuffer auto-manages capacity)
+    particle.trajectory.push({
+      position: { ...particle.position },
+      timestamp: simTime()
+    });
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {

@@ -1,10 +1,10 @@
 import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
 import { ParticleManager } from './ParticleManager';
 import { ObservableManager } from './ObservableManager';
 import type { Observable } from './interfaces/Observable';
 import { USE_NEW_ENGINE } from './config/flags';
 import { PhysicsEngine } from './core/PhysicsEngine';
-import { LegacyStrategyAdapter } from './adapters/LegacyStrategyAdapter';
 import { CoordinateSystem } from './core/CoordinateSystem';
 import { getDensityProfile1D as densityProfile1DUtil, getDensityProfile2D as densityProfile2DUtil, getDensityField1D as densityField1DUtil } from './utils/density';
 import { generateThermalVelocities as genThermalUtil } from './utils/ThermalVelocities';
@@ -12,9 +12,10 @@ import { sampleCanvasPosition as samplePosUtil } from './utils/InitDistributions
 import { analyzeWaveFrontSpeed as analyzeWavefrontSpeedUtil } from './analysis/WavefrontAnalysis';
 import type { SimulatorParams } from './core/ParameterManager';
 import { ParameterManager } from './core/ParameterManager';
-import { createStrategies } from './factories/StrategyFactory';
-import { LegacySimulationRunner, NewEngineSimulationRunner } from './core/SimulationRunner';
+import { createStrategies, createPhysicsStrategies } from './factories/StrategyFactory';
+import { LegacySimulationRunner, EngineSimulationRunner } from './core/SimulationRunner';
 import type { SimulationRunner } from './core/SimulationRunner';
+import { CompositeStrategy } from './strategies/CompositeStrategy';
 
 export class RandomWalkSimulator {
   private particleManager!: ParticleManager;
@@ -44,7 +45,16 @@ export class RandomWalkSimulator {
   private setupStrategies(): void {
     const boundaryConfig = this.parameterManager.getBoundaryConfig();
     this.strategies = createStrategies(this.parameterManager, boundaryConfig);
-    this.currentStrategy = this.strategies[0];
+    // If multiple strategies are returned, wrap them into a CompositeStrategy so the
+    // ParticleManager and PhysicsEngine receive a single strategy that orchestrates them.
+    this.currentStrategy = this.strategies.length > 1
+      ? new CompositeStrategy(this.strategies)
+      : this.strategies[0];
+    console.log('[RWS] Strategy initialized:', {
+      strategyCount: this.strategies.length,
+      currentStrategy: this.currentStrategy.constructor.name,
+      isComposite: this.currentStrategy instanceof CompositeStrategy
+    });
   }
 
   private setupParticleManager(): void {
@@ -61,19 +71,18 @@ export class RandomWalkSimulator {
     console.log('[RWS] setupSimulationRunner', { useNewEngine: this.useNewEngine });
     if (this.useNewEngine) {
       try {
-        const adapter = new LegacyStrategyAdapter(
-          this.currentStrategy,
-          () => this.particleManager.getAllParticles()
-        );
+        // Get physics strategies directly instead of using adapter
+        const physicsStrategies = createPhysicsStrategies(this.parameterManager, this.parameterManager.getBoundaryConfig());
+        
         this.physicsEngine = new PhysicsEngine({
           timeStep: this.parameterManager.dt,
           boundaries: this.parameterManager.getBoundaryConfig(),
           canvasSize: { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
           dimension: this.parameterManager.dimension,
-          strategies: [adapter],
+          strategies: physicsStrategies,
         });
-        this.simulationRunner = new NewEngineSimulationRunner(this.physicsEngine, this.particleManager);
-        console.log('[RWS] Using NewEngineSimulationRunner');
+        this.simulationRunner = new EngineSimulationRunner(this.physicsEngine, this.particleManager);
+        console.log('[RWS] Using EngineSimulationRunner with direct PhysicsStrategies');
       } catch (e) {
         console.warn('[RandomWalkSimulator] Failed to initialize PhysicsEngine (fallback to legacy path):', e);
         this.physicsEngine = undefined;
@@ -162,6 +171,14 @@ export class RandomWalkSimulator {
     if (needsStrategyUpdate) {
       this.setupStrategies();
       this.particleManager.updatePhysicsEngine(this.currentStrategy);
+
+      // New engine path: also refresh engine strategies so runtime toggles take effect
+      if (this.useNewEngine && this.physicsEngine) {
+        // Get physics strategies directly instead of using adapter
+        const physicsStrategies = createPhysicsStrategies(this.parameterManager, this.parameterManager.getBoundaryConfig());
+        this.physicsEngine.updateConfiguration({ strategies: physicsStrategies });
+        console.log('[RWS] PhysicsEngine strategies refreshed with direct PhysicsStrategies');
+      }
     }
     
     this.particleManager.setCanvasSize(this.parameterManager.canvasWidth, this.parameterManager.canvasHeight);

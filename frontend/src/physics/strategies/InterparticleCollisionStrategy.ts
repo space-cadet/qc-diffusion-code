@@ -1,11 +1,13 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle, Vector, Velocity } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
+import type { PhysicsContext } from '../types/PhysicsContext';
 import { simTime } from '../core/GlobalTime';
 
-export class InterparticleCollisionStrategy implements RandomWalkStrategy {
+export class InterparticleCollisionStrategy implements RandomWalkStrategy, PhysicsStrategy {
   private boundaryConfig: BoundaryConfig;
   private coordSystem: CoordinateSystem;
 
@@ -44,6 +46,16 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy {
         }
       }
     }
+  }
+
+  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
+    // Handle inter-particle collisions in the preUpdate phase
+    this.handleInterparticleCollisions(particle, allParticles);
+  }
+
+  integrate(particle: Particle, _dt: number, _context: PhysicsContext): void {
+    // No position integration in this strategy, only collision handling
+    // Position integration is handled by other strategies
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {

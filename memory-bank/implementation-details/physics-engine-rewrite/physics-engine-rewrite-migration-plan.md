@@ -1,7 +1,7 @@
 # Physics Engine Migration Plan (Stepwise)
 
 Created: 2025-08-28 19:00:55 IST
-Last Updated: 2025-08-31 19:10:02 IST
+Last Updated: 2025-09-01 18:41:54 IST
 
 This file tracks the concrete migration steps from the current composite strategy loop to the two-phase PhysicsEngine architecture. Source references: `physics-engine-rewrite-final.md`, `physics-engine-rewrite-claude4.md`, `physics-engine-rewrite-deepseek.md`.
 
@@ -179,10 +179,15 @@ This file tracks the concrete migration steps from the current composite strateg
 - [ ] Add validation for complex strategy combinations
 - [ ] Update all integration tests for new architecture
 
-### Recent Updates (2025-09-01 13:12:23 IST)
+### Recent Updates (2025-09-01 18:41:54 IST)
 - **Coordinate System Integration**: Completed centralization of coordinate transformations across all physics strategies
 - **InterparticleCollisionStrategy**: Refactored to use Vector/Velocity types with coordinate system methods
 - **Type Safety**: Added Vector and Velocity interfaces to Particle.ts for consistent type handling
 - **Strategy Factory**: Updated to support coordinate system integration patterns
+- **PhysicsStrategy Interface Implementation**: Updated InterparticleCollisionStrategy and InterparticleCollisionStrategy1D to implement PhysicsStrategy interface
+- **Method Separation**: Added preUpdate() and integrate() methods to separate collision detection from position integration phases
+- **Boundary Condition Application**: Implemented proper boundary condition enforcement in integrate() method using coordinate system
+- **Trajectory Recording**: Added trajectory point recording with proper simTime() timestamps
+- **Debug Cleanup**: Removed verbose console logs from density visualization utilities for improved performance
 
 This plan is intentionally incremental to keep PRs small, reviewable, and reversible.

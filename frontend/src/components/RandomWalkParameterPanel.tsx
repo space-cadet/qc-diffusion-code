@@ -51,7 +51,10 @@ export const RandomWalkParameterPanel = ({
       {/* Simulation Controls - Moved to top */}
       <div className="mb-6 space-y-3">
         <button
-          onClick={handleInitialize}
+          onClick={() => {
+            console.log('[INITIALIZE] Strategies:', gridLayoutParams.strategies);
+            handleInitialize();
+          }}
           className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -433,10 +436,12 @@ export const RandomWalkParameterPanel = ({
                     const newStrategies = e.target.checked
                       ? [...strategies.filter(s => s !== "ctrw"), "ctrw" as const]
                       : strategies.filter(s => s !== "ctrw");
+                    console.log('[STRATEGY] CTRW:', newStrategies);
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
                   }}
                   className="mr-2"
                 />
@@ -451,10 +456,12 @@ export const RandomWalkParameterPanel = ({
                     const newStrategies = e.target.checked
                       ? [...strategies.filter(s => s !== "collisions"), "collisions" as const]
                       : strategies.filter(s => s !== "collisions");
+                    console.log('[STRATEGY] COLLISIONS:', newStrategies);
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
                   }}
                   className="mr-2"
                 />
@@ -469,10 +476,12 @@ export const RandomWalkParameterPanel = ({
                     const newStrategies = e.target.checked
                       ? [...strategies.filter(s => s !== "simple"), "simple" as const]
                       : strategies.filter(s => s !== "simple");
+                    console.log('[STRATEGY] SIMPLE:', newStrategies);
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
                   }}
                   className="mr-2"
                 />
@@ -487,10 +496,12 @@ export const RandomWalkParameterPanel = ({
                     const newStrategies = e.target.checked
                       ? [...strategies.filter(s => s !== "levy"), "levy" as const]
                       : strategies.filter(s => s !== "levy");
+                    console.log('[STRATEGY] LEVY:', newStrategies);
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
                   }}
                   className="mr-2"
                 />
@@ -505,10 +516,12 @@ export const RandomWalkParameterPanel = ({
                     const newStrategies = e.target.checked
                       ? [...strategies.filter(s => s !== "fractional"), "fractional" as const]
                       : strategies.filter(s => s !== "fractional");
+                    console.log('[STRATEGY] FRACTIONAL:', newStrategies);
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
                   }}
                   className="mr-2"
                 />
@@ -710,7 +723,10 @@ export const RandomWalkParameterPanel = ({
                 <LogNumberSlider
                   label="Particles"
                   value={gridLayoutParams.particles}
-                  onChange={(v) => setGridLayoutParams({ ...gridLayoutParams, particles: v })}
+                  onChange={(v) => {
+                    console.log('[PARTICLES] Changed to:', v);
+                    setGridLayoutParams({ ...gridLayoutParams, particles: v })
+                  }}
                   min={minP}
                   max={maxP}
                   logScale={randomWalkUIState.particlesLogScale}

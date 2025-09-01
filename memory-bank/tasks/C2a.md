@@ -1,6 +1,6 @@
 # C2a: PDE Solver Methods and Boundary Conditions
 *Created: 2025-08-25 12:49:41 IST*
-*Last Updated: 2025-09-01 13:12:23 IST*
+*Last Updated: 2025-09-01 18:41:54 IST*
 
 **Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements for WebGL PDE simulation
 **Status**: 🔄 IN PROGRESS **Priority**: HIGH
@@ -89,6 +89,13 @@ Completed comprehensive comparison of four BC implementation approaches:
 - **Type System Improvements**: Added Vector/Velocity interfaces for better type safety
 - **Strategy Pattern**: Updated StrategyFactory and physics engine to use coordinate system abstractions
 - **Boundary Condition Integration**: Unified coordinate transformations across all physics strategies
+
+**Physics Strategy Implementation (2025-09-01 18:41:54 IST):**
+- **Interface Implementation**: Updated InterparticleCollisionStrategy and InterparticleCollisionStrategy1D to implement PhysicsStrategy interface
+- **Method Separation**: Added preUpdate() and integrate() methods to separate collision detection from position integration
+- **Boundary Handling**: Implemented proper boundary condition application in integrate() method
+- **Trajectory Recording**: Added trajectory point recording with proper timestamp from simTime()
+- **Debug Cleanup**: Removed verbose console logs from density visualization code
 
 **Next Steps:**
 Implement boundary condition UI selection system and add support for additional BC types (Periodic, Absorbing).

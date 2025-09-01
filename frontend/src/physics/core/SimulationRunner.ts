@@ -21,7 +21,7 @@ export class LegacySimulationRunner implements SimulationRunner {
   }
 }
 
-export class NewEngineSimulationRunner implements SimulationRunner {
+export class EngineSimulationRunner implements SimulationRunner {
   #physicsEngine: PhysicsEngine;
   #particleManager: ParticleManager;
   
@@ -31,13 +31,14 @@ export class NewEngineSimulationRunner implements SimulationRunner {
   }
 
   step(dt: number): number {
-    // console.log('[NESR] step called', { dt, hasPhysicsEngine: !!this.#physicsEngine, hasParticleManager: !!this.#particleManager });
+    // console.log('[ESR] step called', { dt, hasPhysicsEngine: !!this.#physicsEngine, hasParticleManager: !!this.#particleManager });
     const particles = this.#particleManager.getAllParticles();
     const physicsTimeStep = this.#physicsEngine.step(particles);
     
-    // Also update particles through ParticleManager for consistency with LegacySimulationRunner
-    this.#particleManager.update(dt);
-    // console.log('[NESR] step completed', { physicsTimeStep });
+    // No need to call particleManager.update() as particles are already updated by the PhysicsEngine
+    // through the PhysicsStrategy implementations
+    
+    // console.log('[ESR] step completed', { physicsTimeStep });
     return physicsTimeStep;
   }
 }

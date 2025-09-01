@@ -1,4 +1,5 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
@@ -6,7 +7,7 @@ import type { Step } from '../types/CollisionEvent';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
 import { simDt, simTime } from '../core/GlobalTime';
 
-export class BallisticStrategy implements RandomWalkStrategy {
+export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
   private boundaryConfig: BoundaryConfig = {
     type: 'reflective',
     xMin: -Infinity,
@@ -22,6 +23,14 @@ export class BallisticStrategy implements RandomWalkStrategy {
         ...config.boundaryConfig
       };
     }
+  }
+
+  preUpdate(_particle: Particle, _allParticles: Particle[], _context: PhysicsContext): void {
+    // no-op: ballistic has no Phase A behavior
+  }
+
+  integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
+    this.updateParticleWithDt(particle, [], dt);
   }
 
   updateParticle(particle: Particle, allParticles?: Particle[]): void {

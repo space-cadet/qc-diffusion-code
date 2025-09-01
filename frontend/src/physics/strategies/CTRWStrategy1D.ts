@@ -1,13 +1,15 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
+import type { PhysicsContext } from '../types/PhysicsContext';
 import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
 import { simTime, simDt } from '../core/GlobalTime';
 import { CoordinateSystem as CoordSystem } from '../core/CoordinateSystem';
 
-export class CTRWStrategy1D implements RandomWalkStrategy {
+export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
   private collisionRate: number;
   private jumpLength: number;
   private velocity: number;
@@ -46,6 +48,46 @@ export class CTRWStrategy1D implements RandomWalkStrategy {
 
   updateParticle(particle: Particle, allParticles: Particle[]): void {
     this.updateParticleWithDt(particle, allParticles, simDt());
+  }
+
+  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
+    if (this.interparticleCollisions) {
+      this.handleInterparticleCollisions(particle, allParticles);
+    }
+
+    const collision = this.handleCollision(particle);
+    
+    if (collision.occurred && collision.newVelocity) {
+      particle.velocity = collision.newVelocity;
+      particle.lastCollisionTime = collision.timestamp;
+      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
+      particle.collisionCount++;
+    }
+
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    velocity.x = this.calculateNewVelocity(velocity.x);
+    particle.velocity = this.coordSystem.toVelocity(velocity);
+  }
+
+  integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    particle.position.x += velocity.x * dt;
+    
+    // Apply boundary conditions
+    const boundaryResult = this.applyBoundaryCondition(particle);
+    particle.position = boundaryResult.position;
+    if (boundaryResult.velocity) {
+      particle.velocity = boundaryResult.velocity;
+    }
+    if (boundaryResult.absorbed) {
+      particle.isActive = false;
+    }
+    
+    // Record trajectory point for every update
+    particle.trajectory.push({
+      position: { ...particle.position },
+      timestamp: simTime()
+    });
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {

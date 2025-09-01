@@ -29,13 +29,13 @@ export const useDensityVisualization = (
 
   const drawDensityHeatmap = useCallback((data: DensityData2D) => {
     const canvas = canvasRef.current;
-    console.log('[drawDensityHeatmap] Starting render:', {
-      canvasExists: !!canvas,
-      canvasWidth: canvas?.width,
-      canvasHeight: canvas?.height,
-      densityRows: data.density.length,
-      densityCols: data.density[0]?.length || 0
-    });
+    // console.log('[drawDensityHeatmap] Starting render:', {
+    //   canvasExists: !!canvas,
+    //   canvasWidth: canvas?.width,
+    //   canvasHeight: canvas?.height,
+    //   densityRows: data.density.length,
+    //   densityCols: data.density[0]?.length || 0
+    // });
 
     if (!canvas) {
       console.error('[drawDensityHeatmap] Canvas ref is null');
@@ -62,22 +62,22 @@ export const useDensityVisualization = (
     const xScale = canvas.width / density[0].length;
     const yScale = canvas.height / density.length;
 
-    console.log('[drawDensityHeatmap] Scaling calculated:', {
-      xScale, yScale,
-      canvasSize: { width: canvas.width, height: canvas.height },
-      densitySize: { rows: density.length, cols: density[0].length }
-    });
+    // console.log('[drawDensityHeatmap] Scaling calculated:', {
+    //   xScale, yScale,
+    //   canvasSize: { width: canvas.width, height: canvas.height },
+    //   densitySize: { rows: density.length, cols: density[0].length }
+    // });
 
     // Find max density for normalization
     const flatDensity = density.flat() as number[];
     const maxDensity = flatDensity.reduce((max, val) => Math.max(max, val), 0);
     
-    console.log('[drawDensityHeatmap] Density stats:', {
-      maxDensity,
-      minDensity: Math.min(...flatDensity),
-      totalValues: flatDensity.length,
-      zeroValues: flatDensity.filter(v => v === 0).length
-    });
+    // console.log('[drawDensityHeatmap] Density stats:', {
+    //   maxDensity,
+    //   minDensity: Math.min(...flatDensity),
+    //   totalValues: flatDensity.length,
+    //   zeroValues: flatDensity.filter(v => v === 0).length
+    // });
     
     if (maxDensity === 0) {
       console.warn('[drawDensityHeatmap] All density values are 0, skipping render');
@@ -102,7 +102,7 @@ export const useDensityVisualization = (
       }
     }
 
-    console.log('[drawDensityHeatmap] Heatmap rendering complete');
+    // console.log('[drawDensityHeatmap] Heatmap rendering complete');
 
     // Draw grid lines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';

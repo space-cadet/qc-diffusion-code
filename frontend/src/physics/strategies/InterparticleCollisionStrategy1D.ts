@@ -1,10 +1,12 @@
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import type { PhysicsContext } from '../types/PhysicsContext';
 import { simTime } from '../core/GlobalTime';
 
-export class InterparticleCollisionStrategy1D implements RandomWalkStrategy {
+export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
   private boundaryConfig: BoundaryConfig;
 
   constructor(params: { boundaryConfig?: BoundaryConfig } = {}) {
@@ -18,6 +20,20 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
+    this.handleCollisions(particle, allParticles);
+  }
+
+  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
+    // Handle inter-particle collisions in the preUpdate phase
+    this.handleCollisions(particle, allParticles);
+  }
+
+  integrate(_particle: Particle, _dt: number, _context: PhysicsContext): void {
+    // No position integration in this strategy, only collision handling
+    // Position integration is handled by other strategies
+  }
+  
+  private handleCollisions(particle: Particle, allParticles: Particle[] = []): void {
     // Simple 1D elastic collisions: swap vx when overlapping
     // Ensure each pair is processed only once per frame using numeric id ordering
     const toNum = (id: string | number): number =>

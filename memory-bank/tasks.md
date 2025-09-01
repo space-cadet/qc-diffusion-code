@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-01 15:04:07 IST_
+_Last Updated: 2025-09-01 18:41:54 IST_
 
 ## Active Tasks
 
@@ -68,9 +68,9 @@ _Last Updated: 2025-09-01 15:04:07 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-08-25 03:08:37 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulationTypes.ts`
-**Notes**: Component refactoring completed - separated PDE and Random Walk parameter panels, consolidated type definitions into RandomWalkParams, enhanced solver support
+**Status**: ✅ COMPLETED **Last**: 2025-09-01 18:41:54 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulationTypes.ts`, `frontend/src/physics/utils/density.ts`, `frontend/src/physics/RandomWalkSimulator.ts`
+**Notes**: Physics strategy implementations updated with PhysicsStrategy interface. Added method separation with preUpdate() and integrate() phases. Fixed method naming in RandomWalkSimulator (evgetObservableData to getObservableData). Removed verbose console logs from density visualization code.
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
@@ -122,9 +122,9 @@ _Last Updated: 2025-09-01 15:04:07 IST_
 
 ### C2a: PDE Solver Methods and Boundary Conditions
 **Description**: Implement multiple PDE solver methods (Crank-Nicolson, RK4, Lax-Wendroff) with boundary condition system and stability improvements for WebGL PDE simulation
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 11:53:16 IST
-**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/webgl-solver.d.ts`, `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/hooks/useWebGLSolver.ts`, `frontend/src/stores/appStore.ts`
-**Notes**: Dirichlet boundary conditions implemented with solver-agnostic post-processing approach. Forward Euler solver fixed for proper rendering with Dirichlet BCs. Enhanced plot legend with solver and parameter information.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 18:41:54 IST
+**Files**: `frontend/src/webgl/webgl-solver.js`, `frontend/src/webgl/webgl-solver.d.ts`, `frontend/src/webgl/solvers/BaseSolver.ts`, `frontend/src/webgl/solvers/ForwardEulerSolver.ts`, `frontend/src/hooks/useWebGLSolver.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts`
+**Notes**: Physics strategy implementations updated to use coordinate system transformations and implement PhysicsStrategy interface. Added preUpdate() and integrate() methods to separate collision detection from position integration. Implemented proper boundary condition application in integrate() method.
 
 ### C2b: PDE UI Implementation
 **Description**: Enhance PDE parameter panel with advanced solver controls, boundary condition selection, and per-equation solver UI for comprehensive PDE simulation interface
