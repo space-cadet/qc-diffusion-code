@@ -1,15 +1,15 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-02 01:13:01 IST*
+*Updated: 2025-09-02 16:57:02 IST*
 
 ## Executive Summary
 
-This document outlines a phased redesign of the observables system to achieve full transparency, modularity, and real-time visualization capabilities. The implementation follows an incremental approach starting with Phase 0 (middle-path enhancements) to provide immediate benefits while building foundation for the complete query-based system.
+This document outlines a phased redesign of the observables system to achieve full transparency, modularity, and real-time visualization capabilities.
 
-**PHASE 0 COMPLETED**: Text-based observable system with per-observable polling intervals successfully implemented in single session (2025-09-02).
-
-**SYSTEM FIXES COMPLETED**: Critical bug fixes for data shape mismatch, MSD initialization, and infinite re-render issues resolved (2025-09-02 01:13:01 IST).
+**Key Features Implemented**:
+- Text-based observable system with per-observable polling intervals
+- Floating panel architecture with custom observables separation
 
 ## Current System Issues
 
@@ -193,190 +193,20 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 };
 ```
 
+## Implementation Status
+
+**Current Status**: Fully functional with all critical features implemented
+
+**Key Milestones**:
+- Phase 0 (Text-based system): Completed 2025-09-02
+- UI Architecture (Floating panels): Completed 2025-09-02
+
 ## Implementation Plan
 
 ### Phase 0: Text-Based Observable System (COMPLETED 2025-09-02)
 
 **Objective**: Replace hardcoded observable polling with unified text-based system
 **Strategy**: Configuration-driven observables + per-observable polling intervals + generic UI rendering
-
-**COMPLETED SESSION: 2025-09-02 00:16:10 IST**
-
-#### Implementation Summary
-
-**Files Created**:
-- `observablesConfig.ts` (73 lines) - Configuration-driven observable definitions with polling intervals
-- `useObservablesPolling.ts` (117 lines) - Unified polling hook with configurable intervals per observable
-
-**Files Modified**:
-- `ObservablesPanel.tsx` (262 lines, -251 lines) - Complete refactor using text-based system with generic renderer
-
-#### Key Achievements
-
-1. **Unified Polling Architecture**
-   - Single polling system replaces 4 separate useEffect hooks
-   - Eliminated 8+ individual state variables for observable data
-   - 50ms polling resolution with per-observable interval checking
-   - Configurable intervals: momentum (50ms), kinetic energy (100ms), particle count (200ms), MSD (500ms)
-
-2. **Text-Based Observable Integration**
-   - Built-in observables now use same text definition system as custom observables
-   - Consistent observable registration through TextObservable system
-   - Fixed ID mapping issue between registration (`text_particleCount`) and retrieval (`particleCount`)
-
-3. **Generic UI Rendering**
-   - ObservableDisplay component handles any observable type through configuration
-   - Field definitions specify formatting, precision, and color coding
-   - Eliminated repetitive JSX patterns across observable types
-
-4. **Performance Optimizations**
-   - Reduced ObservablesPanel from 513 to 262 lines (~49% reduction)
-   - Eliminated redundant polling logic and state management
-   - Improved memory management with unified data flow
-
-#### Technical Implementation
-
-**Configuration Structure**:
-```typescript
-interface ObservableConfig {
-  id: string;
-  name: string;
-  text: string;
-  pollingInterval: number;
-  fields: ObservableField[];
-}
-```
-
-**Polling System**:
-- 50ms resolution timer checks each observable's individual interval
-- State management through useRef for polling coordination
-- Automatic cleanup and registration lifecycle management
-
-**Results Achieved**:
-- ✅ Console errors about unregistered observers resolved
-- ✅ Observables display actual data instead of "No data"
-- ✅ Different polling frequencies working correctly per observable type
-- ✅ Text-based observables properly integrated with built-in observables
-- ✅ Maintained full backward compatibility with existing UI state management
-
-#### Architecture Benefits
-
-1. **Maintainability**: Single source of truth for observable configuration
-2. **Extensibility**: New observables added through configuration, not code changes
-3. **Performance**: Optimized polling prevents unnecessary updates
-4. **Consistency**: Unified system for both built-in and custom observables
-5. **Debugging**: Clear separation between configuration, polling, and rendering
-
-This implementation provides the foundation for Phase 1 query system development while delivering immediate benefits in code maintainability and system performance.
-
-#### Core Components
-
-**1. Observable Registry System** (`ObservableRegistry.ts`, ~200 lines)
-- Central registry for all observable types
-- Dynamic loading based on configuration
-- Plugin-style architecture for easy extension
-- Dependency management between observables
-
-```typescript
-interface ObservableConfig {
-  id: string;
-  type: 'builtin' | 'template' | 'composite';
-  enabled: boolean;
-  config?: any;
-  dependencies?: string[];
-}
-
-class ObservableRegistry {
-  register(config: ObservableConfig): void;
-  create(id: string): Observable;
-  getDependencies(id: string): string[];
-}
-```
-
-**2. Template Observable System** (`TemplateObservable.ts`, ~150 lines)
-- Generic observables for particle properties
-- Configurable aggregation functions
-- Common patterns: mean, sum, max, min, distribution
-
-```typescript
-interface TemplateConfig {
-  property: string; // 'velocity.magnitude', 'position.x', etc.
-  aggregation: 'mean' | 'sum' | 'max' | 'min' | 'count';
-  filter?: (particle: Particle) => boolean;
-}
-
-class TemplateObservable implements Observable {
-  constructor(private config: TemplateConfig) {}
-}
-```
-
-**3. Composite Observable System** (`CompositeObservable.ts`, ~120 lines)
-- Combines results from existing observables
-- Simple expression evaluation for basic math
-- Dependencies automatically managed
-
-```typescript
-interface CompositeConfig {
-  formula: string; // 'kineticEnergy.total / particleCount.active'
-  dependencies: string[];
-}
-
-class CompositeObservable implements Observable {
-  constructor(private config: CompositeConfig) {}
-}
-```
-
-**4. Generic UI System** (`ObservablesPanel.tsx`, ~300 lines modified)
-- Remove hardcoded imports and state management
-- Generic rendering based on registry
-- Configuration-driven observable display
-- Backward compatibility with existing observables
-
-#### Implementation Files
-
-| File | Type | Lines | Description |
-|------|------|-------|-------------|
-| `Observable.ts` | MODIFY | ~50 | Add template/composite interfaces |
-| `TemplateObservable.ts` | NEW | ~150 | Generic particle property observables |
-| `CompositeObservable.ts` | NEW | ~120 | Observable combination system |
-| `ObservableRegistry.ts` | NEW | ~200 | Central plugin system |
-| `ObservableManager.ts` | MODIFY | ~100 | Registry integration |
-| `ObservablesPanel.tsx` | MODIFY | ~300 | Generic rendering |
-| `observableConfig.ts` | NEW | ~80 | Default configurations |
-| `appStore.ts` | MODIFY | ~50 | Generic state management |
-
-**IMPLEMENTATION COMPLETED**: 500 lines across 6 files
-
-#### Implemented Components
-1. **TextObservableParser.ts** (66 lines) - Parses text format to structured definitions
-2. **ExpressionEvaluator.ts** (58 lines) - Safe expression evaluation using expr-eval
-3. **TextObservable.ts** (80 lines) - Observable implementation using parsed definitions
-4. **ObservableManager.ts** (+35 lines) - Integration methods for text observables
-5. **appStore.ts** (+15 lines) - Zustand storage for custom observables
-6. **ObservablesPanel.tsx** (+60 lines) - UI for creating/managing custom observables
-
-#### Features Delivered
-- **Text Format Support**: Simple observable definition syntax with validation
-- **Safe Expression Evaluation**: expr-eval library prevents code injection
-- **Persistent Storage**: Zustand integration with localStorage persistence
-- **UI Integration**: Add/remove custom observables with error handling
-- **Backward Compatibility**: Existing observables continue working unchanged
-- **Foundation Ready**: Architecture ready for time-series visualization
-
-#### Text Format Example
-```
-observable "left_momentum" {
-  source: particles
-  filter: position.x < bounds.width/2
-  select: velocity.magnitude
-  reduce: sum
-}
-```
-
-#### Next Phase Requirements
-- Analysis page integration for time-series plotting
-- Real-time data collection and visualization
-- Multiple observable selection and plotting
 
 ### Phase 1: Core Query System (Week 1-2)
 1. Implement ParticleSelector and AggregationFunction interfaces
@@ -401,6 +231,14 @@ observable "left_momentum" {
 2. Implement observable composition (derived observables)
 3. Add export capabilities (CSV, JSON, PNG)
 4. Performance optimization and memory management
+
+## Success Criteria
+
+1. **Transparency**: Any particle property accessible via simple queries
+2. **Modularity**: New observables added without core system changes
+3. **Performance**: <50ms update latency for 1000 particles
+4. **Usability**: Intuitive UI for observable management
+5. **Reliability**: Stable operation in long simulations
 
 ## Technical Considerations
 
@@ -463,119 +301,67 @@ observable "left_momentum" {
 - **Maintainability**: Clear separation of concerns between data collection and visualization
 - **Extensibility**: Plugin-like architecture for custom observable definitions
 
-## Success Criteria
+## UI Architecture Enhancement (2025-09-02 16:57:02 IST)
 
-1. **Transparency**: Any particle property accessible via simple query interface
-2. **Modularity**: New observables added without modifying core system
-3. **Performance**: Real-time plotting with <50ms update latency for 1000 particles  
-4. **Usability**: Intuitive UI for observable selection and plot controls
-5. **Reliability**: Stable operation during long simulations without memory leaks
+### Floating Panel Abstraction and Observable Panel Separation
+**Objective**: Create reusable floating panel architecture and separate custom observables into dedicated panel
 
-## Final System Fixes (2025-09-02 01:13:01 IST)
+#### Key Achievements
 
-### Critical Bug Resolution Session
-**Files Modified**:
-- `frontend/src/components/ObservablesPanel.tsx` - Fixed data shape mismatch and infinite re-render loop
-- `frontend/src/components/useObservablesPolling.ts` - Updated ID resolution for concrete observables
+1. **Container Abstraction**
+   - FloatingPanel component extracts all react-rnd container logic
+   - Handles positioning, resizing, collapsing, z-index management
+   - Clean props interface for drag/resize/mouse event handling
+   - Configurable bounds, styling, and behavior
 
-### Issues Resolved
+2. **Panel Separation**
+   - Built-in observables remain in ObservablesPanel
+   - Custom observables moved to dedicated CustomObservablesPanel
+   - Clear separation of concerns between observable types
+   - Independent floating windows positioned to avoid overlap
 
-#### 1. Data Shape Mismatch (Root Cause)
-**Problem**: TextObservable.calculate() returned scalar values, but UI expected structured objects with fields like `totalKineticEnergy`, `timestamp`, etc.
-**Solution**: Replaced TextObservable registration with concrete observable classes:
-- ParticleCountObservable → returns {totalCount, activeCount, inactiveCount, timestamp}
-- KineticEnergyObservable → returns {totalKineticEnergy, averageKineticEnergy, maxKineticEnergy, minKineticEnergy, timestamp}
-- MomentumObservable → returns {totalMomentumX, totalMomentumY, totalMomentumMagnitude, timestamp}
-- MSDObservable → returns {meanSquaredDisplacement, rootMeanSquaredDisplacement, timestamp}
+3. **Enhanced Editing Capabilities**
+   - CustomObservablesPanel supports view/edit/remove for all saved observables
+   - Inline editing with validation and error handling
+   - Improved default template with proper syntax
+   - Help text with format guidance and available functions
 
-#### 2. MSD Zero Values (Initialization Reset)
-**Problem**: MSDObservable was being re-registered on every visibility change, resetting reference positions
-**Solution**: Made registration idempotent using `manager.hasObserver(id)` checks and tracking previous visibility state
+4. **Improved Architecture**
+   - FloatingPanel reusable across application for future panels
+   - Clean separation between container logic and content logic
+   - Enhanced state management with multiple window support
+   - Proper z-index ordering and window focus management
 
-#### 3. Infinite Re-render Loop (Dependency Array)
-**Problem**: `visibleObservables.join('|')` in useEffect dependency caused re-renders on every render cycle
-**Solution**: Memoized `visibleObservables` with specific dependencies using useMemo
+#### Technical Implementation
 
-#### 4. ID Resolution Mismatch
-**Problem**: Polling tried `text_${id}` but concrete observables register with exact IDs
-**Solution**: Updated polling to try exact ID first, fallback to `text_` prefixed ID for backward compatibility
+**Store Integration**:
+- Added `customObservablesWindow: WindowRect` for panel state
+- Added `customObservablesCollapsed: boolean` for collapse state
+- Added `updateCustomObservable(index, text)` method for editing
+- Enhanced persistence to include all floating panel states
 
-### Technical Implementation Details
+**Custom Observables Features**:
+- Text input area with improved default template
+- Saved observables list with name extraction
+- Individual edit/remove buttons for each observable
+- Inline editing mode with save/cancel functionality
+- Validation with user-friendly error messages
+- Help text with syntax guidance
 
-**Idempotent Registration Pattern**:
-```typescript
-const prevVisibleRef = useRef<Set<string>>(new Set());
-useEffect(() => {
-  const current = new Set(visibleObservables);
-  const prev = prevVisibleRef.current;
-  
-  // Register newly visible only
-  current.forEach(id => {
-    if (!prev.has(id) && !manager.hasObserver(id)) {
-      manager.register(new ConcreteObservable());
-    }
-  });
-  
-  // Unregister newly hidden only
-  prev.forEach(id => {
-    if (!current.has(id)) {
-      manager.unregister(id);
-    }
-  });
-  
-  prevVisibleRef.current = current;
-}, [simReady, visibleObservables]);
-```
+#### Results Achieved
+- Two independent floating panels: "Observables" (built-in) and "Custom Observables"
+- Custom observables have full edit/view/remove capabilities  
+- Reusable FloatingPanel component ready for future implementations
+- Clean code architecture with clear separation of concerns
+- Enhanced UX with non-overlapping panel positioning
+- Maintained backward compatibility with existing observable system
 
-**Memoized Dependencies**:
-```typescript
-const visibleObservables = useMemo(() => 
-  Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
-    switch (id) {
-      case 'particleCount': return randomWalkUIState.showParticleCount;
-      case 'kineticEnergy': return randomWalkUIState.showKineticEnergy;
-      case 'momentum': return randomWalkUIState.showTotalMomentum;
-      case 'msd': return randomWalkUIState.showMSD;
-      default: return false;
-    }
-  }), [
-    randomWalkUIState.showParticleCount,
-    randomWalkUIState.showKineticEnergy, 
-    randomWalkUIState.showTotalMomentum,
-    randomWalkUIState.showMSD
-  ]
-);
-```
+#### Architecture Benefits
 
-**Dual ID Resolution**:
-```typescript
-if (BUILT_IN_OBSERVABLES[observableId]) {
-  // Try exact ID first (concrete observables)
-  data = simulatorRef.current.getObservableData(observableId);
-  if (!data) {
-    // Fallback to text_ prefix for backward compatibility
-    data = simulatorRef.current.getObservableData(`text_${observableId}`);
-  }
-}
-```
-
-### Results Achieved
-- ✅ All observables display live updating structured data during simulation
-- ✅ MSD properly accumulates displacement from initial reference positions
-- ✅ No console errors or infinite re-render warnings
-- ✅ Smooth UI performance with proper memoization
-- ✅ Maintained backward compatibility with custom TextObservable system
-
-### System Status
-**Observable System**: ✅ **FULLY FUNCTIONAL**
-- Particle Count: Live updates with total/active/inactive counts
-- Kinetic Energy: Live updates with total/average/max/min values  
-- Momentum: Live updates with X/Y components and magnitude
-- MSD: Live updates with mean squared displacement and RMSD
-- Custom TextObservables: Preserved for user-defined observables
-
-This completes the observable system redesign with all critical functionality working correctly. The system now provides a solid foundation for future enhancements while maintaining full backward compatibility.
-
----
-
-This redesign transforms the observables system from a rigid, hardcoded approach to a flexible, transparent, and powerful analytics platform suitable for both interactive exploration and quantitative analysis.
+1. **Maintainability**: Single source of truth for observable configuration
+2. **Extensibility**: New observables added through configuration, not code changes
+3. **Performance**: Optimized polling prevents unnecessary updates
+4. **Consistency**: Unified system for both built-in and custom observables
+5. **Debugging**: Clear separation between configuration, polling, and rendering
+6. **Reusability**: FloatingPanel component can be used for any future floating UI elements
+7. **Scalability**: Easy to add more floating panels without code duplication

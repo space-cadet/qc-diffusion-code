@@ -4,6 +4,14 @@ _Created: 2025-08-20 08:31:32 IST_
 _Last Updated: 2025-09-02 01:16:23 IST_
 
 ### 2025-09-02
+-e 
+#### 16:57 - C7a: Floating Panel Architecture and Custom Observable Panel Separation COMPLETED
+- Created `frontend/src/components/common/FloatingPanel.tsx` - Reusable floating panel container with drag/resize/collapse functionality
+- Created `frontend/src/components/CustomObservablesPanel.tsx` - Dedicated custom observables panel with edit/view/remove capabilities
+- Modified `frontend/src/stores/appStore.ts` - Added customObservablesWindow state and updateCustomObservable method
+- Modified `frontend/src/RandomWalkSim.tsx` - Replaced Rnd wrapper with FloatingPanel, integrated CustomObservablesPanel
+- Modified `frontend/src/components/ObservablesPanel.tsx` - Removed custom observables section, reduced from 262 to 180 lines
+
 
 #### 01:16 - C7a: Observable System Critical Bug Fixes COMPLETED
 - Updated `frontend/src/components/ObservablesPanel.tsx` - Fixed data shape mismatch by replacing TextObservable registration with concrete observables (ParticleCountObservable, KineticEnergyObservable, MomentumObservable, MSDObservable), made registration idempotent to prevent MSD re-initialization, memoized visibleObservables with specific dependencies to eliminate infinite re-render loop

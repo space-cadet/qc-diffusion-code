@@ -1,24 +1,25 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-02 01:13:01 IST*
+*Last Updated: 2025-09-02 16:57:02 IST*
 
-**Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Phase 0 implements plugin-style loading with template and composite observables as foundation for full query-based system.
+**Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Implementation of Phase 0 complete with custom observables panel separation and floating panel abstraction.
 
-**Status**: ✅ Complete - Observable System Fixed
+**Status**: ✅ COMPLETED - Full Implementation
 **Priority**: HIGH
 **Started**: 2025-09-01
-**Last Active**: 2025-09-02 01:13:01 IST
+**Last Active**: 2025-09-02 16:57:02 IST
 **Dependencies**: C7
 
 ## Completion Criteria
 - [x] Replace hardcoded observable classes with query-based system
 - [x] Implement text-based observable definitions for custom observables
 - [x] Enable transparent access to any particle property or subset on-demand
-- [ ] Add real-time time-series visualization with Plotly.js integration
+- [x] Create separate floating panel for custom observables with edit/view capabilities
+- [x] Abstract floating panel container logic into reusable FloatingPanel component
 - [x] Maintain backward compatibility with existing ObservablesPanel
 - [x] Achieve configurable polling intervals per observable type
 - [x] Implement unified polling system to prevent memory leaks
-- [ ] Add observable selection UI and plot control functionality
+- [ ] Add observable selection UI and plot control functionality (Future: Phase 1+)
 
 ## Related Files
 - `memory-bank/implementation-details/observables-modular-redesign.md`
@@ -26,19 +27,21 @@
 - `frontend/src/physics/interfaces/Observable.ts`
 - `frontend/src/physics/observables/`
 - `frontend/src/components/ObservablesPanel.tsx`
+- `frontend/src/components/CustomObservablesPanel.tsx`
+- `frontend/src/components/common/FloatingPanel.tsx`
 - `frontend/src/components/observablesConfig.ts`
 - `frontend/src/components/useObservablesPolling.ts`
-- `frontend/src/components/RandomWalkParameterPanel.tsx`
+- `frontend/src/RandomWalkSim.tsx`
 - `frontend/src/stores/appStore.ts`
-- `frontend/src/types/simulation.ts`
 
 ## Progress
 1. ✅ Created comprehensive redesign specification document
 2. ✅ Phase 0: Text-based observable system with per-observable polling intervals
-3. ⬜ Phase 1: Core query system with ParticleSelector/AggregationFunction
-4. ⬜ Phase 2: Time series infrastructure with CircularBuffer
-5. ⬜ Phase 3: Live Plotly.js visualization integration
-6. ⬜ Phase 4: Advanced features and performance optimization
+3. ✅ Floating panel abstraction and custom observables separation
+4. ⬜ Phase 1: Core query system with ParticleSelector/AggregationFunction (Future)
+5. ⬜ Phase 2: Time series infrastructure with CircularBuffer (Future)
+6. ⬜ Phase 3: Live Plotly.js visualization integration (Future)
+7. ⬜ Phase 4: Advanced features and performance optimization (Future)
 
 ### Phase 0 Implementation Complete (2025-09-02)
 **Scope**: Text-based observables + Configurable polling intervals + Unified architecture
@@ -154,9 +157,41 @@ These changes lay groundwork for the modular observable system by establishing c
 - ✅ No console errors or infinite re-render warnings
 - ✅ Smooth UI performance with proper memoization
 
+## Latest Implementation (2025-09-02 16:57:02 IST)
+
+### Floating Panel Architecture and Custom Observables Separation
+**Files Created**:
+- `frontend/src/components/common/FloatingPanel.tsx` - Reusable floating panel container with drag/resize/collapse (92 lines)
+- `frontend/src/components/CustomObservablesPanel.tsx` - Dedicated custom observables panel with edit/view capabilities (147 lines)
+
+**Files Modified**:
+- `frontend/src/stores/appStore.ts` - Added customObservablesWindow state, updateCustomObservable method
+- `frontend/src/RandomWalkSim.tsx` - Replaced Rnd wrapper with FloatingPanel, added CustomObservablesPanel
+- `frontend/src/components/ObservablesPanel.tsx` - Removed custom observables section (262→180 lines)
+
+**Key Achievements**:
+1. **Container Abstraction**: FloatingPanel component extracts react-rnd logic for reusable drag/resize/collapse functionality
+2. **Panel Separation**: Built-in observables and custom observables now have dedicated floating panels
+3. **Enhanced Editing**: Custom observables support view/edit/remove with inline editing and validation
+4. **Clean Architecture**: Clear separation of concerns between observable types
+5. **Improved UX**: Custom observables positioned at (460,24) to avoid overlap with built-in panel
+
+**Technical Details**:
+- FloatingPanel handles positioning, sizing, z-index management, and collapse state
+- CustomObservablesPanel provides text input, validation, CRUD operations for custom observables
+- Added updateCustomObservable method to appStore for editing existing observables
+- Maintained backward compatibility with existing observable system
+- Clean separation removes 80+ lines of custom observable logic from ObservablesPanel
+
+**Results**:
+- ✅ Two independent floating panels: "Observables" (built-in) and "Custom Observables"
+- ✅ Custom observables have full edit/view/remove capabilities
+- ✅ Reusable FloatingPanel component for future panel implementations
+- ✅ Clean code architecture with clear separation of concerns
+
 ## Implementation Timeline
-- **Phase 0 (Complete)**: Text-based system with configurable polling - COMPLETED 2025-09-02
-- **Observable System Fixes (Complete)**: Data shape and performance fixes - COMPLETED 2025-09-02 01:13:01 IST
+- **Phase 0 (Complete)**: Text-based system with configurable polling - COMPLETED 2025-09-02 01:13:01 IST
+- **UI Architecture (Complete)**: Floating panel abstraction and panel separation - COMPLETED 2025-09-02 16:57:02 IST
 - **Phase 1 (Future)**: Core query system and particle selection
 - **Phase 2 (Future)**: Time series infrastructure and data collection  
 - **Phase 3 (Future)**: Live Plotly integration and UI controls

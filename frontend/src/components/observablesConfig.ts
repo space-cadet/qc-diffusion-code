@@ -34,9 +34,9 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     pollingInterval: 100, // Standard polling for energy values
     fields: [
       { label: 'Total KE', path: 'totalKineticEnergy', format: 'scientific', precision: 3 },
-      { label: 'Average KE', path: 'averageKineticEnergy', format: 'scientific', precision: 6 },
-      { label: 'Max KE', path: 'maxKineticEnergy', format: 'scientific', precision: 6, color: 'orange' },
-      { label: 'Min KE', path: 'minKineticEnergy', format: 'scientific', precision: 6, color: 'blue' },
+      { label: 'Average KE', path: 'averageKineticEnergy', format: 'scientific', precision: 3 },
+      { label: 'Max KE', path: 'maxKineticEnergy', format: 'scientific', precision: 3, color: 'orange' },
+      { label: 'Min KE', path: 'minKineticEnergy', format: 'scientific', precision: 3, color: 'blue' },
       { label: 'Active particles', path: 'activeParticleCount', format: 'number' },
       { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
     ]

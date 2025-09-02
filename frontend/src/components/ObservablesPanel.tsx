@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
-import { TextObservable } from "../physics/observables/TextObservable";
 import { ParticleCountObservable } from "../physics/observables/ParticleCountObservable";
 import { KineticEnergyObservable } from "../physics/observables/KineticEnergyObservable";
 import { MomentumObservable } from "../physics/observables/MomentumObservable";
 import { MSDObservable } from "../physics/observables/MSDObservable";
+import { TextObservable } from "../physics/observables/TextObservable";
 import { BUILT_IN_OBSERVABLES, type ObservableConfig, type ObservableField } from "./observablesConfig";
 import { useObservablesPolling } from "./useObservablesPolling";
 
@@ -77,16 +77,8 @@ function ObservableDisplay({
 export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, simReady }: ObservablesPanelProps) {
   const {
     randomWalkUIState,
-    setRandomWalkUIState,
-    customObservables,
-    addCustomObservable,
-    removeCustomObservable
+    setRandomWalkUIState
   } = useAppStore();
-
-  // Custom observable UI state
-  const [showCustomObservables, setShowCustomObservables] = useState(false);
-  const [newObservableText, setNewObservableText] = useState('');
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Determine which built-in observables are visible (memoized to prevent re-renders)
   const visibleObservables = useMemo(() => Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
@@ -194,28 +186,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     prevVisibleRef.current = current;
   }, [simReady, visibleObservables]);
 
-  // Load custom observables when simulator is ready
-  useEffect(() => {
-    if (simReady && simulatorRef.current && customObservables.length > 0) {
-      simulatorRef.current.getObservableManager().loadTextObservables(customObservables);
-    }
-  }, [simReady, customObservables]);
 
-  const handleAddCustomObservable = () => {
-    const validation = TextObservable.validate(newObservableText);
-    if (!validation.valid) {
-      setValidationErrors(validation.errors);
-      return;
-    }
-
-    addCustomObservable(newObservableText);
-    setNewObservableText('');
-    setValidationErrors([]);
-  };
-
-  const handleRemoveCustomObservable = (index: number) => {
-    removeCustomObservable(index);
-  };
 
   return (
     <div className="space-y-4">
@@ -229,65 +200,6 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
           onToggle={(visible) => toggleObservable(id, visible)}
         />
       ))}
-
-      {/* Custom Observables */}
-      <div className="border rounded-lg p-3">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium">Custom Observables</label>
-          <button
-            onClick={() => setShowCustomObservables(!showCustomObservables)}
-            className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
-          >
-            {showCustomObservables ? 'Hide' : 'Show'}
-          </button>
-        </div>
-
-        {showCustomObservables && (
-          <div className="space-y-3">
-            <div>
-              <textarea
-                value={newObservableText}
-                onChange={(e) => setNewObservableText(e.target.value)}
-                placeholder={`observable "my_observable" {\n  filter: speed > 2.0\n  select: velocity.magnitude\n  reduce: mean\n}`}
-                className="w-full text-xs font-mono border rounded p-2 h-20 resize-none"
-              />
-              {validationErrors.length > 0 && (
-                <div className="text-xs text-red-500 mt-1">
-                  {validationErrors.map((error, i) => (
-                    <div key={i}>{error}</div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={handleAddCustomObservable}
-              className="text-xs bg-green-500 text-white px-3 py-1 rounded"
-            >
-              Add Observable
-            </button>
-
-            {customObservables.length > 0 && (
-              <div className="space-y-2">
-                <div className="text-xs font-medium text-gray-600">Saved Observables:</div>
-                {customObservables.map((obs, index) => (
-                  <div key={index} className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
-                    <div className="font-mono text-gray-700 truncate flex-1 mr-2">
-                      {obs.split('\n')[0].replace(/observable\s+"([^"]+)".*/, '$1')}
-                    </div>
-                    <button
-                      onClick={() => handleRemoveCustomObservable(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

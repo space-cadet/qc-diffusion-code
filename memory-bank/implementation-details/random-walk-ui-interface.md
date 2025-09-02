@@ -1,11 +1,11 @@
 # Random Walk UI Interface Design
 
 *Created: 2025-08-21 07:03:35 IST*
-*Last Updated: 2025-08-31 22:41:47 IST*
+*Last Updated: 2025-09-02 16:57:02 IST*
 
 ## Overview
 
-This document defines the user interface design for the Random Walk simulation page, including layout, controls, history management, and data export functionality.
+This document defines the user interface design for the Random Walk simulation page, including layout, controls, history management, data export functionality, and floating panel architecture.
 
 ## Main Interface Layout
 
@@ -69,7 +69,7 @@ This document defines the user interface design for the Random Walk simulation p
 │                     │                                                       │
 │ Particles: [1000▼]  │              [Live particle dots]                    │
 │ λ: [▓▓▓▓░░░░░░] 2.5  │                                                       │
-│ a: [▓▓▓░░░░░░░] 0.1  │                                                       │
+│ a: [▓▓░░░░░░░] 0.1  │                                                       │
 │ v: [▓▓▓▓▓░░░░░] 1.0  │                                                       │
 │                     │                                                       │
 │ ┌─────────────────┐ │                                                       │
@@ -248,6 +248,28 @@ This document defines the user interface design for the Random Walk simulation p
 - **Data Decimation**: Reduce file size by sampling
 - **Compression**: Optional data compression
 
+## Implementation Phases
+
+### Completed
+- Basic layout and navigation integration
+- Core functionality (parameter controls, particle rendering)
+- Enhanced UX (state persistence, grid layout)
+- Dual mode visualization (continuum vs graph)
+- Performance optimizations (60fps target, CPU usage elimination)
+- Floating panel architecture
+
+### Current Focus
+- Physics integration (CTRW implementation)
+- Real-time density calculation
+- Telegraph equation comparison
+- Status display metrics
+
+### Future Work
+- History system with replay controls
+- Advanced export functionality
+- Compare mode features
+- Mobile responsiveness
+
 ## Integration Points
 
 ### Existing Components
@@ -284,244 +306,65 @@ This document defines the user interface design for the Random Walk simulation p
 - **Data Cleanup**: Automatic garbage collection
 - **Canvas Optimization**: Minimize redraw operations
 
-## Implementation Priority
-
-### Phase 1: Basic Layout ✅ COMPLETED (2025-08-21)
-1. ✅ Navigation tab integration
-2. ✅ Static parameter panel  
-3. ✅ Placeholder canvas
-4. ✅ Basic control buttons
-
-### Phase 2: Core Functionality ✅ COMPLETED (2025-08-21)
-1. ✅ Parameter sliders with validation
-2. ⬜ CTRW physics integration
-3. ⬜ Basic particle rendering
-4. ✅ Start/pause/reset controls
-
-### Phase 2.5: Enhanced UX ✅ COMPLETED (2025-08-21)
-1. ✅ Title-bar only dragging using draggableHandle=".drag-handle"
-2. ✅ State persistence integration with Zustand store
-3. ✅ Grid layout parameters persist across browser refresh
-4. ✅ Improved drag interaction preventing accidental panel movement
-
-### Phase 3: Dual Mode Visualization ✅ COMPLETED (2025-08-21)
-1. ✅ Simulation type selection (continuum vs graph)
-2. ✅ tsParticles integration for continuum mode
-3. ✅ Sigma.js integration for graph visualization
-4. ✅ Graph parameter controls (type, size, periodic boundaries)
-5. ✅ Graph-core package integration for arbitrary graphs
-6. ✅ Conditional rendering based on simulation type
-
-### Phase 4: Physics Integration (In Progress)
-1. 🔄 CTRW physics implementation
-2. ⬜ Real-time density calculation
-3. ⬜ Telegraph equation comparison
-4. ⬜ Status display with simulation metrics
-
-### Phase 5: History System
-1. Automatic state saving
-2. History panel interface
-3. Replay controls
-4. Basic export functionality
-
-### Phase 6: Advanced Features
-1. Compare mode
-2. Advanced export options
-3. Performance optimizations
-4. Mobile responsiveness
-
-## File Structure
-
-```
-frontend/src/
-├── pages/
-│   └── RandomWalkPage.tsx          # Main page component
-├── components/randomwalk/
-│   ├── ParameterPanel.tsx          # Physics parameter controls
-│   ├── ParticleCanvas.tsx          # Main particle visualization
-│   ├── DensityComparison.tsx       # Telegraph equation comparison
-│   ├── HistoryPanel.tsx            # Simulation history management
-│   ├── ExportPanel.tsx             # Data export interface
-│   └── ReplayControls.tsx          # VCR-style replay controls
-├── hooks/
-│   ├── useRandomWalk.ts            # Core simulation logic
-│   ├── useHistory.ts               # History management
-│   └── useExport.ts                # Data export functionality
-└── utils/randomwalk/
-    ├── ctrwPhysics.ts              # CTRW physics engine
-    ├── densityCalculator.ts        # Spatial binning and density
-    ├── historyManager.ts           # State persistence
-    └── dataExporter.ts             # Export format handlers
-```
-
-## Implementation Status (2025-08-21)
-
-### Completed Features
-- ✅ **react-grid-layout Framework**: 6-panel draggable/resizable layout
-- ✅ **Parameter Controls**: Functional sliders for collision rate, jump length, velocity
-- ✅ **Grid Layout Integration**: Third tab navigation in main app
-- ✅ **State Management**: Local simulation state with derived parameter calculations
-- ✅ **Title-bar Dragging**: Panels only draggable by title bars using draggableHandle
-- ✅ **State Persistence**: Grid layout parameters persist via Zustand store
-- ✅ **UI Polish**: Professional styling with proper visual feedback
-
-### Current Implementation
-The UI framework is complete with dual mode support for both continuum and graph-based simulations. All 6 panels are implemented with conditional rendering: tsParticles for continuum mode and Sigma.js for graph visualization. Graph-core package provides support for arbitrary graph structures (lattices, paths, complete graphs). State persistence handles all parameters including graph configurations.
-
-### Recent Enhancements (2025-08-21 Morning Session)
-- ✅ **Dual Mode Framework**: Seamless switching between continuum and graph simulations
-- ✅ **Graph Parameter Controls**: Type selection, sizing, periodic boundaries, edge weights
-- ✅ **Professional Graph Visualization**: Sigma.js with proper node positioning and layouts
-- ✅ **Arbitrary Graph Support**: Integration with @spin-network/graph-core package
-- ✅ **Physics Framework Ready**: PhysicsRandomWalk class supports both simulation modes
-
-### Component Refactoring (2025-08-21 Evening Session)
-- ✅ **Component Extraction**: Separated ParticleCanvas, ParameterPanel, and other UI components
-- ✅ **Code Organization**: Reduced main file size by 20% through proper separation of concerns
-- ✅ **TypeScript Improvements**: Better interface definitions and type safety
-- ✅ **Animation Issues Resolved**: Fixed particle position preservation during animation toggle
-
-### Major Update (2025-08-23)
-- ✅ **Grid Layout Persistence**: Claude implemented React Grid Layout panel positions/sizes persisting between page reloads via Zustand store integration
-- ✅ **Distribution Controls System**: GPT5 implemented comprehensive particle distribution system with 5 types:
-  - **Uniform**: Random distribution across canvas
-  - **Gaussian**: Box-Muller transform with configurable σx, σy parameters
-  - **Ring/Annulus**: Polar coordinates with r0 ± dr radius control
-  - **Vertical Stripe**: Centered stripe with configurable thickness
-  - **Grid**: Regular grid with jitter for natural variation
-- ✅ **Conditional UI**: GPT5 added distribution controls that only appear in continuum mode
-- ✅ **Coordinate System Fix**: GPT5 corrected coordinate mapping preventing density clustering at corners
-- ✅ **Visualization Synchronization**: Claude 3.5 ensured initial particle view matches selected distribution pattern immediately
-
-### Current Status (2025-08-24)
-UI implementation completed with comprehensive performance optimization:
-1. ✅ **Persistent Settings**: Observable panel states, density auto-update, and all checkbox states persist across sessions
-2. ✅ **Panel Collapsing**: Fixed observables panel to properly collapse to header-only instead of maintaining full height
-3. ✅ **Scrolling Support**: Added vertical scrolling to observables panel for future observable additions
-4. ✅ **Performance Optimization**: Resolved 60fps ParticleCanvas re-rendering issue through React.memo() and animation loop decoupling
-5. ✅ **State Management**: Decoupled physics updates from React state updates using refs and periodic sync intervals
-6. ✅ **CPU Usage Elimination**: Completely eliminated high CPU usage when simulation paused/stopped
-
-### Performance Enhancements (2025-08-24 by GPT5)
-- **Animation Loop Optimization**: Removed updateSimulationMetrics from frame-by-frame animation loop
-- **React Re-render Prevention**: Applied React.memo() to ParticleCanvas component
-- **Memoized State Objects**: Used useMemo() for simulationState to prevent object recreation
-- **Ref-based Tracking**: Moved time/collision counters to refs, sync to state every 1 second
-- **Selective Updates**: Metrics only update on pause/resume/reset events, not every frame
-
-### CPU Usage Elimination (2025-08-24)
-- **tsParticles Internal Control**: Disabled autoPlay and added explicit container.pause() to prevent hidden RAF loops
-- **Status-Gated Animation**: ParticleCanvas now checks simulation status - draws single frame when not running, no continuous RAF
-- **Comprehensive Rendering Control**: Added simReady flag, renderEnabledRef, and visibility change handlers
-- **Race Condition Prevention**: Fixed observable registration timing with proper dependency gating
-- **Debug Infrastructure**: Added comprehensive logging to trace animation lifecycle and performance
-
-### Observable System Architecture
-- **Persistent Observable Controls**: Checkbox states for particle count, kinetic energy, total momentum, momentum X/Y components
-- **Future-Ready Framework**: UI infrastructure prepared for kinetic energy and momentum observable implementations
-- **Registration Timing Fixed**: Observable registration/unregistration race conditions resolved with simReady gating
-- **Performance Optimized**: System maintains stable operation without CPU spikes in any state
-
-### Technical Achievements
-- **Zero Background CPU**: No animation loops run when simulation paused/stopped
-- **Single Frame Rendering**: Static displays use minimal CPU with proper visual updates
-- **Tab Visibility Optimization**: Battery conservation through proper pause/resume on tab changes
-- **Complete Dependency Control**: All useEffect timing issues resolved with proper gating
-
-### Ready for Next Phase
-1. ✅ Observable registration timing issue resolved
-2. Continue with kinetic energy and momentum observable implementations
-3. Complete observer pattern integration for numerical analysis
-4. System ready for advanced physics features with optimal performance
-
-### PDE Controls Enhancement (2025-08-25)
-- **Negative Input Support**: Fixed negative number input UX by implementing local string state for position/center fields
-- **Input Field Optimization**: Changed negative-capable inputs from type="number" to type="text" with onBlur commit pattern
-- **Parameter Synchronization**: Added useEffect hooks to sync local string states with external parameter changes
-- **Enhanced User Experience**: Users can now type negative values naturally without input field interference
-
-### Component Refactoring and Type Consolidation (2025-08-25)
-- **Parameter Panel Separation**: Split Controls.tsx into dedicated PdeParameterPanel.tsx for PDE simulations, maintained RandomWalkParameterPanel.tsx for random walk physics
-- **Type System Unification**: Eliminated duplicate GridLayoutParams interfaces by creating comprehensive RandomWalkParams type in simulationTypes.ts
-- **Enhanced Solver Integration**: Added solver selection UI to PDE panel with GPU/CPU options and solver parameter configuration
-- **Import Updates**: Updated App.tsx and RandomWalkSim.tsx imports to use dedicated parameter panel components
-- **Store Consolidation**: Updated appStore.ts to use unified RandomWalkParams type with solver defaults
-- **Parameter Visibility Fix**: Removed equation selection dependency for parameter visibility in PDE controls
-- **Range Input Enhancement**: Changed step values from fixed to "any" for smoother parameter adjustment
-- **Log-Scale Particle Slider**: Added logarithmic scale option for particle count slider with synchronized numeric input
-- **Reusable UI Component**: Created generic LogNumberSlider component for any numeric parameter requiring log scale
-
 ## Success Criteria
 
-1. ✅ **Intuitive Interface**: Users can explore parameters without training
+1. **Intuitive Interface**: Users can explore parameters without training
 2. **Smooth Performance**: Real-time simulation without lag
 3. **Scientific Accuracy**: Correct convergence to telegraph equation
 4. **Data Accessibility**: Easy export for further analysis
-5. ✅ **Session Continuity**: Reliable save/load functionality
+5. **Session Continuity**: Reliable save/load functionality
 6. **Cross-platform**: Works on desktop and mobile browsers
 
-## Enhanced UI Components (2025-08-27)
+## File Structure
 
-### Log-Scale Particle Slider
+Key components organized under:
+- `pages/RandomWalkPage.tsx` - Main page component
+- `components/randomwalk/` - UI panels and controls
+- `hooks/` - Core simulation logic and state management
+- `utils/randomwalk/` - Physics engine and data processing utilities
 
-- **Purpose**: Improve usability when adjusting particle counts across wide ranges (0-2000)
-- **Implementation**: Created reusable LogNumberSlider component with toggle between linear and logarithmic scales
+Complete implementation spans 15 files with clear separation of concerns between:
+- UI rendering
+- Physics simulation
+- State management
+- Data processing
+
+## Floating Panel Architecture
+
+### FloatingPanel Component
+- **Purpose**: Abstracted react-rnd container logic into reusable component for any floating UI element
+- **Location**: `frontend/src/components/common/FloatingPanel.tsx`
 - **Features**:
-  - Log/linear toggle with persistent preference
-  - Direct numeric input field synchronized with slider
-  - Logarithmic mapping: slider position s → particles = round(10^s - 1)
-  - Linear mapping when log scale disabled
-  - Automatic clamping to min/max bounds
-  - Proper handling of edge cases (zero particles)
+  - Drag/resize/collapse functionality with react-rnd integration
+  - Z-index management and window focus handling
+  - Configurable positioning, sizing, and bounds
+  - Clean props interface for event handling
+  - Standardized header with title and collapse toggle
 
-### LogNumberSlider Component
+### Observable Panel Separation
+- **Architecture**: Two independent floating panels instead of single integrated panel
+- **Built-in Observables**: Remains in original ObservablesPanel (180 lines, reduced from 262)
+- **Custom Observables**: Dedicated CustomObservablesPanel (147 lines)
+- **Positioning**: Custom panel at (460,24) to avoid overlap with built-in panel at (24,24)
+- **State Management**: Separate window states in appStore for position, size, collapse, z-index
 
-- **Location**: `frontend/src/components/common/LogNumberSlider.tsx`
-- **Props API**:
-  - `value`: number - Current value (source of truth)
-  - `onChange`: (v: number) => void - Value change handler
-  - `min`: number - Minimum allowed value
-  - `max`: number - Maximum allowed value
-  - `label?`: string - Optional label text
-  - `logScale?`: boolean - Controlled log scale state
-  - `onToggleLogScale?`: (v: boolean) => void - Log scale toggle handler
-  - `defaultLogScale?`: boolean - Default for uncontrolled mode
-  - `showNumberInput?`: boolean - Show/hide numeric input (default: true)
-  - Additional formatting and styling props
-
-### Integration
-
-- **Current Usage**: Particles slider in RandomWalkParameterPanel
-- **State Management**: Log scale preference stored in randomWalkUIState.particlesLogScale
-- **Persistence**: Log scale preference persists across page reloads via Zustand store
-- **Future Applications**: Can be applied to other numeric sliders (collision rate, velocity, jump length)
+### Custom Observable Features
+- **Edit Capabilities**: View/edit/remove functionality for all saved observables
+- **Inline Editing**: Text area with validation and save/cancel controls
+- **Enhanced Template**: Improved default observable template with proper syntax
+- **Help Documentation**: Format guidance and available functions reference
+- **Validation**: Real-time syntax validation with user-friendly error messages
 
 ### Technical Implementation
+- **Container Abstraction**: FloatingPanel props interface for title, position, size, events
+- **Store Integration**: Extended appStore with customObservablesWindow and updateCustomObservable
+- **Component Separation**: Clean split between container logic (FloatingPanel) and content (panels)
+- **Event Handling**: Standardized drag/resize/focus event patterns
+- **Z-index Management**: Automatic window ordering with click-to-front behavior
 
-- **Mapping Functions**:
-  - Linear → Log: `toLog = (p) => Math.log10(Math.max(min, p))`
-  - Log → Linear: `fromLog = (s) => Math.pow(10, s)`
-- **Edge Case Handling**:
-  - Proper log mapping without +1 hacks for smooth slider movement
-  - NaN/invalid inputs clamped to valid range
-  - Disabled when min ≥ max
-- **Performance**: Optimized with React hooks (useMemo, useCallback) to prevent unnecessary recalculations
-
-## UI Control Enhancements (2025-08-31)
-
-### dt Parameter Control
-- **dt Propagation**: Fixed missing dt parameter propagation from UI slider to RandomWalkSimulator constructor and updateParameters calls
-- **Timestep Control**: UI dt slider now properly controls physics engine timestep via ParameterManager
-- **Real-time Updates**: Changes to dt affect simulation speed immediately during runtime
-
-### LogNumberSlider Improvements
-- **Slider Responsiveness**: Fixed slider not moving by correcting log mapping and removing forced rounding
-- **Checkbox Toggle**: Fixed unresponsive log-scale checkbox by making it uncontrolled when not explicitly controlled
-- **Discrete Mode**: Added discrete boolean prop for integer-only outputs while preserving log-scale mapping
-- **Continuous vs Discrete**: Particle count uses discrete mode (integers), dt and temperature use continuous mode
-- **Precision Handling**: Enhanced number input with proper step support and min/max label formatting
-
-### Container Lifecycle
-- **Rendering Fix**: Fixed useParticlesLoader destroying active tsParticles container causing blank canvas
-- **Container Reuse**: Limited cleanup to requestAnimationFrame cancellation only, preserving container lifecycle
-- **Particle Visibility**: Particles now render correctly after parameter changes and initialization
+### Benefits
+- **Reusability**: FloatingPanel component ready for additional UI panels
+- **Maintainability**: Clear separation between container and content logic
+- **User Experience**: Independent panel management with proper focus handling
+- **Scalability**: Easy addition of new floating panels without code duplication
+- **Architecture**: Foundation for future floating UI components across application

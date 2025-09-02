@@ -79,8 +79,10 @@ interface AppState {
   randomWalkSimulationState: RandomWalkSimulationState
   // RND-based Observables floating window state
   observablesWindow: WindowRect
+  customObservablesWindow: WindowRect
   zCounter: number
   observablesCollapsed: boolean
+  customObservablesCollapsed: boolean
   // Custom text observables storage
   customObservables: string[]
   // PDE persistent state
@@ -100,11 +102,14 @@ interface AppState {
   setRandomWalkUIState: (state: RandomWalkUIState) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
   setObservablesWindow: (rect: WindowRect) => void
+  setCustomObservablesWindow: (rect: WindowRect) => void
   setZCounter: (value: number) => void
   setObservablesCollapsed: (collapsed: boolean) => void
+  setCustomObservablesCollapsed: (collapsed: boolean) => void
   setCustomObservables: (observables: string[]) => void
   addCustomObservable: (observable: string) => void
   removeCustomObservable: (index: number) => void
+  updateCustomObservable: (index: number, observable: string) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -241,8 +246,17 @@ export const useAppStore = create<AppState>()(
         height: 320,
         zIndex: 1,
       },
-      zCounter: 1,
+      // Default position/size for Custom Observables floating window
+      customObservablesWindow: {
+        left: 460,
+        top: 24,
+        width: 380,
+        height: 400,
+        zIndex: 2,
+      },
+      zCounter: 2,
       observablesCollapsed: false,
+      customObservablesCollapsed: false,
       customObservables: [],
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
@@ -251,14 +265,19 @@ export const useAppStore = create<AppState>()(
       setRandomWalkUIState: (state) => set({ randomWalkUIState: state }),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
+      setCustomObservablesWindow: (rect) => set({ customObservablesWindow: rect }),
       setZCounter: (value) => set({ zCounter: value }),
       setObservablesCollapsed: (collapsed) => set({ observablesCollapsed: collapsed }),
+      setCustomObservablesCollapsed: (collapsed) => set({ customObservablesCollapsed: collapsed }),
       setCustomObservables: (observables) => set({ customObservables: observables }),
       addCustomObservable: (observable) => set((state) => ({ 
         customObservables: [...state.customObservables, observable] 
       })),
       removeCustomObservable: (index) => set((state) => ({
         customObservables: state.customObservables.filter((_, i) => i !== index)
+      })),
+      updateCustomObservable: (index, observable) => set((state) => ({
+        customObservables: state.customObservables.map((obs, i) => i === index ? observable : obs)
       })),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
@@ -316,8 +335,10 @@ export const useAppStore = create<AppState>()(
         randomWalkUIState: state.randomWalkUIState,
         randomWalkSimulationState: state.randomWalkSimulationState,
         observablesWindow: state.observablesWindow,
+        customObservablesWindow: state.customObservablesWindow,
         zCounter: state.zCounter,
         observablesCollapsed: state.observablesCollapsed,
+        customObservablesCollapsed: state.customObservablesCollapsed,
         customObservables: state.customObservables,
       }),
     }

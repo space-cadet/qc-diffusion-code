@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-02 01:13:01 IST_
+_Last Updated: 2025-09-02 16:59:29 IST_
 
 ## Active Tasks
 
@@ -68,10 +68,10 @@ _Last Updated: 2025-09-02 01:13:01 IST_
 **Notes**: UI interface designed with dnd-kit framework - ready for implementation planning
 
 ### C5b: Random Walk UI Implementation
-**Description**: Implement complete random walk user interface with react-grid-layout framework
-**Status**: ✅ COMPLETED **Last**: 2025-09-01 18:41:54 IST
-**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/types/simulationTypes.ts`, `frontend/src/physics/utils/density.ts`, `frontend/src/physics/RandomWalkSimulator.ts`
-**Notes**: Physics strategy implementations updated with PhysicsStrategy interface. Added method separation with preUpdate() and integrate() phases. Fixed method naming in RandomWalkSimulator (evgetObservableData to getObservableData). Removed verbose console logs from density visualization code.
+**Description**: Implement complete random walk user interface with react-grid-layout framework and floating panel architecture
+**Status**: ✅ COMPLETED **Last**: 2025-09-02 16:57:02 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`
+**Notes**: Extended with FloatingPanel architecture (2025-09-02 16:57:02 IST) - Abstracted react-rnd container logic into reusable FloatingPanel component (92 lines), supports multiple independent floating panels with z-index management, clean separation between container and content logic. Original physics strategy implementations maintained with PhysicsStrategy interface and method separation.
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
@@ -98,10 +98,10 @@ _Last Updated: 2025-09-02 01:13:01 IST_
 **Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
 
 ### C7a: Modular Transparent Observable System Redesign
-**Description**: Redesign hardcoded observable system into flexible query-based architecture with real-time time-series visualization
-**Status**: ✅ COMPLETED **Last**: 2025-09-02 01:13:01 IST
-**Files**: `frontend/src/components/observablesConfig.ts`, `frontend/src/components/useObservablesPolling.ts`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`, `frontend/src/physics/ObservableManager.ts`, `frontend/src/stores/appStore.ts`
-**Notes**: SYSTEM COMPLETED (2025-09-02 01:13:01 IST) - All critical bugs resolved: data shape mismatch fixed by using concrete observables instead of TextObservable scalars, MSD initialization reset prevented through idempotent registration, infinite re-render loop eliminated via memoized dependencies, and ID resolution updated for exact ID matching. Observable system now fully functional with live updating values for all built-in observables (Particle Count, Kinetic Energy, Momentum, MSD) while preserving custom TextObservable support.
+**Description**: Redesign hardcoded observable system into flexible query-based architecture with floating panel UI separation
+**Status**: ✅ COMPLETED **Last**: 2025-09-02 16:57:02 IST
+**Files**: `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/CustomObservablesPanel.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`
+**Notes**: FULL IMPLEMENTATION COMPLETED (2025-09-02 16:57:02 IST) - Phase 0 observable system with floating panel abstraction: FloatingPanel component (92 lines) extracts container logic, CustomObservablesPanel (147 lines) provides dedicated custom observables with edit/view capabilities, clean separation between built-in and custom observables, independent floating panels with z-index management. System ready for custom observable definitions like KE fluctuations.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

@@ -3,7 +3,7 @@ import RGL, { WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Container } from "@tsparticles/engine";
 import type { Particle } from "./physics/types/Particle";
-import { Rnd } from "react-rnd";
+
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanel } from "./components/RandomWalkParameterPanel";
 import { DensityComparison } from "./components/DensityComparison";
@@ -12,6 +12,8 @@ import { ReplayControls } from "./components/ReplayControls";
 import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvas } from "./components/ParticleCanvas";
 import { ObservablesPanel } from "./components/ObservablesPanel";
+import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
+import { FloatingPanel } from "./components/common/FloatingPanel";
 import { PhysicsRandomWalk } from "./physics/PhysicsRandomWalk";
 import { RandomWalkSimulator } from "./physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "./physics/observables/ParticleCountObservable";
@@ -44,10 +46,14 @@ export default function RandomWalkSim() {
     saveSimulationSnapshot,
     observablesWindow,
     setObservablesWindow,
+    customObservablesWindow,
+    setCustomObservablesWindow,
     zCounter,
     setZCounter,
     observablesCollapsed,
-    setObservablesCollapsed
+    setObservablesCollapsed,
+    customObservablesCollapsed,
+    setCustomObservablesCollapsed
   } = useAppStore();
 
   // State declarations should come before refs
@@ -679,62 +685,59 @@ export default function RandomWalkSim() {
           </div>
         </ReactGridLayout>
 
-        {/* Floating Observables Window via react-rnd */}
-        <Rnd
-          bounds="parent"
-          size={{ width: observablesWindow.width, height: observablesCollapsed ? 40 : observablesWindow.height }}
+        {/* Floating Observables Panel */}
+        <FloatingPanel
+          title="Observables"
           position={{ x: observablesWindow.left, y: observablesWindow.top }}
-          onDragStop={(e: any, d: any) => {
-            setObservablesWindow({
-              ...observablesWindow,
-              left: d.x,
-              top: d.y,
-            });
+          size={{ width: observablesWindow.width, height: observablesWindow.height }}
+          zIndex={observablesWindow.zIndex}
+          isCollapsed={observablesCollapsed}
+          onToggleCollapse={() => setObservablesCollapsed(!observablesCollapsed)}
+          onDragStop={(x, y) => {
+            setObservablesWindow({ ...observablesWindow, left: x, top: y });
           }}
-          onResizeStop={(e: any, dir: any, ref: any, delta: any, position: any) => {
-            setObservablesWindow({
-              ...observablesWindow,
-              width: ref.offsetWidth,
-              height: ref.offsetHeight,
-              left: position.x,
-              top: position.y,
-            });
+          onResizeStop={(width, height, x, y) => {
+            setObservablesWindow({ ...observablesWindow, width, height, left: x, top: y });
           }}
           onMouseDown={() => {
             const nextZ = zCounter + 1;
             setZCounter(nextZ);
             setObservablesWindow({ ...observablesWindow, zIndex: nextZ });
           }}
-          dragHandleClassName="drag-handle"
-          enableResizing={observablesCollapsed ? { top: false, right: false, bottom: false, left: false, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false } : { top: true, right: true, bottom: true, left: true, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true }}
-          style={{ zIndex: observablesWindow.zIndex }}
-          className="shadow-lg rounded-md bg-white border border-gray-200 overflow-hidden"
         >
-          <div className="drag-handle flex items-center justify-between cursor-move select-none px-3 py-2 bg-gray-100 border-b border-gray-200 text-sm font-medium">
-            <span>Observables</span>
-            <button
-              type="button"
-              className="ml-2 cursor-pointer rounded px-2 py-0.5 text-xs border border-gray-300 bg-white hover:bg-gray-50"
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                setObservablesCollapsed(!observablesCollapsed);
-              }}
-            >
-              {observablesCollapsed ? 'Expand' : 'Collapse'}
-            </button>
-          </div>
-          {!observablesCollapsed && (
-            <div className="p-3 overflow-y-auto" style={{ maxHeight: observablesWindow.height ? observablesWindow.height - 40 : undefined }}>
-              <ObservablesPanel
-                simulatorRef={simulatorRef}
-                isRunning={simulationState.isRunning}
-                simulationStatus={simulationState.status}
-                simReady={simReady}
-              />
-            </div>
-          )}
-        </Rnd>
+          <ObservablesPanel
+            simulatorRef={simulatorRef}
+            isRunning={simulationState.isRunning}
+            simulationStatus={simulationState.status}
+            simReady={simReady}
+          />
+        </FloatingPanel>
+
+        {/* Floating Custom Observables Panel */}
+        <FloatingPanel
+          title="Custom Observables"
+          position={{ x: customObservablesWindow.left, y: customObservablesWindow.top }}
+          size={{ width: customObservablesWindow.width, height: customObservablesWindow.height }}
+          zIndex={customObservablesWindow.zIndex}
+          isCollapsed={customObservablesCollapsed}
+          onToggleCollapse={() => setCustomObservablesCollapsed(!customObservablesCollapsed)}
+          onDragStop={(x, y) => {
+            setCustomObservablesWindow({ ...customObservablesWindow, left: x, top: y });
+          }}
+          onResizeStop={(width, height, x, y) => {
+            setCustomObservablesWindow({ ...customObservablesWindow, width, height, left: x, top: y });
+          }}
+          onMouseDown={() => {
+            const nextZ = zCounter + 1;
+            setZCounter(nextZ);
+            setCustomObservablesWindow({ ...customObservablesWindow, zIndex: nextZ });
+          }}
+        >
+          <CustomObservablesPanel
+            simulatorRef={simulatorRef}
+            simReady={simReady}
+          />
+        </FloatingPanel>
       </div>
     </div>
   );

@@ -1,14 +1,15 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-09-01 18:41:54 IST_
+_Last Updated: 2025-09-02 16:57:02 IST_
 
-**Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system
+**Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system. Extended with floating panel architecture.
 
 **Status**: ✅ COMPLETED
 **Priority**: HIGH
 **Started**: 2025-08-21 07:52:44 IST
 **Completed**: 2025-08-22 18:41:31 IST
+**Extended**: 2025-09-02 16:57:02 IST (Floating panel architecture)
 **Dependencies**: C5a
 
 ## Completion Criteria
@@ -30,10 +31,13 @@ _Last Updated: 2025-09-01 18:41:54 IST_
 - ✅ Fix particle display issues by replacing container.refresh() with container.draw(false)
 - ✅ Decouple physics stepping from rendering for proper pause control
 - ✅ Implement independent animation toggle without stopping physics simulation
+- ✅ Abstract floating panel container logic into reusable FloatingPanel component
+- ✅ Support multiple independent floating panels with z-index management
 
 ## Related Files
 
-- `frontend/src/GridLayoutPage.tsx` - Main grid layout implementation
+- `frontend/src/RandomWalkSim.tsx` - Main grid layout implementation (renamed from GridLayoutPage)
+- `frontend/src/components/common/FloatingPanel.tsx` - Reusable floating panel container
 - `frontend/src/App.tsx` - Navigation integration with third tab
 - `memory-bank/implementation-details/random-walk-ui-interface.md` - UI specification
 - `memory-bank/tasks/C5a.md` - Architecture planning task
@@ -253,3 +257,19 @@ This task implements the complete UI framework for the random walk simulation ba
 - ✅ **Trajectory Recording**: Added trajectory point recording with proper timestamp from simTime()
 - ✅ **Debug Cleanup**: Removed verbose console logs from density visualization code for improved performance
 - ✅ **Method Naming Fix**: Fixed typo in RandomWalkSimulator.getObservableData() method name (was evgetObservableData)
+
+**Floating Panel Architecture Extension (2025-09-02 16:57:02 IST)**:
+
+- ✅ **FloatingPanel Component**: Abstracted react-rnd container logic into reusable FloatingPanel component with drag/resize/collapse functionality
+- ✅ **Container Extraction**: Removed 40+ lines of Rnd wrapper code from RandomWalkSim.tsx, replaced with clean FloatingPanel usage
+- ✅ **Multiple Panel Support**: Enhanced architecture to support multiple independent floating panels with proper z-index management
+- ✅ **Panel State Management**: Extended appStore with floating panel state management for position, size, collapse state, and z-ordering
+- ✅ **Clean Architecture**: Achieved clear separation between container logic (FloatingPanel) and content logic (ObservablesPanel, CustomObservablesPanel)
+- ✅ **Reusability**: FloatingPanel component ready for future panel implementations across the application
+
+**Technical Implementation**:
+- FloatingPanel.tsx: 92 lines with complete drag/resize/collapse/z-index functionality
+- Supports any React children content with configurable title, position, size
+- Integrated with appStore for state persistence across sessions
+- Clean props interface for event handlers (onDragStop, onResizeStop, onMouseDown)
+- Responsive collapse behavior with dynamic height adjustment
