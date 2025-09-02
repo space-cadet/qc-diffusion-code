@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import { useAppStore } from "../stores/appStore";
 import type { RandomWalkSimulator } from "../physics/RandomWalkSimulator";
 import { ParticleCountObservable } from "../physics/observables/ParticleCountObservable";
@@ -77,8 +77,33 @@ function ObservableDisplay({
 export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, simReady }: ObservablesPanelProps) {
   const {
     randomWalkUIState,
-    setRandomWalkUIState
+    setRandomWalkUIState,
+    customObservables,
+    customObservableVisibility,
+    setCustomObservableVisibility
   } = useAppStore();
+
+  // State for custom observable data with individual polling intervals
+  const [customObservableData, setCustomObservableData] = useState<Record<string, any>>({});
+
+  // Parse custom observables to extract names and intervals
+  const customObservableConfigs = useMemo(() => {
+    return customObservables.map((text, index) => {
+      try {
+        const parsed = TextObservable.fromText(text)[0];
+        const name = parsed?.getName() || `custom_${index}`;
+        const interval = parsed?.getInterval() || 1000;
+        return { name, text, interval, valid: true };
+      } catch (error) {
+        return { name: `custom_${index}`, text, interval: 1000, valid: false };
+      }
+    });
+  }, [customObservables]);
+
+  // Get visible custom observables
+  const visibleCustomObservables = useMemo(() => 
+    customObservableConfigs.filter(config => customObservableVisibility[config.name])
+  , [customObservableConfigs, customObservableVisibility]);
 
   // Determine which built-in observables are visible (memoized to prevent re-renders)
   const visibleObservables = useMemo(() => Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
@@ -186,6 +211,76 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     prevVisibleRef.current = current;
   }, [simReady, visibleObservables]);
 
+  // Register/unregister custom observables and handle individual polling
+  const prevVisibleCustomRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!simReady || !simulatorRef.current) return;
+
+    const manager = simulatorRef.current.getObservableManager();
+    const intervals: NodeJS.Timeout[] = [];
+    const currentVisible = new Set(visibleCustomObservables.map(c => c.name));
+    const prevVisible = prevVisibleCustomRef.current;
+
+    // Register newly visible custom observables
+    visibleCustomObservables.forEach(config => {
+      if (!config.valid || prevVisible.has(config.name)) return;
+      
+      try {
+        manager.registerTextObservable(config.text);
+        console.log(`[ObservablesPanel] Registered custom observable: ${config.name}`);
+      } catch (error) {
+        console.error(`[ObservablesPanel] Failed to register ${config.name}:`, error);
+      }
+    });
+
+    // Unregister no longer visible custom observables
+    prevVisible.forEach(name => {
+      if (currentVisible.has(name)) return;
+      
+      try {
+        manager.unregister(`text_${name}`);
+        console.log(`[ObservablesPanel] Unregistered custom observable: ${name}`);
+      } catch (error) {
+        console.error(`[ObservablesPanel] Error unregistering ${name}:`, error);
+      }
+    });
+
+    // Setup individual polling for visible custom observables
+    visibleCustomObservables.forEach(config => {
+      if (!config.valid) return;
+
+      const pollObservable = () => {
+        if (!isRunning || !simulatorRef.current) return;
+        
+        const observableId = `text_${config.name}`;
+        const result = manager.getResult(observableId);
+        console.log(`[Poll] ${config.name}: ${result}`);
+        
+        if (result !== null) {
+          setCustomObservableData(prev => ({
+            ...prev,
+            [config.name]: result
+          }));
+        }
+      };
+
+      // Initial poll
+      pollObservable();
+
+      // Setup interval polling
+      const intervalId = setInterval(pollObservable, config.interval);
+      intervals.push(intervalId);
+    });
+
+    // Update prev ref
+    prevVisibleCustomRef.current = currentVisible;
+
+    // Cleanup intervals on unmount or dependency change
+    return () => {
+      intervals.forEach(id => clearInterval(id));
+    };
+  }, [simReady, isRunning, visibleCustomObservables, customObservables]);
+
 
 
   return (
@@ -200,6 +295,48 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
           onToggle={(visible) => toggleObservable(id, visible)}
         />
       ))}
+
+      {/* Custom Observables Section */}
+      {customObservableConfigs.length > 0 && (
+        <>
+          <div className="border-t pt-3">
+            <div className="text-sm font-medium text-gray-600 mb-3">
+              Custom Observables ({customObservableConfigs.length})
+            </div>
+          </div>
+          
+          {customObservableConfigs.map(config => {
+            const isVisible = customObservableVisibility[config.name] || false;
+            const data = customObservableData[config.name];
+            
+            // Create a simple config for ObservableDisplay
+            const displayConfig: ObservableConfig = {
+              id: `custom_${config.name}`,
+              name: config.name,
+              text: config.text,
+              pollingInterval: config.interval,
+              fields: [
+                {
+                  label: "Value",
+                  path: "", // Direct value
+                  format: "number",
+                  precision: 4
+                }
+              ]
+            };
+
+            return (
+              <ObservableDisplay
+                key={config.name}
+                config={displayConfig}
+                data={data !== undefined ? data : null}
+                isVisible={isVisible}
+                onToggle={(visible) => setCustomObservableVisibility(config.name, visible)}
+              />
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }

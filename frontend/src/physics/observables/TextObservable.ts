@@ -31,6 +31,10 @@ export class TextObservable implements Observable {
     return parts.join(', ');
   }
 
+  getInterval(): number {
+    return this.definition.interval || 1000; // Default 1 second
+  }
+
   private compute(particles: Particle[], timestamp: number): number {
     const bounds = { width: 800, height: 600 }; // Default bounds, should be passed from context
     

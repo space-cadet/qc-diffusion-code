@@ -6,6 +6,7 @@ export interface ParsedObservable {
   filter?: string;
   select?: string;
   reduce: string;
+  interval?: number;
 }
 
 export class TextObservableParser {
@@ -48,6 +49,12 @@ export class TextObservableParser {
             break;
           case 'reduce':
             current.reduce = value;
+            break;
+          case 'interval':
+            const intervalValue = parseInt(value);
+            if (!isNaN(intervalValue) && intervalValue > 0) {
+              current.interval = intervalValue;
+            }
             break;
         }
       }

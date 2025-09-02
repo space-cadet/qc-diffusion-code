@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-02 16:59:29 IST_
+_Last Updated: 2025-09-03 01:13:59 IST_
 
 ## Active Tasks
 
@@ -98,10 +98,10 @@ _Last Updated: 2025-09-02 16:59:29 IST_
 **Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
 
 ### C7a: Modular Transparent Observable System Redesign
-**Description**: Redesign hardcoded observable system into flexible query-based architecture with floating panel UI separation
-**Status**: ✅ COMPLETED **Last**: 2025-09-02 16:57:02 IST
-**Files**: `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/CustomObservablesPanel.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`
-**Notes**: FULL IMPLEMENTATION COMPLETED (2025-09-02 16:57:02 IST) - Phase 0 observable system with floating panel abstraction: FloatingPanel component (92 lines) extracts container logic, CustomObservablesPanel (147 lines) provides dedicated custom observables with edit/view capabilities, clean separation between built-in and custom observables, independent floating panels with z-index management. System ready for custom observable definitions like KE fluctuations.
+**Description**: Redesign hardcoded observable system into flexible query-based architecture with floating panel UI separation and custom observable value display
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 01:12:37 IST
+**Files**: `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/CustomObservablesPanel.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/stores/appStore.ts`
+**Notes**: Extended implementation for custom observable value display with individual polling intervals. UI framework complete - custom observables appear in main ObservablesPanel with visibility toggles and interval parsing support. Current issue: values not displaying despite successful polling (showing "No data" instead of polled values like 0, NaN). Data format mismatch between polling results and ObservableDisplay component needs debugging.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

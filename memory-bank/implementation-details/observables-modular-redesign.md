@@ -1,7 +1,7 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-02 16:57:02 IST*
+*Updated: 2025-09-03 01:12:37 IST*
 
 ## Executive Summary
 
@@ -365,3 +365,37 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 5. **Debugging**: Clear separation between configuration, polling, and rendering
 6. **Reusability**: FloatingPanel component can be used for any future floating UI elements
 7. **Scalability**: Easy to add more floating panels without code duplication
+
+## Extended Implementation (2025-09-03 01:12:37 IST)
+
+### Custom Observable Value Display Integration
+**Objective**: Connect custom observable definitions to live value display with individual polling intervals per C17 requirements
+
+#### Implementation Status
+
+**Completed**:
+1. **Store Integration**: Added `customObservableVisibility: Record<string, boolean>` to appStore for individual custom observable toggles
+2. **Interval Parsing**: Extended TextObservableParser to support `interval` field in observable definitions
+3. **TextObservable Enhancement**: Added `getInterval()` method with 1000ms default fallback
+4. **ObservablesPanel Integration**: Added custom observable display section with individual polling intervals and visibility controls
+5. **Registration Management**: Only visible custom observables are registered in ObservableManager to optimize performance
+
+**Technical Details**:
+- Custom observables now appear in main ObservablesPanel alongside built-in observables
+- Each custom observable can specify polling interval: `interval: 500` (milliseconds)
+- Visibility-based registration prevents unnecessary Observable manager operations
+- Individual polling timers created per visible custom observable
+- Registration/unregistration follows same pattern as built-in observables
+
+**Current Issue**: 
+- UI displays "No data" despite successful polling returning values (0, NaN)
+- Console shows polling working: `[Poll] left-momentum: 0`, `[Poll] KE-Fluctuations: NaN`
+- Data format mismatch between polling results and ObservableDisplay component expectations
+
+**Files Modified**:
+- `frontend/src/stores/appStore.ts` - Added customObservableVisibility state
+- `frontend/src/physics/observables/TextObservableParser.ts` - Added interval field parsing
+- `frontend/src/physics/observables/TextObservable.ts` - Added getInterval() method
+- `frontend/src/components/ObservablesPanel.tsx` - Integrated custom observable display with individual polling
+
+**Next Session Priority**: Debug data format mismatch causing "No data" display despite successful value polling

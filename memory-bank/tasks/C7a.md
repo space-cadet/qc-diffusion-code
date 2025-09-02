@@ -1,6 +1,6 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-02 16:57:02 IST*
+*Last Updated: 2025-09-03 01:12:37 IST*
 
 **Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Implementation of Phase 0 complete with custom observables panel separation and floating panel abstraction.
 
@@ -189,9 +189,45 @@ These changes lay groundwork for the modular observable system by establishing c
 - ✅ Reusable FloatingPanel component for future panel implementations
 - ✅ Clean code architecture with clear separation of concerns
 
+## Extended Implementation (2025-09-03 01:12:37 IST)
+
+### Custom Observable Value Display and Interval Parsing
+**Objective**: Connect custom observables to UI display with individual polling intervals per C17 requirements
+
+**Files Modified**:
+- `frontend/src/stores/appStore.ts` - Added customObservableVisibility state for individual custom observable toggles
+- `frontend/src/physics/observables/TextObservableParser.ts` - Added interval field parsing to ParsedObservable interface
+- `frontend/src/physics/observables/TextObservable.ts` - Added getInterval() method with 1000ms default
+- `frontend/src/components/ObservablesPanel.tsx` - Integrated custom observable display section with individual polling
+
+**Key Changes**:
+1. **Individual Polling**: Each custom observable can specify polling interval (e.g., interval: 500)
+2. **Visibility Control**: Custom observables appear in main ObservablesPanel with checkboxes like built-in observables
+3. **Registration Logic**: Only visible custom observables are registered in ObservableManager
+4. **Interval Support**: TextObservable system now supports interval field in observable definitions
+
+**Technical Implementation**:
+- CustomObservablesPanel: Edit/create custom observable definitions
+- ObservablesPanel: Display custom observable values with individual polling intervals
+- Registration tracks visibility state to prevent unnecessary manager operations
+- Polling intervals extracted from TextObservable.getInterval() method
+
+**Current Status**: 
+- ✅ UI framework complete - custom observables display in ObservablesPanel
+- ✅ Interval parsing implemented in TextObservableParser and TextObservable
+- ✅ Individual polling logic implemented with visibility-based registration
+- ⚠️ Values not displaying (showing "No data") despite polling returning results (0, NaN)
+- 🔄 Data display issue requires debugging - ObservableDisplay expecting different data format
+
+**Debug Status**: 
+- Console shows polling working: `[Poll] left-momentum: 0` and `[Poll] KE-Fluctuations: NaN`
+- Issue likely in data format mismatch between polling results and ObservableDisplay component expectations
+- Next session: Debug data pipeline from TextObservable results to UI display
+
 ## Implementation Timeline
 - **Phase 0 (Complete)**: Text-based system with configurable polling - COMPLETED 2025-09-02 01:13:01 IST
 - **UI Architecture (Complete)**: Floating panel abstraction and panel separation - COMPLETED 2025-09-02 16:57:02 IST
+- **Custom Display Integration (In Progress)**: Individual polling and value display - STARTED 2025-09-03 01:12:37 IST
 - **Phase 1 (Future)**: Core query system and particle selection
 - **Phase 2 (Future)**: Time series infrastructure and data collection  
 - **Phase 3 (Future)**: Live Plotly integration and UI controls

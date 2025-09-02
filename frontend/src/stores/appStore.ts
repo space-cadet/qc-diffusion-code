@@ -85,6 +85,8 @@ interface AppState {
   customObservablesCollapsed: boolean
   // Custom text observables storage
   customObservables: string[]
+  // Custom observable visibility state (by observable name)
+  customObservableVisibility: Record<string, boolean>
   // PDE persistent state
   pdeState: PdeState
   // PDE UI fold states for Controls panel
@@ -110,6 +112,7 @@ interface AppState {
   addCustomObservable: (observable: string) => void
   removeCustomObservable: (index: number) => void
   updateCustomObservable: (index: number, observable: string) => void
+  setCustomObservableVisibility: (name: string, visible: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -258,6 +261,7 @@ export const useAppStore = create<AppState>()(
       observablesCollapsed: false,
       customObservablesCollapsed: false,
       customObservables: [],
+      customObservableVisibility: {},
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
@@ -278,6 +282,9 @@ export const useAppStore = create<AppState>()(
       })),
       updateCustomObservable: (index, observable) => set((state) => ({
         customObservables: state.customObservables.map((obs, i) => i === index ? observable : obs)
+      })),
+      setCustomObservableVisibility: (name, visible) => set((state) => ({
+        customObservableVisibility: { ...state.customObservableVisibility, [name]: visible }
       })),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
@@ -340,6 +347,7 @@ export const useAppStore = create<AppState>()(
         observablesCollapsed: state.observablesCollapsed,
         customObservablesCollapsed: state.customObservablesCollapsed,
         customObservables: state.customObservables,
+        customObservableVisibility: state.customObservableVisibility,
       }),
     }
   )

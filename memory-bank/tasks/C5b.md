@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-09-02 16:57:02 IST_
+_Last Updated: 2025-09-03 01:12:37 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system. Extended with floating panel architecture.
 
@@ -273,3 +273,13 @@ This task implements the complete UI framework for the random walk simulation ba
 - Integrated with appStore for state persistence across sessions
 - Clean props interface for event handlers (onDragStop, onResizeStop, onMouseDown)
 - Responsive collapse behavior with dynamic height adjustment
+
+**Custom Observable Display Integration (2025-09-03 01:12:37 IST)**:
+
+- 🔄 **Main Panel Integration**: Extended ObservablesPanel to display custom observable values alongside built-in observables
+- ✅ **Visibility Management**: Added customObservableVisibility state to appStore for individual custom observable toggles
+- ✅ **Individual Polling**: Implemented per-observable polling intervals with visibility-based registration in ObservableManager
+- ✅ **Interval Parsing Support**: Extended TextObservable system to parse and use interval field from observable definitions
+- ⚠️ **Display Issue**: Custom observable values not showing in UI despite successful polling (values like 0, NaN returned but "No data" displayed)
+
+**Status**: C5b UI architecture complete with floating panel system. Custom observable display framework implemented but data format debugging needed.
