@@ -246,6 +246,32 @@ const ObservableControls: React.FC<ObservableControlsProps> = (props) => {
 - **Throttled Updates**: Plot updates at configurable frequency (10Hz default), not every frame
 - **Data Decimation**: Automatic reduction of data points for long runs
 - **Lazy Evaluation**: Observables computed only when requested
+
+## Implementation Progress
+
+### 2025-09-03: Bug Fixes and Semantic Validation
+
+This session focused on resolving critical bugs that produced `NaN` values and improving the user experience by adding semantic validation to the text-based observable system.
+
+**1. NaN Bug Fix in Text Observables:**
+- **Problem**: Text observables consistently returned `NaN` because they were initialized with `undefined` bounds. The `ObservableManager` was constructed in `RandomWalkSimulator` without the required canvas dimensions.
+- **Fix**: The `RandomWalkSimulator` constructor was updated to pass the canvas `width` and `height` to the `ObservableManager`.
+- **File Modified**: `frontend/src/physics/RandomWalkSimulator.ts`
+
+**2. Semantic Expression Validation:**
+- **Problem**: The parser only checked for syntactic correctness, allowing users to enter expressions with non-existent variables (e.g., `velocity.x` instead of `velocity.vx`), which resulted in `NaN` values at runtime without clear feedback.
+- **Fix**: `TextObservableParser.validateExpression` was enhanced to perform semantic validation. It now extracts all identifiers from an expression and checks them against an allowlist of properties available in the evaluation context (`ExpressionEvaluator.createContext`).
+- **File Modified**: `frontend/src/physics/observables/TextObservableParser.ts`
+
+**3. Improved UI Guidance:**
+- **Problem**: The help text in the custom observables panel was minimal and listed incorrect variable names (`velocity.x`).
+- **Fix**: The "Format" section in `CustomObservablesPanel.tsx` was expanded to include the full list of correct properties (`velocity.vx`, `speed`, `bounds.width`, etc.) and practical examples for common calculations like kinetic energy and filtered counts.
+- **File Modified**: `frontend/src/components/CustomObservablesPanel.tsx`
+
+**4. Unified Polling and Data Structure (User-led Refactor):**
+- **Change**: The user refactored `ObservablesPanel.tsx` to eliminate separate polling logic for custom observables. All active observables (both built-in and custom) are now managed by a single `useObservablesPolling` hook.
+- **Change**: `TextObservable.calculate` was modified to return a structured object `{ value, timestamp, metadata }` instead of a raw number to align with the data structure used by built-in observables.
+- **Files Modified**: `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservable.ts`
 - **Memory Management**: Circular buffers prevent unbounded memory growth
 - **Selective Updates**: Only update plots when data changes significantly
 

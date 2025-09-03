@@ -196,8 +196,18 @@ export function CustomObservablesPanel({ simulatorRef, simReady }: CustomObserva
       <div className="text-xs text-gray-500 border-t pt-3 space-y-1">
         <div className="font-medium">Format:</div>
         <div>• Each line: key: value (no commas)</div>
-        <div>• Available: source, filter, select, reduce</div>
+        <div>• Keys: source | filter | select | reduce | interval</div>
         <div>• Reduce functions: sum, mean, count, min, max, std</div>
+        <div className="font-medium pt-2">Properties you can use:</div>
+        <div>• position.x, position.y</div>
+        <div>• velocity.vx, velocity.vy, speed</div>
+        <div>• radius, id, collisionCount, interparticleCollisionCount</div>
+        <div>• lastCollisionTime, nextCollisionTime, waitingTime</div>
+        <div>• bounds.width, bounds.height, time</div>
+        <div className="font-medium pt-2">Examples:</div>
+        <div>• Kinetic energy avg: select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean</div>
+        <div>• Fast particles count: filter: speed &gt; 2.0, select: 1, reduce: count</div>
+        <div>• Left momentum (x&lt;width/2): filter: position.x &lt; bounds.width/2, select: velocity.vx, reduce: sum</div>
       </div>
     </div>
   );

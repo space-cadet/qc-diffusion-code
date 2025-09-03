@@ -4,17 +4,32 @@ import type { ParsedObservable } from './TextObservableParser';
 import { TextObservableParser } from './TextObservableParser';
 import { ExpressionEvaluator } from './ExpressionEvaluator';
 
+// Add debug logger
+const debug = (...args: any[]) => console.debug('[TextObservable]', ...args);
+
 export class TextObservable implements Observable {
   private definition: ParsedObservable;
   public readonly id: string;
+  private bounds: { width: number; height: number };
 
-  constructor(definition: ParsedObservable) {
+  constructor(definition: ParsedObservable, bounds: { width: number; height: number }) {
     this.definition = definition;
     this.id = `text_${this.definition.name}`;
+    this.bounds = bounds;
   }
 
-  calculate(particles: Particle[], timestamp: number): number {
-    return this.compute(particles, timestamp);
+  calculate(particles: Particle[], timestamp: number): any {
+    debug(`Calculating for ${particles.length} particles`);
+    const result = this.compute(particles, timestamp);
+    debug(`Calculation result: ${result}`);
+    return {
+      value: result,
+      timestamp: timestamp,
+      metadata: {
+        particleCount: particles.length,
+        observableName: this.definition.name
+      }
+    };
   }
 
   reset(): void {}
@@ -36,16 +51,22 @@ export class TextObservable implements Observable {
   }
 
   private compute(particles: Particle[], timestamp: number): number {
-    const bounds = { width: 800, height: 600 }; // Default bounds, should be passed from context
+    // Validate bounds
+    if (!this.bounds || !this.bounds.width || !this.bounds.height) {
+      debug('Invalid bounds:', this.bounds);
+      return NaN;
+    }
     
     let filteredParticles = particles;
     
     // Apply filter if specified
     if (this.definition.filter) {
+      debug(`Applying filter: ${this.definition.filter}`);
       filteredParticles = particles.filter(particle => {
-        const context = ExpressionEvaluator.createContext(particle, bounds, timestamp);
+        const context = ExpressionEvaluator.createContext(particle, this.bounds, timestamp);
         return ExpressionEvaluator.evaluateFilter(this.definition.filter!, context);
       });
+      debug(`Filtered particles: ${filteredParticles.length}/${particles.length}`);
     }
 
     // Handle count reduction early (no select needed)
@@ -56,8 +77,9 @@ export class TextObservable implements Observable {
     // Apply select to get values
     let values: number[];
     if (this.definition.select) {
+      debug(`Applying select: ${this.definition.select}`);
       values = filteredParticles.map(particle => {
-        const context = ExpressionEvaluator.createContext(particle, bounds, timestamp);
+        const context = ExpressionEvaluator.createContext(particle, this.bounds, timestamp);
         return ExpressionEvaluator.evaluateSelect(this.definition.select!, context);
       });
     } else {
@@ -66,12 +88,17 @@ export class TextObservable implements Observable {
     }
 
     // Apply reduce function
-    return ExpressionEvaluator.applyReduce(values, this.definition.reduce);
+    debug(`Applying reduce: ${this.definition.reduce}`);
+    const result = ExpressionEvaluator.applyReduce(values, this.definition.reduce);
+    if (isNaN(result)) {
+      debug('Invalid calculation - values:', values, 'reduce:', this.definition.reduce);
+    }
+    return result;
   }
 
-  static fromText(text: string): TextObservable[] {
+  static fromText(text: string, bounds: { width: number; height: number }): TextObservable[] {
     const parsed = TextObservableParser.parse(text);
-    return parsed.map(definition => new TextObservable(definition));
+    return parsed.map(definition => new TextObservable(definition, bounds));
   }
 
   static validate(text: string): { valid: boolean; errors: string[] } {

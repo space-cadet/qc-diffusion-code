@@ -38,7 +38,10 @@ export class RandomWalkSimulator {
     this.setupStrategies();
     this.setupParticleManager();
     this.setupSimulationRunner();
-    this.observableManager = new ObservableManager();
+    this.observableManager = new ObservableManager({
+      width: this.parameterManager.canvasWidth,
+      height: this.parameterManager.canvasHeight
+    });
     this.initializeParticles();
   }
 

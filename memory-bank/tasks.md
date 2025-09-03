@@ -99,9 +99,9 @@ _Last Updated: 2025-09-03 01:13:59 IST_
 
 ### C7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture with floating panel UI separation and custom observable value display
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 01:12:37 IST
+**Status**: ✅ COMPLETED **Last**: 2025-09-03 10:08:43 IST
 **Files**: `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/CustomObservablesPanel.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/stores/appStore.ts`
-**Notes**: Extended implementation for custom observable value display with individual polling intervals. UI framework complete - custom observables appear in main ObservablesPanel with visibility toggles and interval parsing support. Current issue: values not displaying despite successful polling (showing "No data" instead of polled values like 0, NaN). Data format mismatch between polling results and ObservableDisplay component needs debugging.
+**Notes**: Phase 0 COMPLETED. Fixed critical NaN bug by propagating canvas bounds to the `ObservableManager`. Implemented semantic validation in `TextObservableParser` to prevent use of invalid properties in expressions. Enhanced UI help text in `CustomObservablesPanel` with correct property names and examples. Integrated user-led refactor to unify observable polling and standardize data structures.
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

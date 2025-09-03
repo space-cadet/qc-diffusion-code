@@ -12,6 +12,21 @@ _Last Updated: 2025-09-03 01:12:37 IST_
 - Updated `frontend/src/components/ObservablesPanel.tsx` - Integrated custom observable display section with individual polling
 - Created `memory-bank/sessions/2025-09-03-early-morning.md` - Session documentation for custom observable display work
 
+### 2025-09-03
+
+#### 10:08 - C7a: Observable System Bug Fixes and Semantic Validation
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Passed canvas bounds to `ObservableManager` constructor to fix `NaN` bug in text observables.
+- Updated `frontend/src/physics/observables/TextObservableParser.ts` - Implemented semantic validation to check for unknown variables in expressions; corrected `getAvailableProperties` to match evaluation context (`velocity.vx`).
+- Updated `frontend/src/components/CustomObservablesPanel.tsx` - Enhanced help text with correct property names and usage examples.
+- Updated `frontend/src/physics/observables/TextObservable.ts` (by user) - Changed `calculate` return type to a structured object `{ value, timestamp, metadata }`.
+- Updated `frontend/src/components/ObservablesPanel.tsx` (by user) - Refactored to use a unified polling hook for both built-in and custom observables, removing separate state management.
+- Updated `memory-bank/tasks/C7a.md` - Added implementation details for the bug fixes and validation feature.
+- Updated `memory-bank/tasks.md` - Updated C7a task status.
+- Updated `memory-bank/implementation-details/observables-modular-redesign.md` - Integrated session summary into the progress section.
+- Created `memory-bank/sessions/2025-09-03-morning.md` - New session file documenting the work.
+- Updated `memory-bank/session_cache.md` - Updated current session and focus.
+- Updated `memory-bank/edit_history.md` - Added this entry.
+
 ### 2025-09-02
 
 #### 16:57 - C7a: Floating Panel Architecture and Custom Observable Panel Separation COMPLETED

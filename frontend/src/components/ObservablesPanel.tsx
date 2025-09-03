@@ -6,6 +6,7 @@ import { KineticEnergyObservable } from "../physics/observables/KineticEnergyObs
 import { MomentumObservable } from "../physics/observables/MomentumObservable";
 import { MSDObservable } from "../physics/observables/MSDObservable";
 import { TextObservable } from "../physics/observables/TextObservable";
+import { TextObservableParser } from "../physics/observables/TextObservableParser";
 import { BUILT_IN_OBSERVABLES, type ObservableConfig, type ObservableField } from "./observablesConfig";
 import { useObservablesPolling } from "./useObservablesPolling";
 
@@ -83,16 +84,13 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     setCustomObservableVisibility
   } = useAppStore();
 
-  // State for custom observable data with individual polling intervals
-  const [customObservableData, setCustomObservableData] = useState<Record<string, any>>({});
-
   // Parse custom observables to extract names and intervals
   const customObservableConfigs = useMemo(() => {
     return customObservables.map((text, index) => {
       try {
-        const parsed = TextObservable.fromText(text)[0];
-        const name = parsed?.getName() || `custom_${index}`;
-        const interval = parsed?.getInterval() || 1000;
+        const parsed = TextObservableParser.parse(text)[0];
+        const name = parsed?.name || `custom_${index}`;
+        const interval = parsed?.interval || 1000;
         return { name, text, interval, valid: true };
       } catch (error) {
         return { name: `custom_${index}`, text, interval: 1000, valid: false };
@@ -100,13 +98,15 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     });
   }, [customObservables]);
 
-  // Get visible custom observables
-  const visibleCustomObservables = useMemo(() => 
-    customObservableConfigs.filter(config => customObservableVisibility[config.name])
+  // Get visible custom observables - now handled by unified polling
+  const visibleCustomObservableIds = useMemo(() => 
+    customObservableConfigs
+      .filter(config => config.valid && customObservableVisibility[config.name])
+      .map(config => `text_${config.name}`)
   , [customObservableConfigs, customObservableVisibility]);
 
   // Determine which built-in observables are visible (memoized to prevent re-renders)
-  const visibleObservables = useMemo(() => Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
+  const visibleBuiltInObservables = useMemo(() => Object.keys(BUILT_IN_OBSERVABLES).filter(id => {
     switch (id) {
       case 'particleCount': return randomWalkUIState.showParticleCount;
       case 'kineticEnergy': return randomWalkUIState.showKineticEnergy;
@@ -116,10 +116,16 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     }
   }), [randomWalkUIState.showParticleCount, randomWalkUIState.showKineticEnergy, randomWalkUIState.showTotalMomentum, randomWalkUIState.showMSD]);
 
-  // Use unified polling hook
+  // Combine built-in and custom observable IDs for unified polling
+  const allVisibleObservables = useMemo(() => [
+    ...visibleBuiltInObservables,
+    ...visibleCustomObservableIds
+  ], [visibleBuiltInObservables, visibleCustomObservableIds]);
+
+  // Use unified polling hook for all observables
   const observableData = useObservablesPolling(
     simulatorRef,
-    visibleObservables,
+    allVisibleObservables,
     isRunning,
     simReady || false
   );
@@ -160,7 +166,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     if (!simReady || !simulatorRef.current) return;
 
     const manager = simulatorRef.current.getObservableManager();
-    const current = new Set(visibleObservables);
+    const current = new Set(visibleBuiltInObservables);
     const prev = prevVisibleRef.current;
 
     // Register newly visible
@@ -209,27 +215,29 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
     // Update prev ref
     prevVisibleRef.current = current;
-  }, [simReady, visibleObservables]);
+  }, [simReady, visibleBuiltInObservables]);
 
   // Register/unregister custom observables and handle individual polling
   const prevVisibleCustomRef = useRef<Set<string>>(new Set());
+  const debug = (...args: any[]) => console.debug('[ObservablesPanel]', ...args);
   useEffect(() => {
     if (!simReady || !simulatorRef.current) return;
-
+    
+    debug('Registering custom observables');
     const manager = simulatorRef.current.getObservableManager();
     const intervals: NodeJS.Timeout[] = [];
-    const currentVisible = new Set(visibleCustomObservables.map(c => c.name));
+    const currentVisible = new Set(customObservableConfigs.filter(c => customObservableVisibility[c.name]).map(c => c.name));
     const prevVisible = prevVisibleCustomRef.current;
 
     // Register newly visible custom observables
-    visibleCustomObservables.forEach(config => {
+    customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
       if (!config.valid || prevVisible.has(config.name)) return;
       
+      debug(`Registering observable: ${config.name}`);
       try {
         manager.registerTextObservable(config.text);
-        console.log(`[ObservablesPanel] Registered custom observable: ${config.name}`);
       } catch (error) {
-        console.error(`[ObservablesPanel] Failed to register ${config.name}:`, error);
+        debug(`Failed to register ${config.name}:`, error);
       }
     });
 
@@ -246,22 +254,17 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     });
 
     // Setup individual polling for visible custom observables
-    visibleCustomObservables.forEach(config => {
+    customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
       if (!config.valid) return;
 
+      const observableId = `text_${config.name}`;
       const pollObservable = () => {
         if (!isRunning || !simulatorRef.current) return;
         
-        const observableId = `text_${config.name}`;
         const result = manager.getResult(observableId);
-        console.log(`[Poll] ${config.name}: ${result}`);
+        debug(`Polling ${config.name}:`, result);
         
-        if (result !== null) {
-          setCustomObservableData(prev => ({
-            ...prev,
-            [config.name]: result
-          }));
-        }
+        // Custom observables handled by unified polling now, no separate state needed
       };
 
       // Initial poll
@@ -278,8 +281,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     // Cleanup intervals on unmount or dependency change
     return () => {
       intervals.forEach(id => clearInterval(id));
+      customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
+        debug(`Cleaning up polling for ${config.name}`);
+      });
     };
-  }, [simReady, isRunning, visibleCustomObservables, customObservables]);
+  }, [simReady, isRunning, customObservableConfigs, customObservableVisibility, customObservables]);
 
 
 
@@ -291,7 +297,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
           key={id}
           config={config}
           data={observableData[id]}
-          isVisible={visibleObservables.includes(id)}
+          isVisible={visibleBuiltInObservables.includes(id)}
           onToggle={(visible) => toggleObservable(id, visible)}
         />
       ))}
@@ -307,7 +313,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
           
           {customObservableConfigs.map(config => {
             const isVisible = customObservableVisibility[config.name] || false;
-            const data = customObservableData[config.name];
+            const data = observableData[`text_${config.name}`];
             
             // Create a simple config for ObservableDisplay
             const displayConfig: ObservableConfig = {
@@ -318,7 +324,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
               fields: [
                 {
                   label: "Value",
-                  path: "", // Direct value
+                  path: "value", // Use structured format
                   format: "number",
                   precision: 4
                 }

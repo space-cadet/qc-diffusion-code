@@ -1,6 +1,6 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-03 01:12:37 IST*
+*Last Updated: 2025-09-03 10:08:43 IST*
 
 **Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Implementation of Phase 0 complete with custom observables panel separation and floating panel abstraction.
 
@@ -20,6 +20,23 @@
 - [x] Achieve configurable polling intervals per observable type
 - [x] Implement unified polling system to prevent memory leaks
 - [ ] Add observable selection UI and plot control functionality (Future: Phase 1+)
+
+## Latest Implementation (2025-09-03 10:08:43 IST)
+
+### Bug Fixes, Semantic Validation, and Unified Polling
+**Files Modified**:
+- `frontend/src/physics/RandomWalkSimulator.ts`
+- `frontend/src/physics/observables/TextObservableParser.ts`
+- `frontend/src/components/CustomObservablesPanel.tsx`
+- `frontend/src/physics/observables/TextObservable.ts` (by user)
+- `frontend/src/components/ObservablesPanel.tsx` (by user)
+
+**Key Achievements**:
+1.  **NaN Bug Fix**: Resolved `NaN` results in text observables by correctly passing canvas `bounds` from `RandomWalkSimulator` to `ObservableManager` during construction.
+2.  **Semantic Validation**: Implemented expression validation in `TextObservableParser` to check for unknown variables (e.g., `velocity.x` vs `velocity.vx`), preventing runtime errors. Aligned `getAvailableProperties` with the actual evaluation context.
+3.  **Enhanced UI Help**: Updated the "Format" section in `CustomObservablesPanel` with correct property names (`velocity.vx`) and practical examples.
+4.  **Unified Polling (User Refactor)**: User refactored `ObservablesPanel` to use a single `useObservablesPolling` hook for both built-in and custom observables, removing separate state and polling logic for custom observables.
+5.  **Structured Observable Results (User Refactor)**: User updated `TextObservable.calculate` to return a structured object `{ value, timestamp, metadata }` instead of a raw number, which was then handled in the updated `ObservablesPanel`.
 
 ## Related Files
 - `memory-bank/implementation-details/observables-modular-redesign.md`

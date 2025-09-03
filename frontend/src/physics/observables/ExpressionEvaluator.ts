@@ -63,6 +63,7 @@ export class ExpressionEvaluator {
       case 'sum':
         return values.reduce((sum, val) => sum + val, 0);
       case 'mean':
+      case 'avg':
         return values.reduce((sum, val) => sum + val, 0) / values.length;
       case 'count':
         return values.length;

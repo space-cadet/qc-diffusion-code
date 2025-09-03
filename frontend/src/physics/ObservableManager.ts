@@ -9,6 +9,12 @@ export class ObservableManager {
   private currentTimestamp: number = 0;
   private cachedResults: Map<string, CachedResult> = new Map();
   private snapshotValid: boolean = false;
+  private bounds: { width: number; height: number };
+
+  constructor(bounds: { width: number; height: number }) {
+    this.bounds = bounds;
+    this.observers = new Map();
+  }
 
   register(observable: Observable): void {
     this.observers.set(observable.id, observable);
@@ -31,7 +37,7 @@ export class ObservableManager {
     // Load new text observables
     textDefinitions.forEach(text => {
       try {
-        const observables = TextObservable.fromText(text);
+        const observables = TextObservable.fromText(text, this.bounds);
         observables.forEach(obs => {
           this.textObservables.push(obs);
           this.register(obs);
@@ -49,7 +55,7 @@ export class ObservableManager {
     }
 
     try {
-      const observables = TextObservable.fromText(text);
+      const observables = TextObservable.fromText(text, this.bounds);
       observables.forEach(obs => {
         this.textObservables.push(obs);
         this.register(obs);
