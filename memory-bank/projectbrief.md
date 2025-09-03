@@ -1,6 +1,6 @@
 # Project Brief
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-24 00:02:35 IST*
+*Last Updated: 2025-09-03 17:36:15 IST*
 
 ## Project Overview
 **Name**: QC-Diffusion Code Implementation  
@@ -17,9 +17,10 @@ This project implements sophisticated computational tools for studying finite ve
 
 ### Advanced Physics Implementation
 1. **WebGL GPU-Accelerated PDE Solvers**: Fragment shader-based telegraph and diffusion equation solving with 100x performance improvement over CPU implementations
-2. **CTRW Random Walk Physics Engine**: Strategy pattern implementation with modular physics strategies (CTRW, Simple, Lévy, Fractional) and comprehensive collision mechanisms
-3. **Observer Pattern Architecture**: Lazy evaluation system for numerical observables (particle count, kinetic energy, momentum) with temporal consistency
+2. **Dual Physics Engine Architecture**: Runtime-switchable legacy and new physics engines with strategy pattern implementation supporting CTRW, Simple, Lévy, Fractional strategies and comprehensive collision mechanisms
+3. **Observer Pattern Architecture**: Lazy evaluation system for numerical observables (particle count, kinetic energy, momentum) with temporal consistency and text-based custom observables
 4. **Density Profile Calculations**: 2D spatial binning with coordinate system alignment for telegraph equation verification
+5. **Runtime Engine Selection**: UI toggle for switching between legacy and new physics engines with state persistence and visual feedback
 
 ### Sophisticated User Interface
 1. **React Grid Layout System**: Professional draggable/resizable panel interface with state persistence across browser sessions

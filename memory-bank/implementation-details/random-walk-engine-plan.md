@@ -1,7 +1,7 @@
 # Random Walk Engine Implementation Plan
 
 _Created: 2025-08-21 09:10:30 IST_
-_Last Updated: 2025-08-23 17:05:57 IST_
+_Last Updated: 2025-09-03 17:41:45 IST_
 
 ## Overview
 
@@ -231,6 +231,165 @@ useEffect(() => {
 3. **Conservation**: Particle number and momentum conservation
 4. **Stability**: No numerical instabilities for educational parameter ranges
 
+## Dual Physics Engine Architecture (Added 2025-09-03 17:41:00 IST)
+
+### Architecture Overview
+
+The system now supports runtime switching between legacy and new physics engines via a UI toggle button. Both engines coexist and can be selected without code changes or restarts.
+
+### Complete Architecture Map
+
+```
+                               RandomWalkSimulator
+                                       |
+                          ┌────────────┴────────────┐
+                          │                         │
+                    LEGACY ENGINE              NEW ENGINE
+                   (useNewEngine=false)      (useNewEngine=true)
+                          │                         │
+                          │                         │
+                ┌─────────┴─────────┐     ┌─────────┴─────────┐
+                │ LegacySimulation  │     │ EngineSimulation  │
+                │ Runner            │     │ Runner            │
+                └─────────┬─────────┘     └─────────┬─────────┘
+                          │                         │
+                          │                         │
+                ┌─────────▼─────────┐               │
+                │ ParticleManager   │               │
+                │   .update(dt)     │               │
+                └─────────┬─────────┘               │
+                          │                         │
+                ┌─────────▼─────────┐               │
+                │ CompositeStrategy │◄──────────────┤
+                │ (legacy wrapper)  │               │
+                └─────────┬─────────┘               │
+                          │                         │
+                          ├─────────────────────────┼─────────────────────────┐
+                          │                         │                         │
+                          │                         │                         │
+          ┌───────────────▼───────────────┐ ┌───────▼───────┐ ┌───────────────▼───────────────┐
+          │ LegacyBallisticStrategy      │ │ PhysicsEngine  │ │ BallisticStrategy             │
+          │                              │ │                │ │ (implements both interfaces) │
+          │ updateParticle() {           │ │ .step() {      │ │                              │
+          │   console.log("[Ballistic]   │ │   Phase A      │ │ preUpdate() - no-op          │
+          │     p0 update", ...)         │ │   Phase B      │ │ integrate() - ballistic      │
+          │   pos += vel * 0.01          │ │ }              │ │                              │
+          │ }                            │ │                │ │ updateParticleWithDt() {     │
+          │                              │ │                │ │   pos += vel * dt            │
+          │ updateParticleWithDt() {     │ │                │ │ }                            │
+          │   pos += vel * dt            │ │                │ │                              │
+          │ }                            │ └────────────────┘ │                              │
+          └──────────────────────────────┘                    └──────────────────────────────┘
+```
+
+### Engine Execution Flows
+
+**LEGACY ENGINE** - When "LEGACY" button is selected:
+```
+User clicks "Resume" button
+│
+▼
+1. RandomWalkParameterPanel.tsx:85 (button onClick)
+   └─ handlePause() function (RandomWalkSim.tsx:375)
+   
+2. State updates: setIsRunning(true), status="Running"
+
+3. Animation loop restart: useParticlesLoader.restartAnimation()
+   └─ startAnimation() → animate() RAF loop
+   
+4. Physics stepping: simulatorRef.current.step(dt)
+   └─ RandomWalkSimulator.step() → this.simulationRunner.step(dt)
+   
+5. LegacySimulationRunner.step(dt)
+   └─ this.particleManager.update(dt)
+   
+6. ParticleManager.update(dt)
+   └─ strategy.updateParticleWithDt(particle, allParticles, dt)
+   
+7. LegacyBallisticStrategy.updateParticleWithDt()
+   ├─ Console.log("[Ballistic] p0 update Object {...}")  ← EXPECTED LOG
+   ├─ particle.position.x += particle.velocity.vx * dt
+   ├─ particle.position.y += particle.velocity.vy * dt
+   └─ Apply boundary conditions
+
+8. Rendering: updateParticlesFromStrategies() → container.draw()
+```
+
+**NEW ENGINE** - When "NEW" button is selected:
+```
+User clicks "Resume" button
+│
+(Steps 1-4 same as legacy)
+│
+5. EngineSimulationRunner.step(dt)
+   ├─ Get particles from particleManager  
+   └─ this.physicsEngine.step(particles)
+   
+6. PhysicsEngine.step(particles)
+   ├─ timeManager.advance() → get dt
+   ├─ Create PhysicsContext
+   ├─ Phase A: orchestrator.executePhaseA() → preUpdate()
+   └─ Phase B: orchestrator.executePhaseB() → integrate()
+   
+7. BallisticStrategy.integrate(particle, dt, context)
+   └─ this.updateParticleWithDt(particle, [], dt)
+      ├─ particle.position.x += particle.velocity.vx * dt
+      ├─ particle.position.y += particle.velocity.vy * dt  
+      └─ Apply boundary conditions
+
+8. Rendering: (same as legacy)
+```
+
+### Runtime Engine Selection
+
+**UI Implementation:**
+- Toggle button in page header: "LEGACY" / "NEW" 
+- Persistent state via Zustand store (`useNewEngine` boolean)
+- Visual feedback with color coding (gray/green)
+- Simulator recreation when engine flag changes
+
+**Engine Determination:**
+```typescript
+// RandomWalkSimulator constructor
+constructor(config: SimulatorParams & { useNewEngine?: boolean }) {
+  this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
+  // ... rest of initialization
+}
+```
+
+**Strategy Factory Logic:**
+```typescript
+// StrategyFactory.createStrategies() - for legacy engine
+function createStrategiesInternal(/* ... */, forPhysicsEngine: boolean) {
+  // Legacy path uses LegacyBallisticStrategy
+  // New path uses BallisticStrategy (implements both interfaces)
+  
+  const strategy = forPhysicsEngine || getNewEngineFlag()
+    ? new BallisticStrategy({ boundaryConfig })
+    : new LegacyBallisticStrategy({ boundaryConfig });
+}
+```
+
+### Debugging Engine Selection
+
+**Expected Console Logs:**
+
+*Legacy Engine:*
+- `[RWS] setupSimulationRunner { useNewEngine: false }`
+- `[RWS] Using LegacySimulationRunner (flag disabled)`
+- `[Ballistic] p0 update Object { beforePos: {...}, velocity: {...}, dt: 0.01 }`
+
+*New Engine:*
+- `[RWS] setupSimulationRunner { useNewEngine: true }`
+- `[RWS] Using EngineSimulationRunner with direct PhysicsStrategies`
+- `[ESR] step called`, `[PhysicsEngine] step` logs
+
+**Missing Legacy Logs Troubleshooting:**
+1. Check `[RWS] setupSimulationRunner` message for engine selection
+2. Verify animation loop is running (simulation not paused)
+3. Confirm particles are initialized and active
+4. Check that `LegacyBallisticStrategy.updateParticleWithDt()` is being called
+
 ## Integration with Existing Architecture
 
 ### C1 Telegraph Solver Integration
@@ -244,6 +403,7 @@ useEffect(() => {
 - Connect physics parameters to Zustand store
 - Persist simulation settings across browser sessions
 - Maintain separation between physics state and UI state
+- **NEW**: Engine selection persistence via `useNewEngine` flag
 
 ### History and Replay System
 

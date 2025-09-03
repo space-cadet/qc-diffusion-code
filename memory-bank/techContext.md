@@ -1,6 +1,6 @@
 # Technical Context
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-24 00:02:35 IST*
+*Last Updated: 2025-09-03 17:37:30 IST*
 
 ## Backend Technical Details
 
@@ -113,10 +113,12 @@ qc-diffusion-code/
 ## Advanced Integration Architecture
 
 ### Physics Engine Integration
-- **Strategy Pattern**: Modular physics implementations (CTRW, Simple, Lévy, Fractional)
-- **Observer Pattern**: Lazy evaluation system for numerical observables
-- **Coordinate System**: Clean separation between physics (-200,+200) and canvas (0,width) coordinates
+- **Dual Engine Architecture**: Runtime-switchable legacy and new physics engines with feature flag system
+- **Strategy Pattern**: Modular physics implementations (CTRW, Simple, Lévy, Fractional) with PhysicsStrategy and RandomWalkStrategy interfaces
+- **Observer Pattern**: Lazy evaluation system for numerical observables with text-based custom observables and unified polling
+- **Coordinate System**: Clean separation between physics (-200,+200) and canvas (0,width) coordinates with proper transformations
 - **WebGL Acceleration**: Fragment shader-based PDE solving with 100x performance improvement
+- **Engine Selection UI**: Runtime toggle button in page header with persistent state management
 
 ### State Management Integration
 - **Zustand Persistence**: Complete application state with localStorage integration

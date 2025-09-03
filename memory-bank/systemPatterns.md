@@ -1,27 +1,44 @@
 # System Patterns
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-24 00:02:35 IST*
+*Last Updated: 2025-09-03 17:38:45 IST*
 
 ## Architecture Overview
 Advanced hybrid client-server architecture with GPU acceleration, modular physics engines, and comprehensive state management for high-performance scientific computing simulations.
 
 ## Core Design Patterns
 
-### 1. Strategy Pattern Physics Engine
-**Implementation**: `frontend/src/physics/strategies/`
-**Purpose**: Modular physics simulation architectures supporting multiple random walk approaches
+### 1. Dual Physics Engine Architecture
+**Implementation**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/core/`
+**Purpose**: Runtime-switchable physics engines with comprehensive strategy support
 **Key Components**:
-- `RandomWalkStrategy` interface defining common physics operations
-- `CTRWStrategy.ts` - Continuous Time Random Walk implementation with exponential collision timing
-- `SimpleStrategy.ts` - Basic random walk for educational comparison
-- `LévyStrategy.ts` - Lévy flight implementation for anomalous diffusion
-- `FractionalStrategy.ts` - Fractional derivative random walks
+- **Legacy Engine Path**: `LegacySimulationRunner` → `ParticleManager` → `RandomWalkStrategy` implementations
+- **New Engine Path**: `EngineSimulationRunner` → `PhysicsEngine` → `PhysicsStrategy` implementations
+- **Strategy Interfaces**: Dual interface support (`RandomWalkStrategy` and `PhysicsStrategy`)
+- **Runtime Toggle**: UI button with persistent state management for seamless engine switching
+
+**Strategy Implementations**:
+- `CTRWStrategy.ts` - Continuous Time Random Walk with exponential collision timing
+- `BallisticStrategy.ts` - Unified ballistic motion supporting both engine interfaces
+- `LegacyBallisticStrategy.ts` - Legacy engine ballistic implementation with detailed logging
+- `InterparticleCollisionStrategy.ts` - Collision detection and response
+- `CompositeStrategy.ts` - Multi-strategy orchestration wrapper
+
+**Engine Execution Flows**:
+```
+LEGACY: handlePause() → setSimulationState() → useParticlesLoader.animate() → 
+        LegacySimulationRunner.step() → ParticleManager.update() → 
+        LegacyBallisticStrategy.updateParticleWithDt()
+
+NEW:    handlePause() → setSimulationState() → useParticlesLoader.animate() → 
+        EngineSimulationRunner.step() → PhysicsEngine.step() → 
+        BallisticStrategy.integrate()
+```
 
 **Benefits**:
-- Runtime strategy switching without code changes
-- Isolated testing of individual physics approaches
-- Easy extension for new physics models
-- Parameter-specific optimization per strategy
+- Runtime engine comparison for performance and behavior analysis
+- Backwards compatibility preservation during architecture migration
+- Independent testing of both legacy and new physics implementations
+- Seamless user experience with visual feedback for engine selection
 
 ### 2. Observer Pattern for Numerical Observables
 **Implementation**: `frontend/src/physics/ObservableManager.ts`

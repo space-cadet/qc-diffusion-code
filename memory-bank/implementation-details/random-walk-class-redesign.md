@@ -1,8 +1,5 @@
 # Random Walk Class Redesign Implementation Plan
 
-_Created: 2025-08-22 08:07:05 IST_
-_Last Updated: 2025-08-22 08:54:17 IST_
-
 ## Motivation and Goals
 
 ### Current Problems
@@ -185,8 +182,9 @@ class RandomWalkSimulator {
 
 ### Detailed Comparison Table
 
+
 | Aspect                   | Abstract Hierarchy              | Strategy Pattern                    | Winner    |
-| ------------------------ | ------------------------------- | ----------------------------------- | --------- |
+| -------------------------- | --------------------------------- | ------------------------------------- | ----------- |
 | **Complexity**           | Moderate (3 inheritance levels) | Low (interfaces + composition)      | Strategy  |
 | **State Preservation**   | Requires careful design         | Natural - swap strategy, keep state | Strategy  |
 | **Extensibility**        | Clear inheritance paths         | Add new strategies easily           | Strategy  |
@@ -200,8 +198,9 @@ class RandomWalkSimulator {
 
 ### Implementation Effort Comparison
 
+
 | Task                 | Abstract Hierarchy                | Strategy Pattern                    | Winner    |
-| -------------------- | --------------------------------- | ----------------------------------- | --------- |
+| ---------------------- | ----------------------------------- | ------------------------------------- | ----------- |
 | Base Infrastructure  | 8-10 files (~300 lines)           | 3-4 files (~150 lines)              | Strategy  |
 | Adding New Walk Type | Extend base class, modify factory | Implement interface, add to factory | Tie       |
 | Parameter Updates    | State management across hierarchy | Swap strategy object                | Strategy  |
@@ -211,8 +210,9 @@ class RandomWalkSimulator {
 
 ### Functional vs OOP Comparison
 
+
 | Aspect               | Strategy (OOP)                   | Pure Functional                   | Trade-off                |
-| -------------------- | -------------------------------- | --------------------------------- | ------------------------ |
+| ---------------------- | ---------------------------------- | ----------------------------------- | -------------------------- |
 | **Syntax**           | `strategy.updateParticle(p)`     | `updateParticle(walkFunction, p)` | OOP: familiar            |
 | **State Management** | Strategy object holds parameters | Parameters passed to functions    | Functional: cleaner      |
 | **Performance**      | Object creation overhead         | Function call overhead            | Similar                  |
@@ -405,3 +405,73 @@ class CTRWStrategy implements RandomWalkStrategy {
 **Abstract Hierarchy Approach**: 8-10 hours total (not recommended)
 
 - Significantly more complex with questionable benefits for current needs
+
+## Engine Architecture Implementation
+
+### Dual Engine Execution Flow
+
+```
+                               RandomWalkSimulator
+                                       |
+                          ┌────────────┴────────────┐
+                          │                         │
+                    LEGACY ENGINE              NEW ENGINE
+                   (useNewEngine=false)      (useNewEngine=true)
+                          │                         │
+                          │                         │
+                ┌─────────┴─────────┐     ┌─────────┴─────────┐
+                │ LegacySimulation  │     │ EngineSimulation  │
+                │ Runner            │     │ Runner            │
+                └─────────┬─────────┘     └─────────┬─────────┘
+                          │                         │
+                          │                         │
+                ┌─────────▼─────────┐               │
+                │ ParticleManager   │               │
+                │   .update(dt)     │               │
+                └─────────┬─────────┘               │
+                          │                         │
+                ┌─────────▼─────────┐               │
+                │ CompositeStrategy │◄──────────────┤
+                │ (legacy wrapper)  │               │
+                └─────────┬─────────┘               │
+                          │                         │
+                          ├─────────────────────────┼─────────────────────────┐
+                          │                         │                         │
+                          │                         │                         │
+          ┌───────────────▼───────────────┐ ┌───────▼───────┐ ┌───────────────▼───────────────┐
+          │ LegacyBallisticStrategy      │ │ PhysicsEngine  │ │ BallisticStrategy             │
+          │                              │ │                │ │ (implements both interfaces) │
+          │ updateParticle() {           │ │ .step() {      │ │                              │
+          │   console.log("[Ballistic]   │ │   Phase A      │ │ preUpdate() - no-op          │
+          │     p0 update", ...)         │ │   Phase B      │ │ integrate() - ballistic      │
+          │   pos += vel * 0.01          │ │ }              │ │                              │
+          │ }                            │ │                │ │ updateParticleWithDt() {     │
+          │                              │ │                │ │   pos += vel * dt            │
+          │ updateParticleWithDt() {     │ │                │ │ }                            │
+          │   pos += vel * dt            │ │                │ │                              │
+          │ }                            │ └────────────────┘ │                              │
+          └──────────────────────────────┘                    └──────────────────────────────┘
+```
+
+### Key Runtime Characteristics
+
+**Legacy Path**
+
+- ParticleManager drives updates via strategy.updateParticleWithDt()
+- Fixed timestep (0.01) if using updateParticle() fallback
+- CompositeStrategy wraps multiple strategies
+
+**New Engine Path**
+
+- PhysicsEngine orchestrates phased execution (collision → integration)
+- Proper variable timestep handling
+- Strategies implement both RandomWalkStrategy and PhysicsStrategy
+
+### Verification Logs
+
+```
+[RWS] setupSimulationRunner { useNewEngine: false/true }
+[RWS] Using LegacySimulationRunner (flag disabled)
+[RWS] Using EngineSimulationRunner with direct PhysicsStrategies
+[PM] updatePhysicsEngine: new bounds {...}
+```

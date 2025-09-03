@@ -1,9 +1,23 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 12:47:40 IST_
+_Last Updated: 2025-09-03 21:38:30 IST_
 
 ### 2025-09-03
+
+#### 21:38 - C15 & META-1: Runtime Physics Engine Toggle Implementation and Memory Bank Updates
+- Updated `frontend/src/RandomWalkSim.tsx` - Added toggle button in page header for switching between legacy and new physics engines, visual feedback with color-coded states (gray for LEGACY, green for NEW)
+- Updated `frontend/src/stores/appStore.ts` - Added useNewEngine boolean state with persistence, setUseNewEngine action for runtime engine selection
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Modified constructor to accept useNewEngine parameter via intersection types, updated useEffect dependency to recreate simulator on engine change
+- Updated `memory-bank/activeContext.md` - Current focus on C15 physics engine toggle implementation with current timestamps
+- Updated `memory-bank/projectbrief.md` - Enhanced physics implementation section with dual engine architecture details
+- Updated `memory-bank/techContext.md` - Updated physics engine integration with runtime engine selection details
+- Updated `memory-bank/systemPatterns.md` - Expanded dual engine architecture documentation with comprehensive analysis
+- Updated `memory-bank/implementation-details/random-walk-engine-plan.md` - Added complete architecture map, execution flows, and debugging information
+- Updated `memory-bank/tasks/C15.md` - Added runtime toggle phase completion with progress log entry
+- Updated `memory-bank/tasks.md` - Updated C15 and META-1 task details with implementation completion
+- Created `memory-bank/sessions/2025-09-03-evening.md` - Evening session documentation with comprehensive work summary
+- Updated `memory-bank/session_cache.md` - Updated current session and history with evening focus
 
 #### 12:47 - C7a: Single-Timer Polling Architecture Implementation
 - Rewrote `frontend/src/components/useObservablesPolling.ts` - Implemented single 25ms timer architecture with per-observable nextPollTime tracking

@@ -26,14 +26,15 @@ export class RandomWalkSimulator {
   private observableManager: ObservableManager;
   private simulationRunner: SimulationRunner | undefined;
   private parameterManager: ParameterManager;
-  private readonly useNewEngine: boolean = USE_NEW_ENGINE === true;
+  private readonly useNewEngine: boolean;
   private densityHistory: Array<{
     time: number;
     density: number[][];
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
   }> = [];
 
-  constructor(config: SimulatorParams) {
+  constructor(config: SimulatorParams & { useNewEngine?: boolean }) {
+    this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
     this.parameterManager = new ParameterManager(config);
     this.setupStrategies();
     this.setupParticleManager();

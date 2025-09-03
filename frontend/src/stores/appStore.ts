@@ -87,6 +87,8 @@ interface AppState {
   customObservables: string[]
   // Custom observable visibility state (by observable name)
   customObservableVisibility: Record<string, boolean>
+  // Physics engine selection
+  useNewEngine: boolean
   // PDE persistent state
   pdeState: PdeState
   // PDE UI fold states for Controls panel
@@ -113,6 +115,7 @@ interface AppState {
   removeCustomObservable: (index: number) => void
   updateCustomObservable: (index: number, observable: string) => void
   setCustomObservableVisibility: (name: string, visible: boolean) => void
+  setUseNewEngine: (useNew: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -262,6 +265,7 @@ export const useAppStore = create<AppState>()(
       customObservablesCollapsed: false,
       customObservables: [],
       customObservableVisibility: {},
+      useNewEngine: false, // Default to legacy engine
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
@@ -286,6 +290,7 @@ export const useAppStore = create<AppState>()(
       setCustomObservableVisibility: (name, visible) => set((state) => ({
         customObservableVisibility: { ...state.customObservableVisibility, [name]: visible }
       })),
+      setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -348,6 +353,7 @@ export const useAppStore = create<AppState>()(
         customObservablesCollapsed: state.customObservablesCollapsed,
         customObservables: state.customObservables,
         customObservableVisibility: state.customObservableVisibility,
+        useNewEngine: state.useNewEngine,
       }),
     }
   )

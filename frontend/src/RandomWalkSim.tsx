@@ -53,7 +53,9 @@ export default function RandomWalkSim() {
     observablesCollapsed,
     setObservablesCollapsed,
     customObservablesCollapsed,
-    setCustomObservablesCollapsed
+    setCustomObservablesCollapsed,
+    useNewEngine,
+    setUseNewEngine
   } = useAppStore();
 
   // State declarations should come before refs
@@ -244,6 +246,7 @@ export default function RandomWalkSim() {
       canvasWidth,
       canvasHeight,
       temperature: gridLayoutParams.temperature,
+      useNewEngine: useNewEngine,
       // initial distribution wiring
       initialDistType: gridLayoutParams.initialDistType,
       distSigmaX: gridLayoutParams.distSigmaX,
@@ -312,6 +315,7 @@ export default function RandomWalkSim() {
     gridLayoutParams.dimension,
     gridLayoutParams.graphType,
     gridLayoutParams.graphSize,
+    useNewEngine, // Recreate simulator when engine toggle changes
   ]);
 
   // Update physics parameters when store changes
@@ -580,14 +584,31 @@ export default function RandomWalkSim() {
           {tempNotice}
         </div>
       )}
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-2">
-          Random Walk → Telegraph Equation
-        </h1>
-        <p className="text-gray-600">
-          Interactive simulation showing stochastic particle motion converging
-          to telegraph equation
-        </p>
+      <div className="p-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">
+            Random Walk → Telegraph Equation
+          </h1>
+          <p className="text-gray-600">
+            Interactive simulation showing stochastic particle motion converging
+            to telegraph equation
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Physics Engine:
+          </label>
+          <button
+            onClick={() => setUseNewEngine(!useNewEngine)}
+            className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
+              useNewEngine
+                ? 'bg-green-100 border-green-300 text-green-800 hover:bg-green-200'
+                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {useNewEngine ? 'NEW' : 'LEGACY'}
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 p-4 relative">

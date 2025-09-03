@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 12:47:40 IST_
+_Last Updated: 2025-09-03 21:36:15 IST_
 
 ## Active Tasks
 
@@ -153,20 +153,15 @@ _Last Updated: 2025-09-03 12:47:40 IST_
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency
-**Status**: 🔄 ACTIVE **Last**: 2025-08-24 11:16:39 IST
-**Files**: All memory bank files
-**Notes**: Ongoing maintenance to ensure documentation accuracy and system consistency
+**Status**: 🔄 ACTIVE **Last**: 2025-09-03 21:36:15 IST
+**Files**: `memory-bank/activeContext.md`, `memory-bank/projectbrief.md`, `memory-bank/techContext.md`, `memory-bank/systemPatterns.md`, `memory-bank/implementation-details/random-walk-engine-plan.md`
+**Notes**: Updated core memory bank files with current system timestamps, enhanced architecture documentation with dual physics engine details, added comprehensive execution flow analysis to implementation details
 
 ### C15: Physics Engine Architecture Migration
 **Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model
-**Status**: 🔄 IN PROGRESS
-**Current Phase**: Step 4 - Animation loop architecture and logging fixes
-**Priority**: HIGH
-**Started**: 2025-08-28
-**Last Active**: 2025-08-31 02:43:12 IST
-**Dependencies**: C5c, C12, C14
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/strategies/LegacyBallisticStrategy.ts`, `frontend/src/physics/utils/density.ts`, `frontend/src/physics/utils/ThermalVelocities.ts`, `frontend/src/physics/utils/InitDistributions.ts`, `frontend/src/physics/analysis/WavefrontAnalysis.ts`, `frontend/src/physics/core/SimulationRunner.ts`, `frontend/src/physics/core/ParameterManager.ts`
-**Notes**: RandomWalkSimulator refactoring: Completed all three phases - (1) Extracted density profile and field computation to utils/density.ts; (2) extracted thermal velocity generation to utils/ThermalVelocities.ts and initial position sampling to utils/InitDistributions.ts; (3) extracted analysis utilities to analysis/WavefrontAnalysis.ts. Fixed TypeScript errors in SimulationRunner.ts by replacing shorthand constructor syntax with explicit property declarations to comply with 'erasableSyntaxOnly' compiler option. Fixed RandomWalkSimulator.ts type-only imports and added definite assignment assertions to uninitialized properties. Preserved existing behavior and APIs while improving modularity and code organization.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 21:36:15 IST
+**Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/RandomWalkSimulator.ts`, `memory-bank/implementation-details/random-walk-engine-plan.md`
+**Notes**: Runtime engine toggle implementation completed - Added UI toggle button in page header for switching between legacy and new physics engines, useNewEngine state with persistence, modified RandomWalkSimulator constructor to accept engine flag parameter, comprehensive architecture analysis and execution flow documentation added
 
 ### C15a: Random Walk Physics Engine Implementation Verification
 **Description**: Systematic verification and correction of critical logical errors and architectural problems discovered in random walk physics engine through comprehensive code examination
