@@ -1,7 +1,7 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-03 22:47:40 IST*
+*Updated: 2025-09-04 00:54:05 IST*
 
 ## Executive Summary
 
@@ -540,29 +540,37 @@ kineticEnergy: {
 4. **Maintainability**: Eliminates separate class files for built-in observables
 5. **Flexibility**: Easy to modify observable definitions without code changes
 
-## Streaming Observable Framework Integration (2025-09-03 22:22:05 IST)
+## GPT-5 Enhanced Observable System (2025-09-04 00:54:05 IST)
 
-### EventEmitter-Based Observable System (C18 Completion)
-**Objective**: Replace polling-based architecture with streaming/push-based framework using EventEmitter pattern
+### Initial State Tracking and Transform System Implementation
+**Primary Contributor**: GPT-5 with significant architectural enhancements and performance optimizations
+**Objective**: Add comprehensive initial state tracking and post-aggregation transform capabilities to observable system
 
-#### Key Implementation
+#### Key Enhancements by GPT-5
 
-**StreamObservableManager Architecture**:
-- EventEmitter-based data emission during simulation step
-- Real-time updates eliminate polling complexity and improve performance
-- Automatic observable registration/unregistration based on visibility
-- Support for both built-in and custom text-based observables
+**Initial State Tracking System**:
+- Added `InitialState` interface with position, velocity, and timestamp capture on particle creation
+- Enhanced `ParticleManager.ts` to store initial conditions for all particles enabling displacement-based calculations
+- Extended `ExpressionEvaluator.ts` context with `initial.position.{x,y,magnitude}` and `initial.velocity.{vx,vy,magnitude}` access
+- Enables sophisticated observables like true displacement, velocity changes, and time-based evolution tracking
 
-**React Integration**:
-- `useObservableStream` hook replaces complex polling logic with event subscriptions
-- `StreamObservablesPanel` provides streaming version with simplified architecture
-- Feature toggle system allows A/B testing between polling and streaming approaches
+**Transform System Implementation**:
+- Added post-aggregation transform support in `TextObservable.ts` with `sqrt`, `abs`, `log`, `exp` functions
+- Enhanced `TextObservableParser.ts` with transform field parsing and validation
+- Enables mathematical operations on aggregated results: `reduce: mean, transform: sqrt` for standard deviations
+- Comprehensive error handling and validation for unknown transform functions
 
-**Performance Benefits**:
-- Eliminates all interval/timing complexity from polling system
-- Real-time data emission with no polling lag
-- Lower CPU usage through event-driven updates
-- Cleaner separation of concerns between simulation and UI
+**Performance Optimizations**:
+- Moved snapshot updates from every simulation frame to polling-only in `RandomWalkSimulator.ts` 
+- Added manual snapshot update in polling system via `useObservablesPolling.ts` for current data
+- Reduced computational overhead while maintaining data accuracy
+- Gated debug logging with `DEBUG_ENABLED` flags to reduce console noise
+
+**Parser Enhancements**:
+- Improved comma-separated parsing with bracket and quote awareness for nested expressions
+- Removed ambiguous inline syntax without braces, enforcing block-with-braces syntax only  
+- Added comprehensive identifier validation for initial state properties
+- Enhanced error messages and validation feedback for better user experience
 
 #### Technical Architecture
 
@@ -617,3 +625,18 @@ manager.on('update', handleUpdate);
 **Phase 2 (2025-09-03)**: Streaming observable framework with EventEmitter-based push updates
 
 The observable system has evolved from hardcoded classes to a flexible, modular architecture supporting both polling and streaming paradigms, with complete text-based observable definitions and real-time performance optimization.
+
+## C7b Task Creation and Composable Framework Planning (2025-09-04 00:54:05 IST)
+
+### Future Architecture Planning
+**Created**: C7b task and `composable-observables-plan.md` for next-generation composable observable framework design
+**Objective**: Design pipeline-based observable composition system enabling complex calculations through functional operators
+
+**Planned Architecture Features**:
+- Pipeline operators: `map`, `filter`, `reduce`, `combine`, `window`, `delay`  
+- Functional composition patterns for complex multi-step calculations
+- Observable dependency graph system for automatic recalculation
+- Lazy evaluation and caching for performance optimization
+- Type-safe observable composition with TypeScript generics
+
+**Integration Path**: Build upon GPT-5's initial state tracking and transform system to create composable calculation pipelines, enabling users to construct complex observables from simple building blocks through operator chaining.

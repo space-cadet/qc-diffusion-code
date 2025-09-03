@@ -1,7 +1,8 @@
 import { Parser } from 'expr-eval';
 
-// Add debug logger
-const debug = (...args: any[]) => console.debug('[TextObservableParser]', ...args);
+// Add debug logger (gated)
+const DEBUG_ENABLED = false;
+const debug = (...args: any[]) => { if (DEBUG_ENABLED) console.debug('[TextObservableParser]', ...args); };
 
 export interface ParsedObservable {
   name: string;
@@ -10,6 +11,7 @@ export interface ParsedObservable {
   select?: string;
   reduce: string;
   interval?: number;
+  transform?: string; // post-aggregation unary transform
 }
 
 export class TextObservableParser {
@@ -22,13 +24,18 @@ export class TextObservableParser {
     // Nested objects
     'position.x', 'position.y', 'position.magnitude',
     'velocity.vx', 'velocity.vy', 'velocity.magnitude',
-    'bounds.width', 'bounds.height'
+    'bounds.width', 'bounds.height',
+    // Initial state (positions, velocities, timestamp)
+    'initial.position.x', 'initial.position.y', 'initial.position.magnitude',
+    'initial.velocity.vx', 'initial.velocity.vy', 'initial.velocity.magnitude',
+    'initial.timestamp'
   ]);
 
   // Common math/function identifiers provided by expr-eval that shouldn't be treated as variables
   private static allowedFunctions: Set<string> = new Set([
     'abs','acos','acosh','asin','asinh','atan','atan2','atanh','ceil','cos','cosh','exp','floor','log','log10',
-    'max','min','pow','round','sign','sin','sinh','sqrt','tan','tanh','random','ln','mod'
+    'max','min','pow','round','sign','sin','sinh','sqrt','tan','tanh','random','ln','mod',
+    'and','or','not'
   ]);
 
   private static extractIdentifiers(expression: string): string[] {
@@ -42,7 +49,7 @@ export class TextObservableParser {
   private static isAllowedIdentifier(id: string): boolean {
     if (this.allowedProperties.has(id)) return true;
     // Allow roots 'position', 'velocity', 'bounds' to be used only with known subkeys
-    if (id === 'position' || id === 'velocity' || id === 'bounds') return true; // parser may reference object; runtime selects subfields
+    if (id === 'position' || id === 'velocity' || id === 'bounds' || id === 'initial') return true; // parser may reference object; runtime selects subfields
     return false;
   }
 
@@ -53,11 +60,16 @@ export class TextObservableParser {
     const hasBlockSyntax = text.includes('{') && text.includes('}');
     const hasInlineSyntax = text.includes(',') && text.includes(':');
     
-    if (hasInlineSyntax && !hasBlockSyntax) {
-      return this.parseInline(text);
-    } else {
-      return this.parseBlock(text);
+    // New rule: Only block-with-braces syntax is accepted.
+    // Inline-without-braces is no longer supported.
+    if (!hasBlockSyntax) {
+      if (hasInlineSyntax) {
+        throw new Error('Inline syntax without braces is not supported. Use: observable "name" { key: value, ... }');
+      }
+      // If no braces at all, nothing to parse
+      return [];
     }
+    return this.parseBlock(text);
   }
 
   private static parseInline(text: string): ParsedObservable[] {
@@ -112,6 +124,39 @@ export class TextObservableParser {
     return observables;
   }
 
+  private static splitTopLevelByComma(input: string): string[] {
+    const parts: string[] = [];
+    let current = '';
+    let depthParen = 0;
+    let depthBrace = 0;
+    let depthBracket = 0;
+    let inSingle = false;
+    let inDouble = false;
+    for (let i = 0; i < input.length; i++) {
+      const ch = input[i];
+      const prev = i > 0 ? input[i - 1] : '';
+      // Toggle quotes (ignore escaped quotes)
+      if (!inDouble && ch === '\'' && prev !== '\\') inSingle = !inSingle;
+      else if (!inSingle && ch === '"' && prev !== '\\') inDouble = !inDouble;
+      else if (!inSingle && !inDouble) {
+        if (ch === '(') depthParen++;
+        else if (ch === ')') depthParen = Math.max(0, depthParen - 1);
+        else if (ch === '{') depthBrace++;
+        else if (ch === '}') depthBrace = Math.max(0, depthBrace - 1);
+        else if (ch === '[') depthBracket++;
+        else if (ch === ']') depthBracket = Math.max(0, depthBracket - 1);
+      }
+      if (ch === ',' && !inSingle && !inDouble && depthParen === 0 && depthBrace === 0 && depthBracket === 0) {
+        if (current.trim().length > 0) parts.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    if (current.trim().length > 0) parts.push(current.trim());
+    return parts;
+  }
+
   private static parseBlock(text: string): ParsedObservable[] {
     debug('Parsing block syntax:', text);
     
@@ -120,6 +165,7 @@ export class TextObservableParser {
     
     let current: Partial<ParsedObservable> = {};
     let inBlock = false;
+    let buffer: string[] = [];
     
     for (const line of lines) {
       if (line.match(/^observable\s+"([^"]+)"\s*\{/)) {
@@ -128,6 +174,54 @@ export class TextObservableParser {
         inBlock = true;
         debug('Parsing observable:', current.name);
       } else if (line === '}') {
+        // Join all content captured within braces and parse comma-separated pairs
+        const content = buffer.join(' ').replace(/\s+/g, ' ').trim();
+        buffer = [];
+        if (content.length > 0) {
+          const pairs = this.splitTopLevelByComma(content);
+          for (const pair of pairs) {
+            const colonIdx = pair.indexOf(':');
+            if (colonIdx === -1) continue; // skip invalid segments
+            const key = pair.substring(0, colonIdx).trim();
+            const value = pair.substring(colonIdx + 1).trim().replace(/,$/, '');
+            switch (key) {
+              case 'source':
+                current.source = value as 'particles' | 'simulation';
+                debug(`Parsed source: ${current.source}`);
+                break;
+              case 'filter':
+                current.filter = value;
+                debug(`Parsed filter: ${current.filter}`);
+                break;
+              case 'select':
+                current.select = value;
+                debug(`Parsed select: ${current.select}`);
+                break;
+              case 'reduce':
+                current.reduce = value;
+                debug(`Parsed reduce: ${current.reduce}`);
+                break;
+              case 'transform':
+              case 'post': {
+                const t = value.replace(/['"]/g, '').trim();
+                current.transform = t;
+                debug(`Parsed transform: ${current.transform}`);
+                break;
+              }
+              case 'interval':
+                const intervalValue = parseInt(value);
+                if (!isNaN(intervalValue) && intervalValue > 0) {
+                  current.interval = intervalValue;
+                  debug(`Parsed interval: ${current.interval}`);
+                }
+                break;
+              case 'name':
+                current.name = value;
+                debug(`Parsed name: ${current.name}`);
+                break;
+            }
+          }
+        }
         if (current.name && current.reduce) {
           debug('Parsed observable:', current);
           observables.push({
@@ -138,34 +232,9 @@ export class TextObservableParser {
         current = {};
         inBlock = false;
       } else if (inBlock) {
-        const [key, ...valueParts] = line.split(':');
-        const value = valueParts.join(':').trim();
-        
-        switch (key.trim()) {
-          case 'source':
-            current.source = value as 'particles' | 'simulation';
-            debug(`Parsed source: ${current.source}`);
-            break;
-          case 'filter':
-            current.filter = value;
-            debug(`Parsed filter: ${current.filter}`);
-            break;
-          case 'select':
-            current.select = value;
-            debug(`Parsed select: ${current.select}`);
-            break;
-          case 'reduce':
-            current.reduce = value;
-            debug(`Parsed reduce: ${current.reduce}`);
-            break;
-          case 'interval':
-            const intervalValue = parseInt(value);
-            if (!isNaN(intervalValue) && intervalValue > 0) {
-              current.interval = intervalValue;
-              debug(`Parsed interval: ${current.interval}`);
-            }
-            break;
-        }
+        // Accumulate raw lines between braces; parsing happens when we hit '}'
+        // Allow trailing commas and multiple pairs per line
+        buffer.push(line);
       }
     }
     
@@ -196,7 +265,10 @@ export class TextObservableParser {
       'lastCollisionTime', 'nextCollisionTime', 'collisionCount',
       'interparticleCollisionCount', 'waitingTime',
       'bounds.width', 'bounds.height',
-      'time'
+      'time',
+      'initial.position.x', 'initial.position.y', 'initial.position.magnitude',
+      'initial.velocity.vx', 'initial.velocity.vy', 'initial.velocity.magnitude',
+      'initial.timestamp'
     ];
   }
 

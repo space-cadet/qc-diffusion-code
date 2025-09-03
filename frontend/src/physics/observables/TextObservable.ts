@@ -4,8 +4,9 @@ import type { ParsedObservable } from './TextObservableParser';
 import { TextObservableParser } from './TextObservableParser';
 import { ExpressionEvaluator } from './ExpressionEvaluator';
 
-// Add debug logger
-const debug = (...args: any[]) => console.debug('[TextObservable]', ...args);
+// Add debug logger (gated)
+const DEBUG_ENABLED = false;
+const debug = (...args: any[]) => { if (DEBUG_ENABLED) console.debug('[TextObservable]', ...args); };
 
 export class TextObservable implements Observable {
   private definition: ParsedObservable;
@@ -43,6 +44,7 @@ export class TextObservable implements Observable {
     if (this.definition.filter) parts.push(`filter: ${this.definition.filter}`);
     if (this.definition.select) parts.push(`select: ${this.definition.select}`);
     parts.push(`reduce: ${this.definition.reduce}`);
+    if (this.definition.transform) parts.push(`transform: ${this.definition.transform}`);
     return parts.join(', ');
   }
 
@@ -89,9 +91,28 @@ export class TextObservable implements Observable {
 
     // Apply reduce function
     debug(`Applying reduce: ${this.definition.reduce}`);
-    const result = ExpressionEvaluator.applyReduce(values, this.definition.reduce);
+    let result = ExpressionEvaluator.applyReduce(values, this.definition.reduce);
     if (isNaN(result)) {
       debug('Invalid calculation - values:', values, 'reduce:', this.definition.reduce);
+    }
+
+    // Apply optional post-aggregation transform
+    if (this.definition.transform) {
+      const t = this.definition.transform;
+      const transforms: Record<string, (x: number) => number> = {
+        sqrt: Math.sqrt,
+        abs: Math.abs,
+        log: Math.log,
+        exp: Math.exp,
+      };
+      const fn = transforms[t];
+      if (fn) {
+        const before = result;
+        result = fn(result);
+        debug(`Applied transform ${t}: ${before} -> ${result}`);
+      } else {
+        debug(`Unknown transform '${t}', skipping.`);
+      }
     }
     return result;
   }
@@ -110,6 +131,12 @@ export class TextObservable implements Observable {
       for (const def of parsed) {
         if (!def.name) errors.push('Observable missing name');
         if (!def.reduce) errors.push(`Observable "${def.name}" missing reduce function`);
+        if (def.transform) {
+          const allowed = new Set(['sqrt', 'abs', 'log', 'exp']);
+          if (!allowed.has(def.transform)) {
+            errors.push(`Invalid transform in "${def.name}": ${def.transform}`);
+          }
+        }
         
         if (def.filter) {
           const filterValidation = TextObservableParser.validateExpression(def.filter);

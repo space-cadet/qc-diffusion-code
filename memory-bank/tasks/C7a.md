@@ -1,6 +1,6 @@
 # C7a: Modular Transparent Observable System Redesign
 *Created: 2025-09-01 14:55:13 IST*
-*Last Updated: 2025-09-03 10:08:43 IST*
+*Last Updated: 2025-09-04 00:54:05 IST*
 
 **Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Implementation of Phase 0 complete with custom observables panel separation and floating panel abstraction.
 
@@ -25,28 +25,35 @@
 - [ ] Complete conversion of all built-in observables to text-based system
 - [ ] Add observable selection UI and plot control functionality (Future: Phase 1+)
 
-## Latest Implementation (2025-09-03 12:47:40 IST)
+## Latest Implementation (2025-09-04 00:54:05 IST)
 
-### Unified Polling Architecture and Built-In Observable Migration
-**Files Modified**:
-- `frontend/src/components/useObservablesPolling.ts` - Complete rewrite with single-timer architecture (25ms resolution)
-- `frontend/src/physics/observables/TextObservableParser.ts` - Added inline syntax support for simpler observable definitions
-- `frontend/src/components/observablesConfig.ts` - Converted particle count and kinetic energy to text-based system
-- `frontend/src/components/ObservablesPanel.tsx` - Updated registration logic for text-based built-in observables
+### GPT-5 Enhanced Observable System with Initial State Tracking and Transform Framework
+**Primary contributor**: GPT-5 with significant performance optimizations and feature enhancements
 
-**Key Achievements**:
-1. **Single-Timer Polling Architecture**: Replaced multiple timers with single 25ms timer using Δ_min approach. Each observable tracks `nextPollTime` with intervals as multiples of 25ms for optimal performance.
-2. **Custom Observable Data Display Fix**: Resolved "No data" issue by fixing polling system to handle both built-in and custom observables with unified architecture. Custom observables now display continuous updates during simulation.
-3. **Inline Syntax Parser**: Added support for comma-separated syntax `name: particleCount, reduce: count` alongside existing block syntax. Enables simpler observable definitions for both built-in and custom observables.
-4. **Built-In Observable Migration**: Successfully converted particle count and kinetic energy observables from hardcoded classes to text-based system. Observables now use unified data structure `{value, timestamp, metadata}`.
-5. **Performance Optimization**: Eliminated duplicate polling systems, reduced from N+1 timers to single timer, improved memory management with proper state tracking.
+**Files Modified by GPT-5**:
+- `frontend/src/components/useObservablesPolling.ts` - Added manual snapshot update in polling system for current particle data
+- `frontend/src/physics/ParticleManager.ts` - Added initial state tracking (position, velocity, timestamp) for all particles  
+- `frontend/src/physics/RandomWalkSimulator.ts` - Optimized snapshot updates to polling-only for performance
+- `frontend/src/physics/observables/ExpressionEvaluator.ts` - Added initial state context with position/velocity magnitudes
+- `frontend/src/physics/observables/TextObservable.ts` - Implemented transform system (sqrt, abs, log, exp) with gated debug logging
+- `frontend/src/physics/observables/TextObservableParser.ts` - Enhanced parser with initial state properties, transform validation, bracket-aware parsing
+- `frontend/src/physics/types/Particle.ts` - Added InitialState interface and initial field to Particle interface
 
-**Technical Details**:
-- Single 25ms timer polls all observables based on individual `nextPollTime` calculations
-- Forced observable intervals to multiples of 25ms (25, 50, 100, 200, 500, 1000ms, etc.)
-- Custom observable IDs (`text_KE-Fluctuations`) now properly handled in unified polling system
-- Text parser auto-detects syntax (inline vs block) and routes to appropriate parser
-- Built-in observables use same registration flow as custom observables through `registerTextObservable`
+**Key Achievements by GPT-5**:
+1. **Initial State Tracking**: Added comprehensive initial state capture (position, velocity, timestamp) to all particles enabling displacement-based calculations
+2. **Transform System**: Implemented post-aggregation transforms (sqrt, abs, log, exp) with validation for advanced mathematical operations on observables
+3. **Performance Optimization**: Moved snapshot updates from every simulation frame to polling-only, reducing computational overhead
+4. **Enhanced Parser**: Added initial state properties, improved comma-separated parsing with bracket/quote awareness, gated debug logging
+5. **Context Enhancement**: Extended evaluation context with initial state access and magnitude calculations for both position and velocity
+6. **Parser Robustness**: Removed inline syntax without braces, improved error handling, added transform field validation
+
+**Technical Details by GPT-5**:
+- Initial state stored as `{position: Vector, velocity: Velocity, timestamp: number}` on particle creation
+- Transform system supports `sqrt`, `abs`, `log`, `exp` with validation and error handling
+- Expression evaluator context includes `initial.position.{x,y,magnitude}` and `initial.velocity.{vx,vy,magnitude}`
+- Parser enforces block-with-braces syntax only, removing ambiguous inline support
+- Snapshot updates optimized from every frame to polling-only (performance improvement)
+- Debug logging gated with `DEBUG_ENABLED` flags to reduce console noise
 
 **Results**:
 - ✅ Custom observables display live data during simulation (no longer "No data")

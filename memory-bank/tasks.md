@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 22:30:24 IST_
+_Last Updated: 2025-09-04 00:54:05 IST_
 
 ## Active Tasks
 
@@ -31,6 +31,7 @@ _Last Updated: 2025-09-03 22:30:24 IST_
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
+| C7b | Composable Observable Framework                   | 📝 PLANNED     | LOW      | 2025-09-04 | C7a, C18        |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
@@ -99,10 +100,10 @@ _Last Updated: 2025-09-03 22:30:24 IST_
 **Notes**: Enhanced with streaming framework (C18) and text-based system (C7a). Dual architecture supports both polling and event-driven observables with feature toggle. Complete UI separation between built-in and custom observables.
 
 ### C7a: Modular Transparent Observable System Redesign
-**Description**: Redesign hardcoded observable system into flexible query-based architecture with unified polling system and built-in observable migration to text-based system
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 12:47:40 IST
-**Files**: `frontend/src/components/useObservablesPolling.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/components/observablesConfig.ts`, `frontend/src/components/ObservablesPanel.tsx`
-**Notes**: Advanced implementation phase - converted particle count and kinetic energy to text-based system, implemented single-timer polling architecture with 25ms resolution, added inline syntax parser for simpler observable definitions, resolved custom observable "No data" issues with unified polling system
+**Description**: Redesign hardcoded observable system into flexible query-based architecture enhanced by GPT-5 with initial state tracking and transform system
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-04 00:54:05 IST
+**Files**: `frontend/src/components/useObservablesPolling.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/physics/observables/ExpressionEvaluator.ts`
+**Notes**: GPT-5 enhanced with initial state tracking for all particles, transform system (sqrt, abs, log, exp), performance optimizations moving snapshot updates to polling-only, enhanced parser with bracket-aware parsing and initial state context
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification
@@ -184,9 +185,15 @@ _Last Updated: 2025-09-03 22:30:24 IST_
 
 ### C18: Streaming Observable Framework Implementation
 **Description**: Replace polling-based observable system with streaming/push-based framework for better performance and cleaner architecture
-**Status**: ✅ COMPLETED **Last**: 2025-09-03 22:22:05 IST
+**Status**: ✅ COMPLETED **Last**: 2025-09-04 00:54:05 IST
 **Files**: `frontend/src/physics/stream-ObservableManager.ts`, `frontend/src/components/stream-useObservableStream.ts`, `frontend/src/components/stream-ObservablesPanel.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/RandomWalkSimulator.ts`
 **Notes**: EventEmitter-based streaming architecture completed with feature toggle system. UI toggle button switches between polling and streaming panels. Real-time data emission during simulation step eliminates polling complexity and improves performance.
+
+### C7b: Composable Observable Framework
+**Description**: Design future composable observable framework enabling complex observable composition through pipeline operators and functional patterns
+**Status**: 📝 PLANNED **Last**: 2025-09-04 00:54:05 IST
+**Files**: `memory-bank/tasks/C7b.md`, `memory-bank/implementation-details/composable-observables-plan.md`
+**Notes**: Planning task created in Sep 3 night session for future implementation of composable observable architecture with pipeline operators (map, filter, reduce, combine, window) and functional composition patterns
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

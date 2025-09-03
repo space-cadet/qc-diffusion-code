@@ -68,6 +68,11 @@ export class ParticleManager {
         vx: vx,
         vy: vy,
       },
+      initial: {
+        position: { x: physicsPos.x, y: physicsPos.y },
+        velocity: { vx, vy },
+        timestamp: currentTime,
+      },
       lastCollisionTime: currentTime,
       nextCollisionTime: currentTime + Math.random() * 0.5,
       collisionCount: 0,

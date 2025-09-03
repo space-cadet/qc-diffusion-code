@@ -15,6 +15,12 @@ export interface TrajectoryPoint {
   timestamp: number;
 }
 
+export interface InitialState {
+  position: Vector;
+  velocity: Velocity;
+  timestamp: number;
+}
+
 export interface Particle {
   id: string;
   position: Vector;
@@ -32,4 +38,5 @@ export interface Particle {
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;
   lastUpdate: number;
+  initial: InitialState;
 }

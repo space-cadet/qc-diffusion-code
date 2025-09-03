@@ -165,12 +165,12 @@ export class RandomWalkSimulator {
     this.time += timeStep;
     // console.log('[RWS] step completed', { timeStep, newTime: this.time });
     
+    // Observable calculations now triggered only during polling, not every simulation step
     const particles = this.particleManager.getAllParticles();
     if (this.observableManager instanceof StreamObservableManager) {
       this.observableManager.updateSnapshotAndCalculate(particles, this.time);
-    } else {
-      this.observableManager.updateSnapshot(particles, this.time);
     }
+    // Regular ObservableManager updateSnapshot moved to polling system
   }
 
   reset(): void {

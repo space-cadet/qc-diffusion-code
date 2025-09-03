@@ -14,6 +14,11 @@ export interface EvaluationContext {
   waitingTime: number;
   bounds: { width: number; height: number };
   time: number;
+  initial: {
+    position: { x: number; y: number; magnitude: number };
+    velocity: { vx: number; vy: number; magnitude: number };
+    timestamp: number;
+  };
 }
 
 export class ExpressionEvaluator {
@@ -40,7 +45,20 @@ export class ExpressionEvaluator {
       interparticleCollisionCount: particle.interparticleCollisionCount,
       waitingTime: particle.waitingTime,
       bounds,
-      time
+      time,
+      initial: {
+        position: {
+          x: particle.initial.position.x,
+          y: particle.initial.position.y,
+          magnitude: Math.sqrt(particle.initial.position.x ** 2 + particle.initial.position.y ** 2)
+        },
+        velocity: {
+          vx: particle.initial.velocity.vx,
+          vy: particle.initial.velocity.vy,
+          magnitude: Math.sqrt(particle.initial.velocity.vx ** 2 + particle.initial.velocity.vy ** 2)
+        },
+        timestamp: particle.initial.timestamp,
+      }
     };
   }
 
