@@ -18,7 +18,7 @@ export interface EvaluationContext {
     position: { x: number; y: number; magnitude: number };
     velocity: { vx: number; vy: number; magnitude: number };
     timestamp: number;
-  };
+  } | undefined;
 }
 
 export class ExpressionEvaluator {
@@ -46,7 +46,7 @@ export class ExpressionEvaluator {
       waitingTime: particle.waitingTime,
       bounds,
       time,
-      initial: {
+      initial: particle.initial ? {
         position: {
           x: particle.initial.position.x,
           y: particle.initial.position.y,
@@ -58,7 +58,7 @@ export class ExpressionEvaluator {
           magnitude: Math.sqrt(particle.initial.velocity.vx ** 2 + particle.initial.velocity.vy ** 2)
         },
         timestamp: particle.initial.timestamp,
-      }
+      } : undefined
     };
   }
 

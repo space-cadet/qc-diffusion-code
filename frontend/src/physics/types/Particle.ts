@@ -38,5 +38,5 @@ export interface Particle {
   trajectory: CircularBuffer<TrajectoryPoint>;
   isActive: boolean;
   lastUpdate: number;
-  initial: InitialState;
+  initial?: InitialState; // Optional for backward compatibility
 }
