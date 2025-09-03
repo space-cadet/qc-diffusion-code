@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 01:13:59 IST_
+_Last Updated: 2025-09-03 12:47:40 IST_
 
 ## Active Tasks
 
@@ -29,7 +29,7 @@ _Last Updated: 2025-09-03 01:13:59 IST_
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
-| C7a | Modular Transparent Observable System Redesign    | ✅ COMPLETED   | HIGH     | 2025-09-01 | C7              |
+| C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 
@@ -98,10 +98,10 @@ _Last Updated: 2025-09-03 01:13:59 IST_
 **Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
 
 ### C7a: Modular Transparent Observable System Redesign
-**Description**: Redesign hardcoded observable system into flexible query-based architecture with floating panel UI separation and custom observable value display
-**Status**: ✅ COMPLETED **Last**: 2025-09-03 10:08:43 IST
-**Files**: `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/CustomObservablesPanel.tsx`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/physics/observables/TextObservable.ts`, `frontend/src/stores/appStore.ts`
-**Notes**: Phase 0 COMPLETED. Fixed critical NaN bug by propagating canvas bounds to the `ObservableManager`. Implemented semantic validation in `TextObservableParser` to prevent use of invalid properties in expressions. Enhanced UI help text in `CustomObservablesPanel` with correct property names and examples. Integrated user-led refactor to unify observable polling and standardize data structures.
+**Description**: Redesign hardcoded observable system into flexible query-based architecture with unified polling system and built-in observable migration to text-based system
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 12:47:40 IST
+**Files**: `frontend/src/components/useObservablesPolling.ts`, `frontend/src/physics/observables/TextObservableParser.ts`, `frontend/src/components/observablesConfig.ts`, `frontend/src/components/ObservablesPanel.tsx`
+**Notes**: Advanced implementation phase - converted particle count and kinetic energy to text-based system, implemented single-timer polling architecture with 25ms resolution, added inline syntax parser for simpler observable definitions, resolved custom observable "No data" issues with unified polling system
 
 ### C8: Density Profile Calculation Implementation
 **Description**: Implement 2D density profile calculation ρ(x,y,t) for random walk particles with telegraph equation verification

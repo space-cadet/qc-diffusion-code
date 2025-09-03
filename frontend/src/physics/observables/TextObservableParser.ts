@@ -49,6 +49,72 @@ export class TextObservableParser {
   static parse(text: string): ParsedObservable[] {
     debug('Parsing text:', text);
     
+    // Detect syntax type: block syntax has '{' or inline syntax has ','
+    const hasBlockSyntax = text.includes('{') && text.includes('}');
+    const hasInlineSyntax = text.includes(',') && text.includes(':');
+    
+    if (hasInlineSyntax && !hasBlockSyntax) {
+      return this.parseInline(text);
+    } else {
+      return this.parseBlock(text);
+    }
+  }
+
+  private static parseInline(text: string): ParsedObservable[] {
+    debug('Parsing inline syntax:', text);
+    
+    const observables: ParsedObservable[] = [];
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+    
+    for (const line of lines) {
+      const current: Partial<ParsedObservable> = {};
+      const pairs = line.split(',').map(pair => pair.trim());
+      
+      for (const pair of pairs) {
+        const [key, ...valueParts] = pair.split(':');
+        const value = valueParts.join(':').trim();
+        
+        switch (key.trim()) {
+          case 'name':
+            current.name = value;
+            break;
+          case 'source':
+            current.source = value as 'particles' | 'simulation';
+            break;
+          case 'filter':
+            current.filter = value;
+            break;
+          case 'select':
+            current.select = value;
+            break;
+          case 'reduce':
+            current.reduce = value;
+            break;
+          case 'interval':
+            const intervalValue = parseInt(value);
+            if (!isNaN(intervalValue) && intervalValue > 0) {
+              current.interval = intervalValue;
+            }
+            break;
+        }
+      }
+      
+      if (current.name && current.reduce) {
+        debug('Parsed inline observable:', current);
+        observables.push({
+          source: current.source || 'particles',
+          ...current
+        } as ParsedObservable);
+      }
+    }
+    
+    debug('Total parsed inline observables:', observables.length);
+    return observables;
+  }
+
+  private static parseBlock(text: string): ParsedObservable[] {
+    debug('Parsing block syntax:', text);
+    
     const observables: ParsedObservable[] = [];
     const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
     
@@ -103,7 +169,7 @@ export class TextObservableParser {
       }
     }
     
-    debug('Total parsed observables:', observables.length);
+    debug('Total parsed block observables:', observables.length);
     return observables;
   }
 

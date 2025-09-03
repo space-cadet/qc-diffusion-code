@@ -4,10 +4,10 @@
 
 **Description**: Redesign the current hardcoded observable system into a flexible, modular architecture through incremental phases. Implementation of Phase 0 complete with custom observables panel separation and floating panel abstraction.
 
-**Status**: ✅ COMPLETED - Full Implementation
+**Status**: 🔄 ACTIVE - Advanced Implementation Phase
 **Priority**: HIGH
 **Started**: 2025-09-01
-**Last Active**: 2025-09-02 16:57:02 IST
+**Last Active**: 2025-09-03 12:47:40 IST
 **Dependencies**: C7
 
 ## Completion Criteria
@@ -19,24 +19,41 @@
 - [x] Maintain backward compatibility with existing ObservablesPanel
 - [x] Achieve configurable polling intervals per observable type
 - [x] Implement unified polling system to prevent memory leaks
+- [x] Fix custom observable data display issues with unified polling architecture
+- [x] Convert built-in observables to text-based system (particle count, kinetic energy)
+- [x] Implement inline syntax parser for simpler observable definitions
+- [ ] Complete conversion of all built-in observables to text-based system
 - [ ] Add observable selection UI and plot control functionality (Future: Phase 1+)
 
-## Latest Implementation (2025-09-03 10:08:43 IST)
+## Latest Implementation (2025-09-03 12:47:40 IST)
 
-### Bug Fixes, Semantic Validation, and Unified Polling
+### Unified Polling Architecture and Built-In Observable Migration
 **Files Modified**:
-- `frontend/src/physics/RandomWalkSimulator.ts`
-- `frontend/src/physics/observables/TextObservableParser.ts`
-- `frontend/src/components/CustomObservablesPanel.tsx`
-- `frontend/src/physics/observables/TextObservable.ts` (by user)
-- `frontend/src/components/ObservablesPanel.tsx` (by user)
+- `frontend/src/components/useObservablesPolling.ts` - Complete rewrite with single-timer architecture (25ms resolution)
+- `frontend/src/physics/observables/TextObservableParser.ts` - Added inline syntax support for simpler observable definitions
+- `frontend/src/components/observablesConfig.ts` - Converted particle count and kinetic energy to text-based system
+- `frontend/src/components/ObservablesPanel.tsx` - Updated registration logic for text-based built-in observables
 
 **Key Achievements**:
-1.  **NaN Bug Fix**: Resolved `NaN` results in text observables by correctly passing canvas `bounds` from `RandomWalkSimulator` to `ObservableManager` during construction.
-2.  **Semantic Validation**: Implemented expression validation in `TextObservableParser` to check for unknown variables (e.g., `velocity.x` vs `velocity.vx`), preventing runtime errors. Aligned `getAvailableProperties` with the actual evaluation context.
-3.  **Enhanced UI Help**: Updated the "Format" section in `CustomObservablesPanel` with correct property names (`velocity.vx`) and practical examples.
-4.  **Unified Polling (User Refactor)**: User refactored `ObservablesPanel` to use a single `useObservablesPolling` hook for both built-in and custom observables, removing separate state and polling logic for custom observables.
-5.  **Structured Observable Results (User Refactor)**: User updated `TextObservable.calculate` to return a structured object `{ value, timestamp, metadata }` instead of a raw number, which was then handled in the updated `ObservablesPanel`.
+1. **Single-Timer Polling Architecture**: Replaced multiple timers with single 25ms timer using Δ_min approach. Each observable tracks `nextPollTime` with intervals as multiples of 25ms for optimal performance.
+2. **Custom Observable Data Display Fix**: Resolved "No data" issue by fixing polling system to handle both built-in and custom observables with unified architecture. Custom observables now display continuous updates during simulation.
+3. **Inline Syntax Parser**: Added support for comma-separated syntax `name: particleCount, reduce: count` alongside existing block syntax. Enables simpler observable definitions for both built-in and custom observables.
+4. **Built-In Observable Migration**: Successfully converted particle count and kinetic energy observables from hardcoded classes to text-based system. Observables now use unified data structure `{value, timestamp, metadata}`.
+5. **Performance Optimization**: Eliminated duplicate polling systems, reduced from N+1 timers to single timer, improved memory management with proper state tracking.
+
+**Technical Details**:
+- Single 25ms timer polls all observables based on individual `nextPollTime` calculations
+- Forced observable intervals to multiples of 25ms (25, 50, 100, 200, 500, 1000ms, etc.)
+- Custom observable IDs (`text_KE-Fluctuations`) now properly handled in unified polling system
+- Text parser auto-detects syntax (inline vs block) and routes to appropriate parser
+- Built-in observables use same registration flow as custom observables through `registerTextObservable`
+
+**Results**:
+- ✅ Custom observables display live data during simulation (no longer "No data")
+- ✅ Built-in observables (particle count, kinetic energy) migrated to text system successfully
+- ✅ Single efficient polling system with configurable intervals per observable
+- ✅ Console warning floods eliminated - all observables properly registered
+- ✅ Unified architecture supporting both inline and block syntax definitions
 
 ## Related Files
 - `memory-bank/implementation-details/observables-modular-redesign.md`

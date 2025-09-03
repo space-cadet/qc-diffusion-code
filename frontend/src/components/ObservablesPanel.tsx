@@ -126,6 +126,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
   const observableData = useObservablesPolling(
     simulatorRef,
     allVisibleObservables,
+    customObservableConfigs,
     isRunning,
     simReady || false
   );
@@ -177,10 +178,22 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
       try {
         switch (observableId) {
           case 'particleCount':
-            if (!manager.hasObserver('particleCount')) manager.register(new ParticleCountObservable());
+            // Use text observable system for particle count
+            const validation = TextObservable.validate(config.text);
+            if (validation.valid) {
+              manager.registerTextObservable(config.text);
+            } else {
+              console.error(`[ObservablesPanel] Failed to register ${observableId}:`, validation.errors);
+            }
             break;
           case 'kineticEnergy':
-            if (!manager.hasObserver('kineticEnergy')) manager.register(new KineticEnergyObservable());
+            // Use text observable system for kinetic energy
+            const keValidation = TextObservable.validate(config.text);
+            if (keValidation.valid) {
+              manager.registerTextObservable(config.text);
+            } else {
+              console.error(`[ObservablesPanel] Failed to register ${observableId}:`, keValidation.errors);
+            }
             break;
           case 'momentum':
             if (!manager.hasObserver('momentum')) manager.register(new MomentumObservable());
@@ -189,11 +202,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
             if (!manager.hasObserver('msd')) manager.register(new MSDObservable());
             break;
           default:
-            const validation = TextObservable.validate(config.text);
-            if (validation.valid) {
+            const textValidation = TextObservable.validate(config.text);
+            if (textValidation.valid) {
               manager.registerTextObservable(config.text);
             } else {
-              console.error(`[ObservablesPanel] Failed to register ${observableId}:`, validation.errors);
+              console.error(`[ObservablesPanel] Failed to register ${observableId}:`, textValidation.errors);
             }
         }
         console.log(`[ObservablesPanel] Registered ${observableId}`);
@@ -217,15 +230,12 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     prevVisibleRef.current = current;
   }, [simReady, visibleBuiltInObservables]);
 
-  // Register/unregister custom observables and handle individual polling
+  // Register/unregister custom observables (registration only, polling handled by unified hook)
   const prevVisibleCustomRef = useRef<Set<string>>(new Set());
-  const debug = (...args: any[]) => console.debug('[ObservablesPanel]', ...args);
   useEffect(() => {
     if (!simReady || !simulatorRef.current) return;
     
-    debug('Registering custom observables');
     const manager = simulatorRef.current.getObservableManager();
-    const intervals: NodeJS.Timeout[] = [];
     const currentVisible = new Set(customObservableConfigs.filter(c => customObservableVisibility[c.name]).map(c => c.name));
     const prevVisible = prevVisibleCustomRef.current;
 
@@ -233,11 +243,11 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
     customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
       if (!config.valid || prevVisible.has(config.name)) return;
       
-      debug(`Registering observable: ${config.name}`);
       try {
         manager.registerTextObservable(config.text);
+        console.log(`[ObservablesPanel] Registered custom observable: ${config.name}`);
       } catch (error) {
-        debug(`Failed to register ${config.name}:`, error);
+        console.error(`[ObservablesPanel] Failed to register ${config.name}:`, error);
       }
     });
 
@@ -253,39 +263,9 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
       }
     });
 
-    // Setup individual polling for visible custom observables
-    customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
-      if (!config.valid) return;
-
-      const observableId = `text_${config.name}`;
-      const pollObservable = () => {
-        if (!isRunning || !simulatorRef.current) return;
-        
-        const result = manager.getResult(observableId);
-        debug(`Polling ${config.name}:`, result);
-        
-        // Custom observables handled by unified polling now, no separate state needed
-      };
-
-      // Initial poll
-      pollObservable();
-
-      // Setup interval polling
-      const intervalId = setInterval(pollObservable, config.interval);
-      intervals.push(intervalId);
-    });
-
     // Update prev ref
     prevVisibleCustomRef.current = currentVisible;
-
-    // Cleanup intervals on unmount or dependency change
-    return () => {
-      intervals.forEach(id => clearInterval(id));
-      customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
-        debug(`Cleaning up polling for ${config.name}`);
-      });
-    };
-  }, [simReady, isRunning, customObservableConfigs, customObservableVisibility, customObservables]);
+  }, [simReady, customObservableConfigs, customObservableVisibility]);
 
 
 

@@ -18,26 +18,20 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
   particleCount: {
     id: 'particleCount',
     name: 'Particle Count N(t)',
-    text: `observable "particleCount" { select: 1, reduce: count }`,
+    text: `name: particleCount, reduce: count`,
     pollingInterval: 200, // Less frequent updates needed
     fields: [
-      { label: 'Total', path: 'totalCount', format: 'number' },
-      { label: 'Active', path: 'activeCount', format: 'number', color: 'green' },
-      { label: 'Inactive', path: 'inactiveCount', format: 'number', color: 'red' },
+      { label: 'Count', path: 'value', format: 'number' },
       { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
     ]
   },
   kineticEnergy: {
     id: 'kineticEnergy',
     name: 'Kinetic Energy',
-    text: `observable "kineticEnergy" { select: velocity.magnitude^2 * 0.5, reduce: mean }`,
+    text: `name: kineticEnergy, select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean`,
     pollingInterval: 100, // Standard polling for energy values
     fields: [
-      { label: 'Total KE', path: 'totalKineticEnergy', format: 'scientific', precision: 3 },
-      { label: 'Average KE', path: 'averageKineticEnergy', format: 'scientific', precision: 3 },
-      { label: 'Max KE', path: 'maxKineticEnergy', format: 'scientific', precision: 3, color: 'orange' },
-      { label: 'Min KE', path: 'minKineticEnergy', format: 'scientific', precision: 3, color: 'blue' },
-      { label: 'Active particles', path: 'activeParticleCount', format: 'number' },
+      { label: 'Average KE', path: 'value', format: 'number', precision: 10 },
       { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
     ]
   },

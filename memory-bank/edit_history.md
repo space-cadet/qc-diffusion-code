@@ -1,9 +1,15 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 01:12:37 IST_
+_Last Updated: 2025-09-03 12:47:40 IST_
 
 ### 2025-09-03
+
+#### 12:47 - C7a: Single-Timer Polling Architecture Implementation
+- Rewrote `frontend/src/components/useObservablesPolling.ts` - Implemented single 25ms timer architecture with per-observable nextPollTime tracking
+- Enhanced `frontend/src/physics/observables/TextObservableParser.ts` - Added parseInline() method with comma-separated syntax support and auto-detection
+- Updated `frontend/src/components/observablesConfig.ts` - Migrated particle count and kinetic energy to text-based definitions
+- Modified `frontend/src/components/ObservablesPanel.tsx` - Updated registration logic for text-based built-in observables with proper ID handling
 
 #### 01:12 - C7a: Custom Observable Value Display Integration with Individual Polling
 - Updated `frontend/src/stores/appStore.ts` - Added customObservableVisibility state for individual custom observable toggles

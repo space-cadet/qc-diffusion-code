@@ -1,7 +1,7 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-03 01:12:37 IST*
+*Updated: 2025-09-03 12:47:40 IST*
 
 ## Executive Summary
 
@@ -424,4 +424,118 @@ This session focused on resolving critical bugs that produced `NaN` values and i
 - `frontend/src/physics/observables/TextObservable.ts` - Added getInterval() method
 - `frontend/src/components/ObservablesPanel.tsx` - Integrated custom observable display with individual polling
 
-**Next Session Priority**: Debug data format mismatch causing "No data" display despite successful value polling
+**Next Session Priority**: Complete migration of remaining built-in observables (momentum, MSD) to text-based system
+
+## Single-Timer Polling Architecture (2025-09-03 12:47:40 IST)
+
+### Unified Polling System Implementation
+**Objective**: Replace multiple polling timers with single efficient 25ms timer architecture and resolve custom observable data display issues
+
+#### Key Achievements
+
+1. **Single-Timer Architecture (Δ_min = 25ms)**
+   - Replaced N+1 timer approach with single 25ms resolution timer
+   - Each observable tracks `nextPollTime` with intervals as multiples of 25ms
+   - Forced intervals to sensible values: 25, 50, 100, 200, 500, 1000ms
+   - Eliminated duplicate polling systems between built-in and custom observables
+
+2. **Custom Observable Data Display Resolution**
+   - Fixed "No data" issue by implementing proper custom observable handling in unified polling
+   - Custom observable IDs (`text_KE-Fluctuations`, `text_custom_1`) now properly polled
+   - Resolved console warning floods about unregistered observers
+   - Custom observables display live updating values during simulation
+
+3. **Inline Syntax Parser Implementation**
+   - Added support for comma-separated syntax: `name: particleCount, reduce: count`
+   - Auto-detects syntax type (inline vs block) and routes to appropriate parser
+   - Maintains backward compatibility with existing block syntax
+   - Enables simpler observable definitions for both built-in and custom observables
+
+4. **Built-In Observable Migration to Text System**
+   - Successfully migrated particle count: `name: particleCount, reduce: count`
+   - Successfully migrated kinetic energy: `name: kineticEnergy, select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean`
+   - Observables now use unified data structure `{value, timestamp, metadata}`
+   - Simplified UI display to show single value instead of complex multi-field displays
+
+#### Technical Implementation Details
+
+**Polling Architecture**:
+```typescript
+// Single 25ms timer polls all observables
+const DELTA_MIN = 25; // 25ms minimum polling interval
+
+setInterval(() => {
+  const now = Date.now();
+  Object.keys(pollingStatesRef.current).forEach(observableId => {
+    const state = pollingStatesRef.current[observableId];
+    if (now >= state.nextPollTime) {
+      pollObservable(observableId);
+      state.nextPollTime = now + state.interval;
+    }
+  });
+}, DELTA_MIN);
+```
+
+**Inline Parser Implementation**:
+```typescript
+// Detects syntax and routes to appropriate parser
+if (text.includes(',') && text.includes(':') && !text.includes('{')) {
+  return this.parseInline(text); // "name: x, reduce: y, interval: z"
+} else {
+  return this.parseBlock(text);  // "observable "x" { reduce: y }"
+}
+```
+
+**Built-In Observable Text Definitions**:
+```typescript
+particleCount: {
+  text: `name: particleCount, reduce: count`,
+  fields: [
+    { label: 'Count', path: 'value', format: 'number' },
+    { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+  ]
+},
+kineticEnergy: {
+  text: `name: kineticEnergy, select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean`,
+  fields: [
+    { label: 'Average KE', path: 'value', format: 'scientific', precision: 3 },
+    { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+  ]
+}
+```
+
+#### Performance Improvements
+
+1. **Timer Efficiency**: Reduced from 6 timers (1 main + 5 individual) to 1 timer
+2. **Memory Management**: Proper state tracking prevents polling state accumulation
+3. **CPU Usage**: Eliminated redundant timer checks and duplicate polling logic
+4. **Polling Resolution**: Consistent 25ms base resolution with configurable multiples
+
+#### Files Modified
+
+- `frontend/src/components/useObservablesPolling.ts` - Complete rewrite with single-timer architecture
+- `frontend/src/physics/observables/TextObservableParser.ts` - Added `parseInline()` and syntax detection
+- `frontend/src/components/observablesConfig.ts` - Migrated particle count and kinetic energy to text system  
+- `frontend/src/components/ObservablesPanel.tsx` - Updated registration logic for text-based built-in observables
+
+#### Results Achieved
+
+- ✅ Custom observables display live updating data during simulation
+- ✅ Built-in observables (particle count, kinetic energy) successfully migrated to text system
+- ✅ Single efficient polling system with configurable intervals per observable type
+- ✅ Console warning floods eliminated - all observables properly registered and polled
+- ✅ Unified architecture supporting both inline and block syntax definitions
+- ✅ Performance optimized with single timer and proper state management
+
+#### Migration Path Forward
+
+**Remaining Built-In Observables**:
+- `momentum`: Convert to `name: momentum, select: velocity.vx, reduce: sum` (and vy component)
+- `msd`: Convert to `name: msd, select: position.x^2 + position.y^2, reduce: mean` (with displacement logic)
+
+**Architecture Benefits**:
+1. **Unified System**: All observables use same text-based registration and polling
+2. **Performance**: Single timer with O(n) polling check instead of O(n) timers
+3. **Simplicity**: One syntax for all observables, easier for users to understand
+4. **Maintainability**: Eliminates separate class files for built-in observables
+5. **Flexibility**: Easy to modify observable definitions without code changes

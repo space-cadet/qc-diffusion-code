@@ -7,50 +7,78 @@ interface ObservableData {
   timestamp?: number;
 }
 
-interface PollingState {
-  lastPollTime: number;
+interface CustomObservableConfig {
+  name: string;
+  interval: number;
+  valid: boolean;
+}
+
+interface ObservablePollingState {
+  nextPollTime: number;
+  interval: number;
   data: ObservableData | null;
 }
+
+const DELTA_MIN = 25; // 25ms minimum polling interval
 
 export function useObservablesPolling(
   simulatorRef: React.RefObject<RandomWalkSimulator | null>,
   visibleObservables: string[],
+  customObservableConfigs: CustomObservableConfig[],
   isRunning: boolean,
   simReady: boolean
 ) {
   const [observableData, setObservableData] = useState<Record<string, ObservableData | null>>({});
-  const pollingStatesRef = useRef<Record<string, PollingState>>({});
+  const pollingStatesRef = useRef<Record<string, ObservablePollingState>>({});
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize polling states for visible observables
+  // Round interval to nearest multiple of DELTA_MIN
+  const roundToMultiple = useCallback((interval: number) => {
+    return Math.max(DELTA_MIN, Math.round(interval / DELTA_MIN) * DELTA_MIN);
+  }, []);
+
+  // Initialize polling states for all visible observables
   const initializePollingStates = useCallback(() => {
-    const newStates: Record<string, PollingState> = {};
+    const newStates: Record<string, ObservablePollingState> = {};
+    const now = Date.now();
+    
+    // Built-in observables
     visibleObservables.forEach(observableId => {
-      if (BUILT_IN_OBSERVABLES[observableId]) {
+      const config = BUILT_IN_OBSERVABLES[observableId];
+      if (config) {
         newStates[observableId] = {
-          lastPollTime: 0,
+          nextPollTime: now,
+          interval: roundToMultiple(config.pollingInterval),
           data: pollingStatesRef.current[observableId]?.data || null
         };
       }
     });
+
+    // Custom observables
+    customObservableConfigs
+      .filter(config => config.valid)
+      .forEach(config => {
+        const observableId = `text_${config.name}`;
+        if (visibleObservables.includes(observableId)) {
+          newStates[observableId] = {
+            nextPollTime: now,
+            interval: roundToMultiple(config.interval),
+            data: pollingStatesRef.current[observableId]?.data || null
+          };
+        }
+      });
+
     pollingStatesRef.current = newStates;
-  }, [visibleObservables]);
+  }, [visibleObservables, customObservableConfigs, roundToMultiple]);
 
   // Poll a single observable
   const pollObservable = useCallback((observableId: string) => {
     if (!simulatorRef.current) return;
 
-    let data: ObservableData | null = null;
-
-    if (BUILT_IN_OBSERVABLES[observableId]) {
-      // Try exact ID first (concrete observables), then fallback to text_ prefix
-      data = simulatorRef.current.getObservableData(observableId);
-      if (!data) {
-        data = simulatorRef.current.getObservableData(`text_${observableId}`);
-      }
-    } else {
-      // Custom observables use their own ID
-      data = simulatorRef.current.getObservableData(observableId);
+    // For built-in observables that now use text system, try text_ prefix
+    let data = simulatorRef.current.getObservableData(observableId);
+    if (!data && (observableId === 'particleCount' || observableId === 'kineticEnergy')) {
+      data = simulatorRef.current.getObservableData(`text_${observableId}`);
     }
 
     if (data) {
@@ -59,36 +87,29 @@ export function useObservablesPolling(
         [observableId]: data
       }));
 
-      pollingStatesRef.current[observableId] = {
-        ...pollingStatesRef.current[observableId],
-        data,
-        lastPollTime: Date.now()
-      };
+      const state = pollingStatesRef.current[observableId];
+      if (state) {
+        state.data = data;
+      }
     }
   }, [simulatorRef]);
 
-  // Main polling loop
+  // Single timer with 25ms resolution
   const startPolling = useCallback(() => {
     if (intervalRef.current) return; // Already polling
 
-    const POLLING_RESOLUTION = 50; // Check every 50ms
-
     intervalRef.current = setInterval(() => {
-      const currentTime = Date.now();
-
-      visibleObservables.forEach(observableId => {
-        const config = BUILT_IN_OBSERVABLES[observableId];
+      const now = Date.now();
+      
+      Object.keys(pollingStatesRef.current).forEach(observableId => {
         const state = pollingStatesRef.current[observableId];
-
-        if (!config || !state) return;
-
-        // Check if it's time to poll this observable
-        if (currentTime - state.lastPollTime >= config.pollingInterval) {
+        if (now >= state.nextPollTime) {
           pollObservable(observableId);
+          state.nextPollTime = now + state.interval;
         }
       });
-    }, POLLING_RESOLUTION);
-  }, [visibleObservables, pollObservable]);
+    }, DELTA_MIN);
+  }, [pollObservable]);
 
   const stopPolling = useCallback(() => {
     if (intervalRef.current) {
@@ -97,7 +118,7 @@ export function useObservablesPolling(
     }
   }, []);
 
-  // Initialize polling states when visible observables change
+  // Initialize polling states when observables change
   useEffect(() => {
     initializePollingStates();
   }, [initializePollingStates]);
@@ -106,18 +127,18 @@ export function useObservablesPolling(
   useEffect(() => {
     if (!simReady) return;
 
-    if (isRunning && visibleObservables.length > 0) {
+    if (isRunning && Object.keys(pollingStatesRef.current).length > 0) {
       startPolling();
     } else {
       stopPolling();
       // Get final data when stopped
-      visibleObservables.forEach(observableId => {
+      Object.keys(pollingStatesRef.current).forEach(observableId => {
         pollObservable(observableId);
       });
     }
 
     return () => stopPolling();
-  }, [isRunning, simReady, visibleObservables, startPolling, stopPolling, pollObservable]);
+  }, [isRunning, simReady, startPolling, stopPolling, pollObservable]);
 
   // Cleanup on unmount
   useEffect(() => {
