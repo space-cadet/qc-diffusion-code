@@ -6,12 +6,15 @@ export interface ObservableField {
   precision?: number;
 }
 
+import type { RandomWalkUIState } from "../stores/appStore";
+
 export interface ObservableConfig {
   id: string;
   name: string;
   text: string;
   pollingInterval: number; // milliseconds
   fields: ObservableField[];
+  uiToggle: keyof RandomWalkUIState;
 }
 
 export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
@@ -19,6 +22,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     id: 'particleCount',
     name: 'Particle Count N(t)',
     text: `name: particleCount, reduce: count`,
+    uiToggle: 'showParticleCount',
     pollingInterval: 200, // Less frequent updates needed
     fields: [
       { label: 'Count', path: 'value', format: 'number' },
@@ -29,6 +33,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     id: 'kineticEnergy',
     name: 'Kinetic Energy',
     text: `name: kineticEnergy, select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean`,
+    uiToggle: 'showKineticEnergy',
     pollingInterval: 100, // Standard polling for energy values
     fields: [
       { label: 'Average KE', path: 'value', format: 'number', precision: 10 },
@@ -39,6 +44,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     id: 'momentum',
     name: 'Total Momentum',
     text: `observable "momentum" { select: velocity, reduce: sum }`,
+    uiToggle: 'showTotalMomentum',
     pollingInterval: 50, // Fast updates for momentum (rapidly changing)
     fields: [
       { label: '|P| total', path: 'totalMomentumMagnitude', format: 'fixed', precision: 2 },
@@ -53,6 +59,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     id: 'msd',
     name: 'Mean Squared Displacement',
     text: `observable "msd" { select: position.magnitude^2, reduce: mean }`,
+    uiToggle: 'showMSD',
     pollingInterval: 500, // Slower updates for MSD (cumulative metric)
     fields: [
       { label: 'MSD', path: 'meanSquaredDisplacement', format: 'fixed', precision: 1 },

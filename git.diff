@@ -1,0 +1,441 @@
+diff --git a/frontend/src/RandomWalkSim.tsx b/frontend/src/RandomWalkSim.tsx
+index 3876fa9..0b157e1 100644
+--- a/frontend/src/RandomWalkSim.tsx
++++ b/frontend/src/RandomWalkSim.tsx
+@@ -11,6 +11,7 @@ import { HistoryPanel } from "./components/HistoryPanel";
+ import { ReplayControls } from "./components/ReplayControls";
+ import { ExportPanel } from "./components/ExportPanel";
+ import { ParticleCanvas } from "./components/ParticleCanvas";
++import { StreamObservablesPanel } from "./components/stream-ObservablesPanel";
+ import { ObservablesPanel } from "./components/ObservablesPanel";
+ import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
+ import { FloatingPanel } from "./components/common/FloatingPanel";
+@@ -55,7 +56,9 @@ export default function RandomWalkSim() {
+     customObservablesCollapsed,
+     setCustomObservablesCollapsed,
+     useNewEngine,
+-    setUseNewEngine
++    setUseNewEngine,
++    useStreamingObservables,
++    setUseStreamingObservables
+   } = useAppStore();
+ 
+   // State declarations should come before refs
+@@ -247,6 +250,7 @@ export default function RandomWalkSim() {
+       canvasHeight,
+       temperature: gridLayoutParams.temperature,
+       useNewEngine: useNewEngine,
++      useStreamingObservables: useStreamingObservables,
+       // initial distribution wiring
+       initialDistType: gridLayoutParams.initialDistType,
+       distSigmaX: gridLayoutParams.distSigmaX,
+@@ -262,6 +266,9 @@ export default function RandomWalkSim() {
+     // mark simulator as ready for dependent components
+     setSimReady(true);
+ 
++    // Expose simulator to browser console for debugging
++    (window as any).simulator = simulatorRef.current;
++
+     // Connect particle manager to tsParticles
+     if (simulatorRef.current) {
+       setParticleManager(simulatorRef.current.getParticleManager());
+@@ -316,6 +323,7 @@ export default function RandomWalkSim() {
+     gridLayoutParams.graphType,
+     gridLayoutParams.graphSize,
+     useNewEngine, // Recreate simulator when engine toggle changes
++    useStreamingObservables, // Recreate simulator when observable framework changes
+   ]);
+ 
+   // Update physics parameters when store changes
+@@ -598,6 +606,16 @@ export default function RandomWalkSim() {
+           <label className="text-sm font-medium text-gray-700">
+             Physics Engine:
+           </label>
++          <button
++            onClick={() => setUseStreamingObservables(!useStreamingObservables)}
++            className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
++              useStreamingObservables
++                ? 'bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200'
++                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
++            }`}
++          >
++            {useStreamingObservables ? 'STREAM' : 'POLL'}
++          </button>
+           <button
+             onClick={() => setUseNewEngine(!useNewEngine)}
+             className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
+@@ -726,12 +744,19 @@ export default function RandomWalkSim() {
+             setObservablesWindow({ ...observablesWindow, zIndex: nextZ });
+           }}
+         >
+-          <ObservablesPanel
+-            simulatorRef={simulatorRef}
+-            isRunning={simulationState.isRunning}
+-            simulationStatus={simulationState.status}
+-            simReady={simReady}
+-          />
++          {useStreamingObservables ? (
++            <StreamObservablesPanel
++              simulatorRef={simulatorRef}
++              simReady={simReady}
++            />
++          ) : (
++            <ObservablesPanel
++              simulatorRef={simulatorRef}
++              isRunning={simulationState.isRunning}
++              simulationStatus={simulationState.status}
++              simReady={simReady}
++            />
++          )}
+         </FloatingPanel>
+ 
+         {/* Floating Custom Observables Panel */}
+diff --git a/frontend/src/components/CustomObservablesPanel.tsx b/frontend/src/components/CustomObservablesPanel.tsx
+index b686de2..6a04db1 100644
+--- a/frontend/src/components/CustomObservablesPanel.tsx
++++ b/frontend/src/components/CustomObservablesPanel.tsx
+@@ -115,7 +115,10 @@ export function CustomObservablesPanel({ simulatorRef, simReady }: CustomObserva
+   // Load custom observables when simulator is ready
+   useEffect(() => {
+     if (simReady && simulatorRef.current && customObservables.length > 0) {
+-      simulatorRef.current.getObservableManager().loadTextObservables(customObservables);
++      const manager = simulatorRef.current.getObservableManager();
++      if ('loadTextObservables' in manager && typeof manager.loadTextObservables === 'function') {
++        manager.loadTextObservables(customObservables);
++      }
+     }
+   }, [simReady, customObservables]);
+ 
+diff --git a/frontend/src/components/ObservablesPanel.tsx b/frontend/src/components/ObservablesPanel.tsx
+index ea38b79..46f6070 100644
+--- a/frontend/src/components/ObservablesPanel.tsx
++++ b/frontend/src/components/ObservablesPanel.tsx
+@@ -308,7 +308,8 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
+                   format: "number",
+                   precision: 4
+                 }
+-              ]
++              ],
++              uiToggle: 'showParticleCount' // Placeholder, not used for toggling
+             };
+ 
+             return (
+diff --git a/frontend/src/components/observablesConfig.ts b/frontend/src/components/observablesConfig.ts
+index bac06d9..f5979b7 100644
+--- a/frontend/src/components/observablesConfig.ts
++++ b/frontend/src/components/observablesConfig.ts
+@@ -6,12 +6,15 @@ export interface ObservableField {
+   precision?: number;
+ }
+ 
++import type { RandomWalkUIState } from "../stores/appStore";
++
+ export interface ObservableConfig {
+   id: string;
+   name: string;
+   text: string;
+   pollingInterval: number; // milliseconds
+   fields: ObservableField[];
++  uiToggle: keyof RandomWalkUIState;
+ }
+ 
+ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
+@@ -19,6 +22,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
+     id: 'particleCount',
+     name: 'Particle Count N(t)',
+     text: `name: particleCount, reduce: count`,
++    uiToggle: 'showParticleCount',
+     pollingInterval: 200, // Less frequent updates needed
+     fields: [
+       { label: 'Count', path: 'value', format: 'number' },
+@@ -29,6 +33,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
+     id: 'kineticEnergy',
+     name: 'Kinetic Energy',
+     text: `name: kineticEnergy, select: 0.5 * (velocity.vx^2 + velocity.vy^2), reduce: mean`,
++    uiToggle: 'showKineticEnergy',
+     pollingInterval: 100, // Standard polling for energy values
+     fields: [
+       { label: 'Average KE', path: 'value', format: 'number', precision: 10 },
+@@ -39,6 +44,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
+     id: 'momentum',
+     name: 'Total Momentum',
+     text: `observable "momentum" { select: velocity, reduce: sum }`,
++    uiToggle: 'showTotalMomentum',
+     pollingInterval: 50, // Fast updates for momentum (rapidly changing)
+     fields: [
+       { label: '|P| total', path: 'totalMomentumMagnitude', format: 'fixed', precision: 2 },
+@@ -53,6 +59,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
+     id: 'msd',
+     name: 'Mean Squared Displacement',
+     text: `observable "msd" { select: position.magnitude^2, reduce: mean }`,
++    uiToggle: 'showMSD',
+     pollingInterval: 500, // Slower updates for MSD (cumulative metric)
+     fields: [
+       { label: 'MSD', path: 'meanSquaredDisplacement', format: 'fixed', precision: 1 },
+diff --git a/frontend/src/components/useObservablesPolling.ts b/frontend/src/components/useObservablesPolling.ts
+index 13cfa77..14b378c 100644
+--- a/frontend/src/components/useObservablesPolling.ts
++++ b/frontend/src/components/useObservablesPolling.ts
+@@ -75,6 +75,11 @@ export function useObservablesPolling(
+   const pollObservable = useCallback((observableId: string) => {
+     if (!simulatorRef.current) return;
+ 
++    const observableManager = simulatorRef.current.getObservableManager();
++    if (!('getResult' in observableManager)) {
++      return;
++    }
++
+     // For built-in observables that now use text system, try text_ prefix
+     let data = simulatorRef.current.getObservableData(observableId);
+     if (!data && (observableId === 'particleCount' || observableId === 'kineticEnergy')) {
+diff --git a/frontend/src/physics/ParticleManager.ts b/frontend/src/physics/ParticleManager.ts
+index 0e70339..0c7d60b 100644
+--- a/frontend/src/physics/ParticleManager.ts
++++ b/frontend/src/physics/ParticleManager.ts
+@@ -17,6 +17,10 @@ export class ParticleManager {
+     this.coordSystem = coordSystem;
+   }
+ 
++  public getCoordinateSystem(): CoordinateSystem {
++    return this.coordSystem;
++  }
++
+   // Update the canvas size so we can convert physics coordinates -> canvas pixels
+   setCanvasSize(width: number, height: number) {
+     this.coordSystem.updateCanvasSize({ width, height });
+diff --git a/frontend/src/physics/RandomWalkSimulator.ts b/frontend/src/physics/RandomWalkSimulator.ts
+index b7ba744..25bf267 100644
+--- a/frontend/src/physics/RandomWalkSimulator.ts
++++ b/frontend/src/physics/RandomWalkSimulator.ts
+@@ -2,6 +2,7 @@ import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
+ import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
+ import { ParticleManager } from './ParticleManager';
+ import { ObservableManager } from './ObservableManager';
++import { StreamObservableManager } from './stream-ObservableManager';
+ import type { Observable } from './interfaces/Observable';
+ import { USE_NEW_ENGINE } from './config/flags';
+ import { PhysicsEngine } from './core/PhysicsEngine';
+@@ -23,7 +24,8 @@ export class RandomWalkSimulator {
+   private currentStrategy!: RandomWalkStrategy;
+   private physicsEngine?: PhysicsEngine;
+   private time: number = 0;
+-  private observableManager: ObservableManager;
++  private observableManager: ObservableManager | StreamObservableManager;
++  private useStreamingObservables: boolean; 
+   private simulationRunner: SimulationRunner | undefined;
+   private parameterManager: ParameterManager;
+   private readonly useNewEngine: boolean;
+@@ -33,16 +35,24 @@ export class RandomWalkSimulator {
+     bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
+   }> = [];
+ 
+-  constructor(config: SimulatorParams & { useNewEngine?: boolean }) {
++  constructor(config: SimulatorParams & { useNewEngine?: boolean, useStreamingObservables?: boolean }) {
+     this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
++    this.useStreamingObservables = config.useStreamingObservables ?? false;
+     this.parameterManager = new ParameterManager(config);
+     this.setupStrategies();
+     this.setupParticleManager();
+     this.setupSimulationRunner();
+-    this.observableManager = new ObservableManager({
+-      width: this.parameterManager.canvasWidth,
+-      height: this.parameterManager.canvasHeight
+-    });
++    if (this.useStreamingObservables) {
++      this.observableManager = new StreamObservableManager({
++        width: this.parameterManager.canvasWidth,
++        height: this.parameterManager.canvasHeight
++      });
++    } else {
++      this.observableManager = new ObservableManager({
++        width: this.parameterManager.canvasWidth,
++        height: this.parameterManager.canvasHeight
++      });
++    }
+     this.initializeParticles();
+   }
+ 
+@@ -156,7 +166,11 @@ export class RandomWalkSimulator {
+     // console.log('[RWS] step completed', { timeStep, newTime: this.time });
+     
+     const particles = this.particleManager.getAllParticles();
+-    this.observableManager.updateSnapshot(particles, this.time);
++    if (this.observableManager instanceof StreamObservableManager) {
++      this.observableManager.updateSnapshotAndCalculate(particles, this.time);
++    } else {
++      this.observableManager.updateSnapshot(particles, this.time);
++    }
+   }
+ 
+   reset(): void {
+@@ -273,10 +287,14 @@ export class RandomWalkSimulator {
+   }
+ 
+   getObservableData(id: string): any {
+-    return this.observableManager.getResult(id);
++    if ('getResult' in this.observableManager) {
++      return this.observableManager.getResult(id);
++    }
++    console.warn(`[RandomWalkSimulator] getResult is not available for the current observable manager.`);
++    return null;
+   }
+ 
+-  getObservableManager(): ObservableManager {
++  getObservableManager(): ObservableManager | StreamObservableManager {
+     return this.observableManager;
+   }
+ 
+diff --git a/frontend/src/physics/observables/ExpressionEvaluator.ts b/frontend/src/physics/observables/ExpressionEvaluator.ts
+index cf94f20..a317cff 100644
+--- a/frontend/src/physics/observables/ExpressionEvaluator.ts
++++ b/frontend/src/physics/observables/ExpressionEvaluator.ts
+@@ -2,8 +2,8 @@ import { Parser } from 'expr-eval';
+ import type { Particle } from '../types/Particle';
+ 
+ export interface EvaluationContext {
+-  position: { x: number; y: number };
+-  velocity: { vx: number; vy: number };
++  position: { x: number; y: number; magnitude: number };
++  velocity: { vx: number; vy: number; magnitude: number };
+   speed: number;
+   radius?: number;
+   id: string;
+@@ -21,8 +21,16 @@ export class ExpressionEvaluator {
+ 
+   static createContext(particle: Particle, bounds: { width: number; height: number }, time: number): EvaluationContext {
+     return {
+-      position: { x: particle.position.x, y: particle.position.y },
+-      velocity: { vx: particle.velocity.vx, vy: particle.velocity.vy },
++      position: { 
++        x: particle.position.x, 
++        y: particle.position.y,
++        magnitude: Math.sqrt(particle.position.x ** 2 + particle.position.y ** 2)
++      },
++      velocity: { 
++        vx: particle.velocity.vx, 
++        vy: particle.velocity.vy,
++        magnitude: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2)
++      },
+       speed: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2),
+       radius: particle.radius,
+       id: particle.id,
+diff --git a/frontend/src/physics/observables/TextObservableParser.ts b/frontend/src/physics/observables/TextObservableParser.ts
+index a5441ed..aa2c4b4 100644
+--- a/frontend/src/physics/observables/TextObservableParser.ts
++++ b/frontend/src/physics/observables/TextObservableParser.ts
+@@ -20,8 +20,8 @@ export class TextObservableParser {
+     'speed', 'radius', 'id', 'lastCollisionTime', 'nextCollisionTime', 'collisionCount',
+     'interparticleCollisionCount', 'waitingTime', 'time',
+     // Nested objects
+-    'position.x', 'position.y',
+-    'velocity.vx', 'velocity.vy',
++    'position.x', 'position.y', 'position.magnitude',
++    'velocity.vx', 'velocity.vy', 'velocity.magnitude',
+     'bounds.width', 'bounds.height'
+   ]);
+ 
+diff --git a/frontend/src/stores/appStore.ts b/frontend/src/stores/appStore.ts
+index cc5dbee..60c942a 100644
+--- a/frontend/src/stores/appStore.ts
++++ b/frontend/src/stores/appStore.ts
+@@ -4,7 +4,7 @@ import type { SimulationParams } from '../types'
+ import type { Layout } from 'react-grid-layout'
+ import type { RandomWalkParams } from '../types/simulationTypes'
+ 
+-interface RandomWalkUIState {
++export interface RandomWalkUIState {
+   isStrategyOpen: boolean
+   isBoundaryOpen: boolean
+   isParametersOpen: boolean
+@@ -89,6 +89,8 @@ interface AppState {
+   customObservableVisibility: Record<string, boolean>
+   // Physics engine selection
+   useNewEngine: boolean
++  // Observables framework selection
++  useStreamingObservables: boolean
+   // PDE persistent state
+   pdeState: PdeState
+   // PDE UI fold states for Controls panel
+@@ -103,7 +105,7 @@ interface AppState {
+   setSimulationParams: (params: SimulationParams) => void
+   setGridLayoutParams: (params: RandomWalkParams) => void
+   setRandomWalkSimLayouts: (layouts: Layout[]) => void
+-  setRandomWalkUIState: (state: RandomWalkUIState) => void
++  setRandomWalkUIState: (state: Partial<RandomWalkUIState>) => void
+   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
+   setObservablesWindow: (rect: WindowRect) => void
+   setCustomObservablesWindow: (rect: WindowRect) => void
+@@ -116,6 +118,7 @@ interface AppState {
+   updateCustomObservable: (index: number, observable: string) => void
+   setCustomObservableVisibility: (name: string, visible: boolean) => void
+   setUseNewEngine: (useNew: boolean) => void
++  setUseStreamingObservables: (useStreaming: boolean) => void
+   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
+   saveSimulationSnapshot: (
+     particleData: RandomWalkSimulationState['particleData'],
+@@ -266,11 +269,12 @@ export const useAppStore = create<AppState>()(
+       customObservables: [],
+       customObservableVisibility: {},
+       useNewEngine: false, // Default to legacy engine
++      useStreamingObservables: false, // Default to polling
+       setActiveTab: (tab) => set({ activeTab: tab }),
+       setSimulationParams: (params) => set({ simulationParams: params }),
+       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
+       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
+-      setRandomWalkUIState: (state) => set({ randomWalkUIState: state }),
++      setRandomWalkUIState: (partial) => set((state) => ({ randomWalkUIState: { ...state.randomWalkUIState, ...partial } })),
+       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
+       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
+       setCustomObservablesWindow: (rect) => set({ customObservablesWindow: rect }),
+@@ -291,6 +295,7 @@ export const useAppStore = create<AppState>()(
+         customObservableVisibility: { ...state.customObservableVisibility, [name]: visible }
+       })),
+       setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
++      setUseStreamingObservables: (useStreaming) => set({ useStreamingObservables: useStreaming }),
+       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
+         set((state) => ({
+           randomWalkSimulationState: {
+@@ -354,6 +359,7 @@ export const useAppStore = create<AppState>()(
+         customObservables: state.customObservables,
+         customObservableVisibility: state.customObservableVisibility,
+         useNewEngine: state.useNewEngine,
++        useStreamingObservables: state.useStreamingObservables,
+       }),
+     }
+   )
+diff --git a/memory-bank/sessions/2025-09-03-evening.md b/memory-bank/sessions/2025-09-03-evening.md
+index 4f3d34c..e313ca3 100644
+--- a/memory-bank/sessions/2025-09-03-evening.md
++++ b/memory-bank/sessions/2025-09-03-evening.md
+@@ -1,5 +1,6 @@
+ # Session 2025-09-03 - Evening
+ *Created: 2025-09-03 21:37:30 IST*
++*Last Updated: 2025-09-03 21:59:39 IST*
+ 
+ ## Focus Task
+ C15: Physics Engine Architecture Migration - Runtime engine toggle implementation
+diff --git a/memory-bank/tasks.md b/memory-bank/tasks.md
+index 2938d0f..362f186 100644
+--- a/memory-bank/tasks.md
++++ b/memory-bank/tasks.md
+@@ -27,6 +27,7 @@ _Last Updated: 2025-09-03 21:36:15 IST_
+ | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
+ | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
+ | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
++| C18 | Streaming Observable Framework Implementation      | 🔄 IN PROGRESS | MEDIUM   | 2025-09-03 | C7a             |
+ | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
+ | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
+ | C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
+@@ -181,6 +182,12 @@ _Last Updated: 2025-09-03 21:36:15 IST_
+ **Files**: `frontend/src/components/AnalysisPage.tsx`, `frontend/src/components/PlotlyChart.tsx`, `frontend/src/App.tsx`, `memory-bank/implementation-details/analysis-component-plan.md`
+ **Notes**: Basic infrastructure completed - Analysis tab with grid layout, Plotly.js integration, and sample data visualization. Next: data pipeline connection to simulation stores.
+ 
++### C18: Streaming Observable Framework Implementation
++**Description**: Replace polling-based observable system with streaming/push-based framework for better performance and cleaner architecture
++**Status**: 🔄 IN PROGRESS **Last**: 2025-09-03 19:58:00 IST
++**Files**: `physics/stream-ObservableManager.ts`, `components/stream-useObservableStream.ts`, `components/stream-ObservablesPanel.tsx`, `implementation-details/streaming-observables-plan.md`
++**Notes**: Implementation plan created - EventEmitter-based architecture to eliminate complex polling intervals and improve real-time updates
++
+ ### META-2: Document Indexing System
+ **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
+ **Status**: 🔄 ACTIVE **Last**: 2025-08-28 18:04:00 IST

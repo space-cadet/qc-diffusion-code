@@ -17,6 +17,10 @@ export class ParticleManager {
     this.coordSystem = coordSystem;
   }
 
+  public getCoordinateSystem(): CoordinateSystem {
+    return this.coordSystem;
+  }
+
   // Update the canvas size so we can convert physics coordinates -> canvas pixels
   setCanvasSize(width: number, height: number) {
     this.coordSystem.updateCanvasSize({ width, height });

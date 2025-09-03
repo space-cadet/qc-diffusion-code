@@ -2,8 +2,8 @@ import { Parser } from 'expr-eval';
 import type { Particle } from '../types/Particle';
 
 export interface EvaluationContext {
-  position: { x: number; y: number };
-  velocity: { vx: number; vy: number };
+  position: { x: number; y: number; magnitude: number };
+  velocity: { vx: number; vy: number; magnitude: number };
   speed: number;
   radius?: number;
   id: string;
@@ -21,8 +21,16 @@ export class ExpressionEvaluator {
 
   static createContext(particle: Particle, bounds: { width: number; height: number }, time: number): EvaluationContext {
     return {
-      position: { x: particle.position.x, y: particle.position.y },
-      velocity: { vx: particle.velocity.vx, vy: particle.velocity.vy },
+      position: { 
+        x: particle.position.x, 
+        y: particle.position.y,
+        magnitude: Math.sqrt(particle.position.x ** 2 + particle.position.y ** 2)
+      },
+      velocity: { 
+        vx: particle.velocity.vx, 
+        vy: particle.velocity.vy,
+        magnitude: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2)
+      },
       speed: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2),
       radius: particle.radius,
       id: particle.id,

@@ -75,6 +75,11 @@ export function useObservablesPolling(
   const pollObservable = useCallback((observableId: string) => {
     if (!simulatorRef.current) return;
 
+    const observableManager = simulatorRef.current.getObservableManager();
+    if (!('getResult' in observableManager)) {
+      return;
+    }
+
     // For built-in observables that now use text system, try text_ prefix
     let data = simulatorRef.current.getObservableData(observableId);
     if (!data && (observableId === 'particleCount' || observableId === 'kineticEnergy')) {

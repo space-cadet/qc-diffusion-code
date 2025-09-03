@@ -115,7 +115,10 @@ export function CustomObservablesPanel({ simulatorRef, simReady }: CustomObserva
   // Load custom observables when simulator is ready
   useEffect(() => {
     if (simReady && simulatorRef.current && customObservables.length > 0) {
-      simulatorRef.current.getObservableManager().loadTextObservables(customObservables);
+      const manager = simulatorRef.current.getObservableManager();
+      if ('loadTextObservables' in manager && typeof manager.loadTextObservables === 'function') {
+        manager.loadTextObservables(customObservables);
+      }
     }
   }, [simReady, customObservables]);
 

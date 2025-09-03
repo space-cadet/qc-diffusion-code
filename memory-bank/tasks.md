@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-03 21:36:15 IST_
+_Last Updated: 2025-09-03 22:30:24 IST_
 
 ## Active Tasks
 
@@ -27,6 +27,7 @@ _Last Updated: 2025-09-03 21:36:15 IST_
 | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
+| C18 | Streaming Observable Framework Implementation      | ✅ COMPLETED   | MEDIUM   | 2025-09-03 | C7a             |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
@@ -93,9 +94,9 @@ _Last Updated: 2025-09-03 21:36:15 IST_
 
 ### C7: Observer Design and Implementation
 **Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum, MSD) with temporal consistency
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-24 23:36:15 IST
-**Files**: `frontend/src/physics/observables/KineticEnergyObservable.ts`, `frontend/src/physics/observables/MomentumObservable.ts`, `frontend/src/physics/observables/MSDObservable.ts`, `frontend/src/components/ObservablesPanel.tsx`
-**Notes**: UI component cleanup completed - removed internal header/collapse, fixed TypeScript errors, added proper null safety with optional chaining, floating panel integration with react-rnd
+**Status**: ✅ COMPLETED **Last**: 2025-09-03 22:22:05 IST
+**Files**: `frontend/src/physics/ObservableManager.ts`, `frontend/src/physics/stream-ObservableManager.ts`, `frontend/src/physics/observables/`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/stream-ObservablesPanel.tsx`
+**Notes**: Enhanced with streaming framework (C18) and text-based system (C7a). Dual architecture supports both polling and event-driven observables with feature toggle. Complete UI separation between built-in and custom observables.
 
 ### C7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture with unified polling system and built-in observable migration to text-based system
@@ -180,6 +181,12 @@ _Last Updated: 2025-09-03 21:36:15 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 22:48:47 IST
 **Files**: `frontend/src/components/AnalysisPage.tsx`, `frontend/src/components/PlotlyChart.tsx`, `frontend/src/App.tsx`, `memory-bank/implementation-details/analysis-component-plan.md`
 **Notes**: Basic infrastructure completed - Analysis tab with grid layout, Plotly.js integration, and sample data visualization. Next: data pipeline connection to simulation stores.
+
+### C18: Streaming Observable Framework Implementation
+**Description**: Replace polling-based observable system with streaming/push-based framework for better performance and cleaner architecture
+**Status**: ✅ COMPLETED **Last**: 2025-09-03 22:22:05 IST
+**Files**: `frontend/src/physics/stream-ObservableManager.ts`, `frontend/src/components/stream-useObservableStream.ts`, `frontend/src/components/stream-ObservablesPanel.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/RandomWalkSimulator.ts`
+**Notes**: EventEmitter-based streaming architecture completed with feature toggle system. UI toggle button switches between polling and streaming panels. Real-time data emission during simulation step eliminates polling complexity and improves performance.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

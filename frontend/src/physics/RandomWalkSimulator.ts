@@ -2,6 +2,7 @@ import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
 import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
 import { ParticleManager } from './ParticleManager';
 import { ObservableManager } from './ObservableManager';
+import { StreamObservableManager } from './stream-ObservableManager';
 import type { Observable } from './interfaces/Observable';
 import { USE_NEW_ENGINE } from './config/flags';
 import { PhysicsEngine } from './core/PhysicsEngine';
@@ -23,7 +24,8 @@ export class RandomWalkSimulator {
   private currentStrategy!: RandomWalkStrategy;
   private physicsEngine?: PhysicsEngine;
   private time: number = 0;
-  private observableManager: ObservableManager;
+  private observableManager: ObservableManager | StreamObservableManager;
+  private useStreamingObservables: boolean; 
   private simulationRunner: SimulationRunner | undefined;
   private parameterManager: ParameterManager;
   private readonly useNewEngine: boolean;
@@ -33,16 +35,24 @@ export class RandomWalkSimulator {
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
   }> = [];
 
-  constructor(config: SimulatorParams & { useNewEngine?: boolean }) {
+  constructor(config: SimulatorParams & { useNewEngine?: boolean, useStreamingObservables?: boolean }) {
     this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
+    this.useStreamingObservables = config.useStreamingObservables ?? false;
     this.parameterManager = new ParameterManager(config);
     this.setupStrategies();
     this.setupParticleManager();
     this.setupSimulationRunner();
-    this.observableManager = new ObservableManager({
-      width: this.parameterManager.canvasWidth,
-      height: this.parameterManager.canvasHeight
-    });
+    if (this.useStreamingObservables) {
+      this.observableManager = new StreamObservableManager({
+        width: this.parameterManager.canvasWidth,
+        height: this.parameterManager.canvasHeight
+      });
+    } else {
+      this.observableManager = new ObservableManager({
+        width: this.parameterManager.canvasWidth,
+        height: this.parameterManager.canvasHeight
+      });
+    }
     this.initializeParticles();
   }
 
@@ -156,7 +166,11 @@ export class RandomWalkSimulator {
     // console.log('[RWS] step completed', { timeStep, newTime: this.time });
     
     const particles = this.particleManager.getAllParticles();
-    this.observableManager.updateSnapshot(particles, this.time);
+    if (this.observableManager instanceof StreamObservableManager) {
+      this.observableManager.updateSnapshotAndCalculate(particles, this.time);
+    } else {
+      this.observableManager.updateSnapshot(particles, this.time);
+    }
   }
 
   reset(): void {
@@ -273,10 +287,14 @@ export class RandomWalkSimulator {
   }
 
   getObservableData(id: string): any {
-    return this.observableManager.getResult(id);
+    if ('getResult' in this.observableManager) {
+      return this.observableManager.getResult(id);
+    }
+    console.warn(`[RandomWalkSimulator] getResult is not available for the current observable manager.`);
+    return null;
   }
 
-  getObservableManager(): ObservableManager {
+  getObservableManager(): ObservableManager | StreamObservableManager {
     return this.observableManager;
   }
 

@@ -308,7 +308,8 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
                   format: "number",
                   precision: 4
                 }
-              ]
+              ],
+              uiToggle: 'showParticleCount' // Placeholder, not used for toggling
             };
 
             return (

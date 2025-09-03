@@ -4,7 +4,7 @@ import type { SimulationParams } from '../types'
 import type { Layout } from 'react-grid-layout'
 import type { RandomWalkParams } from '../types/simulationTypes'
 
-interface RandomWalkUIState {
+export interface RandomWalkUIState {
   isStrategyOpen: boolean
   isBoundaryOpen: boolean
   isParametersOpen: boolean
@@ -89,6 +89,8 @@ interface AppState {
   customObservableVisibility: Record<string, boolean>
   // Physics engine selection
   useNewEngine: boolean
+  // Observables framework selection
+  useStreamingObservables: boolean
   // PDE persistent state
   pdeState: PdeState
   // PDE UI fold states for Controls panel
@@ -103,7 +105,7 @@ interface AppState {
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
-  setRandomWalkUIState: (state: RandomWalkUIState) => void
+  setRandomWalkUIState: (state: Partial<RandomWalkUIState>) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
   setObservablesWindow: (rect: WindowRect) => void
   setCustomObservablesWindow: (rect: WindowRect) => void
@@ -116,6 +118,7 @@ interface AppState {
   updateCustomObservable: (index: number, observable: string) => void
   setCustomObservableVisibility: (name: string, visible: boolean) => void
   setUseNewEngine: (useNew: boolean) => void
+  setUseStreamingObservables: (useStreaming: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -266,11 +269,12 @@ export const useAppStore = create<AppState>()(
       customObservables: [],
       customObservableVisibility: {},
       useNewEngine: false, // Default to legacy engine
+      useStreamingObservables: false, // Default to polling
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
-      setRandomWalkUIState: (state) => set({ randomWalkUIState: state }),
+      setRandomWalkUIState: (partial) => set((state) => ({ randomWalkUIState: { ...state.randomWalkUIState, ...partial } })),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
       setCustomObservablesWindow: (rect) => set({ customObservablesWindow: rect }),
@@ -291,6 +295,7 @@ export const useAppStore = create<AppState>()(
         customObservableVisibility: { ...state.customObservableVisibility, [name]: visible }
       })),
       setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
+      setUseStreamingObservables: (useStreaming) => set({ useStreamingObservables: useStreaming }),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -354,6 +359,7 @@ export const useAppStore = create<AppState>()(
         customObservables: state.customObservables,
         customObservableVisibility: state.customObservableVisibility,
         useNewEngine: state.useNewEngine,
+        useStreamingObservables: state.useStreamingObservables,
       }),
     }
   )

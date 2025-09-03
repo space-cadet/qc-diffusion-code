@@ -11,6 +11,7 @@ import { HistoryPanel } from "./components/HistoryPanel";
 import { ReplayControls } from "./components/ReplayControls";
 import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvas } from "./components/ParticleCanvas";
+import { StreamObservablesPanel } from "./components/stream-ObservablesPanel";
 import { ObservablesPanel } from "./components/ObservablesPanel";
 import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
 import { FloatingPanel } from "./components/common/FloatingPanel";
@@ -55,7 +56,9 @@ export default function RandomWalkSim() {
     customObservablesCollapsed,
     setCustomObservablesCollapsed,
     useNewEngine,
-    setUseNewEngine
+    setUseNewEngine,
+    useStreamingObservables,
+    setUseStreamingObservables
   } = useAppStore();
 
   // State declarations should come before refs
@@ -247,6 +250,7 @@ export default function RandomWalkSim() {
       canvasHeight,
       temperature: gridLayoutParams.temperature,
       useNewEngine: useNewEngine,
+      useStreamingObservables: useStreamingObservables,
       // initial distribution wiring
       initialDistType: gridLayoutParams.initialDistType,
       distSigmaX: gridLayoutParams.distSigmaX,
@@ -261,6 +265,9 @@ export default function RandomWalkSim() {
 
     // mark simulator as ready for dependent components
     setSimReady(true);
+
+    // Expose simulator to browser console for debugging
+    (window as any).simulator = simulatorRef.current;
 
     // Connect particle manager to tsParticles
     if (simulatorRef.current) {
@@ -316,6 +323,7 @@ export default function RandomWalkSim() {
     gridLayoutParams.graphType,
     gridLayoutParams.graphSize,
     useNewEngine, // Recreate simulator when engine toggle changes
+    useStreamingObservables, // Recreate simulator when observable framework changes
   ]);
 
   // Update physics parameters when store changes
@@ -599,6 +607,16 @@ export default function RandomWalkSim() {
             Physics Engine:
           </label>
           <button
+            onClick={() => setUseStreamingObservables(!useStreamingObservables)}
+            className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
+              useStreamingObservables
+                ? 'bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200'
+                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {useStreamingObservables ? 'STREAM' : 'POLL'}
+          </button>
+          <button
             onClick={() => setUseNewEngine(!useNewEngine)}
             className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
               useNewEngine
@@ -726,12 +744,19 @@ export default function RandomWalkSim() {
             setObservablesWindow({ ...observablesWindow, zIndex: nextZ });
           }}
         >
-          <ObservablesPanel
-            simulatorRef={simulatorRef}
-            isRunning={simulationState.isRunning}
-            simulationStatus={simulationState.status}
-            simReady={simReady}
-          />
+          {useStreamingObservables ? (
+            <StreamObservablesPanel
+              simulatorRef={simulatorRef}
+              simReady={simReady}
+            />
+          ) : (
+            <ObservablesPanel
+              simulatorRef={simulatorRef}
+              isRunning={simulationState.isRunning}
+              simulationStatus={simulationState.status}
+              simReady={simReady}
+            />
+          )}
         </FloatingPanel>
 
         {/* Floating Custom Observables Panel */}

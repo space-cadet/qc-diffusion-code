@@ -20,8 +20,8 @@ export class TextObservableParser {
     'speed', 'radius', 'id', 'lastCollisionTime', 'nextCollisionTime', 'collisionCount',
     'interparticleCollisionCount', 'waitingTime', 'time',
     // Nested objects
-    'position.x', 'position.y',
-    'velocity.vx', 'velocity.vy',
+    'position.x', 'position.y', 'position.magnitude',
+    'velocity.vx', 'velocity.vy', 'velocity.magnitude',
     'bounds.width', 'bounds.height'
   ]);
 

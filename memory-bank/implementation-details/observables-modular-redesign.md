@@ -1,7 +1,7 @@
 # Modular and Transparent Observables System Redesign
 
 *Created: 2025-09-01 15:25:33 IST*
-*Updated: 2025-09-03 12:47:40 IST*
+*Updated: 2025-09-03 22:47:40 IST*
 
 ## Executive Summary
 
@@ -539,3 +539,81 @@ kineticEnergy: {
 3. **Simplicity**: One syntax for all observables, easier for users to understand
 4. **Maintainability**: Eliminates separate class files for built-in observables
 5. **Flexibility**: Easy to modify observable definitions without code changes
+
+## Streaming Observable Framework Integration (2025-09-03 22:22:05 IST)
+
+### EventEmitter-Based Observable System (C18 Completion)
+**Objective**: Replace polling-based architecture with streaming/push-based framework using EventEmitter pattern
+
+#### Key Implementation
+
+**StreamObservableManager Architecture**:
+- EventEmitter-based data emission during simulation step
+- Real-time updates eliminate polling complexity and improve performance
+- Automatic observable registration/unregistration based on visibility
+- Support for both built-in and custom text-based observables
+
+**React Integration**:
+- `useObservableStream` hook replaces complex polling logic with event subscriptions
+- `StreamObservablesPanel` provides streaming version with simplified architecture
+- Feature toggle system allows A/B testing between polling and streaming approaches
+
+**Performance Benefits**:
+- Eliminates all interval/timing complexity from polling system
+- Real-time data emission with no polling lag
+- Lower CPU usage through event-driven updates
+- Cleaner separation of concerns between simulation and UI
+
+#### Technical Architecture
+
+**Event-Driven Data Flow**:
+```typescript
+// StreamObservableManager emits data during simulation step
+updateSnapshotAndCalculate(particles: Particle[], timestamp: number): void {
+  this.observers.forEach((observer, id) => {
+    const result = observer.calculate(particles, timestamp);
+    this.eventEmitter.emit('update', { id, data: result });
+  });
+}
+
+// React hook subscribes to updates
+const handleUpdate = (update: { id: string; data: any }) => {
+  setData(prevData => ({ ...prevData, [update.id]: update.data }));
+};
+manager.on('update', handleUpdate);
+```
+
+**Feature Toggle Integration**:
+- `useStreamingObservables` flag in appStore enables runtime switching
+- RandomWalkSimulator conditionally instantiates correct manager type
+- UI toggle button switches between "POLL" and "STREAM" modes
+- Backward compatibility maintained with existing polling system
+
+#### Files Created/Modified
+
+**New Streaming Components**:
+- `frontend/src/physics/stream-ObservableManager.ts` (120 lines) - EventEmitter-based manager
+- `frontend/src/components/stream-useObservableStream.ts` (25 lines) - Event subscription hook
+- `frontend/src/components/stream-ObservablesPanel.tsx` (147 lines) - Streaming panel implementation
+
+**Integration Updates**:
+- `frontend/src/RandomWalkSim.tsx` - Feature toggle UI and conditional rendering
+- `frontend/src/stores/appStore.ts` - useStreamingObservables flag and state management
+- `frontend/src/physics/RandomWalkSimulator.ts` - Conditional manager instantiation
+
+#### Results Achieved
+
+- ✅ Complete streaming observable framework with EventEmitter architecture
+- ✅ Feature toggle system enabling comparison between polling and streaming approaches
+- ✅ Real-time data emission during simulation step eliminating polling overhead
+- ✅ Automatic observable lifecycle management with registration/unregistration
+- ✅ Backward compatibility with existing polling system maintained
+- ✅ Side-by-side testing capability for performance validation
+
+#### Evolution Summary
+
+**Phase 0 (2025-09-02)**: Text-based observable system with configurable polling intervals
+**Phase 1 (2025-09-03)**: Single-timer polling architecture with built-in observable migration  
+**Phase 2 (2025-09-03)**: Streaming observable framework with EventEmitter-based push updates
+
+The observable system has evolved from hardcoded classes to a flexible, modular architecture supporting both polling and streaming paradigms, with complete text-based observable definitions and real-time performance optimization.
