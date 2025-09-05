@@ -91,6 +91,8 @@ interface AppState {
   useNewEngine: boolean
   // Observables framework selection
   useStreamingObservables: boolean
+  // GPU acceleration toggle
+  useGPU: boolean
   // PDE persistent state
   pdeState: PdeState
   // PDE UI fold states for Controls panel
@@ -119,6 +121,7 @@ interface AppState {
   setCustomObservableVisibility: (name: string, visible: boolean) => void
   setUseNewEngine: (useNew: boolean) => void
   setUseStreamingObservables: (useStreaming: boolean) => void
+  setUseGPU: (useGPU: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -270,6 +273,7 @@ export const useAppStore = create<AppState>()(
       customObservableVisibility: {},
       useNewEngine: false, // Default to legacy engine
       useStreamingObservables: false, // Default to polling
+      useGPU: false, // Default to CPU physics
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
       setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
@@ -296,6 +300,7 @@ export const useAppStore = create<AppState>()(
       })),
       setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
       setUseStreamingObservables: (useStreaming) => set({ useStreamingObservables: useStreaming }),
+      setUseGPU: (useGPU) => set({ useGPU: useGPU }),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -360,6 +365,7 @@ export const useAppStore = create<AppState>()(
         customObservableVisibility: state.customObservableVisibility,
         useNewEngine: state.useNewEngine,
         useStreamingObservables: state.useStreamingObservables,
+        useGPU: state.useGPU,
       }),
     }
   )

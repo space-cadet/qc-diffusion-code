@@ -101,9 +101,9 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
     const nearbyCount = nearby.length;
 
     // Log spatial grid efficiency (every 100th particle to avoid spam)
-    if (Math.random() < 0.00001) {
-      console.log(`[Collision2D] Spatial grid: ${nearbyCount}/${totalParticles} nearby particles for p${pid}`);
-    }
+    // if (Math.random() < 0.00001) {
+    //   console.log(`[Collision2D] Spatial grid: ${nearbyCount}/${totalParticles} nearby particles for p${pid}`);
+    // }
 
     for (const other of nearby) {
       if (particle.id === other.id) continue;
@@ -145,9 +145,9 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
         particle.lastInterparticleCollisionTime = currentTime;
         other.lastInterparticleCollisionTime = currentTime;
 
-        if(Math.random() < 0.01) {
-          console.log(`[Collision2D] Collision: p${pid} <-> p${oid}, dist=${dist.toFixed(2)}`);
-        }
+        // if(Math.random() < 0.01) {
+        //   console.log(`[Collision2D] Collision: p${pid} <-> p${oid}, dist=${dist.toFixed(2)}`);
+        // }
       }
     }
   }

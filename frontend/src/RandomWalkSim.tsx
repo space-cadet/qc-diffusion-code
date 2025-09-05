@@ -58,7 +58,9 @@ export default function RandomWalkSim() {
     useNewEngine,
     setUseNewEngine,
     useStreamingObservables,
-    setUseStreamingObservables
+    setUseStreamingObservables,
+    useGPU,
+    setUseGPU
   } = useAppStore();
 
   // State declarations should come before refs
@@ -625,6 +627,16 @@ export default function RandomWalkSim() {
             }`}
           >
             {useNewEngine ? 'NEW' : 'LEGACY'}
+          </button>
+          <button
+            onClick={() => setUseGPU(!useGPU)}
+            className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
+              useGPU
+                ? 'bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200'
+                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {useGPU ? 'GPU' : 'CPU'}
           </button>
         </div>
       </div>

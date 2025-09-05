@@ -1,0 +1,17 @@
+#version 300 es
+precision highp float;
+
+uniform float u_dt;
+uniform sampler2D u_velocity;
+
+in vec2 v_uv;
+out vec4 fragColor;
+
+void main() {
+  vec2 position = texture(u_state, v_uv).xy;
+  vec2 velocity = texture(u_velocity, v_uv).xy;
+  
+  vec2 newPosition = position + velocity * u_dt;
+  
+  fragColor = vec4(newPosition, 0.0, 1.0);
+}
