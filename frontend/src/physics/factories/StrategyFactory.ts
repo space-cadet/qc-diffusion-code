@@ -6,7 +6,7 @@ import { CTRWStrategy1D } from '../strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { LegacyBallisticStrategy } from '../strategies/LegacyBallisticStrategy';
 import { CompositeStrategy } from '../strategies/CompositeStrategy';
-import { InterparticleCollisionStrategy } from '../strategies/InterparticleCollisionStrategy';
+import { InterparticleCollisionStrategy2D } from '../strategies/InterparticleCollisionStrategy2D';
 import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCollisionStrategy1D';
 import { getNewEngineFlag } from '../config/flags';
 import { BallisticStrategy } from '../strategies/BallisticStrategy';
@@ -87,7 +87,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
     }
 
     if (selectedStrategies.includes('collisions')) {
-      twoDStrategies.push(new InterparticleCollisionStrategy(boundaryConfig, coordSystem));
+      twoDStrategies.push(new InterparticleCollisionStrategy2D(boundaryConfig, coordSystem));
     }
 
     if (forPhysicsEngine) {

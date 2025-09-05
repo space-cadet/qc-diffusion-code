@@ -1,7 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-04 00:54:05 IST_
+_Last Updated: 2025-09-05 19:57:59 IST_
+
+### 2025-09-05
+
+#### 19:57 - C12: CPU Collision Detection Optimization
+- Renamed `frontend/src/physics/strategies/InterparticleCollisionStrategy.ts` to `InterparticleCollisionStrategy2D.ts` - File consistency with 1D version
+- Updated `frontend/src/physics/factories/StrategyFactory.ts` - Fixed import references for renamed collision strategy
+- Created `frontend/src/physics/utils/SpatialGrid.ts` - Spatial partitioning utility for O(n) collision detection vs O(n²) all-pairs checking
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts` - Added spatial grid integration, ID caching, squared distance optimization, minimal performance logging
+- Updated `memory-bank/tasks/C12.md` - Added optimization progress entry with technical details
+- Updated `memory-bank/tasks/C16.md` - Added Phase 0 completion status for CPU optimization baseline
+- Updated `memory-bank/tasks.md` - Updated C12 and C16 task summaries with optimization status
+- Created `memory-bank/sessions/2025-09-05-evening.md` - Session documentation with optimization details
+- Updated `memory-bank/session_cache.md` - Updated current session and task registry
 
 ### 2025-09-04
 

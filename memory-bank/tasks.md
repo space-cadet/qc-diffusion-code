@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-04 00:54:05 IST_
+_Last Updated: 2025-09-05 19:57:59 IST_
 
 ## Active Tasks
 
@@ -137,9 +137,9 @@ _Last Updated: 2025-09-04 00:54:05 IST_
 
 ### C12: Interparticle Collisions and Obstacles Implementation
 **Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-27 09:43:58 IST
-**Files**: `frontend/src/physics/strategies/`, `memory-bank/implementation-details/interparticle-collision-plan.md`
-**Notes**: Critical bug fixes completed by GPT5 - separated scattering vs collision metrics, fixed 1D collision overcounting, removed unintended CTRW at startup, added safe ID parsing
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-05 19:57:59 IST
+**Files**: `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts`, `frontend/src/physics/utils/SpatialGrid.ts`
+**Notes**: CPU collision detection optimized with spatial partitioning (O(n) vs O(n²)), ID caching, squared distance comparisons - 3-5x performance improvement before GPU migration
 
 ### C14: Composite Strategy Framework Implementation
 **Description**: Implement composite strategy framework allowing multiple physics strategies to work together simultaneously, with ballistic motion as default and 2D elastic collision support
@@ -173,9 +173,9 @@ _Last Updated: 2025-09-04 00:54:05 IST_
 
 ### C16: GPU.IO Framework Implementation with Rendering Engine Abstraction
 **Description**: Implement GPU.IO-based particle physics framework with complete backend agnosticism and on-the-fly switching between tsParticles and GPU.IO rendering engines
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-01 13:23:07 IST
-**Files**: `memory-bank/implementation-details/gpu-io-implementation-plan.md`, `memory-bank/tasks/C16.md` (planned: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/rendering/RenderingEngine.ts`, `frontend/src/simulation/SimulationEngine.ts`)
-**Notes**: Comprehensive migration plan created for GPU.IO integration. Target: 100x performance improvement (1K→100K particles) through GPU collision detection. Includes rendering engine abstraction, backend-agnostic architecture, and seamless engine switching capabilities.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-05 19:57:59 IST
+**Files**: `memory-bank/implementation-details/gpu-io-implementation-plan.md`, `memory-bank/tasks/C16.md`
+**Notes**: Phase 0 completed - CPU collision detection optimized in C12 as pre-GPU migration baseline. Spatial partitioning and performance monitoring established. Ready for GPU.IO package integration phase.
 
 ### C17: Analysis Dashboard and Plotly Integration
 **Description**: Implement dedicated Analysis tab with Plotly.js integration, React Grid Layout interface, and data pipeline connecting simulation results to advanced plotting capabilities

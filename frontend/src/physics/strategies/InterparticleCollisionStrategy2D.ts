@@ -6,14 +6,18 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import { simTime } from '../core/GlobalTime';
+import { SpatialGrid } from '../utils/SpatialGrid';
 
-export class InterparticleCollisionStrategy implements RandomWalkStrategy, PhysicsStrategy {
+export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
   private boundaryConfig: BoundaryConfig;
   private coordSystem: CoordinateSystem;
+  private spatialGrid: SpatialGrid;
+  private idCache: Map<string, number> = new Map();
 
   constructor(boundaryConfig: BoundaryConfig, coordSystem: CoordinateSystem) {
     this.boundaryConfig = boundaryConfig;
     this.coordSystem = coordSystem;
+    this.spatialGrid = new SpatialGrid(1000, 20); // Grid size, cell size
   }
 
   private detectCollision(p1: Particle, p2: Particle): boolean {
@@ -73,55 +77,77 @@ export class InterparticleCollisionStrategy implements RandomWalkStrategy, Physi
     this.handleInterparticleCollisions(particle, allParticles);
   }
 
+  private getNumericId(particle: Particle): number {
+    let id = this.idCache.get(particle.id);
+    if (id === undefined) {
+      id = parseInt(String(particle.id).replace(/\D+/g, ''), 10) || 0;
+      this.idCache.set(particle.id, id);
+      // console.log(`[Collision2D] Cached ID: ${particle.id} -> ${id}`);
+    }
+    return id;
+  }
+
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {
-    // Ensure each pair is processed only once per frame using numeric id ordering
-    const pid = parseInt(String(particle.id).replace(/\D+/g, ''), 10) || 0;
-    for (const other of allParticles) {
+    // Build spatial grid
+    this.spatialGrid.clear();
+    for (const p of allParticles) {
+      this.spatialGrid.insert(p);
+    }
+
+    const pid = this.getNumericId(particle);
+    const particleVel = this.coordSystem.toVector(particle.velocity);
+    const nearby = this.spatialGrid.getNearbyParticles(particle);
+    const totalParticles = allParticles.length;
+    const nearbyCount = nearby.length;
+
+    // Log spatial grid efficiency (every 100th particle to avoid spam)
+    if (Math.random() < 0.00001) {
+      console.log(`[Collision2D] Spatial grid: ${nearbyCount}/${totalParticles} nearby particles for p${pid}`);
+    }
+
+    for (const other of nearby) {
       if (particle.id === other.id) continue;
-      const oid = parseInt(String(other.id).replace(/\D+/g, ''), 10) || 0;
+      const oid = this.getNumericId(other);
       if (!(pid < oid)) continue; // only handle pair once when pid < oid
 
-      const particlePosition = { x: particle.position.x, y: particle.position.y };
-      const otherPosition = { x: other.position.x, y: other.position.y };
-      const dx = particlePosition.x - otherPosition.x;
-      const dy = particlePosition.y - otherPosition.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dx = particle.position.x - other.position.x;
+      const dy = particle.position.y - other.position.y;
+      const distSquared = dx * dx + dy * dy;
       const collisionRadius = (particle.radius || 3) + (other.radius || 3);
+      const collisionRadiusSquared = collisionRadius * collisionRadius;
 
-      if (dist < collisionRadius && dist > 0) {
-        // Convert velocity to Vector for calculations
-        const particleVelocity = this.coordSystem.toVector(particle.velocity);
-        const otherVelocity = this.coordSystem.toVector(other.velocity);
+      if (distSquared < collisionRadiusSquared && distSquared > 0) {
+        const dist = Math.sqrt(distSquared);
+        const otherVel = this.coordSystem.toVector(other.velocity);
         
         // 2D elastic collision with momentum conservation
         const [v1x, v1y, v2x, v2y] = this.elasticCollision2D(
-          particleVelocity.x, particleVelocity.y,
-          otherVelocity.x, otherVelocity.y,
+          particleVel.x, particleVel.y,
+          otherVel.x, otherVel.y,
           1, 1
         );
         
-        // Convert back to Velocity for storage
         particle.velocity = this.coordSystem.toVelocity({ x: v1x, y: v1y });
         other.velocity = this.coordSystem.toVelocity({ x: v2x, y: v2y });
 
         // Separate particles to prevent overlap
         const overlap = collisionRadius - dist;
         const separationFactor = overlap / (2 * dist);
-        particlePosition.x += dx * separationFactor;
-        particlePosition.y += dy * separationFactor;
-        otherPosition.x -= dx * separationFactor;
-        otherPosition.y -= dy * separationFactor;
-        particle.position = particlePosition;
-        other.position = otherPosition;
+        particle.position.x += dx * separationFactor;
+        particle.position.y += dy * separationFactor;
+        other.position.x -= dx * separationFactor;
+        other.position.y -= dy * separationFactor;
 
-        // Count actual inter-particle collisions on both participants
+        // Count collisions and mark timestamp
         particle.interparticleCollisionCount = (particle.interparticleCollisionCount || 0) + 1;
         other.interparticleCollisionCount = (other.interparticleCollisionCount || 0) + 1;
-
-        // Mark collision timestamp for visual indicator
         const currentTime = simTime();
         particle.lastInterparticleCollisionTime = currentTime;
         other.lastInterparticleCollisionTime = currentTime;
+
+        if(Math.random() < 0.01) {
+          console.log(`[Collision2D] Collision: p${pid} <-> p${oid}, dist=${dist.toFixed(2)}`);
+        }
       }
     }
   }
