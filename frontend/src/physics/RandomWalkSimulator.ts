@@ -195,7 +195,6 @@ export class RandomWalkSimulator {
         // Get physics strategies directly instead of using adapter
         const physicsStrategies = createPhysicsStrategies(this.parameterManager, this.parameterManager.getBoundaryConfig());
         this.physicsEngine.updateConfiguration({ strategies: physicsStrategies });
-        console.log('[RWS] PhysicsEngine strategies refreshed with direct PhysicsStrategies');
       }
     }
     

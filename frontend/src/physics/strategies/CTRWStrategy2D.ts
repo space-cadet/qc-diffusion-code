@@ -6,7 +6,7 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { IGraph } from '@spin-network/graph-core';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
-import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime, simDt } from '../core/GlobalTime';
 
 export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
@@ -16,7 +16,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
   private diffusionConstant: number;
   private meanWaitTime: number;
   private graph?: IGraph;
-  private boundaryConfig: BoundaryConfig;
+  private boundaryManager: BoundaryManager;
   private coordSystem: CoordinateSystem;
 
   constructor(params: {
@@ -31,13 +31,14 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
     this.diffusionConstant = this.velocity ** 2 / (2 * this.collisionRate);
     this.meanWaitTime = 1 / this.collisionRate;
-    this.boundaryConfig = params.boundaryConfig || {
+    const boundaryConfig = params.boundaryConfig || {
       type: 'periodic',
       xMin: -200,
       xMax: 200,
       yMin: -200,
       yMax: 200
     };
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
     this.coordSystem = params.coordSystem;
   }
 
@@ -61,7 +62,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.x += velocity.x * dt;
     particle.position.y += velocity.y * dt;
 
-    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
     particle.position = newPosition;
     if (newVelocity) {
       particle.velocity = newVelocity;
@@ -88,7 +89,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.x += velocity.x * dt;
     particle.position.y += velocity.y * dt;
 
-    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
     particle.position = newPosition;
     if (newVelocity) {
       particle.velocity = newVelocity;
@@ -101,25 +102,13 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     });
   }
 
-  private applyBoundaryCondition(particle: Particle) {
-    switch (this.boundaryConfig.type) {
-      case 'periodic':
-        return applyPeriodicBoundary(particle.position, this.boundaryConfig);
-      case 'reflective':
-        return applyReflectiveBoundary(particle.position, particle.velocity, this.boundaryConfig);
-      case 'absorbing':
-        return applyAbsorbingBoundary(particle.position, this.boundaryConfig);
-      default:
-        return { position: particle.position };
-    }
-  }
-
   setBoundaries(config: BoundaryConfig): void {
-    this.boundaryConfig = config;
+    console.log('[CTRWStrategy2D] setBoundaries called with:', config.type);
+    this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 
   calculateStep(particle: Particle): Step {

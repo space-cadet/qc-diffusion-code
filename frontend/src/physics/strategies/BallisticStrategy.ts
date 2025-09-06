@@ -4,25 +4,21 @@ import type { Particle } from '../types/Particle';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { Step } from '../types/CollisionEvent';
-import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { BoundaryManager } from '../core/BoundaryManager';
 import { simDt, simTime } from '../core/GlobalTime';
 
 export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
-  private boundaryConfig: BoundaryConfig = {
-    type: 'reflective',
-    xMin: -Infinity,
-    xMax: Infinity,
-    yMin: -Infinity,
-    yMax: Infinity
-  };
+  private boundaryManager: BoundaryManager;
 
   constructor(config?: { boundaryConfig?: BoundaryConfig }) {
-    if (config?.boundaryConfig) {
-      this.boundaryConfig = {
-        ...this.boundaryConfig,
-        ...config.boundaryConfig
-      };
-    }
+    const boundaryConfig = config?.boundaryConfig || {
+      type: 'reflective',
+      xMin: -Infinity,
+      xMax: Infinity,
+      yMin: -Infinity,
+      yMax: Infinity
+    };
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
   }
 
   preUpdate(_particle: Particle, _allParticles: Particle[], _context: PhysicsContext): void {
@@ -45,7 +41,7 @@ export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.y += particle.velocity.vy * dt;
     
     // Apply boundary conditions
-    const { position: newPosition, velocity: newVelocity } = this.applyBoundaryCondition(particle);
+    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
     particle.position = newPosition;
     if (newVelocity) {
       particle.velocity = newVelocity;
@@ -56,19 +52,6 @@ export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
       position: { ...particle.position },
       timestamp: simTime()
     });
-  }
-
-  private applyBoundaryCondition(particle: Particle) {
-    switch (this.boundaryConfig.type) {
-      case 'periodic':
-        return applyPeriodicBoundary(particle.position, this.boundaryConfig);
-      case 'reflective':
-        return applyReflectiveBoundary(particle.position, particle.velocity, this.boundaryConfig);
-      case 'absorbing':
-        return applyAbsorbingBoundary(particle.position, this.boundaryConfig);
-      default:
-        return { position: particle.position };
-    }
   }
 
   calculateStep(particle: Particle): Step {
@@ -100,14 +83,14 @@ export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
   }
 
   getBoundaryConfig(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 
   setBoundaries(config: BoundaryConfig): void {
-    this.boundaryConfig = config;
+    this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 }

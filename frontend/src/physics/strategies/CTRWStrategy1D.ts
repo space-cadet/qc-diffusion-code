@@ -5,7 +5,7 @@ import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
-import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary } from '../utils/boundaryUtils';
+import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime, simDt } from '../core/GlobalTime';
 import { CoordinateSystem as CoordSystem } from '../core/CoordinateSystem';
 
@@ -15,7 +15,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
   private velocity: number;
   private diffusionConstant: number;
   private meanWaitTime: number;
-  private boundaryConfig: BoundaryConfig;
+  private boundaryManager: BoundaryManager;
   private interparticleCollisions: boolean;
   private coordSystem: CoordinateSystem;
 
@@ -31,17 +31,18 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
     this.diffusionConstant = this.velocity ** 2 / (2 * this.collisionRate);
     this.meanWaitTime = 1 / this.collisionRate;
-    this.boundaryConfig = params.boundaryConfig || {
+    const boundaryConfig = params.boundaryConfig || {
       type: 'periodic',
       xMin: -200,
       xMax: 200,
       yMin: -200,
       yMax: 200
     };
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
     this.interparticleCollisions = params.interparticleCollisions || false;
     this.coordSystem = new CoordSystem(
       { width: 800, height: 600 }, // Default canvas size
-      this.boundaryConfig,
+      boundaryConfig,
       '1D'
     );
   }
@@ -74,7 +75,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.x += velocity.x * dt;
     
     // Apply boundary conditions
-    const boundaryResult = this.applyBoundaryCondition(particle);
+    const boundaryResult = this.boundaryManager.apply(particle);
     particle.position = boundaryResult.position;
     if (boundaryResult.velocity) {
       particle.velocity = boundaryResult.velocity;
@@ -110,7 +111,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.x += velocity.x * dt;
     
     // Apply boundary conditions
-    const boundaryResult = this.applyBoundaryCondition(particle);
+    const boundaryResult = this.boundaryManager.apply(particle);
     particle.position = boundaryResult.position;
     if (boundaryResult.velocity) {
       particle.velocity = boundaryResult.velocity;
@@ -140,25 +141,12 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     }
   }
 
-  private applyBoundaryCondition(particle: Particle) {
-    switch (this.boundaryConfig.type) {
-      case 'periodic':
-        return applyPeriodicBoundary(particle.position, this.boundaryConfig);
-      case 'reflective':
-        return applyReflectiveBoundary(particle.position, particle.velocity, this.boundaryConfig);
-      case 'absorbing':
-        return applyAbsorbingBoundary(particle.position, this.boundaryConfig);
-      default:
-        return { position: particle.position };
-    }
-  }
-
   setBoundaries(config: BoundaryConfig): void {
-    this.boundaryConfig = config;
+    this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 
   calculateStep(particle: Particle): Step {
