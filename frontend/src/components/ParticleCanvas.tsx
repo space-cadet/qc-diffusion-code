@@ -9,7 +9,6 @@ import {
   initializeEngine,
   createParticleContainer,
   destroyContainer,
-  updateParticlesFromStrategies,
 } from "../config/tsParticlesConfig";
 
 interface NodeAttributes {
@@ -288,7 +287,7 @@ const ParticleCanvasComponent: React.FC<{
       // This animation loop focuses on rendering/syncing visual particles
 
       if (isRunningStatus) {
-        updateParticlesFromStrategies(container, true, true);
+        // GPU/CPU syncing is now handled exclusively by useParticlesLoader
         (container as any).draw?.(false);
       } else {
         // When paused/stopped, just draw static frame without updates

@@ -1,7 +1,7 @@
 # C5b: Random Walk UI Implementation
 
 _Created: 2025-08-21 07:52:44 IST_
-_Last Updated: 2025-09-03 01:12:37 IST_
+_Last Updated: 2025-09-06 19:29:54 IST_
 
 **Description**: Implement complete random walk user interface with react-grid-layout, including parameter controls, particle canvas, density comparison, and history management system. Extended with floating panel architecture.
 
@@ -283,3 +283,9 @@ This task implements the complete UI framework for the random walk simulation ba
 - ⚠️ **Display Issue**: Custom observable values not showing in UI despite successful polling (values like 0, NaN returned but "No data" displayed)
 
 **Status**: C5b UI architecture complete with floating panel system. Custom observable display framework implemented but data format debugging needed.
+
+**GPU Toggle Button Enhancement (2025-09-06 19:29:54 IST)**:
+
+- ✅ **Debug Logging**: Added comprehensive GPU state debug logging to toggle button click handler
+- ✅ **State Synchronization**: Enhanced gridLayoutParamsRef to include useGPU state for proper parameter tracking
+- ✅ **Console Tracking**: Added detailed logging for GPU state transitions and parameter sync verification

@@ -16,6 +16,8 @@ export interface RandomWalkParams {
   particles: number;
   maxParticles: number;
   minParticles: number;
+  // Enable GPU-based simulation/rendering pathway
+  useGPU?: boolean;
   graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
   graphSize: number;
   isPeriodic: boolean;

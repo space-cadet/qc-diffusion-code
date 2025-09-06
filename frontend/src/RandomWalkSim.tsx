@@ -140,8 +140,9 @@ export default function RandomWalkSim() {
   }, [simulationState, isRunning, randomWalkSimulationState]);
 
   useEffect(() => {
-    gridLayoutParamsRef.current = gridLayoutParams;
-  }, [gridLayoutParams]);
+    gridLayoutParamsRef.current = { ...gridLayoutParams, useGPU };
+    console.log('[GPU State] Updated gridLayoutParamsRef with useGPU:', useGPU);
+  }, [gridLayoutParams, useGPU]);
 
   // Manage rendering when tab/window visibility changes
   useEffect(() => {
@@ -576,7 +577,8 @@ export default function RandomWalkSim() {
     simulationStateRef,
     renderEnabledRef,
     timeRef,
-    collisionsRef
+    collisionsRef,
+    useGPU
   });
 
   const lastTempRef = useTemperatureHandler({
@@ -629,7 +631,11 @@ export default function RandomWalkSim() {
             {useNewEngine ? 'NEW' : 'LEGACY'}
           </button>
           <button
-            onClick={() => setUseGPU(!useGPU)}
+            onClick={() => {
+              console.log('[GPU Toggle] Current useGPU:', useGPU, '-> New value:', !useGPU);
+              console.log('[GPU Toggle] gridLayoutParams.useGPU:', gridLayoutParams.useGPU);
+              setUseGPU(!useGPU);
+            }}
             className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors ${
               useGPU
                 ? 'bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200'

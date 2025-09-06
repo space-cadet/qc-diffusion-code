@@ -1,7 +1,16 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-05 19:57:59 IST_
+_Last Updated: 2025-09-06 19:29:54 IST_
+
+### 2025-09-06
+
+#### 19:29 - C16: GPU Infrastructure Enhancements + C5b: GPU Toggle Improvements
+- Updated `frontend/src/gpu/GPUParticleManager.ts` - Offscreen canvas isolation for WebGL context separation from tsParticles 2D canvas, comprehensive WebGL context validation and error handling, proper uniform management with GLSL type specifications, debug utilities for velocity inspection
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - GPU manager lifecycle management with creation/disposal on mode switch, parameter synchronization fixes, GPU fallback to CPU mode on initialization failure, centralized GPU/CPU physics and rendering coordination
+- Updated `frontend/src/components/ParticleCanvas.tsx` - Removed redundant updateParticlesFromStrategies call since GPU/CPU syncing now handled exclusively by useParticlesLoader
+- Updated `frontend/src/RandomWalkSim.tsx` - GPU toggle button debug logging improvements, enhanced gridLayoutParamsRef to include useGPU state for proper parameter tracking
+- Updated `frontend/src/types/simulationTypes.ts` - useGPU flag to RandomWalkParams interface for comprehensive GPU state management
 
 ### 2025-09-05
 

@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-05 21:16:05 IST_
+_Last Updated: 2025-09-06 19:29:54 IST_
 
 ## Active Tasks
 
@@ -28,6 +28,7 @@ _Last Updated: 2025-09-05 21:16:05 IST_
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C18 | Streaming Observable Framework Implementation      | ✅ COMPLETED   | MEDIUM   | 2025-09-03 | C7a             |
+| C19 | Particle Simulation Boundary Conditions Implementation | 📝 PLANNED | HIGH | 2025-09-06 | C5c, C15a, C2a |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
@@ -71,9 +72,9 @@ _Last Updated: 2025-09-05 21:16:05 IST_
 
 ### C5b: Random Walk UI Implementation
 **Description**: Implement complete random walk user interface with react-grid-layout framework and floating panel architecture
-**Status**: ✅ COMPLETED **Last**: 2025-09-02 16:57:02 IST
+**Status**: ✅ COMPLETED **Last**: 2025-09-06 19:29:54 IST
 **Files**: `frontend/src/RandomWalkSim.tsx`, `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/stores/appStore.ts`
-**Notes**: Extended with FloatingPanel architecture (2025-09-02 16:57:02 IST) - Abstracted react-rnd container logic into reusable FloatingPanel component (92 lines), supports multiple independent floating panels with z-index management, clean separation between container and content logic. Original physics strategy implementations maintained with PhysicsStrategy interface and method separation.
+**Notes**: GPU toggle button enhanced with debug logging and state synchronization. Extended with FloatingPanel architecture - reusable component supports multiple floating panels with z-index management and clean container/content separation.
 
 ### C5c: Random Walk Physics Implementation
 **Description**: Implement CTRW physics engine with collision mechanisms and telegraph equation convergence
@@ -173,9 +174,9 @@ _Last Updated: 2025-09-05 21:16:05 IST_
 
 ### C16: GPU.IO Framework Implementation with Rendering Engine Abstraction
 **Description**: Implement GPU.IO-based particle physics framework with complete backend agnosticism and on-the-fly switching between tsParticles and GPU.IO rendering engines
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-05 21:16:05 IST
-**Files**: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/RandomWalkSim.tsx`
-**Notes**: Phase 1 completed - GPU.IO infrastructure setup with position update shader, animation loop integration, GPU/CPU toggle UI, and tsParticles synchronization. Ready for collision detection shader implementation.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-06 19:29:54 IST
+**Files**: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/components/ParticleCanvas.tsx`, `frontend/src/types/simulationTypes.ts`
+**Notes**: Phase 1 enhanced - GPU context isolation via offscreen canvas, WebGL validation, error handling, lifecycle management. GPU/CPU toggle with comprehensive debug logging and parameter synchronization.
 
 ### C17: Analysis Dashboard and Plotly Integration
 **Description**: Implement dedicated Analysis tab with Plotly.js integration, React Grid Layout interface, and data pipeline connecting simulation results to advanced plotting capabilities
@@ -188,6 +189,12 @@ _Last Updated: 2025-09-05 21:16:05 IST_
 **Status**: ✅ COMPLETED **Last**: 2025-09-04 00:54:05 IST
 **Files**: `frontend/src/physics/stream-ObservableManager.ts`, `frontend/src/components/stream-useObservableStream.ts`, `frontend/src/components/stream-ObservablesPanel.tsx`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/stores/appStore.ts`, `frontend/src/physics/RandomWalkSimulator.ts`
 **Notes**: EventEmitter-based streaming architecture completed with feature toggle system. UI toggle button switches between polling and streaming panels. Real-time data emission during simulation step eliminates polling complexity and improves performance.
+
+### C19: Particle Simulation Boundary Conditions Implementation
+**Description**: Implement comprehensive boundary condition system for particle simulations with unified API
+**Status**: 📝 PLANNED **Last**: 2025-09-06 19:10:20 IST
+**Files**: `memory-bank/tasks/C19.md`, `frontend/src/physics/utils/boundaryUtils.ts`
+**Notes**: Unified boundary system (periodic, reflective, absorbing) building on fragmented implementations from C2a, C5c, C15a, C12
 
 ### C7b: Composable Observable Framework
 **Description**: Design future composable observable framework enabling complex observable composition through pipeline operators and functional patterns
