@@ -1,7 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-08 11:47:52 IST_
+_Last Updated: 2025-09-08 13:14:02 IST_
+
+### 2025-09-08
+
+#### 13:14 - C19: Fixed Boundary Condition Architectural Issues
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts` - Added BoundaryManager usage, boundary application in integrate()
+- Updated `frontend/src/physics/types/BoundaryConfig.ts` - Added validateBoundaryConfig() function with validation
+- Updated `frontend/src/physics/core/BoundaryManager.ts` - Added validation calls and coordinate system support
+- Updated `frontend/src/physics/utils/boundaryUtils.ts` - Added coordinate system parameter to all functions
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Pass coordinate system to BoundaryManager
+- Updated `frontend/src/physics/strategies/CTRWStrategy1D.ts` - Pass coordinate system to BoundaryManager
+- Updated `frontend/src/physics/strategies/CompositeStrategy.ts` - Added boundary consistency checking
 
 ### 2025-09-08
 

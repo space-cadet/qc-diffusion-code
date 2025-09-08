@@ -4,19 +4,21 @@ import type { Particle } from '../types/Particle';
 import type { Step } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { PhysicsContext } from '../types/PhysicsContext';
+import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime } from '../core/GlobalTime';
 
 export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
-  private boundaryConfig: BoundaryConfig;
+  private boundaryManager: BoundaryManager;
 
   constructor(params: { boundaryConfig?: BoundaryConfig } = {}) {
-    this.boundaryConfig = params.boundaryConfig || {
+    const boundaryConfig = params.boundaryConfig || {
       type: 'periodic',
       xMin: -200,
       xMax: 200,
       yMin: -200,
       yMax: 200,
     };
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
@@ -28,9 +30,16 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, Phy
     this.handleCollisions(particle, allParticles);
   }
 
-  integrate(_particle: Particle, _dt: number, _context: PhysicsContext): void {
-    // No position integration in this strategy, only collision handling
-    // Position integration is handled by other strategies
+  integrate(particle: Particle, _dt: number, _context: PhysicsContext): void {
+    // Apply boundary conditions after collision handling
+    const boundaryResult = this.boundaryManager.apply(particle);
+    particle.position = boundaryResult.position;
+    if (boundaryResult.velocity) {
+      particle.velocity = boundaryResult.velocity;
+    }
+    if (boundaryResult.absorbed) {
+      particle.isActive = false;
+    }
   }
   
   private handleCollisions(particle: Particle, allParticles: Particle[] = []): void {
@@ -84,11 +93,11 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, Phy
   }
 
   setBoundaries(config: BoundaryConfig): void {
-    this.boundaryConfig = config;
+    this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 
   validateParameters(): boolean {

@@ -41,7 +41,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
       yMin: -200,
       yMax: 200
     };
-    this.boundaryManager = new BoundaryManager(boundaryConfig);
+    this.boundaryManager = new BoundaryManager(boundaryConfig, params.coordSystem);
     this.interparticleCollisions = params.interparticleCollisions || false;
     this.coordSystem = params.coordSystem;
   }

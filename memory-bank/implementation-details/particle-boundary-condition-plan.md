@@ -1,6 +1,6 @@
 # Particle Boundary Condition System Design
 *Created: 2025-09-06 20:03:13 IST*
-*Last Updated: 2025-09-08 11:44:43 IST*
+*Last Updated: 2025-09-08 13:14:02 IST*
 
 ## Overview
 
@@ -68,6 +68,11 @@ frontend/src/physics/
 - Removed deprecated BoundaryPhase architecture
 - Added absorption handling (particle deactivation)
 - Canvas dimension fixes in StrategyFactory
+- Fixed InterparticleCollisionStrategy1D to use BoundaryManager
+- Added boundary validation with error checking
+- Unified absorption handling across all strategies
+- Coordinate system integration for proper boundary application
+- Boundary consistency checking in CompositeStrategy
 
 **Remaining**
 - Boundary visualization system
@@ -100,6 +105,23 @@ Boundary conditions are working but validation needed:
 - Added store size diagnostic in `ObservablesPanel.tsx`
 - Enhanced initialization logging in `RandomWalkSimulator.ts`
 - Improved particle syncing with active/inactive state handling
+
+## Afternoon Session 2025-09-08 Fixes
+
+**Critical Issue Resolution:**
+- Fixed `InterparticleCollisionStrategy1D.ts` to use BoundaryManager instead of direct config
+- Added boundary validation functions to `BoundaryConfig.ts` with error checking
+- Unified absorption handling across all strategies in integrate() methods
+- Added coordinate system parameter to boundary utility functions
+- Enhanced `CompositeStrategy.ts` with boundary consistency validation
+
+**Files Modified:**
+- `InterparticleCollisionStrategy1D.ts`: BoundaryManager integration, boundary application
+- `BoundaryConfig.ts`: Added validateBoundaryConfig() function
+- `BoundaryManager.ts`: Added validation calls and coordinate system support
+- `boundaryUtils.ts`: Added coordinate system parameter to all functions
+- `CTRWStrategy2D.ts`, `CTRWStrategy1D.ts`: Pass coordinate system to BoundaryManager
+- `CompositeStrategy.ts`: Added boundary consistency checking
 
 ## Future Enhancements
 

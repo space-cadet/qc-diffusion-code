@@ -32,7 +32,17 @@ export class CompositeStrategy implements RandomWalkStrategy {
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.primaryStrategy.getBoundaries();
+    const primaryBounds = this.primaryStrategy.getBoundaries();
+    // Validate all strategies have consistent boundaries
+    for (const strategy of this.strategies) {
+      const bounds = strategy.getBoundaries();
+      if (bounds.type !== primaryBounds.type || bounds.xMin !== primaryBounds.xMin || 
+          bounds.xMax !== primaryBounds.xMax || bounds.yMin !== primaryBounds.yMin || 
+          bounds.yMax !== primaryBounds.yMax) {
+        console.warn('[CompositeStrategy] Inconsistent boundaries detected across strategies');
+      }
+    }
+    return primaryBounds;
   }
 
   validateParameters(params: any): boolean {

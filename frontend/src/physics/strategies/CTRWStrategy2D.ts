@@ -41,7 +41,7 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
       yMin: -200,
       yMax: 200
     };
-    this.boundaryManager = new BoundaryManager(boundaryConfig);
+    this.boundaryManager = new BoundaryManager(boundaryConfig, params.coordSystem);
     this.coordSystem = params.coordSystem;
   }
 
@@ -67,10 +67,13 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.x += velocity.x * dt;
     particle.position.y += velocity.y * dt;
 
-    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
-    particle.position = newPosition;
-    if (newVelocity) {
-      particle.velocity = newVelocity;
+    const boundaryResult = this.boundaryManager.apply(particle);
+    particle.position = boundaryResult.position;
+    if (boundaryResult.velocity) {
+      particle.velocity = boundaryResult.velocity;
+    }
+    if (boundaryResult.absorbed) {
+      particle.isActive = false;
     }
     
     // Record trajectory point (CircularBuffer auto-manages capacity)
