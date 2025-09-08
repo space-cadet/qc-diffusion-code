@@ -1,5 +1,5 @@
 
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 
 type DensitySnapshot = {
   time: number;

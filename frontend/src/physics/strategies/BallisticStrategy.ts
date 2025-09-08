@@ -1,24 +1,19 @@
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { Step } from '../types/CollisionEvent';
+import type { CoordinateSystem } from '../core/CoordinateSystem';
 import { BoundaryManager } from '../core/BoundaryManager';
 import { simDt, simTime } from '../core/GlobalTime';
 
 export class BallisticStrategy implements PhysicsStrategy {
   private boundaryManager: BoundaryManager;
+  private coordSystem: CoordinateSystem;
 
-  constructor(config?: { boundaryConfig?: BoundaryConfig }) {
-    const boundaryConfig = config?.boundaryConfig || {
-      type: 'reflective',
-      xMin: -Infinity,
-      xMax: Infinity,
-      yMin: -Infinity,
-      yMax: Infinity
-    };
-    this.boundaryManager = new BoundaryManager(boundaryConfig);
+  constructor(config: { boundaryConfig: BoundaryConfig; coordSystem: CoordinateSystem }) {
+    this.boundaryManager = new BoundaryManager(config.boundaryConfig);
+    this.coordSystem = config.coordSystem;
   }
 
   preUpdate(_particle: Particle, _allParticles: Particle[], _context: PhysicsContext): void {
@@ -27,8 +22,9 @@ export class BallisticStrategy implements PhysicsStrategy {
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
     // Ballistic motion - straight line movement using provided timestep
-    particle.position.x += particle.velocity.vx * dt;
-    particle.position.y += particle.velocity.vy * dt;
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    particle.position.x += velocity.x * dt;
+    particle.position.y += velocity.y * dt;
     
     // Apply boundary conditions
     const boundaryResult = this.boundaryManager.apply(particle);
@@ -47,7 +43,17 @@ export class BallisticStrategy implements PhysicsStrategy {
     });
   }
 
-  
+  calculateStep(particle: Particle): Step {
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const dt = simDt();
+    return {
+      deltaX: velocity.x * dt,
+      deltaY: velocity.y * dt,
+      collision: { occurred: false, newDirection: 0, waitTime: Infinity, energyChange: 0, timestamp: simTime() },
+      timestamp: simTime(),
+      particleId: particle.id
+    };
+  }
 
   validateParameters(): boolean {
     return true;

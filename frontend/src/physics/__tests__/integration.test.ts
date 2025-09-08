@@ -12,7 +12,10 @@ describe('Physics Engine Integration', () => {
       boundaries: { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 },
       canvasSize: { width: 400, height: 400 },
       dimension: '2D' as const,
-      strategies: [new BallisticStrategy()]
+      strategies: [new BallisticStrategy({ 
+        boundaryConfig: { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 },
+        coordSystem: new CoordinateSystem({ width: 400, height: 400 }, { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 }, '2D')
+      })]
     };
     const engine = new PhysicsEngine(config);
     const particles = [{

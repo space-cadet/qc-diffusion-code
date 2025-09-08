@@ -1,4 +1,4 @@
-export * from './interfaces/RandomWalkStrategy';
+
 export * from './strategies/CTRWStrategy1D';
 export * from './strategies/CTRWStrategy2D';
 export * from './types/Particle';

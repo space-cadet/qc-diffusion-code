@@ -10,8 +10,8 @@ export interface CollisionEvent {
 }
 
 export interface Step {
-  dx: number;
-  dy?: number;
+  deltaX: number;
+  deltaY?: number;
   collision: CollisionEvent;
   timestamp: number;
   particleId: string;

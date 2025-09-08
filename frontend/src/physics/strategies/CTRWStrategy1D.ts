@@ -1,4 +1,3 @@
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
@@ -8,7 +7,7 @@ import type { PhysicsContext } from '../types/PhysicsContext';
 import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime, simDt } from '../core/GlobalTime';
 
-export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
+export class CTRWStrategy1D implements PhysicsStrategy {
   private collisionRate: number;
   private jumpLength: number;
   private velocity: number;
@@ -123,8 +122,8 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     const dx = vx * timeStep;
     
     return {
-      dx,
-      dy: 0,
+      deltaX: dx,
+      deltaY: 0,
       collision,
       timestamp: currentTime,
       particleId: particle.id

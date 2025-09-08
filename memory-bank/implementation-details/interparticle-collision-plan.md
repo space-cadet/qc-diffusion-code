@@ -1,7 +1,7 @@
 # Inter-Particle Collision Implementation Plan
 
 *Created: 2025-08-27 09:34:31 IST*
-*Last Updated: 2025-09-08 22:53:16 IST*
+*Last Updated: 2025-09-08 23:32:26 IST*
 
 ## Current State Analysis
 
@@ -357,6 +357,36 @@ interface ObstacleShape {
 - `InterparticleCollisionStrategy2D.ts`: Improved collision detection and removed legacy code
 - `InterparticleCollisionStrategy1D.ts`: Removed duplicate boundary handling
 - `BoundaryManager.ts`: Simplified coordinate system integration
+
+## Late Night Session 2025-09-08 Changes (Interface Unification)
+
+**Complete Interface Unification:**
+- **RandomWalkStrategy Removal**: Deleted RandomWalkStrategy interface entirely from codebase
+- **LegacyStrategyAdapter Deletion**: Removed adapter pattern and associated complexity
+- **PhysicsStrategy Expansion**: Enhanced PhysicsStrategy interface to include calculateStep method
+- **Factory Simplification**: Updated StrategyFactory to create only PhysicsStrategy instances
+
+**Strategy Implementation Updates:**
+- **All Strategy Files**: Updated 6 strategy files to implement only PhysicsStrategy interface
+- **Constructor Standardization**: Added coordSystem requirements to all strategy constructors
+- **Method Signatures**: Standardized method signatures with non-optional core methods
+- **Build Error Resolution**: Fixed all TypeScript compilation errors from interface changes
+
+**Step Interface Consistency:**
+- **Property Names**: Updated Step interface to use deltaX/deltaY instead of dx/dy
+- **Strategy Updates**: Fixed all strategy files to use consistent Step property names
+- **Type Safety**: Ensured consistent typing across all step calculations
+
+**File Import Updates:**
+- **Import Cleanup**: Removed RandomWalkStrategy imports from 5+ files
+- **Interface Updates**: Updated ParticleManager and RandomWalkSimulator to use PhysicsStrategy
+- **Factory Refactoring**: Simplified factory logic to remove dual interface branching
+
+**Architecture Benefits:**
+- **Reduced Complexity**: Single interface eliminates confusion and maintenance burden
+- **Consistent API**: All strategies follow same method signatures and patterns
+- **Simplified Testing**: Easier to test with unified interface expectations
+- **Enhanced Maintainability**: Changes to interface affect all strategies consistently
 
 ## Performance Considerations
 

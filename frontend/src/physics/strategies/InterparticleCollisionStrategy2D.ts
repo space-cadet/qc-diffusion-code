@@ -1,4 +1,3 @@
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle, Vector, Velocity } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
@@ -9,7 +8,7 @@ import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime } from '../core/GlobalTime';
 import { SpatialGrid } from '../utils/SpatialGrid';
 
-export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
+export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
   private boundaryManager: BoundaryManager;
   private coordSystem: CoordinateSystem;
   private spatialGrid: SpatialGrid;
@@ -34,6 +33,10 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
     // Handle inter-particle collisions in the preUpdate phase
     this.handleInterparticleCollisions(particle, allParticles);
+  }
+
+  integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
+    // No-op: collision strategy only modifies velocities, not positions
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
@@ -134,8 +137,8 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
 
   calculateStep(particle: Particle): Step {
     return {
-      dx: 0,
-      dy: 0,
+      deltaX: 0,
+      deltaY: 0,
       collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: simTime() },
       timestamp: simTime(),
       particleId: particle.id

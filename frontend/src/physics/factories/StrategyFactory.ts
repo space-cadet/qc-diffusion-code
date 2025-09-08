@@ -1,4 +1,4 @@
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
+
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import { CoordinateSystem } from '../core/CoordinateSystem';
@@ -17,15 +17,15 @@ interface SimulatorParams {
   strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
 }
 
-export function createStrategies(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig): RandomWalkStrategy[] {
-  return createStrategiesInternal(parameterManager, boundaryConfig, false) as RandomWalkStrategy[];
+export function createStrategies(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig): PhysicsStrategy[] {
+  return createStrategiesInternal(parameterManager, boundaryConfig, false) as PhysicsStrategy[];
 }
 
 export function createPhysicsStrategies(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig): PhysicsStrategy[] {
   return createStrategiesInternal(parameterManager, boundaryConfig, true) as PhysicsStrategy[];
 }
 
-function createStrategiesInternal(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig, forPhysicsEngine: boolean): (RandomWalkStrategy | PhysicsStrategy)[] {
+function createStrategiesInternal(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig, forPhysicsEngine: boolean): PhysicsStrategy[] {
   const config = { dimension: parameterManager.dimension, strategies: parameterManager.strategies };
   const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
@@ -39,7 +39,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
 
   // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
   if (config.dimension === '1D') {
-    const oneDStrategies: (RandomWalkStrategy | PhysicsStrategy)[] = [];
+    const oneDStrategies: PhysicsStrategy[] = [];
     if (selectedStrategies.includes('ctrw')) {
       oneDStrategies.push(new CTRWStrategy1D({
         collisionRate: physicsParams.collisionRate,
@@ -51,10 +51,10 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       }));
     } else {
       // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
-      oneDStrategies.push(new BallisticStrategy({ boundaryConfig }));
+      oneDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
     if (selectedStrategies.includes('collisions')) {
-      oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: boundaryConfig }));
+      oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: boundaryConfig, coordSystem }));
     }
     
     if (forPhysicsEngine) {
@@ -62,15 +62,15 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       return oneDStrategies as PhysicsStrategy[];
     } else {
       // For legacy path, wrap in CompositeStrategy if needed
-      return oneDStrategies.length === 1 ? [oneDStrategies[0]] : [new CompositeStrategy(oneDStrategies as RandomWalkStrategy[])];
+      return oneDStrategies.length === 1 ? [oneDStrategies[0]] : [new CompositeStrategy(oneDStrategies)];
     }
   }
 
   // For 2D, compose strategies: base is Ballistic; others are added if selected
   else {
     // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
-    const twoDStrategies: (RandomWalkStrategy | PhysicsStrategy)[] = [
-      new BallisticStrategy({ boundaryConfig })
+    const twoDStrategies: PhysicsStrategy[] = [
+      new BallisticStrategy({ boundaryConfig, coordSystem })
     ];
 
     if (selectedStrategies.includes('ctrw')) {
@@ -92,7 +92,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       return twoDStrategies as PhysicsStrategy[];
     } else {
       // For legacy path, wrap in CompositeStrategy if needed
-      return twoDStrategies.length === 1 ? [twoDStrategies[0]] : [new CompositeStrategy(twoDStrategies as RandomWalkStrategy[])];
+      return twoDStrategies.length === 1 ? [twoDStrategies[0]] : [new CompositeStrategy(twoDStrategies)];
     }
   }
 }

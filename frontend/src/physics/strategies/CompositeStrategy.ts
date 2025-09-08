@@ -1,15 +1,14 @@
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { PhysicsContext } from '../types/PhysicsContext';
 
-export class CompositeStrategy implements RandomWalkStrategy, PhysicsStrategy {
-  private strategies: (RandomWalkStrategy & Partial<PhysicsStrategy>)[];
-  private primaryStrategy: RandomWalkStrategy & Partial<PhysicsStrategy>;
+export class CompositeStrategy implements PhysicsStrategy {
+  private strategies: PhysicsStrategy[];
+  private primaryStrategy: PhysicsStrategy;
 
-  constructor(strategies: (RandomWalkStrategy & Partial<PhysicsStrategy>)[]) {
+  constructor(strategies: PhysicsStrategy[]) {
     if (strategies.length === 0) {
       throw new Error('CompositeStrategy requires at least one strategy');
     }
@@ -19,19 +18,13 @@ export class CompositeStrategy implements RandomWalkStrategy, PhysicsStrategy {
 
   preUpdate(particle: Particle, allParticles: Particle[], context: PhysicsContext): void {
     for (const strategy of this.strategies) {
-      strategy.preUpdate?.(particle, allParticles, context);
+      strategy.preUpdate(particle, allParticles, context);
     }
   }
 
   integrate(particle: Particle, dt: number, context: PhysicsContext): void {
     for (const strategy of this.strategies) {
-      strategy.integrate?.(particle, dt, context);
-    }
-  }
-
-  updateParticle(particle: Particle, allParticles: Particle[]): void {
-    for (const strategy of this.strategies) {
-      strategy.updateParticle(particle, allParticles);
+      strategy.integrate(particle, dt, context);
     }
   }
 

@@ -1,17 +1,17 @@
 import type { Particle, TrajectoryPoint } from "./types/Particle";
-import type { RandomWalkStrategy } from "./interfaces/RandomWalkStrategy";
+import type { PhysicsStrategy } from "./interfaces/PhysicsStrategy";
 import { CircularBuffer } from "./utils/CircularBuffer";
 import { simTime } from "./core/GlobalTime";
 import { CoordinateSystem } from "./core/CoordinateSystem";
 
 export class ParticleManager {
-  private strategy: RandomWalkStrategy;
+  private strategy: PhysicsStrategy;
   private dimension: '1D' | '2D';
   private particles: Map<string, Particle> = new Map();
   private diagCounter: number = 0;
   private coordSystem: CoordinateSystem;
 
-  constructor(strategy: RandomWalkStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem) {
+  constructor(strategy: PhysicsStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem) {
     this.strategy = strategy;
     this.dimension = dimension;
     this.coordSystem = coordSystem;
@@ -115,11 +115,8 @@ export class ParticleManager {
     
     for (const particle of allParticles) {
       if (particle.isActive) {
-        if (this.strategy.updateParticleWithDt) {
-          this.strategy.updateParticleWithDt(particle, allParticles, dt);
-        } else {
-          this.strategy.updateParticle(particle, allParticles);
-        }
+        this.strategy.preUpdate(particle, allParticles, {});
+        this.strategy.integrate(particle, dt, {});
       } else {
         console.log('[PM] particle inactive', particle.id);
       }
@@ -130,7 +127,7 @@ export class ParticleManager {
     return Array.from(this.particles.values());
   }
 
-  updatePhysicsEngine(newStrategy: RandomWalkStrategy): void {
+  updatePhysicsEngine(newStrategy: PhysicsStrategy): void {
     this.strategy = newStrategy;
     try {
       console.log(

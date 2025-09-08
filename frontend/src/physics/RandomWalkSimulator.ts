@@ -1,4 +1,4 @@
-import type { RandomWalkStrategy } from './interfaces/RandomWalkStrategy';
+import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
 import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
 import { ParticleManager } from './ParticleManager';
 import { ObservableManager } from './ObservableManager';

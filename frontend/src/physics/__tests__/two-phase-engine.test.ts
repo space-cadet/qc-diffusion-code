@@ -18,7 +18,10 @@ describe('Two-Phase Physics Engine', () => {
     boundaries,
     canvasSize: { width: 800, height: 600 },
     dimension: '2D' as const,
-    strategies: [new BallisticStrategy()]
+    strategies: [new BallisticStrategy({ 
+      boundaryConfig: boundaries,
+      coordSystem: new (require('../core/CoordinateSystem')).CoordinateSystem({ width: 800, height: 600 }, boundaries, '2D')
+    })]
   };
 
   let engine: PhysicsEngine;

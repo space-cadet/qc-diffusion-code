@@ -1,28 +1,19 @@
-import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { PhysicsContext } from '../types/PhysicsContext';
+import type { CoordinateSystem } from '../core/CoordinateSystem';
 import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime } from '../core/GlobalTime';
 
-export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
+export class InterparticleCollisionStrategy1D implements PhysicsStrategy {
   private boundaryManager: BoundaryManager;
+  private coordSystem: CoordinateSystem;
 
-  constructor(params: { boundaryConfig?: BoundaryConfig } = {}) {
-    const boundaryConfig = params.boundaryConfig || {
-      type: 'periodic',
-      xMin: -200,
-      xMax: 200,
-      yMin: -200,
-      yMax: 200,
-    };
-    this.boundaryManager = new BoundaryManager(boundaryConfig);
-  }
-
-  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    this.handleCollisions(particle, allParticles);
+  constructor(params: { boundaryConfig: BoundaryConfig; coordSystem: CoordinateSystem }) {
+    this.boundaryManager = new BoundaryManager(params.boundaryConfig);
+    this.coordSystem = params.coordSystem;
   }
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
@@ -30,7 +21,9 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, Phy
     this.handleCollisions(particle, allParticles);
   }
 
-  
+  integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
+    // No-op: collision strategy only modifies velocities, not positions
+  }
   
   private handleCollisions(particle: Particle, allParticles: Particle[] = []): void {
     // Simple 1D elastic collisions: swap vx when overlapping
@@ -74,8 +67,8 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, Phy
   calculateStep(particle: Particle): Step {
     // No intrinsic displacement; purely modifies velocities
     return {
-      dx: 0,
-      dy: 0,
+      deltaX: 0,
+      deltaY: 0,
       collision: { occurred: false, newDirection: 0, waitTime: 0, energyChange: 0, timestamp: simTime() },
       timestamp: simTime(),
       particleId: particle.id,
