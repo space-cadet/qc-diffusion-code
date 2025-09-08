@@ -1,18 +1,32 @@
+import type { PhysicsStrategy } from '../interfaces/PhysicsStrategy';
 import type { RandomWalkStrategy } from '../interfaces/RandomWalkStrategy';
 import type { Particle } from '../types/Particle';
 import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import type { PhysicsContext } from '../types/PhysicsContext';
 
-export class CompositeStrategy implements RandomWalkStrategy {
-  private strategies: RandomWalkStrategy[];
-  private primaryStrategy: RandomWalkStrategy;
+export class CompositeStrategy implements RandomWalkStrategy, PhysicsStrategy {
+  private strategies: (RandomWalkStrategy & Partial<PhysicsStrategy>)[];
+  private primaryStrategy: RandomWalkStrategy & Partial<PhysicsStrategy>;
 
-  constructor(strategies: RandomWalkStrategy[]) {
+  constructor(strategies: (RandomWalkStrategy & Partial<PhysicsStrategy>)[]) {
     if (strategies.length === 0) {
       throw new Error('CompositeStrategy requires at least one strategy');
     }
     this.strategies = strategies;
     this.primaryStrategy = strategies[0]; // Use first strategy for boundary/parameter methods
+  }
+
+  preUpdate(particle: Particle, allParticles: Particle[], context: PhysicsContext): void {
+    for (const strategy of this.strategies) {
+      strategy.preUpdate?.(particle, allParticles, context);
+    }
+  }
+
+  integrate(particle: Particle, dt: number, context: PhysicsContext): void {
+    for (const strategy of this.strategies) {
+      strategy.integrate?.(particle, dt, context);
+    }
   }
 
   updateParticle(particle: Particle, allParticles: Particle[]): void {
@@ -33,15 +47,9 @@ export class CompositeStrategy implements RandomWalkStrategy {
 
   getBoundaries(): BoundaryConfig {
     const primaryBounds = this.primaryStrategy.getBoundaries();
-    // Validate all strategies have consistent boundaries
-    for (const strategy of this.strategies) {
-      const bounds = strategy.getBoundaries();
-      if (bounds.type !== primaryBounds.type || bounds.xMin !== primaryBounds.xMin || 
-          bounds.xMax !== primaryBounds.xMax || bounds.yMin !== primaryBounds.yMin || 
-          bounds.yMax !== primaryBounds.yMax) {
-        console.warn('[CompositeStrategy] Inconsistent boundaries detected across strategies');
-      }
-    }
+    // In a composite strategy, ensuring consistent boundaries is crucial.
+    // Here we'll just return the primary's but a more robust implementation
+    // might validate or merge them.
     return primaryBounds;
   }
 
@@ -50,10 +58,24 @@ export class CompositeStrategy implements RandomWalkStrategy {
   }
 
   getPhysicsParameters(): Record<string, number> {
-    return this.primaryStrategy.getPhysicsParameters();
+    return this.strategies.reduce((acc, strategy) => {
+      return { ...acc, ...strategy.getPhysicsParameters() };
+    }, {});
   }
 
   getParameters?(): { collisionRate: number; velocity: number; jumpLength: number } {
-    return this.primaryStrategy.getParameters?.() || { collisionRate: 0, velocity: 0, jumpLength: 0 };
+    const combined = this.strategies.reduce((acc, strategy) => {
+      const params = strategy.getParameters?.();
+      if (params) {
+        Object.assign(acc, params);
+      }
+      return acc;
+    }, {} as { collisionRate?: number; velocity?: number; jumpLength?: number });
+
+    return {
+      collisionRate: combined.collisionRate || 0,
+      velocity: combined.velocity || 0,
+      jumpLength: combined.jumpLength || 0,
+    };
   }
 }

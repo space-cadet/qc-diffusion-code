@@ -1,7 +1,7 @@
 # Inter-Particle Collision Implementation Plan
 
 *Created: 2025-08-27 09:34:31 IST*
-*Last Updated: 2025-09-01 08:29:30 IST*
+*Last Updated: 2025-09-08 22:53:16 IST*
 
 ## Current State Analysis
 
@@ -331,6 +331,32 @@ interface ObstacleShape {
 | **Development Time** | 1-2 weeks | 2-3 weeks | 4-6 weeks |
 
 **Recommendation**: Start with Matter.js for rapid prototyping, migrate to Rapier.js when CCD becomes necessary for fast particles or when complex geometries are required.
+
+## Night Session 2025-09-08 Changes (GPT5)
+
+**Strategy Interface Refactoring:**
+- **BallisticStrategy**: Removed RandomWalkStrategy interface, now implements only PhysicsStrategy
+- **CompositeStrategy**: Enhanced to support both RandomWalkStrategy and PhysicsStrategy interfaces
+- **Parameter Merging**: CompositeStrategy now merges physics parameters across all child strategies
+- **Interface Cleanup**: Simplified strategy interfaces and removed duplicate method implementations
+
+**Collision Detection Improvements:**
+- **InterparticleCollisionStrategy2D**: Enhanced collision detection with per-particle radius calculations
+- **Radius Calculation**: Now uses `(p1.radius || 3) + (p2.radius || 3)` instead of fixed collision radius
+- **Legacy Code Removal**: Removed old updateParticle collision loop and resolveCollision methods
+- **Boundary Handling**: Removed duplicate boundary application from integrate methods
+
+**Architecture Simplification:**
+- **InterparticleCollisionStrategy1D**: Removed legacy boundary handling from integrate method
+- **Code Deduplication**: Eliminated duplicate boundary application across collision strategies
+- **Interface Consistency**: All strategies now follow consistent PhysicsStrategy patterns
+
+**Files Modified:**
+- `BallisticStrategy.ts`: Interface simplification, removed RandomWalkStrategy
+- `CompositeStrategy.ts`: Enhanced with PhysicsStrategy support and parameter merging
+- `InterparticleCollisionStrategy2D.ts`: Improved collision detection and removed legacy code
+- `InterparticleCollisionStrategy1D.ts`: Removed duplicate boundary handling
+- `BoundaryManager.ts`: Simplified coordinate system integration
 
 ## Performance Considerations
 

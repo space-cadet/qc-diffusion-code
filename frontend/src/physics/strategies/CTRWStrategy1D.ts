@@ -41,7 +41,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
       yMin: -200,
       yMax: 200
     };
-    this.boundaryManager = new BoundaryManager(boundaryConfig, params.coordSystem);
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
     this.interparticleCollisions = params.interparticleCollisions || false;
     this.coordSystem = params.coordSystem;
   }
@@ -63,10 +63,6 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
       particle.nextCollisionTime = collision.timestamp + collision.waitTime;
       particle.collisionCount++;
     }
-
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    velocity.x = this.calculateNewVelocity(velocity.x);
-    particle.velocity = this.coordSystem.toVelocity(velocity);
   }
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
@@ -123,9 +119,8 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     const collision = this.handleCollision(particle);
     
     const timeStep = Math.min(collision.waitTime, simDt());
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    velocity.x = this.calculateNewVelocity(velocity.x);
-    const dx = velocity.x * timeStep;
+    const vx = this.coordSystem.toVector(particle.velocity).x;
+    const dx = vx * timeStep;
     
     return {
       dx,
@@ -172,21 +167,6 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
         vy: 0
       }
     };
-  }
-
-  private calculateNewVelocity(currentVel: number): number {
-    const currentTime = simTime();
-    const waitTime = this.generateCollisionTime();
-    const shouldCollide = currentTime >= waitTime;
-    
-    if (!shouldCollide) {
-      return currentVel;
-    }
-    
-    const newDirection = Math.random() < 0.5 ? -1 : 1;
-    const speed = Math.abs(currentVel);
-    
-    return speed * newDirection;
   }
 
   validateParameters(params: any): boolean {

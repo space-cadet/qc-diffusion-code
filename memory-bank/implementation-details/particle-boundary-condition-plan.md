@@ -1,6 +1,6 @@
 # Particle Boundary Condition System Design
 *Created: 2025-09-06 20:03:13 IST*
-*Last Updated: 2025-09-08 13:14:02 IST*
+*Last Updated: 2025-09-08 22:53:16 IST*
 
 ## Overview
 
@@ -122,6 +122,28 @@ Boundary conditions are working but validation needed:
 - `boundaryUtils.ts`: Added coordinate system parameter to all functions
 - `CTRWStrategy2D.ts`, `CTRWStrategy1D.ts`: Pass coordinate system to BoundaryManager
 - `CompositeStrategy.ts`: Added boundary consistency checking
+
+## Night Session 2025-09-08 Changes (GPT5)
+
+**Architecture Simplification:**
+- Removed CoordinateSystem dependency from BoundaryManager constructor
+- Simplified BoundaryManager to take only BoundaryConfig parameter
+- Updated boundaryUtils functions to remove coordSystem parameter
+- Streamlined boundary application across all physics strategies
+
+**Strategy Updates:**
+- Updated all strategy files to remove coordSystem from BoundaryManager calls
+- Removed legacy boundary handling code from InterparticleCollisionStrategy files
+- Enhanced CompositeStrategy with PhysicsStrategy interface support
+- Improved collision detection with per-particle radius calculations
+
+**Files Modified:**
+- `BoundaryManager.ts`: Removed coordSystem field and constructor parameter
+- `boundaryUtils.ts`: Removed coordSystem parameter from all utility functions
+- `CTRWStrategy1D.ts`, `CTRWStrategy2D.ts`: Updated BoundaryManager constructor calls
+- `BallisticStrategy.ts`: Removed RandomWalkStrategy interface, simplified to PhysicsStrategy only
+- `CompositeStrategy.ts`: Enhanced with PhysicsStrategy support and parameter merging
+- `InterparticleCollisionStrategy1D.ts`, `InterparticleCollisionStrategy2D.ts`: Removed duplicate boundary handling
 
 ## Future Enhancements
 

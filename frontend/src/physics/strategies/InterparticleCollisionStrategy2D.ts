@@ -25,49 +25,20 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
     const dx = p1.position.x - p2.position.x;
     const dy = p1.position.y - p2.position.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance < 1.0; // Collision radius
+    const r = (p1.radius || 3) + (p2.radius || 3);
+    return distance < r; // Use consistent per-particle radii as in grid path
   }
 
-  private resolveCollision(v1: Vector, v2: Vector): Vector {
-    // Elastic collision in 2D
-    return {
-      x: v2.x,
-      y: v2.y
-    };
-  }
-
-  updateParticle(particle: Particle, allParticles: Particle[]): void {
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    const position = { x: particle.position.x, y: particle.position.y };
-    
-    for (const other of allParticles) {
-      if (other !== particle) {
-        const otherVel = this.coordSystem.toVector(other.velocity);
-        
-        if (this.detectCollision(particle, other)) {
-          const newVel = this.resolveCollision(velocity, otherVel);
-          particle.velocity = this.coordSystem.toVelocity(newVel);
-          break;
-        }
-      }
-    }
-  }
+  
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
     // Handle inter-particle collisions in the preUpdate phase
     this.handleInterparticleCollisions(particle, allParticles);
   }
 
-  integrate(particle: Particle, _dt: number, _context: PhysicsContext): void {
-    // Apply boundary conditions after collision handling
-    const boundaryResult = this.boundaryManager.apply(particle);
-    particle.position = boundaryResult.position;
-    if (boundaryResult.velocity) {
-      particle.velocity = boundaryResult.velocity;
-    }
-    if (boundaryResult.absorbed) {
-      particle.isActive = false;
-    }
+  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
+    // Legacy path: perform collision handling during single-step update
+    this.handleInterparticleCollisions(particle, allParticles);
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {

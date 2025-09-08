@@ -1,9 +1,19 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-08 13:14:02 IST_
+_Last Updated: 2025-09-08 22:53:16 IST_
 
 ### 2025-09-08
+
+#### 22:53 - C19 & C12: Boundary and Collision Strategy Refactoring (GPT5)
+- Updated `frontend/src/physics/core/BoundaryManager.ts` - Removed CoordinateSystem dependency, simplified constructor to take only BoundaryConfig
+- Updated `frontend/src/physics/utils/boundaryUtils.ts` - Removed CoordinateSystem import and parameters from all boundary utility functions
+- Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Removed RandomWalkStrategy interface, now implements only PhysicsStrategy, removed updateParticle and calculateStep methods
+- Updated `frontend/src/physics/strategies/CTRWStrategy1D.ts` - Updated BoundaryManager constructor call, removed velocity recalculation logic, simplified calculateStep method
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Updated BoundaryManager constructor call to remove coordSystem parameter
+- Updated `frontend/src/physics/strategies/CompositeStrategy.ts` - Enhanced with PhysicsStrategy interface support, added preUpdate and integrate methods, improved parameter merging
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts` - Removed legacy boundary handling from integrate method
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts` - Enhanced collision detection with per-particle radius calculations, removed legacy collision methods
 
 #### 13:14 - C19: Fixed Boundary Condition Architectural Issues
 - Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts` - Added BoundaryManager usage, boundary application in integrate()

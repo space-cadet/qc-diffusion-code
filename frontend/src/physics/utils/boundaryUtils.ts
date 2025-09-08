@@ -2,9 +2,8 @@
 // NOTE: 1D strategies accept full BoundaryConfig but only use xMin/xMax. yMin/yMax
 // are ignored by 1D logic. 2D strategies use both x and y bounds.
 import type { BoundaryConfig, Position, Velocity, BoundaryResult } from '../types/BoundaryConfig';
-import type { CoordinateSystem } from '../core/CoordinateSystem';
 
-export function applyPeriodicBoundary(position: Position, boundaries: BoundaryConfig, coordSystem?: CoordinateSystem): BoundaryResult {
+export function applyPeriodicBoundary(position: Position, boundaries: BoundaryConfig): BoundaryResult {
   const { xMin, xMax, yMin, yMax } = boundaries;
   const width = xMax - xMin;
   const height = yMax - yMin;
@@ -26,8 +25,7 @@ export function applyPeriodicBoundary(position: Position, boundaries: BoundaryCo
 export function applyReflectiveBoundary(
   position: Position, 
   velocity: Velocity, 
-  boundaries: BoundaryConfig,
-  coordSystem?: CoordinateSystem
+  boundaries: BoundaryConfig
 ): BoundaryResult {
   const { xMin, xMax, yMin, yMax } = boundaries;
   let { x, y } = position;
@@ -59,7 +57,7 @@ export function applyReflectiveBoundary(
   };
 }
 
-export function applyAbsorbingBoundary(position: Position, boundaries: BoundaryConfig, coordSystem?: CoordinateSystem): BoundaryResult {
+export function applyAbsorbingBoundary(position: Position, boundaries: BoundaryConfig): BoundaryResult {
   const { xMin, xMax, yMin, yMax } = boundaries;
   const { x, y } = position;
   

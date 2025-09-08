@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-08 13:14:02 IST_
+_Last Updated: 2025-09-08 22:53:16 IST_
 
 ## Active Tasks
 
@@ -138,10 +138,10 @@ _Last Updated: 2025-09-08 13:14:02 IST_
 **Notes**: Enhanced plot legend with solver and parameter information. Conservation panel improvements with dt diagnostics, parameters section, and standardized number formatting. Animation speed slider implementation completed.
 
 ### C12: Interparticle Collisions and Obstacles Implementation
-**Description**: Implement Matter.js/Rapier.js physics engines for realistic particle-particle collisions and arbitrary obstacle geometries
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-05 19:57:59 IST
-**Files**: `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts`, `frontend/src/physics/utils/SpatialGrid.ts`
-**Notes**: CPU collision detection optimized with spatial partitioning (O(n) vs O(n²)), ID caching, squared distance comparisons - 3-5x performance improvement before GPU migration
+**Description**: Implement realistic particle-particle collisions and arbitrary obstacle geometries using Matter.js/Rapier.js physics engines to replace current background scatterer model with true many-body dynamics
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-08 22:53:16 IST
+**Files**: `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts`, `frontend/src/physics/strategies/InterparticleCollisionStrategy1D.ts`, `frontend/src/physics/strategies/CompositeStrategy.ts`, `frontend/src/physics/utils/SpatialGrid.ts`
+**Notes**: Strategy interface refactoring completed. Enhanced collision detection with per-particle radius calculations. Simplified boundary handling architecture.
 
 ### C14: Composite Strategy Framework Implementation
 **Description**: Implement composite strategy framework allowing multiple physics strategies to work together simultaneously, with ballistic motion as default and 2D elastic collision support
@@ -193,9 +193,9 @@ _Last Updated: 2025-09-08 13:14:02 IST_
 
 ### C19: Particle Simulation Boundary Conditions Implementation
 **Description**: Implement comprehensive boundary condition system for particle simulations with unified API supporting periodic, reflective, and absorbing boundaries across 1D/2D modes
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-08 13:14:02 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-08 22:53:16 IST
 **Files**: `frontend/src/physics/core/BoundaryManager.ts`, `frontend/src/physics/types/BoundaryConfig.ts`, `frontend/src/physics/strategies/`
-**Notes**: Fixed architectural inconsistencies, added validation, unified absorption handling, coordinate system integration
+**Notes**: Simplified coordinate system integration, removed legacy boundary code, enhanced strategy interfaces
 
 ### C20: Network Diffusion Tab Implementation
 **Description**: Create Network Diffusion tab showing relationship between string substitution systems and graph dynamics

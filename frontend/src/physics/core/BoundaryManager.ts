@@ -6,23 +6,22 @@ import { applyPeriodicBoundary, applyReflectiveBoundary, applyAbsorbingBoundary 
 
 export class BoundaryManager {
   private config: BoundaryConfig;
-  private coordSystem?: CoordinateSystem;
+  
 
-  constructor(config: BoundaryConfig, coordSystem?: CoordinateSystem) {
+  constructor(config: BoundaryConfig) {
     validateBoundaryConfig(config);
     console.log('[BoundaryManager] Created with:', config.type);
     this.config = config;
-    this.coordSystem = coordSystem;
   }
 
   apply(particle: Particle): BoundaryResult {
     switch (this.config.type) {
       case 'periodic':
-        return applyPeriodicBoundary(particle.position, this.config, this.coordSystem);
+        return applyPeriodicBoundary(particle.position, this.config);
       case 'reflective':
-        return applyReflectiveBoundary(particle.position, particle.velocity, this.config, this.coordSystem);
+        return applyReflectiveBoundary(particle.position, particle.velocity, this.config);
       case 'absorbing':
-        return applyAbsorbingBoundary(particle.position, this.config, this.coordSystem);
+        return applyAbsorbingBoundary(particle.position, this.config);
       default:
         console.warn('[BoundaryManager] Unknown boundary type:', this.config.type, '- returning unchanged position');
         return { position: particle.position };

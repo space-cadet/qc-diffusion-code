@@ -30,17 +30,7 @@ export class InterparticleCollisionStrategy1D implements RandomWalkStrategy, Phy
     this.handleCollisions(particle, allParticles);
   }
 
-  integrate(particle: Particle, _dt: number, _context: PhysicsContext): void {
-    // Apply boundary conditions after collision handling
-    const boundaryResult = this.boundaryManager.apply(particle);
-    particle.position = boundaryResult.position;
-    if (boundaryResult.velocity) {
-      particle.velocity = boundaryResult.velocity;
-    }
-    if (boundaryResult.absorbed) {
-      particle.isActive = false;
-    }
-  }
+  
   
   private handleCollisions(particle: Particle, allParticles: Particle[] = []): void {
     // Simple 1D elastic collisions: swap vx when overlapping
