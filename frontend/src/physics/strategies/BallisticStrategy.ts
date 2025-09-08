@@ -41,10 +41,13 @@ export class BallisticStrategy implements RandomWalkStrategy, PhysicsStrategy {
     particle.position.y += particle.velocity.vy * dt;
     
     // Apply boundary conditions
-    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
-    particle.position = newPosition;
-    if (newVelocity) {
-      particle.velocity = newVelocity;
+    const boundaryResult = this.boundaryManager.apply(particle);
+    particle.position = boundaryResult.position;
+    if (boundaryResult.velocity) {
+      particle.velocity = boundaryResult.velocity;
+    }
+    if (boundaryResult.absorbed) {
+      particle.isActive = false;
     }
     
     // Record trajectory point

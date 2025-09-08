@@ -1,7 +1,24 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-06 19:29:54 IST_
+_Last Updated: 2025-09-08 11:47:52 IST_
+
+### 2025-09-08
+
+#### 11:47 - C19: Boundary System Architecture Cleanup
+- Updated `frontend/src/components/ObservablesPanel.tsx` - Added store size diagnostic with calculateStoreSize function and UI display
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Improved particle syncing to handle active/inactive particles, hide surplus visuals, ensure proper opacity
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Added initialization diagnostics for BoundaryConfig and canvas dimensions
+- Deleted `frontend/src/physics/core/BoundaryPhase.ts` - Removed deprecated boundary phase architecture
+- Updated `frontend/src/physics/core/StrategyOrchestrator.ts` - Removed boundary phase execution, simplified to collision and motion phases
+- Updated `frontend/src/physics/factories/StrategyFactory.ts` - Fixed canvas dimensions, deprecated LegacyBallisticStrategy usage
+- Updated `frontend/src/physics/strategies/BallisticStrategy.ts` - Added absorption handling (sets isActive=false when absorbed)
+- Updated `frontend/src/physics/strategies/CTRWStrategy1D.ts` - Unified update paths, added coordSystem parameter requirement
+- Updated `frontend/src/physics/strategies/CTRWStrategy2D.ts` - Unified update paths to avoid code duplication
+- Updated `frontend/src/physics/strategies/InterparticleCollisionStrategy2D.ts` - Integrated BoundaryManager, separated collision from position integration
+- Updated `frontend/src/physics/types/BoundaryConfig.ts` - Added comprehensive documentation for 1D/2D usage
+- Updated `frontend/src/physics/utils/boundaryUtils.ts` - Added documentation comments for boundary utility functions
+- Updated `memory-bank/tasks.md` - Updated C19 status and timestamp
 
 ### 2025-09-06
 

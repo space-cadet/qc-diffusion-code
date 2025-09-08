@@ -135,23 +135,26 @@ export const updateParticlesFromStrategies = (
   }
 
   const physicsParticles = particleManager.getAllParticles() as PhysicsParticle[];
+  const activePhysics = physicsParticles.filter(p => p?.isActive !== false);
 
-  // Sync up to the min count between physics and tsParticles (queried via get(i))
-  if (physicsParticles.length > 0) {
-    let i = 0;
-    // we'll iterate until either physics ends or tsParticles.get(i) returns undefined
-    for (; i < physicsParticles.length; i++) {
-      const physicsParticle = physicsParticles[i];
-      const tsParticle = (container.particles as any).get(i) as TsParticle | undefined;
-      if (!tsParticle) break;
+  // Sync tsParticles with active physics particles; hide any surplus tsParticles
+  const particlesContainer: any = (container.particles as any);
+  const tsCount: number = Number(particlesContainer?.count ?? (particlesContainer?._array?.length ?? 0));
 
-      if (physicsParticle && tsParticle) {
+  if (tsCount > 0) {
+    for (let i = 0; i < tsCount; i++) {
+      const tsParticle = particlesContainer.get(i) as TsParticle | undefined;
+      if (!tsParticle) continue;
+
+      const physicsParticle = activePhysics[i];
+      if (physicsParticle) {
+        // Position sync for active particle
         const px = Number(physicsParticle?.position?.x);
         const py = Number(physicsParticle?.position?.y);
         const finitePX = Number.isFinite(px) ? px : 0;
         const finitePY = Number.isFinite(py) ? py : 0;
 
-        let canvasPos = particleManager.mapToCanvas({ x: finitePX, y: finitePY });
+        const canvasPos = particleManager.mapToCanvas({ x: finitePX, y: finitePY });
 
         const w = container.canvas.size.width || 0;
         const h = container.canvas.size.height || 0;
@@ -161,6 +164,11 @@ export const updateParticlesFromStrategies = (
 
         tsParticle.position.x = safeX;
         tsParticle.position.y = safeY;
+
+        // Ensure visible opacity for active particles
+        if ((tsParticle as any).opacity?.value !== undefined) {
+          (tsParticle as any).opacity.value = 0.8;
+        }
 
         // Visual collision indicator - flash red for 200ms after collision
         const currentTime = simTime();
@@ -184,23 +192,31 @@ export const updateParticlesFromStrategies = (
             tsParticle.color.l.value = hslColor.l;
           }
         }
+      } else {
+        // No corresponding active particle: hide this visual particle
+        tsParticle.position.x = -10000;
+        tsParticle.position.y = -10000;
+        if ((tsParticle as any).opacity?.value !== undefined) {
+          (tsParticle as any).opacity.value = 0.0;
+        }
       }
     }
+  }
 
-    // Only log diagnostics when simulation is actually running
-    if (_diagFrameCounter % 60 === 0 && isSimulationRunning) {
-      // Diagnostic logging
-      const firstPhysicsParticle = physicsParticles[0];
-      const firstTsParticle = (container.particles as any).get(0) as TsParticle | undefined;
-      if (firstPhysicsParticle && firstTsParticle) {
-        const canvasPos = particleManager.mapToCanvas(firstPhysicsParticle?.position || { x: 0, y: 0 });
-        console.log("[tsParticles] Position sync", {
-          physicsPos: { x: firstPhysicsParticle?.position?.x ?? 0, y: firstPhysicsParticle?.position?.y ?? 0 },
-          canvasPos: { x: canvasPos.x, y: canvasPos.y },
-          tsParticlePos: { x: firstTsParticle?.position?.x ?? 0, y: firstTsParticle?.position?.y ?? 0 },
-          particleCount: i
-        });
-      }
+  // Only log diagnostics when simulation is actually running
+  if (_diagFrameCounter % 60 === 0 && isSimulationRunning) {
+    // Diagnostic logging
+    const firstPhysicsParticle = activePhysics[0];
+    const firstTsParticle = (container.particles as any).get(0) as TsParticle | undefined;
+    if (firstPhysicsParticle && firstTsParticle) {
+      const canvasPos = particleManager.mapToCanvas(firstPhysicsParticle?.position || { x: 0, y: 0 });
+      console.log("[tsParticles] Position sync", {
+        physicsPos: { x: firstPhysicsParticle?.position?.x ?? 0, y: firstPhysicsParticle?.position?.y ?? 0 },
+        canvasPos: { x: canvasPos.x, y: canvasPos.y },
+        tsParticlePos: { x: firstTsParticle?.position?.x ?? 0, y: firstTsParticle?.position?.y ?? 0 },
+        activeCount: activePhysics.length,
+        tsCount
+      });
     }
   } else {
     // This case is normal during initialization, so we don't need to warn.

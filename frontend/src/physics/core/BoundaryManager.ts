@@ -19,6 +19,7 @@ export class BoundaryManager {
       case 'absorbing':
         return applyAbsorbingBoundary(particle.position, this.config);
       default:
+        console.warn('[BoundaryManager] Unknown boundary type:', this.config.type, '- returning unchanged position');
         return { position: particle.position };
     }
   }

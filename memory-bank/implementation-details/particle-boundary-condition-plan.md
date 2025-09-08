@@ -1,6 +1,6 @@
 # Particle Boundary Condition System Design
 *Created: 2025-09-06 20:03:13 IST*
-*Last Updated: 2025-09-06 20:03:13 IST*
+*Last Updated: 2025-09-08 11:44:43 IST*
 
 ## Overview
 
@@ -62,11 +62,14 @@ frontend/src/physics/
 **Completed**
 - BoundaryManager class implementation
 - Integration with CTRWStrategy2D, CTRWStrategy1D, BallisticStrategy  
+- Integration with InterparticleCollisionStrategy2D
 - Code deduplication across strategy files
 - Basic logging for configuration changes
+- Removed deprecated BoundaryPhase architecture
+- Added absorption handling (particle deactivation)
+- Canvas dimension fixes in StrategyFactory
 
 **Remaining**
-- Integration with remaining strategy files (InterparticleCollision*, LegacyStrategies)
 - Boundary visualization system
 - Performance optimization for high particle counts
 - Advanced boundary types (mixed, shaped, dynamic)
@@ -78,6 +81,25 @@ Boundary conditions are working but validation needed:
 - Reflective boundaries reverse velocity appropriately  
 - Absorbing boundaries remove particles at boundaries
 - Performance impact assessment with large particle counts
+
+## Session 2025-09-08 Changes
+
+**Architecture Improvements:**
+- Deleted `BoundaryPhase.ts` - boundary handling now integrated directly into strategies
+- Updated `StrategyOrchestrator.ts` to remove boundary phase execution
+- Enhanced `InterparticleCollisionStrategy2D.ts` with BoundaryManager integration
+- Fixed `StrategyFactory.ts` to use actual canvas dimensions from ParameterManager
+
+**Strategy Updates:**
+- `BallisticStrategy.ts`: Added absorption handling (sets isActive=false when absorbed)
+- `CTRWStrategy1D.ts` and `CTRWStrategy2D.ts`: Unified update paths to avoid code duplication
+- Added boundary config validation warnings in strategy constructors
+- Improved particle filtering in `tsParticlesConfig.ts` to handle inactive particles
+
+**Diagnostics:**
+- Added store size diagnostic in `ObservablesPanel.tsx`
+- Enhanced initialization logging in `RandomWalkSimulator.ts`
+- Improved particle syncing with active/inactive state handling
 
 ## Future Enhancements
 

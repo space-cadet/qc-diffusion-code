@@ -39,6 +39,22 @@ export class RandomWalkSimulator {
     this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
     this.useStreamingObservables = config.useStreamingObservables ?? false;
     this.parameterManager = new ParameterManager(config);
+    // DIAG: Log effective boundary configuration and canvas size at initialization
+    try {
+      const bc = this.parameterManager.getBoundaryConfig();
+      // eslint-disable-next-line no-console
+      console.log('[RWS:init] BoundaryConfig', {
+        type: bc.type,
+        xMin: bc.xMin,
+        xMax: bc.xMax,
+        yMin: bc.yMin,
+        yMax: bc.yMax,
+        canvas: { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('[RWS:init] Failed to read BoundaryConfig:', e);
+    }
     this.setupStrategies();
     this.setupParticleManager();
     this.setupSimulationRunner();

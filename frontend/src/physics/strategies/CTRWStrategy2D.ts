@@ -31,6 +31,9 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
     this.diffusionConstant = this.velocity ** 2 / (2 * this.collisionRate);
     this.meanWaitTime = 1 / this.collisionRate;
+    if (!params.boundaryConfig) {
+      console.warn('[CTRWStrategy2D] No boundaryConfig provided; using fallback defaults');
+    }
     const boundaryConfig = params.boundaryConfig || {
       type: 'periodic',
       xMin: -200,
@@ -43,7 +46,9 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
   }
 
   updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    this.updateParticleWithDt(particle, allParticles, simDt());
+    // Unified path to avoid duplication
+    this.preUpdate(particle, allParticles, {} as PhysicsContext);
+    this.integrate(particle, simDt(), {} as PhysicsContext);
   }
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
@@ -76,30 +81,9 @@ export class CTRWStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    const collision = this.handleCollision(particle);
-    
-    if (collision.occurred && collision.newVelocity) {
-      particle.velocity = collision.newVelocity;
-      particle.lastCollisionTime = collision.timestamp;
-      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
-      particle.collisionCount++;
-    }
-
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    particle.position.x += velocity.x * dt;
-    particle.position.y += velocity.y * dt;
-
-    const { position: newPosition, velocity: newVelocity } = this.boundaryManager.apply(particle);
-    particle.position = newPosition;
-    if (newVelocity) {
-      particle.velocity = newVelocity;
-    }
-    
-    // Record trajectory point (CircularBuffer auto-manages capacity)
-    particle.trajectory.push({
-      position: { ...particle.position },
-      timestamp: simTime()
-    });
+    // Unified path to avoid duplication
+    this.preUpdate(particle, allParticles, {} as PhysicsContext);
+    this.integrate(particle, dt, {} as PhysicsContext);
   }
 
   setBoundaries(config: BoundaryConfig): void {

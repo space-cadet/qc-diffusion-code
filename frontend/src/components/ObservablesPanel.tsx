@@ -269,6 +269,34 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
 
 
 
+  const [storeSize, setStoreSize] = useState<number | null>(null);
+
+  const calculateStoreSize = () => {
+    const state = useAppStore.getState();
+    const dataState = {
+        activeTab: state.activeTab,
+        simulationParams: state.simulationParams,
+        pdeState: state.pdeState,
+        pdeUIState: state.pdeUIState,
+        gridLayoutParams: state.gridLayoutParams,
+        randomWalkSimLayouts: state.randomWalkSimLayouts,
+        randomWalkUIState: state.randomWalkUIState,
+        randomWalkSimulationState: state.randomWalkSimulationState,
+        observablesWindow: state.observablesWindow,
+        customObservablesWindow: state.customObservablesWindow,
+        zCounter: state.zCounter,
+        observablesCollapsed: state.observablesCollapsed,
+        customObservablesCollapsed: state.customObservablesCollapsed,
+        customObservables: state.customObservables,
+        customObservableVisibility: state.customObservableVisibility,
+        useNewEngine: state.useNewEngine,
+        useStreamingObservables: state.useStreamingObservables,
+        useGPU: state.useGPU,
+    };
+    const sizeInBytes = new TextEncoder().encode(JSON.stringify(dataState)).length;
+    setStoreSize(sizeInBytes);
+  };
+
   return (
     <div className="space-y-4">
       {/* Built-in Observables */}
@@ -324,6 +352,28 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
           })}
         </>
       )}
+
+      {/* Store Size Diagnostic */}
+      <div className="mt-3 p-3 rounded bg-white border border-gray-200 text-gray-800">
+        <div className="font-medium mb-2 text-sm">Application State</div>
+        <div className="flex items-center justify-between">
+          <div>
+            {storeSize !== null ? (
+              <span className="font-mono text-xs">
+                {(storeSize / 1024 / 1024).toFixed(3)} MB ({storeSize.toLocaleString()} bytes)
+              </span>
+            ) : (
+              <span className="text-gray-500 text-xs">Click to calculate</span>
+            )}
+          </div>
+          <button 
+            onClick={calculateStoreSize}
+            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs font-medium"
+          >
+            Calculate Store Size
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

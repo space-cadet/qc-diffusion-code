@@ -4,7 +4,6 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 import { CoordinateSystem } from '../core/CoordinateSystem';
 import { CTRWStrategy1D } from '../strategies/CTRWStrategy1D';
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
-import { LegacyBallisticStrategy } from '../strategies/LegacyBallisticStrategy';
 import { CompositeStrategy } from '../strategies/CompositeStrategy';
 import { InterparticleCollisionStrategy2D } from '../strategies/InterparticleCollisionStrategy2D';
 import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCollisionStrategy1D';
@@ -31,9 +30,9 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
   const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
 
-  // Create coordinate system instance for strategies that need it
+  // Create coordinate system instance for strategies that need it (use actual canvas size)
   const coordSystem = new CoordinateSystem(
-    { width: 800, height: 600 }, // Default canvas size
+    { width: parameterManager.canvasWidth, height: parameterManager.canvasHeight },
     boundaryConfig,
     config.dimension
   );
@@ -48,12 +47,11 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
         velocity: physicsParams.velocity,
         boundaryConfig: boundaryConfig,
         interparticleCollisions: false, // collisions handled via separate 1D strategy below
+        coordSystem,
       }));
     } else {
-      // Always use BallisticStrategy for physics engine path, LegacyBallisticStrategy for legacy
-      oneDStrategies.push(forPhysicsEngine || getNewEngineFlag()
-        ? new BallisticStrategy({ boundaryConfig })
-        : new LegacyBallisticStrategy({ boundaryConfig: boundaryConfig }));
+      // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
+      oneDStrategies.push(new BallisticStrategy({ boundaryConfig }));
     }
     if (selectedStrategies.includes('collisions')) {
       oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: boundaryConfig }));
@@ -70,10 +68,9 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
 
   // For 2D, compose strategies: base is Ballistic; others are added if selected
   else {
+    // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
     const twoDStrategies: (RandomWalkStrategy | PhysicsStrategy)[] = [
-      forPhysicsEngine || getNewEngineFlag()
-        ? new BallisticStrategy({ boundaryConfig })
-        : new LegacyBallisticStrategy({ boundaryConfig: boundaryConfig })
+      new BallisticStrategy({ boundaryConfig })
     ];
 
     if (selectedStrategies.includes('ctrw')) {

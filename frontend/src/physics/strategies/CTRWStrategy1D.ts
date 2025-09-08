@@ -7,7 +7,6 @@ import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime, simDt } from '../core/GlobalTime';
-import { CoordinateSystem as CoordSystem } from '../core/CoordinateSystem';
 
 export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
   private collisionRate: number;
@@ -25,12 +24,16 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     velocity?: number;
     boundaryConfig?: BoundaryConfig;
     interparticleCollisions?: boolean;
+    coordSystem: CoordinateSystem;
   }) {
     this.collisionRate = params.collisionRate;
     this.jumpLength = params.jumpLength;
     this.velocity = params.velocity || params.jumpLength * params.collisionRate;
     this.diffusionConstant = this.velocity ** 2 / (2 * this.collisionRate);
     this.meanWaitTime = 1 / this.collisionRate;
+    if (!params.boundaryConfig) {
+      console.warn('[CTRWStrategy1D] No boundaryConfig provided; using fallback defaults');
+    }
     const boundaryConfig = params.boundaryConfig || {
       type: 'periodic',
       xMin: -200,
@@ -40,11 +43,7 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
     };
     this.boundaryManager = new BoundaryManager(boundaryConfig);
     this.interparticleCollisions = params.interparticleCollisions || false;
-    this.coordSystem = new CoordSystem(
-      { width: 800, height: 600 }, // Default canvas size
-      boundaryConfig,
-      '1D'
-    );
+    this.coordSystem = params.coordSystem;
   }
 
   updateParticle(particle: Particle, allParticles: Particle[]): void {
@@ -92,39 +91,9 @@ export class CTRWStrategy1D implements RandomWalkStrategy, PhysicsStrategy {
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    if (this.interparticleCollisions) {
-      this.handleInterparticleCollisions(particle, allParticles);
-    }
-
-    const collision = this.handleCollision(particle);
-    
-    if (collision.occurred && collision.newVelocity) {
-      particle.velocity = collision.newVelocity;
-      particle.lastCollisionTime = collision.timestamp;
-      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
-      particle.collisionCount++;
-    }
-
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    velocity.x = this.calculateNewVelocity(velocity.x);
-    particle.velocity = this.coordSystem.toVelocity(velocity);
-    particle.position.x += velocity.x * dt;
-    
-    // Apply boundary conditions
-    const boundaryResult = this.boundaryManager.apply(particle);
-    particle.position = boundaryResult.position;
-    if (boundaryResult.velocity) {
-      particle.velocity = boundaryResult.velocity;
-    }
-    if (boundaryResult.absorbed) {
-      particle.isActive = false;
-    }
-    
-    // Record trajectory point for every update
-    particle.trajectory.push({
-      position: { ...particle.position },
-      timestamp: simTime()
-    });
+    // Unified path: Phase A then Phase B to avoid duplication
+    this.preUpdate(particle, allParticles, {} as PhysicsContext);
+    this.integrate(particle, dt, {} as PhysicsContext);
   }
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {

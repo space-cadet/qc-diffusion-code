@@ -1,3 +1,6 @@
+// Boundary utilities shared by all strategies.
+// NOTE: 1D strategies accept full BoundaryConfig but only use xMin/xMax. yMin/yMax
+// are ignored by 1D logic. 2D strategies use both x and y bounds.
 import type { BoundaryConfig, Position, Velocity, BoundaryResult } from '../types/BoundaryConfig';
 
 export function applyPeriodicBoundary(position: Position, boundaries: BoundaryConfig): BoundaryResult {

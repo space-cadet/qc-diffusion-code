@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-06 20:03:13 IST_
+_Last Updated: 2025-09-08 11:44:43 IST_
 
 ## Active Tasks
 
@@ -28,7 +28,8 @@ _Last Updated: 2025-09-06 20:03:13 IST_
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C18 | Streaming Observable Framework Implementation      | ✅ COMPLETED   | MEDIUM   | 2025-09-03 | C7a             |
-| C19 | Particle Simulation Boundary Conditions Implementation | 📝 PLANNED | HIGH | 2025-09-06 | C5c, C15a, C2a |
+| C19 | Particle Simulation Boundary Conditions Implementation | 🔄 IN PROGRESS | HIGH | 2025-09-06 | C5c, C15a, C2a |
+| C20 | Network Diffusion Tab Implementation               | 📝 PLANNED     | MEDIUM   | 2025-09-07 | -               |
 | C14 | Composite Strategy Framework Implementation        | ✅ COMPLETED   | HIGH     | 2025-08-28 | C5c, C12        |
 | C13 | 1D Random Walk Implementation                      | ✅ COMPLETED   | HIGH     | 2025-08-27 | C5c             |
 | C7a | Modular Transparent Observable System Redesign    | 🔄 IN PROGRESS | HIGH     | 2025-09-01 | C7              |
@@ -191,10 +192,16 @@ _Last Updated: 2025-09-06 20:03:13 IST_
 **Notes**: EventEmitter-based streaming architecture completed with feature toggle system. UI toggle button switches between polling and streaming panels. Real-time data emission during simulation step eliminates polling complexity and improves performance.
 
 ### C19: Particle Simulation Boundary Conditions Implementation
-**Description**: Implement comprehensive boundary condition system for particle simulations with unified API
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-06 20:03:13 IST
+**Description**: Implement comprehensive boundary condition system for particle simulations with unified API supporting periodic, reflective, and absorbing boundaries across 1D/2D modes
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-08 11:44:43 IST
 **Files**: `memory-bank/tasks/C19.md`, `frontend/src/physics/core/BoundaryManager.ts`, `frontend/src/physics/strategies/`
-**Notes**: BoundaryManager class implemented, eliminates code duplication across strategies, centralized boundary logic with consistent behavior
+**Notes**: BoundaryManager integration completed across strategies, removed deprecated BoundaryPhase architecture, added absorption handling
+
+### C20: Network Diffusion Tab Implementation
+**Description**: Create Network Diffusion tab showing relationship between string substitution systems and graph dynamics
+**Status**: 📝 PLANNED **Last**: 2025-09-07 20:21:10 IST
+**Files**: `frontend/src/components/NetworkDiffusionPage.tsx`, `frontend/src/components/StringSubstitutionPanel.tsx`, `frontend/src/components/GraphDynamicsPanel.tsx`
+**Notes**: New tab to demonstrate connections between string rewriting systems and network diffusion processes
 
 ### C7b: Composable Observable Framework
 **Description**: Design future composable observable framework enabling complex observable composition through pipeline operators and functional patterns

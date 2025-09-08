@@ -5,17 +5,18 @@ import type { Step, CollisionEvent } from '../types/CollisionEvent';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
 import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
+import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime } from '../core/GlobalTime';
 import { SpatialGrid } from '../utils/SpatialGrid';
 
 export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, PhysicsStrategy {
-  private boundaryConfig: BoundaryConfig;
+  private boundaryManager: BoundaryManager;
   private coordSystem: CoordinateSystem;
   private spatialGrid: SpatialGrid;
   private idCache: Map<string, number> = new Map();
 
   constructor(boundaryConfig: BoundaryConfig, coordSystem: CoordinateSystem) {
-    this.boundaryConfig = boundaryConfig;
+    this.boundaryManager = new BoundaryManager(boundaryConfig);
     this.coordSystem = coordSystem;
     this.spatialGrid = new SpatialGrid(1000, 20); // Grid size, cell size
   }
@@ -58,22 +59,20 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
   }
 
   integrate(particle: Particle, _dt: number, _context: PhysicsContext): void {
-    // No position integration in this strategy, only collision handling
-    // Position integration is handled by other strategies
+    // Apply boundary conditions after collision handling
+    const boundaryResult = this.boundaryManager.apply(particle);
+    particle.position = boundaryResult.position;
+    if (boundaryResult.velocity) {
+      particle.velocity = boundaryResult.velocity;
+    }
+    if (boundaryResult.absorbed) {
+      particle.isActive = false;
+    }
   }
 
   updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    // Convert velocity to Vector for calculations
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    const position = { x: particle.position.x, y: particle.position.y };
-    position.x += velocity.x * dt;
-    position.y += velocity.y * dt;
-    particle.position = position;
-    
-    // Convert back to Velocity for storage
-    particle.velocity = this.coordSystem.toVelocity(velocity);
-    
-    // Handle inter-particle collisions
+    // Collision-only: do not integrate position here. Movement is handled by a separate strategy.
+    // Handle inter-particle collisions only (may adjust velocities and separate overlaps).
     this.handleInterparticleCollisions(particle, allParticles);
   }
 
@@ -173,11 +172,11 @@ export class InterparticleCollisionStrategy2D implements RandomWalkStrategy, Phy
   }
 
   setBoundaries(config: BoundaryConfig): void {
-    this.boundaryConfig = config;
+    this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
-    return this.boundaryConfig;
+    return this.boundaryManager.getConfig();
   }
 
   validateParameters(): boolean {

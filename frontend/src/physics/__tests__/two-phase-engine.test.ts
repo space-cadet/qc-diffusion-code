@@ -1,6 +1,5 @@
 import { PhysicsEngine } from '../core/PhysicsEngine';
 import { BallisticStrategy } from '../strategies/BallisticStrategy';
-import { BoundaryPhase } from '../core/BoundaryPhase';
 import type { Particle } from '../types/Particle';
 import type { TrajectoryPoint } from '../types/Particle';
 import { CircularBuffer } from '../utils/CircularBuffer';
