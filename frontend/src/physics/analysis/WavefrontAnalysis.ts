@@ -28,7 +28,7 @@ function calculateCenterOfMass(density: number[][]): { x: number; y: number } {
 
 export function analyzeWaveFrontSpeed(
   densityHistory: DensitySnapshot[],
-  currentStrategy: RandomWalkStrategy
+  currentStrategy: PhysicsStrategy
 ): { measuredSpeed: number; theoreticalSpeed: number; error: number } {
   if (densityHistory.length < 2) {
     return { measuredSpeed: 0, theoreticalSpeed: 0, error: 0 };

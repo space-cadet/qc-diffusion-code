@@ -1,22 +1,23 @@
 import { DirichletBC } from '../boundary-conditions/DirichletBC';
+import { vi } from 'vitest';
 
 describe('Boundary Conditions', () => {
   let mockGL: WebGLRenderingContext;
 
   beforeAll(() => {
     mockGL = {
-      getUniformLocation: jest.fn().mockReturnValue({}),
-      uniform1f: jest.fn(),
-      createTexture: jest.fn(),
-      bindTexture: jest.fn(),
-      texParameteri: jest.fn(),
-      texImage2D: jest.fn(),
-      clearColor: jest.fn(),
-      enable: jest.fn(),
-      disable: jest.fn(),
-      isEnabled: jest.fn().mockReturnValue(false),
-      scissor: jest.fn(),
-      clear: jest.fn()
+      getUniformLocation: vi.fn().mockReturnValue({}),
+      uniform1f: vi.fn(),
+      createTexture: vi.fn(),
+      bindTexture: vi.fn(),
+      texParameteri: vi.fn(),
+      texImage2D: vi.fn(),
+      clearColor: vi.fn(),
+      enable: vi.fn(),
+      disable: vi.fn(),
+      isEnabled: vi.fn().mockReturnValue(false),
+      scissor: vi.fn(),
+      clear: vi.fn()
     } as unknown as WebGLRenderingContext;
   });
 

@@ -1,6 +1,8 @@
+import type { PhysicsContext } from './types/PhysicsContext';
 import type { Particle, TrajectoryPoint } from "./types/Particle";
 import type { PhysicsStrategy } from "./interfaces/PhysicsStrategy";
 import { CircularBuffer } from "./utils/CircularBuffer";
+import { TimeManager } from "./core/TimeManager";
 import { simTime } from "./core/GlobalTime";
 import { CoordinateSystem } from "./core/CoordinateSystem";
 
@@ -11,10 +13,13 @@ export class ParticleManager {
   private diagCounter: number = 0;
   private coordSystem: CoordinateSystem;
 
+  private timeManager: TimeManager;
+
   constructor(strategy: PhysicsStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem) {
     this.strategy = strategy;
     this.dimension = dimension;
     this.coordSystem = coordSystem;
+    this.timeManager = new TimeManager();
   }
 
   public getCoordinateSystem(): CoordinateSystem {
@@ -113,10 +118,16 @@ export class ParticleManager {
     const activeParticles = allParticles.filter(p => p.isActive);
     // console.log('[PM] particles status', { total: allParticles.length, active: activeParticles.length });
     
+    const physicsContext: PhysicsContext = {
+      timeManager: this.timeManager,
+      coordinateSystem: this.coordSystem,
+      currentTime: simTime(),
+    };
+
     for (const particle of allParticles) {
       if (particle.isActive) {
-        this.strategy.preUpdate(particle, allParticles, {});
-        this.strategy.integrate(particle, dt, {});
+        this.strategy.preUpdate(particle, allParticles, physicsContext);
+        this.strategy.integrate(particle, dt, physicsContext);
       } else {
         console.log('[PM] particle inactive', particle.id);
       }

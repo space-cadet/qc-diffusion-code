@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-08 23:32:26 IST_
+_Last Updated: 2025-09-09 11:08:11 IST_
 
 ## Active Tasks
 
@@ -36,6 +36,7 @@ _Last Updated: 2025-09-08 23:32:26 IST_
 | C7b | Composable Observable Framework                   | 📝 PLANNED     | LOW      | 2025-09-04 | C7a, C18        |
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
+| C21 | Build and Dependency Vulnerability Resolution       | ✅ COMPLETED   | CRITICAL | 2025-09-09 | -               |
 
 ## Task Details
 
@@ -209,6 +210,12 @@ _Last Updated: 2025-09-08 23:32:26 IST_
 **Files**: `memory-bank/tasks/C7b.md`, `memory-bank/implementation-details/composable-observables-plan.md`
 **Notes**: Planning task created in Sep 3 night session for future implementation of composable observable architecture with pipeline operators (map, filter, reduce, combine, window) and functional composition patterns
 
+### C21: Build and Dependency Vulnerability Resolution
+**Description**: Resolve critical build errors and dependency vulnerabilities in the `frontend` and `packages/graph-core` workspaces.
+**Status**: ✅ COMPLETED **Last**: 2025-09-09 11:08:11 IST
+**Files**: `frontend/package.json`, `frontend/tsconfig.app.json`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/analysis/WavefrontAnalysis.ts`, `frontend/src/physics/ParticleManager.ts`, `frontend/src/webgl/__tests__/boundaryConditions.test.ts`, `frontend/src/physics/__tests__/integration.test.ts`
+**Notes**: Fixed 23 critical dependency vulnerabilities and a series of cascading TypeScript build errors, enabling the project to build successfully.
+
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling
 **Status**: 🔄 ACTIVE **Last**: 2025-08-28 18:04:00 IST
@@ -236,3 +243,4 @@ _Last Updated: 2025-09-08 23:32:26 IST_
 | C4  | Fix Pause Button Functionality            | 2025-08-20 23:44:20 IST |
 | C0  | Code Subproject Memory Bank Initialization | 2025-08-20 08:42:01 IST |
 | C11 | PDE Solver Choice Implementation (merged into C2a) | 2025-08-25 13:03:55 IST |
+| C21 | Build and Dependency Vulnerability Resolution       | 2025-09-09 11:08:11 IST |

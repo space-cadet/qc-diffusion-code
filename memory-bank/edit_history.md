@@ -1,7 +1,18 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-08 23:32:26 IST_
+_Last Updated: 2025-09-09 11:13:10 IST_
+
+### 2025-09-09
+
+#### 11:08 - C21: Build and Dependency Vulnerability Resolution
+- Updated `frontend/tsconfig.app.json` - Added "types": ["vitest/globals"] to resolve test runner type errors
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Removed duplicate import of PhysicsStrategy
+- Updated `frontend/src/physics/ParticleManager.ts` - Fixed PhysicsContext object construction and parameter passing
+- Updated `frontend/src/webgl/__tests__/boundaryConditions.test.ts` - Replaced jest mock functions with vi from Vitest
+- Updated `frontend/src/physics/__tests__/integration.test.ts` - Fixed "used before declaration" error and syntax error
+- Updated `frontend/package.json` - Resolved 23 critical vulnerabilities in dependencies
+- Updated `packages/graph-core/package.json` - Fixed dependency vulnerabilities
 
 ### 2025-09-08
 

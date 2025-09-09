@@ -1,0 +1,124 @@
+# npm audit report
+
+ansi-regex  *
+Severity: critical
+Malware in ansi-regex - https://github.com/advisories/GHSA-jvhh-2m83-6w29
+fix available via `npm audit fix`
+node_modules/ansi-regex
+node_modules/string-width-cjs/node_modules/ansi-regex
+node_modules/strip-ansi-cjs/node_modules/ansi-regex
+node_modules/wrap-ansi-cjs/node_modules/ansi-regex
+  strip-ansi  *
+  Depends on vulnerable versions of ansi-regex
+  node_modules/string-width-cjs/node_modules/strip-ansi
+  node_modules/strip-ansi
+  node_modules/strip-ansi-cjs
+  node_modules/wrap-ansi-cjs/node_modules/strip-ansi
+    @isaacs/cliui  *
+    Depends on vulnerable versions of string-width
+    Depends on vulnerable versions of strip-ansi
+    Depends on vulnerable versions of wrap-ansi
+    node_modules/@isaacs/cliui
+      jackspeak  >=2.1.5
+      Depends on vulnerable versions of @isaacs/cliui
+      node_modules/jackspeak
+        glob  >=10.3.8
+        Depends on vulnerable versions of jackspeak
+        node_modules/glob
+          sucrase  >=3.35.0
+          Depends on vulnerable versions of glob
+          node_modules/sucrase
+            tailwindcss  3.4.15 - 3.4.17
+            Depends on vulnerable versions of sucrase
+            node_modules/tailwindcss
+    string-width  *
+    Depends on vulnerable versions of strip-ansi
+    node_modules/string-width
+    node_modules/string-width-cjs
+    node_modules/wrap-ansi-cjs/node_modules/string-width
+      wrap-ansi  *
+      Depends on vulnerable versions of ansi-styles
+      Depends on vulnerable versions of string-width
+      Depends on vulnerable versions of strip-ansi
+      node_modules/wrap-ansi
+      node_modules/wrap-ansi-cjs
+
+ansi-styles  *
+Severity: critical
+Malware in ansi-styles - https://github.com/advisories/GHSA-p5rr-crjh-x7gr
+Depends on vulnerable versions of color-convert
+No fix available
+node_modules/ansi-styles
+node_modules/wrap-ansi-cjs/node_modules/ansi-styles
+  npm-run-all2  *
+  Depends on vulnerable versions of ansi-styles
+  node_modules/npm-run-all2
+
+color-name  *
+Severity: critical
+Malware in color-name - https://github.com/advisories/GHSA-m99c-cfww-cxqx
+No fix available
+node_modules/color-name
+  color-convert  >=1.6.0
+  Depends on vulnerable versions of color-name
+  node_modules/color-convert
+  color-parse  *
+  Depends on vulnerable versions of color-name
+  node_modules/color-parse
+  node_modules/plotly.js/node_modules/color-alpha/node_modules/color-parse
+  node_modules/plotly.js/node_modules/color-normalize/node_modules/color-parse
+  node_modules/plotly.js/node_modules/color-parse
+    color-alpha  *
+    Depends on vulnerable versions of color-parse
+    node_modules/color-alpha
+    node_modules/plotly.js/node_modules/color-alpha
+      regl-splom  *
+      Depends on vulnerable versions of color-alpha
+      Depends on vulnerable versions of regl-scatter2d
+      node_modules/regl-splom
+        plotly.js  >=1.25.0
+        Depends on vulnerable versions of color-alpha
+        Depends on vulnerable versions of color-normalize
+        Depends on vulnerable versions of color-parse
+        Depends on vulnerable versions of color-rgba
+        Depends on vulnerable versions of gl-text
+        Depends on vulnerable versions of regl-error2d
+        Depends on vulnerable versions of regl-line2d
+        Depends on vulnerable versions of regl-scatter2d
+        Depends on vulnerable versions of regl-splom
+        node_modules/plotly.js
+    color-rgba  *
+    Depends on vulnerable versions of color-parse
+    node_modules/color-rgba
+    node_modules/plotly.js/node_modules/color-normalize/node_modules/color-rgba
+    node_modules/plotly.js/node_modules/color-rgba
+      color-normalize  *
+      Depends on vulnerable versions of color-rgba
+      node_modules/color-normalize
+      node_modules/plotly.js/node_modules/color-normalize
+        gl-text  *
+        Depends on vulnerable versions of color-normalize
+        node_modules/gl-text
+        regl-error2d  *
+        Depends on vulnerable versions of color-normalize
+        node_modules/regl-error2d
+        regl-line2d  >=2.0.0
+        Depends on vulnerable versions of color-normalize
+        node_modules/regl-line2d
+        regl-scatter2d  *
+        Depends on vulnerable versions of color-normalize
+        Depends on vulnerable versions of color-rgba
+        node_modules/regl-scatter2d
+
+
+
+23 critical severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.

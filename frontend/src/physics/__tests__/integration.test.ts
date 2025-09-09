@@ -7,15 +7,17 @@ import type { BoundaryConfig } from '../types/BoundaryConfig';
 
 describe('Physics Engine Integration', () => {
   test('engine configuration update preserves particles', () => {
+  test('engine configuration update preserves particles', () => {
+    const boundaries = { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 };
+    const canvasSize = { width: 400, height: 400 };
+    const dimension = '2D' as const;
+    const coordSystem = new CoordinateSystem(canvasSize, boundaries, dimension);
     const config = {
       timeStep: 0.016,
-      boundaries: { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 },
-      canvasSize: { width: 400, height: 400 },
-      dimension: '2D' as const,
-      strategies: [new BallisticStrategy({ 
-        boundaryConfig: { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 },
-        coordSystem: new CoordinateSystem({ width: 400, height: 400 }, { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 }, '2D')
-      })]
+      boundaries,
+      canvasSize,
+      dimension,
+      strategies: [new BallisticStrategy({ boundaryConfig: boundaries, coordSystem })]
     };
     const engine = new PhysicsEngine(config);
     const particles = [{
@@ -37,17 +39,21 @@ describe('Physics Engine Integration', () => {
   });
 
   test('physics engine initialization', () => {
+    const boundaries = { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 };
+    const canvasSize = { width: 400, height: 400 };
+    const dimension = '2D' as const;
+    const coordSystem = new CoordinateSystem(canvasSize, boundaries, dimension);
     const config = {
       timeStep: 0.016,
-      boundaries: { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 },
-      canvasSize: { width: 400, height: 400 },
-      dimension: '2D' as const,
-      strategies: [new BallisticStrategy()]
+      boundaries,
+      canvasSize,
+      dimension,
+      strategies: [new BallisticStrategy({ boundaryConfig: boundaries, coordSystem })]
     };
     const engine = new PhysicsEngine(config);
     expect(engine).toBeDefined();
-    const coordSystem = engine.getCoordinateSystem();
-    expect(coordSystem.getDimension()).toBe('2D');
+    const coordSystemFromEngine = engine.getCoordinateSystem();
+    expect(coordSystemFromEngine.getDimension()).toBe('2D');
   });
 
   test('particle manager and strategy coordination', () => {
@@ -85,4 +91,5 @@ describe('Physics Engine Integration', () => {
     // After one update, the particle should have moved from the center
     expect(mockTsParticle.position.x).not.toBe(200);
   });
+});
 });

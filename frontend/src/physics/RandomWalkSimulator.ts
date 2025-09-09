@@ -1,5 +1,4 @@
 import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
-import type { PhysicsStrategy } from './interfaces/PhysicsStrategy';
 import { ParticleManager } from './ParticleManager';
 import { ObservableManager } from './ObservableManager';
 import { StreamObservableManager } from './stream-ObservableManager';
@@ -20,8 +19,8 @@ import { CompositeStrategy } from './strategies/CompositeStrategy';
 
 export class RandomWalkSimulator {
   private particleManager!: ParticleManager;
-  private strategies!: RandomWalkStrategy[];
-  private currentStrategy!: RandomWalkStrategy;
+  private strategies!: PhysicsStrategy[];
+  private currentStrategy!: PhysicsStrategy;
   private physicsEngine?: PhysicsEngine;
   private time: number = 0;
   private observableManager: ObservableManager | StreamObservableManager;
