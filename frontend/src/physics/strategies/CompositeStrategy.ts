@@ -56,12 +56,10 @@ export class CompositeStrategy implements PhysicsStrategy {
     }, {});
   }
 
-  getParameters?(): { collisionRate: number; velocity: number; jumpLength: number } {
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number } {
     const combined = this.strategies.reduce((acc, strategy) => {
-      const params = strategy.getParameters?.();
-      if (params) {
-        Object.assign(acc, params);
-      }
+      const params = strategy.getParameters();
+      Object.assign(acc, params);
       return acc;
     }, {} as { collisionRate?: number; velocity?: number; jumpLength?: number });
 

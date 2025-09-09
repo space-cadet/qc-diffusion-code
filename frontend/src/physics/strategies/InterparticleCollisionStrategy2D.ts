@@ -14,9 +14,9 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
   private spatialGrid: SpatialGrid;
   private idCache: Map<string, number> = new Map();
 
-  constructor(boundaryConfig: BoundaryConfig, coordSystem: CoordinateSystem) {
-    this.boundaryManager = new BoundaryManager(boundaryConfig);
-    this.coordSystem = coordSystem;
+  constructor(params: { boundaryConfig: BoundaryConfig; coordSystem: CoordinateSystem }) {
+    this.boundaryManager = new BoundaryManager(params.boundaryConfig);
+    this.coordSystem = params.coordSystem;
     this.spatialGrid = new SpatialGrid(1000, 20); // Grid size, cell size
   }
 
@@ -37,17 +37,6 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
     // No-op: collision strategy only modifies velocities, not positions
-  }
-
-  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    // Legacy path: perform collision handling during single-step update
-    this.handleInterparticleCollisions(particle, allParticles);
-  }
-
-  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    // Collision-only: do not integrate position here. Movement is handled by a separate strategy.
-    // Handle inter-particle collisions only (may adjust velocities and separate overlaps).
-    this.handleInterparticleCollisions(particle, allParticles);
   }
 
   private getNumericId(particle: Particle): number {
@@ -159,5 +148,13 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
 
   getPhysicsParameters(): Record<string, number> {
     return {};
+  }
+
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number } {
+    return {
+      collisionRate: 0,
+      velocity: 0,
+      jumpLength: 0
+    };
   }
 }

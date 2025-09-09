@@ -20,6 +20,6 @@ export interface PhysicsStrategy {
   validateParameters(params: any): boolean;
   getPhysicsParameters(): Record<string, number>;
   
-  // Optional strategy-specific parameters
-  getParameters?(): { collisionRate: number; velocity: number; jumpLength: number };
+  // Strategy-specific parameters (required for parameter display)
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number };
 }

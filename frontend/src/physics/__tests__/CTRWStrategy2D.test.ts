@@ -50,7 +50,8 @@ describe('CTRWStrategy2D', () => {
 
   test('particle updates preserve momentum in absence of collisions', () => {
     const initialVelocity = { ...mockParticle.velocity };
-    strategy.updateParticle(mockParticle);
+    strategy.preUpdate(mockParticle, [], {} as any);
+    strategy.integrate(mockParticle, 0.01, {} as any);
     expect(mockParticle.velocity).toEqual(initialVelocity);
   });
 
@@ -60,7 +61,8 @@ describe('CTRWStrategy2D', () => {
       mockParticle.velocity.vx ** 2 + mockParticle.velocity.vy ** 2
     );
     
-    strategy.updateParticle(mockParticle);
+    strategy.preUpdate(mockParticle, [], {} as any);
+    strategy.integrate(mockParticle, 0.01, {} as any);
     
     const newSpeed = Math.sqrt(
       mockParticle.velocity.vx ** 2 + mockParticle.velocity.vy ** 2
@@ -73,7 +75,8 @@ describe('CTRWStrategy2D', () => {
     
     // Fill buffer beyond capacity
     for (let i = 0; i < bufferSize + 10; i++) {
-      strategy.updateParticle(mockParticle);
+      strategy.preUpdate(mockParticle, [], {} as any);
+      strategy.integrate(mockParticle, 0.01, {} as any);
     }
     
     expect(mockParticle.trajectory.getSize()).toBe(bufferSize);
@@ -85,7 +88,8 @@ describe('CTRWStrategy2D', () => {
     
     for (let i = 0; i < samples; i++) {
       mockParticle.nextCollisionTime = 0; // Force collision
-      strategy.updateParticle(mockParticle);
+      strategy.preUpdate(mockParticle, [], {} as any);
+      strategy.integrate(mockParticle, 0.01, {} as any);
       times.push(mockParticle.nextCollisionTime - mockParticle.lastCollisionTime);
     }
     

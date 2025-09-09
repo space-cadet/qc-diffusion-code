@@ -84,7 +84,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
     }
 
     if (selectedStrategies.includes('collisions')) {
-      twoDStrategies.push(new InterparticleCollisionStrategy2D(boundaryConfig, coordSystem));
+      twoDStrategies.push(new InterparticleCollisionStrategy2D({ boundaryConfig, coordSystem }));
     }
 
     if (forPhysicsEngine) {

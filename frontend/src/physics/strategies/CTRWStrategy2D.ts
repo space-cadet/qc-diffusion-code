@@ -44,11 +44,7 @@ export class CTRWStrategy2D implements PhysicsStrategy {
     this.coordSystem = params.coordSystem;
   }
 
-  updateParticle(particle: Particle, allParticles: Particle[] = []): void {
-    // Unified path to avoid duplication
-    this.preUpdate(particle, allParticles, {} as PhysicsContext);
-    this.integrate(particle, simDt(), {} as PhysicsContext);
-  }
+
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
     const collision = this.handleCollision(particle);
@@ -82,11 +78,7 @@ export class CTRWStrategy2D implements PhysicsStrategy {
     });
   }
 
-  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    // Unified path to avoid duplication
-    this.preUpdate(particle, allParticles, {} as PhysicsContext);
-    this.integrate(particle, dt, {} as PhysicsContext);
-  }
+
 
   setBoundaries(config: BoundaryConfig): void {
     console.log('[CTRWStrategy2D] setBoundaries called with:', config.type);
@@ -106,21 +98,7 @@ export class CTRWStrategy2D implements PhysicsStrategy {
     const dx = velocity.x * timeStep;
     const dy = velocity.y * timeStep;
 
-    // DIAG: occasional log for p0 to inspect CTRW2D motion inputs
-    if ((particle.id === 'p0') && (Math.floor(currentTime / Math.max(timeStep, 1e-6)) % 60 === 0)) {
-      const speed = Math.hypot(velocity.x, velocity.y);
-      console.log('[CTRW2D] p0', {
-        simTime: currentTime.toFixed(3),
-        dt: timeStep.toExponential(3),
-        vx: velocity.x.toFixed(4),
-        vy: velocity.y.toFixed(4),
-        speed: speed.toFixed(4),
-        dx: dx.toExponential(3),
-        dy: dy.toExponential(3),
-        nextCollisionTime: particle.nextCollisionTime.toFixed(3),
-        collided: collision.occurred,
-      });
-    }
+
      
      return {
        deltaX: dx,

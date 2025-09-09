@@ -63,19 +63,19 @@ export class BallisticStrategy implements PhysicsStrategy {
     return {};
   }
 
-  reset(): void {
-    // No state to reset
-  }
-
-  getBoundaryConfig(): BoundaryConfig {
-    return this.boundaryManager.getConfig();
-  }
-
   setBoundaries(config: BoundaryConfig): void {
     this.boundaryManager.updateConfig(config);
   }
 
   getBoundaries(): BoundaryConfig {
     return this.boundaryManager.getConfig();
+  }
+
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number } {
+    return {
+      collisionRate: 0,
+      velocity: 0,
+      jumpLength: 0
+    };
   }
 }

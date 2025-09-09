@@ -45,9 +45,7 @@ export class CTRWStrategy1D implements PhysicsStrategy {
     this.coordSystem = params.coordSystem;
   }
 
-  updateParticle(particle: Particle, allParticles: Particle[]): void {
-    this.updateParticleWithDt(particle, allParticles, simDt());
-  }
+
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
     if (this.interparticleCollisions) {
@@ -85,11 +83,7 @@ export class CTRWStrategy1D implements PhysicsStrategy {
     });
   }
 
-  updateParticleWithDt(particle: Particle, allParticles: Particle[], dt: number): void {
-    // Unified path: Phase A then Phase B to avoid duplication
-    this.preUpdate(particle, allParticles, {} as PhysicsContext);
-    this.integrate(particle, dt, {} as PhysicsContext);
-  }
+
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {
     for (const other of allParticles) {

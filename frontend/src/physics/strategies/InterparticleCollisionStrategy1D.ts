@@ -90,4 +90,12 @@ export class InterparticleCollisionStrategy1D implements PhysicsStrategy {
   getPhysicsParameters(): Record<string, number> {
     return {};
   }
+
+  getParameters(): { collisionRate: number; velocity: number; jumpLength: number } {
+    return {
+      collisionRate: 0,
+      velocity: 0,
+      jumpLength: 0
+    };
+  }
 }
