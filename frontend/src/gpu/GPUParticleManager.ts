@@ -8,7 +8,7 @@ uniform sampler2D u_position;
 uniform sampler2D u_velocity;
 uniform vec2 u_bounds_min;
 uniform vec2 u_bounds_max;
-uniform int u_boundary_condition; // 0: periodic, 1: reflective
+uniform int u_boundary_condition; // 0: periodic, 1: reflective, 2: absorbing
 
 in vec2 v_uv;
 out vec4 fragColor;
@@ -26,19 +26,66 @@ void main() {
     if (newPosition.y < u_bounds_min.y) { newPosition.y += (u_bounds_max.y - u_bounds_min.y); }
     if (newPosition.y > u_bounds_max.y) { newPosition.y -= (u_bounds_max.y - u_bounds_min.y); }
   } else if (u_boundary_condition == 1) { // Reflective
-    // This is a temporary implementation. Proper reflection requires flipping velocity,
-    // which should be handled in a separate velocity-update shader pass.
-    // For now, we clamp the position to keep particles within bounds.
+    // Clamp position to bounds; velocity flip is handled in a separate pass
     newPosition.x = clamp(newPosition.x, u_bounds_min.x, u_bounds_max.x);
     newPosition.y = clamp(newPosition.y, u_bounds_min.y, u_bounds_max.y);
+  } else if (u_boundary_condition == 2) { // Absorbing (remove)
+    // Mark particle as removed by moving it just outside bounds; sync step will skip rendering
+    bool crossed = (newPosition.x < u_bounds_min.x) || (newPosition.x > u_bounds_max.x) ||
+                   (newPosition.y < u_bounds_min.y) || (newPosition.y > u_bounds_max.y);
+    if (crossed) {
+      newPosition = vec2(u_bounds_min.x - 1.0, u_bounds_min.y - 1.0);
+    }
   }
   
   fragColor = vec4(newPosition, 0.0, 1.0);
 }`;
 
+const VELOCITY_UPDATE_SHADER = `#version 300 es
+precision highp float;
+
+uniform float u_dt;
+uniform sampler2D u_position;
+uniform sampler2D u_velocity;
+uniform vec2 u_bounds_min;
+uniform vec2 u_bounds_max;
+uniform int u_boundary_condition; // 0: periodic, 1: reflective, 2: absorbing
+
+in vec2 v_uv;
+out vec4 fragColor;
+
+void main() {
+  vec2 position = texture(u_position, v_uv).xy;
+  vec2 velocity = texture(u_velocity, v_uv).xy;
+
+  // Default: keep velocity
+  vec2 newVelocity = velocity;
+
+  if (u_boundary_condition == 1) {
+    // Reflective: if the tentative step would cross a boundary, flip corresponding velocity component
+    vec2 tentative = position + velocity * u_dt;
+    if (tentative.x < u_bounds_min.x || tentative.x > u_bounds_max.x) {
+      newVelocity.x = -newVelocity.x;
+    }
+    if (tentative.y < u_bounds_min.y || tentative.y > u_bounds_max.y) {
+      newVelocity.y = -newVelocity.y;
+    }
+  } else if (u_boundary_condition == 2) {
+    // Absorbing: if outside bounds, zero velocity
+    bool dead = (position.x < u_bounds_min.x) || (position.x > u_bounds_max.x) ||
+                (position.y < u_bounds_min.y) || (position.y > u_bounds_max.y);
+    if (dead) {
+      newVelocity = vec2(0.0);
+    }
+  }
+
+  fragColor = vec4(newVelocity, 0.0, 1.0);
+}`;
+
 const boundaryConditionMap: { [key: string]: number } = {
   'periodic': 0,
   'reflective': 1,
+  'absorbing': 2,
 };
 
 export class GPUParticleManager {
@@ -46,6 +93,7 @@ export class GPUParticleManager {
   private positionLayer: GPULayer;
   private velocityLayer: GPULayer;
   private positionProgram: GPUProgram;
+  private velocityProgram: GPUProgram;
   private particleCount: number;
   private canvasMapper?: (pos: { x: number; y: number }) => { x: number; y: number };
   private collisionCount: number = 0;
@@ -123,7 +171,9 @@ export class GPUParticleManager {
       dimensions: [textureSize, textureSize],
       type: 'FLOAT',
       filter: 'NEAREST',
-      numComponents: 2
+      numComponents: 2,
+      // Double buffer so we can use velocity as input while writing to the next buffer
+      numBuffers: 2
     });
 
     this.positionProgram = new GPUProgram(this.composer, {
@@ -138,6 +188,18 @@ export class GPUParticleManager {
     this.positionProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
     this.positionProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
     this.positionProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
+
+    // Velocity update program (for reflective flip and absorbing zeroing)
+    this.velocityProgram = new GPUProgram(this.composer, {
+      name: 'velocityUpdate',
+      fragmentShader: VELOCITY_UPDATE_SHADER
+    });
+    this.velocityProgram.setUniform('u_position', 0, INT);
+    this.velocityProgram.setUniform('u_velocity', 1, INT);
+    this.velocityProgram.setUniform('u_dt', 0.0, FLOAT);
+    this.velocityProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+    this.velocityProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+    this.velocityProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
     
     console.log('[GPU] GPUParticleManager initialized successfully');
   }
@@ -184,10 +246,18 @@ export class GPUParticleManager {
     // Set scalar uniform and pass samplers via input array order
     // gpu-io requires the uniform type on first set; use FLOAT for GLSL float
     this.positionProgram.setUniform('u_dt', dt, FLOAT);
+    this.velocityProgram.setUniform('u_dt', dt, FLOAT);
+    // Pass 1: update positions (handles wrap/reflect clamp/absorbing mark)
     this.composer.step({
       program: this.positionProgram,
       input: [this.positionLayer, this.velocityLayer],
       output: this.positionLayer
+    });
+    // Pass 2: update velocities (reflect flip, absorbing zero)
+    this.composer.step({
+      program: this.velocityProgram,
+      input: [this.positionLayer, this.velocityLayer],
+      output: this.velocityLayer
     });
   }
 
@@ -242,6 +312,18 @@ export class GPUParticleManager {
       const px = data[i * 2];
       const py = data[i * 2 + 1];
 
+      // Skip dead particles for absorbing BC: they are marked just outside bounds
+      if (this.boundaryCondition === 'absorbing') {
+        const dead = (px < this.bounds.xMin - 0.5) || (px > this.bounds.xMax + 0.5) ||
+                     (py < this.bounds.yMin - 0.5) || (py > this.bounds.yMax + 0.5);
+        if (dead) {
+          // Move off-canvas to prevent rendering while keeping container count stable
+          tsParticle.position.x = -1e9;
+          tsParticle.position.y = -1e9;
+          continue;
+        }
+      }
+
       if (this.canvasMapper) {
         const mapped = this.canvasMapper({ x: px, y: py });
         // Clamp to canvas bounds defensively if available
@@ -284,9 +366,14 @@ export class GPUParticleManager {
     // Validate and update boundary condition
     if (params.boundaryCondition) {
       this.boundaryCondition = params.boundaryCondition;
-      const conditionCode = boundaryConditionMap[this.boundaryCondition] ?? 0;
-      this.positionProgram.setUniform('u_boundary_condition', conditionCode, INT);
-      console.log('[GPU] Boundary condition updated:', this.boundaryCondition, '-> code:', conditionCode);
+      const conditionCode = boundaryConditionMap[this.boundaryCondition];
+      if (conditionCode === undefined) {
+        console.warn('[GPU] Unsupported boundary condition in GPU mode:', this.boundaryCondition, '- continuing with GPU and defaulting to periodic');
+      }
+      const code = conditionCode ?? 0;
+      this.positionProgram.setUniform('u_boundary_condition', code, INT);
+      this.velocityProgram.setUniform('u_boundary_condition', code, INT);
+      console.log('[GPU] Boundary condition updated:', this.boundaryCondition, '-> code:', code);
     }
     
     // Validate and update boundary bounds
@@ -295,6 +382,8 @@ export class GPUParticleManager {
       this.bounds = params.bounds;
       this.positionProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
       this.positionProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+      this.velocityProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+      this.velocityProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
       console.log('[GPU] Boundary bounds updated:', { 
         from: oldBounds, 
         to: this.bounds,

@@ -1,7 +1,7 @@
 # GPU.IO Implementation Plan: Migration from tsParticles
 
 *Created: 2025-09-01 14:32:15 IST*
-*Last Updated: 2025-09-10 15:03:23 IST*
+*Last Updated: 2025-09-10 17:28:06 IST*
 
 ## Executive Summary
 
@@ -287,6 +287,35 @@ export class MockBackendInterface implements BackendInterface {
 - `frontend/src/stores/appStore.ts` (gpuState persistence)
 
 **Phase 1.5 Status**: ✅ COMPLETED - UI integration working, ready for Phase 2 collision physics
+
+#### Session 2025-09-10 Afternoon - Complete Boundary Conditions Implementation (✅ COMPLETED)
+**Phase 1.6 - Full Boundary Conditions Support**: All missing boundary condition functionality implemented
+**Major Enhancements**:
+1. **Absorbing Boundaries Added**: Complete support for absorbing boundary conditions in GPU shaders
+2. **Dual-Shader Architecture**: Separate `VELOCITY_UPDATE_SHADER` for proper reflective boundary physics
+3. **Two-Pass Rendering**: Position update pass → Velocity update pass for correct physics simulation
+4. **Dead Particle Handling**: Particles crossing absorbing boundaries marked outside bounds and excluded from rendering
+5. **Velocity Reflection**: Proper velocity component flipping when particles hit reflective boundaries
+6. **Complete BC Mapping**: All three boundary types (periodic, reflective, absorbing) fully functional
+
+**Technical Implementation**:
+- Added `VELOCITY_UPDATE_SHADER` with reflective collision detection and velocity flipping
+- Enhanced `boundaryConditionMap` to include absorbing boundaries (code: 2)
+- Implemented dead particle detection in `syncToTsParticles()` for absorbing boundaries
+- Added velocity layer double buffering for proper shader input/output handling
+- Synchronized all boundary parameters across both position and velocity shaders
+
+**Architecture Analysis Results**:
+- **Current GPU Status**: Complete ballistic motion with all boundary conditions
+- **Remaining Implementation**: CTRW strategy, strategy composition, interparticle collisions
+- **Estimated Effort**: 6-9 weeks for complete GPU physics parity
+- **File Requirements**: ~800-1200 lines across 3-4 new shader files plus modifications
+- **Critical Path**: Spatial partitioning for interparticle collisions (most complex component)
+
+**Files Enhanced**:
+- `frontend/src/gpu/GPUParticleManager.ts` (+97 lines: velocity shader, absorbing boundaries, dual-pass rendering)
+
+**Phase 1.6 Status**: ✅ COMPLETED - All boundary condition gaps resolved, ready for Phase 2 collision physics
 
 ### Phase 2: GPU Physics (Week 3-4)
 - [ ] Implement GPU collision detection shaders
