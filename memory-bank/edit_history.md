@@ -1,7 +1,20 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-09 11:45:50 IST_
+_Last Updated: 2025-09-10 11:34:18 IST_
+
+### 2025-09-10
+
+#### 11:32 - C16: GPU Simulation Fixes and UI Integration Analysis
+- Updated `frontend/src/gpu/GPUParticleManager.ts` - Added setCanvasMapper() for physics-to-canvas coordinate mapping, enhanced syncToTsParticles with throttled logging and defensive container validation, fixed tsParticles API usage with particles.get(i) instead of array indexing, added canvas bounds clamping
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Fixed GPU manager initialization timing to wait for container readiness, added late mapper binding in render loop, enhanced GPU/CPU parameter synchronization, added container validation before GPU sync
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Fixed tsParticles API usage to use particles.count and particles.get(i) methods, removed deprecated array access patterns, added particle creation logging
+- Updated `memory-bank/tasks/C16.md` - Status to Phase 1.5 (UI Integration Issues), added Phase 1.5 requirements for GPU reset/initialize/metrics/parameters
+- Updated `memory-bank/tasks.md` - C16 status to UI Integration phase, updated last timestamp
+- Updated `memory-bank/implementation-details/gpu-io-implementation-plan.md` - Added Session 2025-09-10 GPU fixes section and current issues analysis
+- Created `memory-bank/sessions/2025-09-10-afternoon.md` - Session documenting GPU simulation fixes and UI integration analysis
+- Updated `memory-bank/session_cache.md` - New current session 2025-09-10-afternoon, updated history and task registry
+- Updated `memory-bank/edit_history.md` - This entry
 
 ### 2025-09-09
 

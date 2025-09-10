@@ -100,8 +100,21 @@ export const useParticlesLoader = ({
       // PHASE B: Rendering - only when needed and visible
       if (shouldRender && container) {
         if (useGPU && gpuManagerRef.current) {
-          // console.log('[GPU] Using GPU rendering sync');
-          gpuManagerRef.current.syncToTsParticles(container);
+          // Ensure mapper is set if simulator becomes available later
+          if (simulatorRef.current && (gpuManagerRef.current as any).setCanvasMapper && !(gpuManagerRef.current as any)._mapperSet) {
+            const pm = simulatorRef.current.getParticleManager?.();
+            if (pm) {
+              (gpuManagerRef.current as any).setCanvasMapper((pos: { x: number; y: number }) => pm.mapToCanvas(pos));
+              (gpuManagerRef.current as any)._mapperSet = true;
+              console.log('[GPU] Canvas mapper set (late) from ParticleManager');
+            }
+          }
+          // Verify container is ready for GPU sync
+          if (container.particles && container.particles.count > 0) {
+            gpuManagerRef.current.syncToTsParticles(container);
+          } else {
+            console.warn('[GPU] Skipping sync - container not ready');
+          }
         } else {
           updateParticlesFromStrategies(container, true, isRunning || false);
         }
@@ -142,26 +155,34 @@ export const useParticlesLoader = ({
       const htmlCanvas = (container as any)?.canvas?.element as HTMLCanvasElement | undefined;
       console.log('[GPU] Canvas check:', { htmlCanvas: !!htmlCanvas, container: !!container });
       
-      if (htmlCanvas) {
+      if (htmlCanvas && container.particles && container.particles.count > 0) {
         try {
           gpuManagerRef.current = new GPUParticleManager(htmlCanvas, particleCount);
           console.log('[GPU] GPU manager created successfully');
-          // Expose temporary global for debugging in DevTools
+
+          // Initialize with current particles only if container is ready
+          if (simulatorRef.current) {
+            const particles = simulatorRef.current.getParticleManager().getAllParticles();
+            gpuManagerRef.current.initializeParticles(particles);
+            console.log('[GPU] GPU manager initialized with', particles.length, 'particles');
+
+            // Provide physics->canvas mapper so GPU visuals match CPU path
+            const pm = simulatorRef.current.getParticleManager?.();
+            if (pm && gpuManagerRef.current.setCanvasMapper) {
+              gpuManagerRef.current.setCanvasMapper((pos: { x: number; y: number }) => pm.mapToCanvas(pos));
+              console.log('[GPU] Canvas mapper set from ParticleManager');
+            } else {
+              console.warn('[GPU] Canvas mapper not set - ParticleManager unavailable');
+            }
+          }
+
           (window as any).gpuManager = gpuManagerRef.current;
         } catch (error) {
           console.error('[GPU] Failed to create GPU manager:', error);
           console.log('[GPU] Falling back to CPU mode');
-          // Don't set gpuManagerRef.current, will use CPU path
         }
       } else {
-        console.warn('[GPU] No HTMLCanvasElement available on container.canvas.element');
-      }
-      
-      // Initialize with current particles
-      if (gpuManagerRef.current && simulatorRef.current) {
-        const particles = simulatorRef.current.getParticleManager().getAllParticles();
-        gpuManagerRef.current.initializeParticles(particles);
-        console.log('[GPU] GPU manager initialized with', particles.length, 'particles');
+        console.warn('[GPU] Delaying GPU init - container not ready');
       }
     } else if (!useGPU && gpuManagerRef.current) {
       console.log('[GPU] Disposing GPU manager (switched to CPU)');

@@ -1,7 +1,7 @@
 # GPU.IO Implementation Plan: Migration from tsParticles
 
 *Created: 2025-09-01 14:32:15 IST*
-*Last Updated: 2025-09-06 19:29:54 IST*
+*Last Updated: 2025-09-10 11:32:03 IST*
 
 ## Executive Summary
 
@@ -241,19 +241,37 @@ export class MockBackendInterface implements BackendInterface {
 - [x] Create data structure migration utilities
 - [x] Set up development environment and testing framework
 
-#### Phase 1 Implementation Details
+#### Phase 1 Implementation Details (✅ COMPLETED)
 **GPUParticleManager Enhanced**: Offscreen canvas isolation, WebGL context validation, proper uniform management, debug utilities
 **Context Isolation**: Fixed tsParticles 2D canvas conflicts by using offscreen canvas for GPU.IO WebGL context
 **Error Handling**: GPU initialization fallback to CPU mode on failure
 **Animation Loop Optimization**: Removed redundant updateParticlesFromStrategies call, centralized GPU/CPU sync in useParticlesLoader
 **State Management**: Enhanced parameter synchronization with useGPU flag in gridLayoutParamsRef
 **Debug Logging**: Comprehensive GPU state transitions and lifecycle management
-**Files Created/Modified**: 
-- `frontend/src/gpu/GPUParticleManager.ts` (enhanced from 80 to 158 lines)
-- `frontend/src/hooks/useParticlesLoader.ts` (GPU lifecycle management)
-- `frontend/src/components/ParticleCanvas.tsx` (rendering optimization)
-- `frontend/src/RandomWalkSim.tsx` (debug logging enhancement)
-- `frontend/src/types/simulationTypes.ts` (useGPU flag addition)
+
+#### Session 2025-09-10 - GPU Position Updates & Sync Fixes (✅ COMPLETED)
+**tsParticles API Fixes**: Fixed particle access using `particles.get(i)` instead of array indexing
+**Coordinate Mapping**: Implemented physics-to-canvas coordinate mapping via `setCanvasMapper()`
+**Robust Synchronization**: Added container readiness checks, throttled logging, defensive validation
+**Late Binding**: Canvas mapper set during render loop if simulator becomes available later
+**Initialization Timing**: GPU manager creation delayed until container is ready with particles
+
+**Files Enhanced**:
+- `frontend/src/gpu/GPUParticleManager.ts` (coordinate mapping, throttled logs, defensive sync)
+- `frontend/src/hooks/useParticlesLoader.ts` (initialization timing, late mapper binding)
+- `frontend/src/config/tsParticlesConfig.ts` (proper tsParticles API usage)
+
+#### Current Status & Issues Found (2025-09-10)
+**GPU SIMULATION WORKING**: Position updates, coordinate mapping, particle sync functional
+**CRITICAL UI INTEGRATION ISSUES DISCOVERED**:
+1. **Reset/Initialize disconnect**: UI controls only work with CPU simulator, don't reset/reinitialize GPU
+2. **Parameter updates ignored**: GPU manager doesn't update when physics parameters change
+3. **Metrics not tracked**: Time/collision stats only come from CPU simulator in GPU mode
+4. **State snapshots incomplete**: Periodic saves only capture CPU state, not GPU state
+5. **GPU lifecycle broken**: GPU manager created once, never updated/recreated
+
+**Phase 1.5 Required**: Fix UI integration before Phase 2 collision physics
+**Estimated Effort**: ~180 lines across 3-4 files to add GPU paths to all UI control flows
 
 ### Phase 2: GPU Physics (Week 3-4)
 - [ ] Implement GPU collision detection shaders

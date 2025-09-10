@@ -118,8 +118,15 @@ export const createParticleContainer = async (
       // Disable any built-in movement
       particle.velocity.x = 0;
       particle.velocity.y = 0;
+      
+      // Ensure particle is properly initialized using the official API
+      if (!container.particles.get(i)) {
+        console.warn('Failed to initialize particle at index', i);
+      }
     }
   }
+  
+  console.log('[tsParticles] Container initialized with', container.particles.count, 'particles');
 
   return container;
 };

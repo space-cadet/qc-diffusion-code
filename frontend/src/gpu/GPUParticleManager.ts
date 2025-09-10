@@ -25,6 +25,7 @@ export class GPUParticleManager {
   private velocityLayer: GPULayer;
   private positionProgram: GPUProgram;
   private particleCount: number;
+  private canvasMapper?: (pos: { x: number; y: number }) => { x: number; y: number };
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -106,6 +107,11 @@ export class GPUParticleManager {
     console.log('[GPU] GPUParticleManager initialized successfully');
   }
 
+  // Allow caller to provide a mapping from physics space -> canvas pixels
+  setCanvasMapper(mapper: (pos: { x: number; y: number }) => { x: number; y: number }) {
+    this.canvasMapper = mapper;
+  }
+
   initializeParticles(particles: Array<{position: {x: number, y: number}, velocity: {vx: number, vy: number}}>) {
     console.log('[GPU] Initializing particles', { count: particles.length });
     
@@ -154,19 +160,73 @@ export class GPUParticleManager {
   }
 
   syncToTsParticles(tsContainer: any) {
+    if (!tsContainer || typeof tsContainer !== 'object') {
+      console.error('[GPU] Invalid tsParticles container:', tsContainer);
+      return;
+    }
+
+    const particlesContainer: any = (tsContainer as any).particles;
+    if (!particlesContainer) {
+      console.error('[GPU] No particles container on tsParticles');
+      return;
+    }
+
+    // Determine count using public API; fall back to internal array length if needed
+    const tsCount: number = Number(
+      particlesContainer?.count ?? (particlesContainer?._array?.length ?? 0)
+    );
+    if (!Number.isFinite(tsCount) || tsCount <= 0) {
+      // Throttled warning
+      (this as any)._syncWarnCounter = ((this as any)._syncWarnCounter ?? 0) + 1;
+      if ((this as any)._syncWarnCounter % 60 === 0) {
+        console.warn('[GPU] Skipping sync - container has no particles yet');
+      }
+      return;
+    }
+
     const data = this.getParticleData();
-    const particles = tsContainer.particles;
-    const syncCount = Math.min(particles.length, this.particleCount);
-    
-    // console.log('[GPU] Syncing to tsParticles', { 
-    //   gpuParticles: this.particleCount, 
-    //   tsParticles: particles.length,
-    //   syncing: syncCount
-    // });
-    
+    const syncCount = Math.min(tsCount, this.particleCount);
+
+    // Throttled diagnostic
+    (this as any)._syncLogCounter = ((this as any)._syncLogCounter ?? 0) + 1;
+    if ((this as any)._syncLogCounter % 120 === 0) {
+      console.log('[GPU] Syncing to tsParticles', {
+        gpuParticles: this.particleCount,
+        tsParticles: tsCount,
+        syncing: syncCount,
+      });
+    }
+
+    // Sync positions
     for (let i = 0; i < syncCount; i++) {
-      particles[i].position.x = data[i * 2];
-      particles[i].position.y = data[i * 2 + 1];
+      const tsParticle = particlesContainer.get ? particlesContainer.get(i) : particlesContainer?._array?.[i];
+      if (!tsParticle) continue;
+
+      // Physics positions from GPU textures
+      const px = data[i * 2];
+      const py = data[i * 2 + 1];
+
+      if (this.canvasMapper) {
+        const mapped = this.canvasMapper({ x: px, y: py });
+        // Clamp to canvas bounds defensively if available
+        const w = tsContainer?.canvas?.size?.width ?? undefined;
+        const h = tsContainer?.canvas?.size?.height ?? undefined;
+        const clamp = (v: number, min: number, max: number) => (v < min ? min : v > max ? max : v);
+        tsParticle.position.x = (w && Number.isFinite(mapped.x)) ? clamp(mapped.x, 0, w) : mapped.x ?? 0;
+        tsParticle.position.y = (h && Number.isFinite(mapped.y)) ? clamp(mapped.y, 0, h) : mapped.y ?? 0;
+      } else {
+        // Fallback: write raw physics values
+        tsParticle.position.x = px;
+        tsParticle.position.y = py;
+      }
+    }
+
+    // Verify sync for first particle occasionally
+    if ((this as any)._syncLogCounter % 240 === 0) {
+      const ts0 = particlesContainer.get ? particlesContainer.get(0) : particlesContainer?._array?.[0];
+      if (ts0) {
+        console.log('[GPU] Sample p0 after sync', { x: ts0.position.x, y: ts0.position.y, gpuX: data[0], gpuY: data[1], mapped: !!this.canvasMapper });
+      }
     }
   }
 
