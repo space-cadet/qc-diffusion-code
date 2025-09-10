@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-10 19:32:23 IST_
+_Last Updated: 2025-09-10 23:09:55 IST_
 
 ## Active Tasks
 
@@ -38,6 +38,7 @@ _Last Updated: 2025-09-10 19:32:23 IST_
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 | C21 | Build and Dependency Vulnerability Resolution       | ✅ COMPLETED   | CRITICAL | 2025-09-09 | -               |
 | C22 | Strategy System Implementation and Architecture    | 🔄 IN PROGRESS | HIGH     | 2025-09-09 | C5c, C12, C19   |
+| C23 | Comprehensive Testing Framework Enhancement   | 🔄 IN PROGRESS | HIGH     | 2025-09-10 | C15a, C21     |
 
 ## Task Details
 
@@ -222,6 +223,12 @@ _Last Updated: 2025-09-10 19:32:23 IST_
 **Status**: 🔄 IN PROGRESS **Last**: 2025-09-09 11:41:19 IST
 **Files**: `frontend/src/physics/interfaces/PhysicsStrategy.ts`, `frontend/src/physics/strategies/`, `frontend/src/physics/factories/StrategyFactory.ts`, `memory-bank/implementation-details/random-walk-strategy-system.md`
 **Notes**: Interface standardization completed - removed optional getParameters(), standardized constructors, removed legacy methods, fixed test suite. Ready for documentation phase.
+
+### C23: Comprehensive Testing Framework Enhancement
+**Description**: Enhance the existing testing framework, including Vitest configuration, JSDOM environment setup, and refinement of physics engine test cases.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-10 23:09:55 IST
+**Files**: `frontend/package.json`, `frontend/pnpm-lock.yaml`, `frontend/vite.config.ts`, `frontend/src/physics/__tests__/CTRWStrategy2D.test.ts`, `frontend/src/physics/__tests__/integration.test.ts`, `frontend/src/physics/__tests__/two-phase-engine.test.ts`
+**Notes**: This task consolidates and formalizes ongoing efforts to improve the project's testing infrastructure and test coverage, building upon previous work in dependency resolution and physics engine verification.
 
 ### META-2: Document Indexing System
 **Description**: Ongoing development and maintenance of the text-based document indexing system (`index.md` + `prompts.md`) and query tooling

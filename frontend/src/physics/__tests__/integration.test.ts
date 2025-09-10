@@ -4,9 +4,9 @@ import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { ParticleManager } from '../ParticleManager';
 import { CoordinateSystem } from '../core/CoordinateSystem';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import { CircularBuffer } from '../utils/CircularBuffer';
 
 describe('Physics Engine Integration', () => {
-  test('engine configuration update preserves particles', () => {
   test('engine configuration update preserves particles', () => {
     const boundaries = { type: 'periodic' as const, xMin: -200, xMax: 200, yMin: -200, yMax: 200 };
     const canvasSize = { width: 400, height: 400 };
@@ -30,7 +30,7 @@ describe('Physics Engine Integration', () => {
       nextCollisionTime: Infinity,
       collisionCount: 0,
       waitingTime: 0,
-      trajectory: new (require('../utils/CircularBuffer').CircularBuffer)(100)
+      trajectory: new CircularBuffer(100)
     }];
 
     engine.updateConfiguration({ timeStep: 0.032 });
@@ -77,19 +77,19 @@ describe('Physics Engine Integration', () => {
       coordSystem
     });
     
-    const boundaryConfig: BoundaryConfig = { type: 'periodic', xMin: -200, xMax: 200, yMin: -200, yMax: 200 };
     const manager = new ParticleManager(strategy, '2D', coordSystem);
     const mockTsParticle = {
       id: 'test-1',
-      position: { x: 200, y: 200 }, // Start at canvas center
+      position: { x: 50, y: 50 },
       velocity: { x: 10, y: 0 }
     };
     
     manager.initializeParticle(mockTsParticle);
+    const initialPos = { ...mockTsParticle.position };
     manager.updateParticle(mockTsParticle);
     
-    // After one update, the particle should have moved from the center
-    expect(mockTsParticle.position.x).not.toBe(200);
+    // Verify position changed (using fixed time step of 0.016)
+    expect(mockTsParticle.position.x).toBeCloseTo(initialPos.x + mockTsParticle.velocity.x * 0.016);
+    expect(mockTsParticle.position.y).toBeCloseTo(initialPos.y + mockTsParticle.velocity.y * 0.016);
   });
-});
 });

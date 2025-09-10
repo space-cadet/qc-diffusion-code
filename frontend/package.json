@@ -8,7 +8,7 @@
     "build": "cd ../packages/graph-core && pnpm build && cd ../../frontend && tsc -b && vite build",
     "preview": "vite preview",
     "dev:full": "concurrently \"cd ../backend && source .venv/bin/activate && python main.py\" \"pnpm dev\"",
-    "test": "vitest",
+    "test": "pnpm exec vitest run",
     "test:watch": "vitest --watch"
   },
   "dependencies": {
@@ -54,6 +54,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/ui": "3.2.4",
     "autoprefixer": "^10.4.20",
+    "jsdom": "^24.0.0",
     "npm-run-all2": "8.0.4",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10",

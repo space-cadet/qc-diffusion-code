@@ -3,6 +3,7 @@ import { BallisticStrategy } from '../strategies/BallisticStrategy';
 import type { Particle } from '../types/Particle';
 import type { TrajectoryPoint } from '../types/Particle';
 import { CircularBuffer } from '../utils/CircularBuffer';
+import { CoordinateSystem } from '../core/CoordinateSystem';
 
 describe('Two-Phase Physics Engine', () => {
   const boundaries = {
@@ -20,7 +21,7 @@ describe('Two-Phase Physics Engine', () => {
     dimension: '2D' as const,
     strategies: [new BallisticStrategy({ 
       boundaryConfig: boundaries,
-      coordSystem: new (require('../core/CoordinateSystem')).CoordinateSystem({ width: 800, height: 600 }, boundaries, '2D')
+      coordSystem: new CoordinateSystem({ width: 800, height: 600 }, boundaries, '2D')
     })]
   };
 
