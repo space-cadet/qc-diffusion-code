@@ -460,8 +460,9 @@ export const RandomWalkParameterPanel = ({
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
+                      interparticleCollisions: e.target.checked,
                     });
-                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies, interparticleCollisions: e.target.checked });
                   }}
                   className="mr-2"
                 />

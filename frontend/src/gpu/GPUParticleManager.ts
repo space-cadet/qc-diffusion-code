@@ -123,6 +123,8 @@ export class GPUParticleManager {
   private bounds = { xMin: -1, xMax: 1, yMin: -1, yMax: 1 };
   private collisionManager: GPUCollisionManager;
   private interparticleCollisions: boolean = false;
+  private lastCollisionLogTime: number = 0;
+  private lastDebugLogTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -288,39 +290,69 @@ export class GPUParticleManager {
 
     // Pass 3: collision detection only if enabled (match CPU behavior)
     if (this.interparticleCollisions) {
-      const texSize = Math.ceil(Math.sqrt(this.particleCount));
-      this.collisionManager.applyCollisions(
-        this.composer,
-        this.positionLayer,
-        this.velocityLayer,
-        dt,
-        texSize,
-        texSize,
-        this.particleCount,
-        this.simulationTime
-      );
-      this.updateCollisionCount();
+      try {
+        const texSize = Math.ceil(Math.sqrt(this.particleCount));
+        // console.log('[GPU] Running collision detection step', { 
+        //   texSize, 
+        //   particleCount: this.particleCount, 
+        //   simulationTime: this.simulationTime 
+        // });
+        this.collisionManager.applyCollisions(
+          this.composer,
+          this.positionLayer,
+          this.velocityLayer,
+          dt,
+          texSize,
+          texSize,
+          this.particleCount,
+          this.simulationTime
+        );
+        this.updateCollisionCount();
+      } catch (error) {
+        console.error('[GPU] Collision step failed, disabling collisions:', error);
+        this.interparticleCollisions = false;
+      }
     }
   }
 
   private updateCollisionCount(): void {
-    const collisionTimes = this.collisionManager.getCollisionTimes();
-    if (!collisionTimes) return;
-
-    let currentCollisions = 0;
-    const currentTime = this.simulationTime;
-    
-    // Count particles that have collided recently (within last step)
-    for (let i = 0; i < Math.min(this.particleCount, collisionTimes.length); i++) {
-      const lastCollisionTime = collisionTimes[i];
-      if (lastCollisionTime > 0 && (currentTime - lastCollisionTime) < 0.02) { // Within last dt
-        currentCollisions++;
+    try {
+      const collisionTimes = this.collisionManager.getCollisionTimes();
+      if (!collisionTimes) {
+        console.log('[GPU] No collision times available');
+        return;
       }
-    }
-    
-    // Accumulate total collisions (approximate)
-    if (currentCollisions > 0) {
-      this.collisionCount += Math.floor(currentCollisions / 2); // Each collision involves 2 particles
+
+      let currentCollisions = 0;
+      const currentTime = this.simulationTime;
+      
+      // Debug: check first few collision times
+      const debugTimes = [];
+      for (let i = 0; i < Math.min(5, collisionTimes.length); i++) {
+        debugTimes.push(collisionTimes[i]);
+      }
+      const now = performance.now();
+      if (now - this.lastDebugLogTime > 1000) { // Log every 1 second
+        this.lastDebugLogTime = now;
+        console.log('[GPU] Debug collision times:', debugTimes, 'currentTime:', currentTime);
+      }
+      
+      for (let i = 0; i < Math.min(this.particleCount, collisionTimes.length); i++) {
+        const lastCollisionTime = collisionTimes[i];
+        if (lastCollisionTime > 0 && (currentTime - lastCollisionTime) < 0.02) {
+          currentCollisions++;
+        }
+      }
+      
+      if (currentCollisions > 0) {
+        this.collisionCount += Math.floor(currentCollisions / 2);
+        // console.log('[GPU] Collision count updated:', {
+        //   currentCollisions,
+        //   totalCollisionCount: this.collisionCount
+        // });
+      }
+    } catch (error) {
+      console.error('[GPU] Collision count update failed:', error);
     }
   }
 
@@ -432,7 +464,7 @@ export class GPUParticleManager {
         const lastCollisionTime = collisionTimes[i] || 0;
         const timeSinceCollision = this.simulationTime - lastCollisionTime;
         
-        if (timeSinceCollision < 0.2 && lastCollisionTime > 0) { // Flash for 200ms
+        if (timeSinceCollision < 0.5 && lastCollisionTime > 0) { // Flash for 500ms
           const redColor = hexToHsl("#ff4444"); // Red flash
           tsParticle.color.h.value = redColor.h;
           tsParticle.color.s.value = redColor.s;
@@ -514,11 +546,20 @@ export class GPUParticleManager {
       console.log('[GPU] Interparticle collisions:', this.interparticleCollisions ? 'ENABLED' : 'DISABLED');
     }
 
-    // Allow collision manager to react to parameter changes (radius supported)
-    if (params && typeof params.radius === 'number') {
-      this.collisionManager.updateParameters({ radius: params.radius });
-    } else {
-      this.collisionManager.updateParameters({});
+    // Allow collision manager to react to parameter changes (radius and bounds supported)
+    if (params) {
+      const collisionParams: any = {};
+      if (typeof params.radius === 'number') {
+        collisionParams.radius = params.radius;
+      }
+      if (params.bounds) {
+        collisionParams.bounds = this.bounds;
+      }
+      
+      const success = this.collisionManager.updateParameters(collisionParams);
+      if (!success) {
+        console.warn('[GPU] Collision parameter update failed, collisions may not work correctly');
+      }
     }
 
     console.log('[GPU] Parameters update complete:', {

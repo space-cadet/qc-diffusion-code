@@ -56,20 +56,16 @@ export class TextObservableParser {
   static parse(text: string): ParsedObservable[] {
     debug('Parsing text:', text);
     
-    // Detect syntax type: block syntax has '{' or inline syntax has ','
-    const hasBlockSyntax = text.includes('{') && text.includes('}');
-    const hasInlineSyntax = text.includes(',') && text.includes(':');
+    // Normalize input - remove extra whitespace
+    const normalized = text.trim().replace(/\s+/g, ' ');
     
-    // New rule: Only block-with-braces syntax is accepted.
-    // Inline-without-braces is no longer supported.
-    if (!hasBlockSyntax) {
-      if (hasInlineSyntax) {
-        throw new Error('Inline syntax without braces is not supported. Use: observable "name" { key: value, ... }');
-      }
-      // If no braces at all, nothing to parse
-      return [];
+    // Check for observable blocks
+    if (normalized.includes('observable "')) {
+      return this.parseBlock(text);
     }
-    return this.parseBlock(text);
+    
+    // Fallback to empty array if no valid syntax detected
+    return [];
   }
 
   private static parseInline(text: string): ParsedObservable[] {
@@ -161,84 +157,39 @@ export class TextObservableParser {
     debug('Parsing block syntax:', text);
     
     const observables: ParsedObservable[] = [];
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
     
     let current: Partial<ParsedObservable> = {};
     let inBlock = false;
-    let buffer: string[] = [];
     
     for (const line of lines) {
-      if (line.match(/^observable\s+"([^"]+)"\s*\{/)) {
-        const match = line.match(/^observable\s+"([^"]+)"\s*\{/);
-        current = { name: match![1] };
-        inBlock = true;
-        debug('Parsing observable:', current.name);
-      } else if (line === '}') {
-        // Join all content captured within braces and parse comma-separated pairs
-        const content = buffer.join(' ').replace(/\s+/g, ' ').trim();
-        buffer = [];
-        if (content.length > 0) {
-          const pairs = this.splitTopLevelByComma(content);
-          for (const pair of pairs) {
-            const colonIdx = pair.indexOf(':');
-            if (colonIdx === -1) continue; // skip invalid segments
-            const key = pair.substring(0, colonIdx).trim();
-            const value = pair.substring(colonIdx + 1).trim().replace(/,$/, '');
-            switch (key) {
-              case 'source':
-                current.source = value as 'particles' | 'simulation';
-                debug(`Parsed source: ${current.source}`);
-                break;
-              case 'filter':
-                current.filter = value;
-                debug(`Parsed filter: ${current.filter}`);
-                break;
-              case 'select':
-                current.select = value;
-                debug(`Parsed select: ${current.select}`);
-                break;
-              case 'reduce':
-                current.reduce = value;
-                debug(`Parsed reduce: ${current.reduce}`);
-                break;
-              case 'transform':
-              case 'post': {
-                const t = value.replace(/['"]/g, '').trim();
-                current.transform = t;
-                debug(`Parsed transform: ${current.transform}`);
-                break;
-              }
-              case 'interval':
-                const intervalValue = parseInt(value);
-                if (!isNaN(intervalValue) && intervalValue > 0) {
-                  current.interval = intervalValue;
-                  debug(`Parsed interval: ${current.interval}`);
-                }
-                break;
-              case 'name':
-                current.name = value;
-                debug(`Parsed name: ${current.name}`);
-                break;
-            }
-          }
+      if (line.startsWith('observable "')) {
+        const nameMatch = line.match(/observable \"([^\"]+)\"/);
+        if (nameMatch) {
+          current = { name: nameMatch[1] };
+          inBlock = true;
         }
-        if (current.name && current.reduce) {
-          debug('Parsed observable:', current);
-          observables.push({
-            source: current.source || 'particles',
-            ...current
-          } as ParsedObservable);
-        }
-        current = {};
-        inBlock = false;
       } else if (inBlock) {
-        // Accumulate raw lines between braces; parsing happens when we hit '}'
-        // Allow trailing commas and multiple pairs per line
-        buffer.push(line);
+        if (line.includes('source:')) {
+          current.source = line.split(':')[1].trim() as 'particles' | 'simulation';
+        } else if (line.includes('filter:')) {
+          current.filter = line.split(':')[1].trim();
+        } else if (line.includes('reduce:')) {
+          current.reduce = line.split(':')[1].trim();
+        } else if (line.includes('interval:')) {
+          current.interval = parseInt(line.split(':')[1].trim());
+        } else if (line === '}') {
+          if (current.name && current.reduce) {
+            observables.push({
+              source: current.source || 'particles',
+              ...current
+            } as ParsedObservable);
+          }
+          inBlock = false;
+        }
       }
     }
     
-    debug('Total parsed block observables:', observables.length);
     return observables;
   }
 

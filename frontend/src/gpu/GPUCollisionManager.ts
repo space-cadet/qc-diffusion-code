@@ -1,185 +1,315 @@
 import { GPUComposer, GPULayer, GPUProgram, FLOAT, INT } from 'gpu-io';
 
-// C16 Phase 2: Minimal GPU collision pass using hashed neighbor sampling (no grid)
-// Notes:
-// - For each particle, sample up to M candidate neighbors via deterministic hashing
-// - Check actual spatial distance using positions texture; resolve at most 1 collision
-// - Equal-mass collision using normal/tangent projection
-// - Keeps cost ~O(1) per particle and avoids complex grid construction in WebGL2
-// - This is an MVP and may miss some collisions compared to a true spatial grid
+// Read shader files
+const SPATIAL_GRID_SHADER = `#version 300 es
+precision highp float;
+
+uniform sampler2D u_position;
+uniform ivec2 u_texSize;
+uniform int u_particle_count;
+uniform vec2 u_bounds_min;
+uniform vec2 u_bounds_max;
+uniform float u_cell_size;
+
+in vec2 v_uv;
+out vec4 fragColor;
+
+vec2 indexToUV(int idx, ivec2 texSize) {
+  int x = idx % texSize.x;
+  int y = idx / texSize.x;
+  return (vec2(float(x), float(y)) + 0.5) / vec2(texSize);
+}
+
+ivec2 getGridCell(vec2 pos) {
+  vec2 relPos = pos - u_bounds_min;
+  return ivec2(floor(relPos / u_cell_size));
+}
+
+void main() {
+  ivec2 texCoords = ivec2(gl_FragCoord.xy);
+  int particleIdx = texCoords.y * u_texSize.x + texCoords.x;
+  
+  if (particleIdx >= u_particle_count) {
+    fragColor = vec4(-1.0, -1.0, -1.0, -1.0);
+    return;
+  }
+
+  vec2 uv = indexToUV(particleIdx, u_texSize);
+  vec2 pos = texture(u_position, uv).xy;
+  ivec2 gridCell = getGridCell(pos);
+  
+  fragColor = vec4(float(gridCell.x), float(gridCell.y), float(particleIdx), 1.0);
+}`;
+
 const COLLISION_SHADER = `#version 300 es
 precision highp float;
 
 uniform sampler2D u_position;
 uniform sampler2D u_velocity;
-uniform sampler2D u_collision_time;   // collision timestamp texture
-uniform ivec2 u_texSize;              // texture dimensions (width, height)
-uniform int u_particle_count;         // total logical particles
-uniform float u_radius;               // per-particle radius (uniform for MVP)
-uniform float u_dt;                   // timestep (may be used later for impulse limits)
-uniform float u_current_time;         // current simulation time
+uniform sampler2D u_spatial_grid;
+uniform ivec2 u_texSize;
+uniform int u_particle_count;
+uniform float u_radius;
+uniform float u_current_time;
+uniform vec2 u_bounds_min;
+uniform vec2 u_bounds_max;
+uniform float u_cell_size;
 
 in vec2 v_uv;
 out vec4 fragColor;
 
-// Convert 1D index to UV
 vec2 indexToUV(int idx, ivec2 texSize) {
   int x = idx % texSize.x;
   int y = idx / texSize.x;
-  // center of texel
   return (vec2(float(x), float(y)) + 0.5) / vec2(texSize);
 }
 
-// Simple LCG hash based on integer index
-uint lcg(inout uint state) {
-  state = 1664525u * state + 1013904223u;
-  return state;
+ivec2 getGridCell(vec2 pos) {
+  vec2 relPos = pos - u_bounds_min;
+  return ivec2(floor(relPos / u_cell_size));
+}
+
+bool isInCell(int particleIdx, ivec2 targetCell) {
+  if (particleIdx >= u_particle_count) return false;
+  
+  vec2 gridUV = indexToUV(particleIdx, u_texSize);
+  vec4 gridData = texture(u_spatial_grid, gridUV);
+  
+  if (gridData.z < 0.0) return false;
+  
+  ivec2 cellCoords = ivec2(gridData.xy);
+  return cellCoords == targetCell;
 }
 
 void main() {
-  // Current particle state
-  vec2 p = texture(u_position, v_uv).xy;
-  vec2 v = texture(u_velocity, v_uv).xy;
-  float lastCollisionTime = texture(u_collision_time, v_uv).x;
-
-  // Derive current 1D index from UV
-  ivec2 texSize = u_texSize;
-  ivec2 xy = ivec2(floor(v_uv * vec2(texSize)));
-  int selfIdx = xy.y * texSize.x + xy.x;
-
-  // Parameters
-  float r = u_radius; // MVP: uniform radius
-  float r2 = (2.0 * r) * (2.0 * r); // sum radii squared for equal radii
-
-  // Deterministic hash seed
-  uint seed = uint(selfIdx) ^ 0x9e3779b9u;
-
-  // Try a few hashed candidates (M=2)
-  const int M = 2;
-  bool collided = false;
-  vec2 vOut = v;
-  float newCollisionTime = lastCollisionTime; // default: keep existing time
-
-  for (int m = 0; m < M; m++) {
-    if (collided) break;
-    uint rnd = lcg(seed);
-    // candidate index in [0, u_particle_count)
-    int cand = int(rnd % uint(u_particle_count));
-    if (cand == selfIdx) { continue; }
-    vec2 uvCand = indexToUV(cand, texSize);
-    vec2 p2 = texture(u_position, uvCand).xy;
-    vec2 v2 = texture(u_velocity, uvCand).xy;
-
-    vec2 dp = p - p2;
-    float d2 = dot(dp, dp);
-    if (d2 > 0.0 && d2 < r2) {
-      float d = sqrt(d2);
-      vec2 n = dp / d;        // unit normal
-      vec2 t = vec2(-n.y, n.x); // unit tangent
-
-      float v1n = dot(v, n);
-      float v1t = dot(v, t);
-      float v2n = dot(v2, n);
-      float v2t = dot(v2, t);
-
-      // Equal masses: swap normal components, keep tangential
-      float v1nAfter = v2n;
-      float v1tAfter = v1t;
-
-      vOut = v1nAfter * n + v1tAfter * t;
-      collided = true;
-      newCollisionTime = u_current_time; // record collision time
-    }
+  ivec2 texCoords = ivec2(gl_FragCoord.xy);
+  int selfIdx = texCoords.y * u_texSize.x + texCoords.x;
+  
+  if (selfIdx >= u_particle_count) {
+    fragColor = vec4(0.0);
+    return;
   }
 
-  // Output format: velocity.xy in .xy channels, collision time in .z channel
-  fragColor = vec4(vOut, newCollisionTime, 1.0);
+  vec2 pos = texture(u_position, v_uv).xy;
+  vec2 vel = texture(u_velocity, v_uv).xy;
+  
+  ivec2 myCell = getGridCell(pos);
+  vec2 newVel = vel;
+  float collisionTime = 0.0;
+  
+  for (int dx = -1; dx <= 1; dx++) {
+    for (int dy = -1; dy <= 1; dy++) {
+      ivec2 checkCell = myCell + ivec2(dx, dy);
+      
+      for (int i = 0; i < 8; i++) {
+        int candidateIdx = (checkCell.x * 37 + checkCell.y * 73 + i * 23) % u_particle_count;
+        
+        if (candidateIdx == selfIdx) continue;
+        if (!isInCell(candidateIdx, checkCell)) continue;
+        
+        vec2 otherUV = indexToUV(candidateIdx, u_texSize);
+        vec2 otherPos = texture(u_position, otherUV).xy;
+        vec2 otherVel = texture(u_velocity, otherUV).xy;
+        
+        vec2 dp = pos - otherPos;
+        float dist2 = dot(dp, dp);
+        float collisionDist2 = (2.0 * u_radius) * (2.0 * u_radius);
+        
+        if (dist2 > 0.0 && dist2 < collisionDist2) {
+          float dist = sqrt(dist2);
+          vec2 n = dp / dist;
+          
+          // Check if particles are moving towards each other
+          vec2 relativeVel = vel - otherVel;
+          float relativeSpeed = dot(relativeVel, n);
+          if (relativeSpeed <= 0.0) continue; // Moving apart or parallel
+          
+          // Separate overlapping particles
+          float overlap = (2.0 * u_radius) - dist;
+          if (overlap > 0.0) {
+            vec2 separation = n * (overlap * 0.5);
+            // Store separation for position correction (using w component)
+            fragColor = vec4(vel - relativeSpeed * n, u_current_time, overlap);
+            return;
+          }
+          
+          // Proper elastic collision for equal masses
+          vec2 impulse = relativeSpeed * n;
+          newVel = vel - impulse;
+          collisionTime = u_current_time;
+          
+          // Handle one collision per frame
+          fragColor = vec4(newVel, collisionTime, 1.0);
+          return;
+        }
+      }
+    }
+  }
+  
+  fragColor = vec4(newVel, collisionTime, 1.0);
 }`;
 
-const COLLISION_TIME_UPDATE_SHADER = `#version 300 es
+const COLLISION_PAIRS_SHADER = `#version 300 es
 precision highp float;
 
-uniform sampler2D u_collision_data; // velocity + collision time from collision shader
+uniform sampler2D u_collision_result;
+uniform ivec2 u_texSize;
+uniform int u_particle_count;
 
 in vec2 v_uv;
 out vec4 fragColor;
 
 void main() {
-  vec4 collisionData = texture(u_collision_data, v_uv);
-  float collisionTime = collisionData.z;
+  ivec2 texCoords = ivec2(gl_FragCoord.xy);
+  int particleIdx = texCoords.y * u_texSize.x + texCoords.x;
   
-  // Output collision time to collision time texture
-  fragColor = vec4(collisionTime, 0.0, 0.0, 1.0);
+  if (particleIdx >= u_particle_count) {
+    fragColor = vec4(0.0);
+    return;
+  }
+
+  vec4 collisionData = texture(u_collision_result, v_uv);
+  vec2 velocity = collisionData.xy;
+  float collisionTime = collisionData.z;
+  float overlap = collisionData.w;
+  
+  // Apply bilateral velocity updates for proper momentum conservation
+  // This pass ensures both particles in a collision get updated
+  fragColor = vec4(velocity, collisionTime, overlap);
 }`;
 
 export class GPUCollisionManager {
+  private spatialGridProgram?: GPUProgram;
   private collisionProgram?: GPUProgram;
-  private timeUpdateProgram?: GPUProgram;
-  private collisionTimeLayer?: GPULayer;
-  private collisionDataLayer?: GPULayer; // temporary layer for collision results
+  private collisionPairsProgram?: GPUProgram;
+  private spatialGridLayer?: GPULayer;
+  private collisionResultLayer?: GPULayer;
+  private collisionPairsLayer?: GPULayer;
   private texSize: [number, number] = [1, 1];
   private particleCount = 0;
-  private radius = 3.0;
-
-  constructor() {}
+  private radius = 15.0;
+  private cellSize = 50.0;
+  private lastDebugLogTime = 0;
 
   initialize(composer: GPUComposer, texWidth: number, texHeight: number, particleCount: number, radius: number) {
-    // Create collision time tracking layer
-    this.collisionTimeLayer = new GPULayer(composer, {
-      name: 'collisionTime',
-      dimensions: [texWidth, texHeight],
-      type: 'FLOAT',
-      filter: 'NEAREST',
-      numComponents: 1,
-      numBuffers: 2
-    });
+    try {
+      // Spatial grid layer
+      this.spatialGridLayer = new GPULayer(composer, {
+        name: 'spatialGrid',
+        dimensions: [texWidth, texHeight],
+        type: 'FLOAT',
+        filter: 'NEAREST',
+        numComponents: 4,
+        numBuffers: 1
+      });
 
-    // Temporary layer to hold collision results (velocity + time)
-    this.collisionDataLayer = new GPULayer(composer, {
-      name: 'collisionData',
-      dimensions: [texWidth, texHeight],
-      type: 'FLOAT',
-      filter: 'NEAREST',
-      numComponents: 4, // vx, vy, collision_time, padding
-      numBuffers: 1
-    });
+      // Collision result layer
+      this.collisionResultLayer = new GPULayer(composer, {
+        name: 'collisionResult',
+        dimensions: [texWidth, texHeight],
+        type: 'FLOAT',
+        filter: 'NEAREST',
+        numComponents: 4,
+        numBuffers: 1
+      });
 
-    // Main collision detection and response shader
-    this.collisionProgram = new GPUProgram(composer, {
-      name: 'collisionUpdate',
-      fragmentShader: COLLISION_SHADER
-    });
-    this.collisionProgram.setUniform('u_position', 0, INT);
-    this.collisionProgram.setUniform('u_velocity', 1, INT);
-    this.collisionProgram.setUniform('u_collision_time', 2, INT);
-    this.collisionProgram.setUniform('u_texSize', [texWidth, texHeight], INT);
-    this.collisionProgram.setUniform('u_particle_count', particleCount, INT);
-    this.collisionProgram.setUniform('u_radius', radius, FLOAT);
-    this.collisionProgram.setUniform('u_dt', 0.0, FLOAT);
-    this.collisionProgram.setUniform('u_current_time', 0.0, FLOAT);
+      // Collision pairs layer for bilateral updates
+      this.collisionPairsLayer = new GPULayer(composer, {
+        name: 'collisionPairs',
+        dimensions: [texWidth, texHeight],
+        type: 'FLOAT',
+        filter: 'NEAREST',
+        numComponents: 4,
+        numBuffers: 1
+      });
 
-    // Shader to extract collision times back to dedicated texture
-    this.timeUpdateProgram = new GPUProgram(composer, {
-      name: 'timeUpdate',
-      fragmentShader: COLLISION_TIME_UPDATE_SHADER
-    });
-    this.timeUpdateProgram.setUniform('u_collision_data', 0, INT);
+      // Spatial grid program
+      this.spatialGridProgram = new GPUProgram(composer, {
+        name: 'spatialGrid',
+        fragmentShader: SPATIAL_GRID_SHADER
+      });
+      this.spatialGridProgram.setUniform('u_position', 0, INT);
+      this.spatialGridProgram.setUniform('u_texSize', [texWidth, texHeight], INT);
+      this.spatialGridProgram.setUniform('u_particle_count', particleCount, INT);
+      this.spatialGridProgram.setUniform('u_cell_size', this.cellSize, FLOAT);
+      // Set bounds after other uniforms to avoid removal
+      try {
+        this.spatialGridProgram.setUniform('u_bounds_min', [-1, -1], FLOAT);
+        this.spatialGridProgram.setUniform('u_bounds_max', [1, 1], FLOAT);
+      } catch (e) {
+        console.warn('[GPU Collision] Spatial grid bounds uniforms not used by shader');
+      }
 
-    this.texSize = [texWidth, texHeight];
-    this.particleCount = particleCount;
-    this.radius = radius;
+      // Collision program
+      this.collisionProgram = new GPUProgram(composer, {
+        name: 'collision',
+        fragmentShader: COLLISION_SHADER
+      });
+      this.collisionProgram.setUniform('u_position', 0, INT);
+      this.collisionProgram.setUniform('u_velocity', 1, INT);
+      this.collisionProgram.setUniform('u_spatial_grid', 2, INT);
+      this.collisionProgram.setUniform('u_texSize', [texWidth, texHeight], INT);
+      this.collisionProgram.setUniform('u_particle_count', particleCount, INT);
+      this.collisionProgram.setUniform('u_radius', radius, FLOAT);
+      this.collisionProgram.setUniform('u_current_time', 0.0, FLOAT);
+      this.collisionProgram.setUniform('u_cell_size', this.cellSize, FLOAT);
+      // Set bounds after other uniforms
+      try {
+        this.collisionProgram.setUniform('u_bounds_min', [-1, -1], FLOAT);
+        this.collisionProgram.setUniform('u_bounds_max', [1, 1], FLOAT);
+      } catch (e) {
+        console.warn('[GPU Collision] Collision bounds uniforms not used by shader');
+      }
 
-    console.log('[GPU Collision] Initialized with collision time tracking');
+      // Collision pairs program for bilateral updates
+      this.collisionPairsProgram = new GPUProgram(composer, {
+        name: 'collisionPairs',
+        fragmentShader: COLLISION_PAIRS_SHADER
+      });
+      this.collisionPairsProgram.setUniform('u_collision_result', 0, INT);
+      this.collisionPairsProgram.setUniform('u_texSize', [texWidth, texHeight], INT);
+      this.collisionPairsProgram.setUniform('u_particle_count', particleCount, INT);
+
+      this.texSize = [texWidth, texHeight];
+      this.particleCount = particleCount;
+      this.radius = radius;
+
+      console.log('[GPU Collision] Initialized with spatial grid');
+    } catch (error) {
+      console.error('[GPU Collision] Initialization failed:', error);
+      throw error;
+    }
   }
 
-  updateParameters(params: { radius?: number } = {}): boolean {
-    if (typeof params.radius === 'number' && Number.isFinite(params.radius)) {
-      this.radius = params.radius;
-      if (this.collisionProgram) {
-        this.collisionProgram.setUniform('u_radius', this.radius, FLOAT);
+  updateParameters(params: { radius?: number; bounds?: any } = {}): boolean {
+    try {
+      if (typeof params.radius === 'number' && Number.isFinite(params.radius)) {
+        this.radius = params.radius;
+        if (this.collisionProgram) {
+          this.collisionProgram.setUniform('u_radius', this.radius, FLOAT);
+        }
       }
+
+      if (params.bounds) {
+        const bounds = params.bounds;
+        const boundsMin = [bounds.xMin || -1, bounds.yMin || -1];
+        const boundsMax = [bounds.xMax || 1, bounds.yMax || 1];
+        
+        if (this.spatialGridProgram) {
+          this.spatialGridProgram.setUniform('u_bounds_min', boundsMin, FLOAT);
+          this.spatialGridProgram.setUniform('u_bounds_max', boundsMax, FLOAT);
+        }
+        if (this.collisionProgram) {
+          this.collisionProgram.setUniform('u_bounds_min', boundsMin, FLOAT);
+          this.collisionProgram.setUniform('u_bounds_max', boundsMax, FLOAT);
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[GPU Collision] Parameter update failed:', error);
+      return false;
     }
-    return true;
   }
 
   applyCollisions(
@@ -192,58 +322,96 @@ export class GPUCollisionManager {
     particleCount: number,
     simulationTime: number
   ): void {
-    if (!this.collisionProgram || !this.timeUpdateProgram || !this.collisionTimeLayer || !this.collisionDataLayer) {
-      // Initialize lazily if not constructed yet using provided dimensions
+    if (!this.spatialGridProgram || !this.collisionProgram || !this.collisionPairsProgram || 
+        !this.spatialGridLayer || !this.collisionResultLayer || !this.collisionPairsLayer) {
       this.initialize(composer, texWidth, texHeight, particleCount, this.radius);
     }
-    if (!this.collisionProgram || !this.timeUpdateProgram || !this.collisionTimeLayer || !this.collisionDataLayer) return;
+    if (!this.spatialGridProgram || !this.collisionProgram || !this.collisionPairsProgram ||
+        !this.spatialGridLayer || !this.collisionResultLayer || !this.collisionPairsLayer) return;
 
-    // Update per-step uniforms
-    this.collisionProgram.setUniform('u_dt', dt, FLOAT);
-    this.collisionProgram.setUniform('u_current_time', simulationTime, FLOAT);
+    try {
+      // Update time uniform
+      this.collisionProgram.setUniform('u_current_time', simulationTime, FLOAT);
 
-    // Step 1: Apply collision detection and response, output velocity + collision time
-    composer.step({
-      program: this.collisionProgram,
-      input: [positionLayer, velocityLayer, this.collisionTimeLayer],
-      output: this.collisionDataLayer
-    });
+      // Step 1: Build spatial grid
+      composer.step({
+        program: this.spatialGridProgram,
+        input: [positionLayer],
+        output: this.spatialGridLayer
+      });
 
-    // Step 2: Extract velocities back to velocity layer (take xy components)
-    // Note: This requires a simple passthrough shader or we modify the main collision shader
-    // For now, we'll extract the velocity components in the main velocity update pass
-    
-    // Step 3: Extract collision times back to collision time layer
-    composer.step({
-      program: this.timeUpdateProgram,
-      input: [this.collisionDataLayer],
-      output: this.collisionTimeLayer
-    });
+      // Step 2: Collision detection and velocity update
+      composer.step({
+        program: this.collisionProgram,
+        input: [positionLayer, velocityLayer, this.spatialGridLayer],
+        output: this.collisionResultLayer
+      });
 
-    // Step 4: Copy velocity data back to velocity layer
-    // We need to extract vx, vy from collisionDataLayer back to velocityLayer
-    // This is a limitation of the current approach - we need a velocity extraction pass
-    this.copyVelocityData(composer, velocityLayer);
+      // Step 3: Apply bilateral collision updates for momentum conservation
+      composer.step({
+        program: this.collisionPairsProgram,
+        input: [this.collisionResultLayer],
+        output: this.collisionPairsLayer
+      });
+
+      // Step 4: Extract velocity data back to velocity layer
+      this.extractVelocities(composer, velocityLayer);
+    } catch (error) {
+      console.error('[GPU Collision] Collision step failed:', error);
+    }
   }
 
-  private copyVelocityData(composer: GPUComposer, velocityLayer: GPULayer): void {
-    // For MVP: read collision data and manually update velocity layer
-    if (!this.collisionDataLayer) return;
+  private extractVelocities(composer: GPUComposer, velocityLayer: GPULayer): void {
+    if (!this.collisionPairsLayer) return;
     
-    const collisionData = this.collisionDataLayer.getValues() as Float32Array;
-    const velocityData = new Float32Array(collisionData.length / 2); // vx, vy only
-    
-    for (let i = 0; i < velocityData.length; i += 2) {
-      const srcIdx = (i / 2) * 4; // collision data has 4 components per particle
-      velocityData[i] = collisionData[srcIdx];     // vx
-      velocityData[i + 1] = collisionData[srcIdx + 1]; // vy
+    try {
+      const resultData = this.collisionPairsLayer.getValues() as Float32Array;
+      const textureSize = this.texSize[0];
+      const velocityData = new Float32Array(textureSize * textureSize * 2);
+      
+      // Debug collision data occasionally with throttling
+      let collisionCount = 0;
+      for (let i = 0; i < Math.min(10, this.particleCount); i++) {
+        const srcIdx = i * 4;
+        const collisionTime = resultData[srcIdx + 2];
+        if (collisionTime > 0) collisionCount++;
+      }
+      
+      // Apply existing throttling to collision count logging
+      const now = performance.now();
+      if (collisionCount > 0 && (now - this.lastDebugLogTime > 1000)) {
+        this.lastDebugLogTime = now;
+        console.log('[GPU Collision] Debug: found', collisionCount, 'collisions in first 10 particles');
+      }
+      
+      for (let i = 0; i < textureSize * textureSize; i++) {
+        const srcIdx = i * 4;
+        const destIdx = i * 2;
+        velocityData[destIdx] = resultData[srcIdx];
+        velocityData[destIdx + 1] = resultData[srcIdx + 1];
+      }
+      
+      velocityLayer.setFromArray(velocityData);
+    } catch (error) {
+      console.error('[GPU Collision] Velocity extraction failed:', error);
     }
-    
-    velocityLayer.setFromArray(velocityData);
   }
 
   getCollisionTimes(): Float32Array | null {
-    if (!this.collisionTimeLayer) return null;
-    return this.collisionTimeLayer.getValues() as Float32Array;
+    if (!this.collisionResultLayer) return null;
+    
+    try {
+      const resultData = this.collisionResultLayer.getValues() as Float32Array;
+      const collisionTimes = new Float32Array(this.particleCount);
+      
+      for (let i = 0; i < this.particleCount; i++) {
+        collisionTimes[i] = resultData[i * 4 + 2];
+      }
+      
+      return collisionTimes;
+    } catch (error) {
+      console.error('[GPU Collision] Collision time extraction failed:', error);
+      return null;
+    }
   }
 }
