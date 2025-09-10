@@ -1,4 +1,25 @@
 import { GPUComposer, GPULayer, GPUProgram, FLOAT, INT } from 'gpu-io';
+import { GPUCollisionManager } from './GPUCollisionManager';
+
+// TODO[C16-Phase2 GPU Collisions]: Minimal MVP plan (comments only, no behavior change)
+// 1) Data layout
+//    - positionLayer: vec2 (x,y)
+//    - velocityLayer: vec2 (vx,vy)
+//    - radius: derive from UI for now (uniform) or pack into spare channels if needed later
+// 2) Spatial binning (coarse):
+//    - Build a per-pixel cell index texture from position (compute cell id via bounds + cellSize)
+//    - Option A (simplest): fixed-capacity per cell: write up to K indices; overflow: skip
+//    - Option B: prefix-sum compaction (later). Start with Option A.
+// 3) Collision pass ordering (per step):
+//    - Pass A: position update (existing)
+//    - Pass B: velocity boundary update (existing)
+//    - Pass C: collision update (new): for each particle, scan 3x3 neighboring cells (max N per cell),
+//             resolve at most M collisions per particle deterministically. Equal mass 2D using n/t projection.
+// 4) Validation:
+//    - For small N (<= 256), mirror CPU strategy and compare per-step energies; target <1% error.
+//    - Log collision counts and step timings via getMetrics().
+// 5) Fallback:
+//    - If shaders fail or capacities exceeded, skip collisions and continue with advection only.
 
 const POSITION_UPDATE_SHADER = `#version 300 es
 precision highp float;
@@ -100,6 +121,8 @@ export class GPUParticleManager {
   private simulationTime: number = 0;
   private boundaryCondition: string = 'periodic';
   private bounds = { xMin: -1, xMax: 1, yMin: -1, yMax: 1 };
+  private collisionManager: GPUCollisionManager;
+  private interparticleCollisions: boolean = false;
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -202,6 +225,9 @@ export class GPUParticleManager {
     this.velocityProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
     
     console.log('[GPU] GPUParticleManager initialized successfully');
+
+    // Initialize collision manager (no-op for now)
+    this.collisionManager = new GPUCollisionManager();
   }
 
   // Allow caller to provide a mapping from physics space -> canvas pixels
@@ -259,6 +285,43 @@ export class GPUParticleManager {
       input: [this.positionLayer, this.velocityLayer],
       output: this.velocityLayer
     });
+
+    // Pass 3: collision detection only if enabled (match CPU behavior)
+    if (this.interparticleCollisions) {
+      const texSize = Math.ceil(Math.sqrt(this.particleCount));
+      this.collisionManager.applyCollisions(
+        this.composer,
+        this.positionLayer,
+        this.velocityLayer,
+        dt,
+        texSize,
+        texSize,
+        this.particleCount,
+        this.simulationTime
+      );
+      this.updateCollisionCount();
+    }
+  }
+
+  private updateCollisionCount(): void {
+    const collisionTimes = this.collisionManager.getCollisionTimes();
+    if (!collisionTimes) return;
+
+    let currentCollisions = 0;
+    const currentTime = this.simulationTime;
+    
+    // Count particles that have collided recently (within last step)
+    for (let i = 0; i < Math.min(this.particleCount, collisionTimes.length); i++) {
+      const lastCollisionTime = collisionTimes[i];
+      if (lastCollisionTime > 0 && (currentTime - lastCollisionTime) < 0.02) { // Within last dt
+        currentCollisions++;
+      }
+    }
+    
+    // Accumulate total collisions (approximate)
+    if (currentCollisions > 0) {
+      this.collisionCount += Math.floor(currentCollisions / 2); // Each collision involves 2 particles
+    }
   }
 
   getParticleData(): Float32Array {
@@ -291,6 +354,7 @@ export class GPUParticleManager {
     }
 
     const data = this.getParticleData();
+    const collisionTimes = this.collisionManager.getCollisionTimes();
     const syncCount = Math.min(tsCount, this.particleCount);
 
     // Throttled diagnostic
@@ -300,10 +364,35 @@ export class GPUParticleManager {
         gpuParticles: this.particleCount,
         tsParticles: tsCount,
         syncing: syncCount,
+        hasCollisionTimes: !!collisionTimes,
       });
     }
 
-    // Sync positions
+    // Helper function to convert hex color to HSL
+    const hexToHsl = (hex: string): { h: number; s: number; l: number } => {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0, s = 0, l = (max + min) / 2;
+
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      return { h: h * 360, s: s * 100, l: l * 100 };
+    };
+
+    // Sync positions and collision visual feedback
     for (let i = 0; i < syncCount; i++) {
       const tsParticle = particlesContainer.get ? particlesContainer.get(i) : particlesContainer?._array?.[i];
       if (!tsParticle) continue;
@@ -337,20 +426,47 @@ export class GPUParticleManager {
         tsParticle.position.x = px;
         tsParticle.position.y = py;
       }
+
+      // GPU collision red flash - same logic as CPU version
+      if (collisionTimes && tsParticle.color) {
+        const lastCollisionTime = collisionTimes[i] || 0;
+        const timeSinceCollision = this.simulationTime - lastCollisionTime;
+        
+        if (timeSinceCollision < 0.2 && lastCollisionTime > 0) { // Flash for 200ms
+          const redColor = hexToHsl("#ff4444"); // Red flash
+          tsParticle.color.h.value = redColor.h;
+          tsParticle.color.s.value = redColor.s;
+          tsParticle.color.l.value = redColor.l;
+        } else {
+          const blueColor = hexToHsl("#3b82f6"); // Default blue
+          tsParticle.color.h.value = blueColor.h;
+          tsParticle.color.s.value = blueColor.s;
+          tsParticle.color.l.value = blueColor.l;
+        }
+      }
     }
 
     // Verify sync for first particle occasionally
     if ((this as any)._syncLogCounter % 240 === 0) {
       const ts0 = particlesContainer.get ? particlesContainer.get(0) : particlesContainer?._array?.[0];
       if (ts0) {
-        console.log('[GPU] Sample p0 after sync', { x: ts0.position.x, y: ts0.position.y, gpuX: data[0], gpuY: data[1], mapped: !!this.canvasMapper });
+        console.log('[GPU] Sample p0 after sync', { 
+          x: ts0.position.x, 
+          y: ts0.position.y, 
+          gpuX: data[0], 
+          gpuY: data[1], 
+          mapped: !!this.canvasMapper,
+          collisionTime: collisionTimes?.[0] || 0,
+          timeSinceCollision: collisionTimes?.[0] ? this.simulationTime - collisionTimes[0] : 'N/A'
+        });
       }
     }
   }
 
   reset() {
     console.log('[GPU] Resetting GPU state');
-    // This should also reset simulationTime and collisionCount if they are added back
+    this.collisionCount = 0;
+    this.simulationTime = 0;
     const textureSize = Math.ceil(Math.sqrt(this.particleCount));
     const emptyData = new Float32Array(textureSize * textureSize * 2);
     this.positionLayer.setFromArray(emptyData);
@@ -392,6 +508,19 @@ export class GPUParticleManager {
       });
     }
 
+    // Update collision state
+    if (params.interparticleCollisions !== undefined) {
+      this.interparticleCollisions = params.interparticleCollisions;
+      console.log('[GPU] Interparticle collisions:', this.interparticleCollisions ? 'ENABLED' : 'DISABLED');
+    }
+
+    // Allow collision manager to react to parameter changes (radius supported)
+    if (params && typeof params.radius === 'number') {
+      this.collisionManager.updateParameters({ radius: params.radius });
+    } else {
+      this.collisionManager.updateParameters({});
+    }
+
     console.log('[GPU] Parameters update complete:', {
       boundaryCondition: this.boundaryCondition,
       bounds: this.bounds,
@@ -402,9 +531,8 @@ export class GPUParticleManager {
   }
 
   getMetrics() {
-    // Placeholder for metrics like collision count
     return {
-      collisionCount: 0, // This is a placeholder, collision detection is not implemented on GPU yet
+      collisionCount: this.collisionCount,
       simulationTime: this.simulationTime
     };
   }

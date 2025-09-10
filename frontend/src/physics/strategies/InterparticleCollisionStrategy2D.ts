@@ -31,7 +31,16 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
   
 
   preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
-    // Handle inter-particle collisions in the preUpdate phase
+    // Build the spatial grid ONCE per update pass using the first particle call
+    // Assumes engine calls preUpdate sequentially over the same allParticles array
+    if (allParticles.length > 0 && particle.id === allParticles[0].id) {
+      this.spatialGrid.clear();
+      for (const p of allParticles) {
+        this.spatialGrid.insert(p);
+      }
+    }
+
+    // Handle inter-particle collisions using the prebuilt spatial grid
     this.handleInterparticleCollisions(particle, allParticles);
   }
 
@@ -50,12 +59,6 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
   }
 
   private handleInterparticleCollisions(particle: Particle, allParticles: Particle[]): void {
-    // Build spatial grid
-    this.spatialGrid.clear();
-    for (const p of allParticles) {
-      this.spatialGrid.insert(p);
-    }
-
     const pid = this.getNumericId(particle);
     const particleVel = this.coordSystem.toVector(particle.velocity);
     const nearby = this.spatialGrid.getNearbyParticles(particle);
@@ -82,13 +85,13 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
         const dist = Math.sqrt(distSquared);
         const otherVel = this.coordSystem.toVector(other.velocity);
         
-        // 2D elastic collision with momentum conservation
+        // Correct 2D elastic collision (equal masses) via normal/tangent projection
         const [v1x, v1y, v2x, v2y] = this.elasticCollision2D(
           particleVel.x, particleVel.y,
           otherVel.x, otherVel.y,
-          1, 1
+          dx / dist, dy / dist // collision normal components
         );
-        
+
         particle.velocity = this.coordSystem.toVelocity({ x: v1x, y: v1y });
         other.velocity = this.coordSystem.toVelocity({ x: v2x, y: v2y });
 
@@ -114,13 +117,33 @@ export class InterparticleCollisionStrategy2D implements PhysicsStrategy {
     }
   }
 
-  private elasticCollision2D(v1x: number, v1y: number, v2x: number, v2y: number, m1: number, m2: number): [number, number, number, number] {
-    const totalMass = m1 + m2;
-    const newV1x = ((m1 - m2) * v1x + 2 * m2 * v2x) / totalMass;
-    const newV1y = ((m1 - m2) * v1y + 2 * m2 * v2y) / totalMass;
-    const newV2x = ((m2 - m1) * v2x + 2 * m1 * v1x) / totalMass;
-    const newV2y = ((m2 - m1) * v2y + 2 * m1 * v1y) / totalMass;
-    
+  private elasticCollision2D(
+    v1x: number, v1y: number,
+    v2x: number, v2y: number,
+    nx: number, ny: number // unit normal from other -> particle
+  ): [number, number, number, number] {
+    // Unit tangent
+    const tx = -ny;
+    const ty = nx;
+
+    // Project initial velocities onto normal and tangent
+    const v1n = v1x * nx + v1y * ny;
+    const v1t = v1x * tx + v1y * ty;
+    const v2n = v2x * nx + v2y * ny;
+    const v2t = v2x * tx + v2y * ty;
+
+    // Equal masses: swap normal components, tangential components unchanged
+    const v1nAfter = v2n;
+    const v2nAfter = v1n;
+    const v1tAfter = v1t;
+    const v2tAfter = v2t;
+
+    // Recompose into x,y
+    const newV1x = v1nAfter * nx + v1tAfter * tx;
+    const newV1y = v1nAfter * ny + v1tAfter * ty;
+    const newV2x = v2nAfter * nx + v2tAfter * tx;
+    const newV2y = v2nAfter * ny + v2tAfter * ty;
+
     return [newV1x, newV1y, newV2x, newV2y];
   }
 

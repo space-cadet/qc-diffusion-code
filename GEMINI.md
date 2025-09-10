@@ -1,4 +1,6 @@
 # Project: QC-Diffusion Code
+*Created: 2025-08-20 08:31:32 IST*
+*Last Updated: 2025-09-10 18:50:11 IST*
 
 ## Project Overview
 
@@ -8,7 +10,7 @@ This project is a sophisticated computational simulation system for studying fin
 *   **Backend:** A Python-based server using the FastAPI framework. It likely handles WebSocket connections for real-time communication with the frontend and may perform some of the more intensive computations.
 *   **Julia Code:** The `DynamicalBilliards.jl` directory contains a Julia project, likely for research and development of the physics models.
 
-The project is well-structured and uses modern tools like `pnpm` for monorepo management, TypeScript for type safety, and Jest for testing.
+The project is well-structured and uses modern tools like `pnpm` for monorepo management, TypeScript for type safety, and `vitest` for testing.
 
 ## Simulation Details
 
@@ -59,12 +61,13 @@ This project contains a set of integrated rules and guidelines for the Gemini ag
 
 4.  **Run Frontend and Backend concurrently:**
     ```bash
+    cd frontend
     pnpm run dev:full
     ```
 
 ### Building for Production
 
-To create a production build of the frontend:
+To create a production build of the frontend, run the following command from the root of the project:
 
 ```bash
 pnpm build
@@ -74,9 +77,8 @@ pnpm build
 
 *   **Monorepo:** The project is a monorepo using `pnpm` workspaces.
 *   **TypeScript:** The frontend code is written in TypeScript with strict mode enabled.
-*   **Testing:** The project uses Jest for testing. You can run tests using the following commands:
-    *   Run all tests: `pnpm test`
-    *   Frontend unit tests: `cd frontend && pnpm test`
-    *   Physics verification tests: `cd frontend && pnpm test -- physics`
+*   **Testing:** The project uses `vitest` for testing. You can run tests using the following commands:
+    *   Run all frontend tests: `cd frontend && pnpm test`
+    *   Run all frontend tests in watch mode: `cd frontend && pnpm test:watch`
 *   **Code Style:** The project uses ESLint with scientific computing rules to enforce code style.
 *   **Documentation:** The `memory-bank/` directory contains comprehensive documentation, including technical implementation details, physics mathematical foundations, architecture decision records, and development session logs.

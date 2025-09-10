@@ -48,9 +48,10 @@ export const useParticlesLoader = ({
         console.warn('[GPU] No boundary config available from simulator during parameter update');
       }
 
-      // Combine UI params with simulator bounds
+      // Combine UI params with simulator bounds and collision state
       const fullParams = {
         ...params,
+        interparticleCollisions: gridLayoutParamsRef.current?.interparticleCollisions || false,
         ...(bounds && { bounds }),
       };
 
@@ -216,6 +217,7 @@ export const useParticlesLoader = ({
             const bounds = simulatorRef.current.getBoundaryConfig();
             const initialParams = {
               ...gridLayoutParamsRef.current,
+              interparticleCollisions: gridLayoutParamsRef.current?.interparticleCollisions || false,
               ...(bounds && { bounds }),
             };
             gpuManagerRef.current.updateParameters(initialParams);

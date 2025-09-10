@@ -45,8 +45,8 @@ export class SpatialGrid {
       }
     }
     
-    // Log grid query efficiency occasionally
-    if (Math.random() < 0.000001) { // 1% chance
+    // Log grid query efficiency very rarely (~0.0001%)
+    if (Math.random() < 0.000001) { // ~0.0001% chance
       console.log(`[SpatialGrid] Query grid(${gx},${gy}): found ${nearby.length} nearby particles`);
     }
     
