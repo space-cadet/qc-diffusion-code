@@ -53,6 +53,12 @@ interface RandomWalkSimulationState {
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number }
   }>
   observableData: Record<string, any>
+  gpuState?: {
+    positions: Float32Array
+    velocities: Float32Array
+    collisionCount: number
+    simulationTime: number
+  }
 }
 
 // Persistent PDE page state (simulation + UI bits)
@@ -126,7 +132,8 @@ interface AppState {
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
     densityHistory: RandomWalkSimulationState['densityHistory'],
-    observableData: RandomWalkSimulationState['observableData']
+    observableData: RandomWalkSimulationState['observableData'],
+    gpuState?: RandomWalkSimulationState['gpuState']
   ) => void
   // PDE setters
   setPdeState: (partial: Partial<PdeState>) => void
@@ -311,13 +318,14 @@ export const useAppStore = create<AppState>()(
             interparticleCollisions
           }
         })),
-      saveSimulationSnapshot: (particleData, densityHistory, observableData) =>
+      saveSimulationSnapshot: (particleData, densityHistory, observableData, gpuState?) =>
         set((state) => ({
           randomWalkSimulationState: {
             ...state.randomWalkSimulationState,
             particleData,
             densityHistory,
-            observableData
+            observableData,
+            gpuState: gpuState || state.randomWalkSimulationState.gpuState
           }
         })),
       setPdeState: (partial) =>

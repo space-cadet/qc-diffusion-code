@@ -25,6 +25,51 @@ export const useParticlesLoader = ({
   const animationFrameId = useRef<number>();
   const gpuManagerRef = useRef<GPUParticleManager | null>(null);
 
+  const resetGPU = useCallback(() => {
+    if (gpuManagerRef.current) {
+      gpuManagerRef.current.reset();
+      timeRef.current = 0;
+      collisionsRef.current = 0;
+    }
+  }, []);
+
+  const initializeGPU = useCallback((particles: any[]) => {
+    if (gpuManagerRef.current && particles.length > 0) {
+      gpuManagerRef.current.initializeParticles(particles);
+    }
+  }, []);
+
+  const updateGPUParameters = useCallback((params: any) => {
+    if (gpuManagerRef.current) {
+      // Get bounds from the CPU-side simulator itself
+      const bounds = simulatorRef.current?.getBoundaryConfig();
+      
+      if (!bounds) {
+        console.warn('[GPU] No boundary config available from simulator during parameter update');
+      }
+
+      // Combine UI params with simulator bounds
+      const fullParams = {
+        ...params,
+        ...(bounds && { bounds }),
+      };
+
+      console.log('[GPU] Updating parameters:', { 
+        uiParams: params, 
+        simulatorBounds: bounds,
+        combined: fullParams 
+      });
+
+      const needsRecreation = !gpuManagerRef.current.updateParameters(fullParams);
+      if (needsRecreation) {
+        console.log('[GPU] Recreating GPU manager due to parameter change.');
+        gpuManagerRef.current.dispose();
+        gpuManagerRef.current = null;
+        // The main loader logic will handle recreation on the next frame
+      }
+    }
+  }, [simulatorRef]);
+
   const cleanup = useCallback(() => {
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
@@ -88,9 +133,15 @@ export const useParticlesLoader = ({
         }
         
         // Sync collision count from physics engine
-        const collisionStats = simulatorRef.current?.getCollisionStats?.();
-        if (collisionStats) {
-          collisionsRef.current = collisionStats.totalCollisions || 0;
+        if (useGPU && gpuManagerRef.current) {
+          const gpuMetrics = gpuManagerRef.current.getMetrics();
+          collisionsRef.current = gpuMetrics.collisionCount;
+          timeRef.current = gpuMetrics.simulationTime;
+        } else {
+          const collisionStats = simulatorRef.current?.getCollisionStats?.();
+          if (collisionStats) {
+            collisionsRef.current = collisionStats.totalCollisions || 0;
+          }
         }
       } else {
         // Reset accumulator when simulation not running
@@ -135,8 +186,8 @@ export const useParticlesLoader = ({
     }
   }, [startAnimation]);
 
-  // Expose restart function and return the main loader
-  return useCallback((container: Container) => {
+  // Expose restart function and return the main loader with GPU methods
+  const particlesLoader = useCallback((container: Container) => {
     // Stop any previous animation loop but keep the container intact
     cleanup();
     tsParticlesContainerRef.current = container;
@@ -160,8 +211,16 @@ export const useParticlesLoader = ({
           gpuManagerRef.current = new GPUParticleManager(htmlCanvas, particleCount);
           console.log('[GPU] GPU manager created successfully');
 
-          // Initialize with current particles only if container is ready
+          // CRITICAL FIX: Set proper boundary conditions immediately after creation
           if (simulatorRef.current) {
+            const bounds = simulatorRef.current.getBoundaryConfig();
+            const initialParams = {
+              ...gridLayoutParamsRef.current,
+              ...(bounds && { bounds }),
+            };
+            gpuManagerRef.current.updateParameters(initialParams);
+            console.log('[GPU] Initial boundary parameters applied:', bounds);
+
             const particles = simulatorRef.current.getParticleManager().getAllParticles();
             gpuManagerRef.current.initializeParticles(particles);
             console.log('[GPU] GPU manager initialized with', particles.length, 'particles');
@@ -174,6 +233,8 @@ export const useParticlesLoader = ({
             } else {
               console.warn('[GPU] Canvas mapper not set - ParticleManager unavailable');
             }
+          } else {
+            console.warn('[GPU] Simulator not available during GPU init - using default boundaries');
           }
 
           (window as any).gpuManager = gpuManagerRef.current;
@@ -198,4 +259,11 @@ export const useParticlesLoader = ({
     // Add restart method to the container reference for external access
     (container as any)._restartAnimation = restartAnimation;
   }, [cleanup, startAnimation, restartAnimation]);
+
+  // Expose GPU methods
+  (particlesLoader as any).resetGPU = resetGPU;
+  (particlesLoader as any).initializeGPU = initializeGPU;
+  (particlesLoader as any).updateGPUParameters = updateGPUParameters;
+
+  return particlesLoader;
 };

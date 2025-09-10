@@ -6,6 +6,9 @@ precision highp float;
 uniform float u_dt;
 uniform sampler2D u_position;
 uniform sampler2D u_velocity;
+uniform vec2 u_bounds_min;
+uniform vec2 u_bounds_max;
+uniform int u_boundary_condition; // 0: periodic, 1: reflective
 
 in vec2 v_uv;
 out vec4 fragColor;
@@ -15,9 +18,28 @@ void main() {
   vec2 velocity = texture(u_velocity, v_uv).xy;
   
   vec2 newPosition = position + velocity * u_dt;
+
+  // Boundary Conditions
+  if (u_boundary_condition == 0) { // Periodic
+    if (newPosition.x < u_bounds_min.x) { newPosition.x += (u_bounds_max.x - u_bounds_min.x); }
+    if (newPosition.x > u_bounds_max.x) { newPosition.x -= (u_bounds_max.x - u_bounds_min.x); }
+    if (newPosition.y < u_bounds_min.y) { newPosition.y += (u_bounds_max.y - u_bounds_min.y); }
+    if (newPosition.y > u_bounds_max.y) { newPosition.y -= (u_bounds_max.y - u_bounds_min.y); }
+  } else if (u_boundary_condition == 1) { // Reflective
+    // This is a temporary implementation. Proper reflection requires flipping velocity,
+    // which should be handled in a separate velocity-update shader pass.
+    // For now, we clamp the position to keep particles within bounds.
+    newPosition.x = clamp(newPosition.x, u_bounds_min.x, u_bounds_max.x);
+    newPosition.y = clamp(newPosition.y, u_bounds_min.y, u_bounds_max.y);
+  }
   
   fragColor = vec4(newPosition, 0.0, 1.0);
 }`;
+
+const boundaryConditionMap: { [key: string]: number } = {
+  'periodic': 0,
+  'reflective': 1,
+};
 
 export class GPUParticleManager {
   private composer: GPUComposer;
@@ -26,12 +48,22 @@ export class GPUParticleManager {
   private positionProgram: GPUProgram;
   private particleCount: number;
   private canvasMapper?: (pos: { x: number; y: number }) => { x: number; y: number };
+  private collisionCount: number = 0;
+  private simulationTime: number = 0;
+  private boundaryCondition: string = 'periodic';
+  private bounds = { xMin: -1, xMax: 1, yMin: -1, yMax: 1 };
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
 
     // Store particle count early
     this.particleCount = particleCount;
+    
+    // Log initial boundary conditions
+    console.log('[GPU] Initial boundary conditions:', {
+      condition: this.boundaryCondition,
+      bounds: this.bounds
+    });
 
     // Compute texture grid size for state storage
     const textureSize = Math.ceil(Math.sqrt(particleCount));
@@ -103,6 +135,9 @@ export class GPUParticleManager {
     this.positionProgram.setUniform('u_position', 0, INT);
     this.positionProgram.setUniform('u_velocity', 1, INT);
     this.positionProgram.setUniform('u_dt', 0.0, FLOAT);
+    this.positionProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+    this.positionProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+    this.positionProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
     
     console.log('[GPU] GPUParticleManager initialized successfully');
   }
@@ -144,6 +179,7 @@ export class GPUParticleManager {
 
   step(dt: number) {
     // console.log('[GPU] Stepping physics', { dt });
+    this.simulationTime += dt;
     
     // Set scalar uniform and pass samplers via input array order
     // gpu-io requires the uniform type on first set; use FLOAT for GLSL float
@@ -228,6 +264,60 @@ export class GPUParticleManager {
         console.log('[GPU] Sample p0 after sync', { x: ts0.position.x, y: ts0.position.y, gpuX: data[0], gpuY: data[1], mapped: !!this.canvasMapper });
       }
     }
+  }
+
+  reset() {
+    console.log('[GPU] Resetting GPU state');
+    // This should also reset simulationTime and collisionCount if they are added back
+    const textureSize = Math.ceil(Math.sqrt(this.particleCount));
+    const emptyData = new Float32Array(textureSize * textureSize * 2);
+    this.positionLayer.setFromArray(emptyData);
+    this.velocityLayer.setFromArray(emptyData);
+  }
+
+  updateParameters(params: any) {
+    if (params.particleCount && params.particleCount !== this.particleCount) {
+      console.log('[GPU] Particle count changed, recreation needed');
+      return false; // Indicates recreation is needed
+    }
+
+    // Validate and update boundary condition
+    if (params.boundaryCondition) {
+      this.boundaryCondition = params.boundaryCondition;
+      const conditionCode = boundaryConditionMap[this.boundaryCondition] ?? 0;
+      this.positionProgram.setUniform('u_boundary_condition', conditionCode, INT);
+      console.log('[GPU] Boundary condition updated:', this.boundaryCondition, '-> code:', conditionCode);
+    }
+    
+    // Validate and update boundary bounds
+    if (params.bounds) {
+      const oldBounds = { ...this.bounds };
+      this.bounds = params.bounds;
+      this.positionProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+      this.positionProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+      console.log('[GPU] Boundary bounds updated:', { 
+        from: oldBounds, 
+        to: this.bounds,
+        width: this.bounds.xMax - this.bounds.xMin,
+        height: this.bounds.yMax - this.bounds.yMin
+      });
+    }
+
+    console.log('[GPU] Parameters update complete:', {
+      boundaryCondition: this.boundaryCondition,
+      bounds: this.bounds,
+      hasValidBounds: this.bounds.xMax > this.bounds.xMin && this.bounds.yMax > this.bounds.yMin
+    });
+
+    return true; // Indicates manager can be updated
+  }
+
+  getMetrics() {
+    // Placeholder for metrics like collision count
+    return {
+      collisionCount: 0, // This is a placeholder, collision detection is not implemented on GPU yet
+      simulationTime: this.simulationTime
+    };
   }
 
   dispose() {

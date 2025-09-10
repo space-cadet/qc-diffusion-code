@@ -341,6 +341,7 @@ export default function RandomWalkSim() {
         dimension: gridLayoutParams.dimension,
         interparticleCollisions: gridLayoutParams.interparticleCollisions,
         strategies: gridLayoutParams.strategies,
+        boundaryCondition: gridLayoutParams.boundaryCondition,
         graphType: gridLayoutParams.graphType,
         graphSize: gridLayoutParams.graphSize,
         particleCount: gridLayoutParams.particles,
@@ -360,7 +361,12 @@ export default function RandomWalkSim() {
       // Re-connect particle manager after parameter updates
       setParticleManager(simulatorRef.current.getParticleManager());
     }
-  }, [gridLayoutParams]);
+
+    // Update GPU parameters if in GPU mode
+    if (useGPU && (particlesLoaded as any).updateGPUParameters) {
+      (particlesLoaded as any).updateGPUParameters(gridLayoutParams);
+    }
+  }, [gridLayoutParams, useGPU]);
 
   const handleStart = () => {
     setSimulationState((prev) => ({
@@ -431,6 +437,11 @@ export default function RandomWalkSim() {
       if (observableManager) {
         observableManager.reset();
       }
+    }
+    
+    // Reset GPU if in GPU mode
+    if (useGPU && (particlesLoaded as any).resetGPU) {
+      (particlesLoaded as any).resetGPU();
     }
     
     // Reset refs
@@ -527,6 +538,11 @@ export default function RandomWalkSim() {
       for (const p of particles) {
         const canvasPos = pm.mapToCanvas(p.position);
         container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
+      }
+
+      // Initialize GPU if in GPU mode
+      if (useGPU && (particlesLoaded as any).initializeGPU) {
+        (particlesLoaded as any).initializeGPU(particles);
       }
 
       // Save the initialized particle state

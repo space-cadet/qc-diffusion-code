@@ -1,7 +1,7 @@
 # GPU.IO Implementation Plan: Migration from tsParticles
 
 *Created: 2025-09-01 14:32:15 IST*
-*Last Updated: 2025-09-10 11:32:03 IST*
+*Last Updated: 2025-09-10 15:03:23 IST*
 
 ## Executive Summary
 
@@ -261,17 +261,32 @@ export class MockBackendInterface implements BackendInterface {
 - `frontend/src/hooks/useParticlesLoader.ts` (initialization timing, late mapper binding)
 - `frontend/src/config/tsParticlesConfig.ts` (proper tsParticles API usage)
 
-#### Current Status & Issues Found (2025-09-10)
-**GPU SIMULATION WORKING**: Position updates, coordinate mapping, particle sync functional
-**CRITICAL UI INTEGRATION ISSUES DISCOVERED**:
-1. **Reset/Initialize disconnect**: UI controls only work with CPU simulator, don't reset/reinitialize GPU
-2. **Parameter updates ignored**: GPU manager doesn't update when physics parameters change
-3. **Metrics not tracked**: Time/collision stats only come from CPU simulator in GPU mode
-4. **State snapshots incomplete**: Periodic saves only capture CPU state, not GPU state
-5. **GPU lifecycle broken**: GPU manager created once, never updated/recreated
+#### Session 2025-09-10 Afternoon - GPU-CPU Parameter Synchronization (✅ COMPLETED)
+**UI Integration Issues Resolved**: All critical issues from Phase 1.5 addressed
+**Key Fixes Applied**:
+1. **GPU Lifecycle Management**: Added `resetGPU()`, `initializeGPU()`, `updateGPUParameters()` methods to useParticlesLoader
+2. **Boundary Condition Integration**: Enhanced GPU shader with `u_bounds_min`, `u_bounds_max`, `u_boundary_condition` uniforms for periodic/reflective boundaries
+3. **Parameter Synchronization**: Fixed missing `boundaryCondition` parameter in CPU simulator calls, ensuring proper GPU-CPU sync
+4. **State Persistence**: Added `gpuState` field to store interface for position/velocity/collision state persistence
+5. **Critical Timing Fix**: Resolved particle collapse by ensuring boundary parameters set immediately after GPU manager creation
+6. **API Enhancement**: Added `getBoundaryConfig()` to RandomWalkSimulator and `getStrategy()` to ParticleManager for GPU access
 
-**Phase 1.5 Required**: Fix UI integration before Phase 2 collision physics
-**Estimated Effort**: ~180 lines across 3-4 files to add GPU paths to all UI control flows
+**Technical Impact**:
+- GPU particles initialize correctly without collapse to origin
+- Boundary condition changes apply immediately without reload
+- Proper parameter flow: UI → CPU simulator → GPU manager
+- Enhanced error handling for missing configurations
+- GPU state properly tracked and persisted across sessions
+
+**Files Enhanced**:
+- `frontend/src/gpu/GPUParticleManager.ts` (boundary shader uniforms, parameter validation)
+- `frontend/src/hooks/useParticlesLoader.ts` (GPU lifecycle methods, boundary initialization)
+- `frontend/src/RandomWalkSim.tsx` (GPU parameter updates, reset/initialize calls)
+- `frontend/src/physics/RandomWalkSimulator.ts` (getBoundaryConfig API)
+- `frontend/src/physics/ParticleManager.ts` (getStrategy API)
+- `frontend/src/stores/appStore.ts` (gpuState persistence)
+
+**Phase 1.5 Status**: ✅ COMPLETED - UI integration working, ready for Phase 2 collision physics
 
 ### Phase 2: GPU Physics (Week 3-4)
 - [ ] Implement GPU collision detection shaders

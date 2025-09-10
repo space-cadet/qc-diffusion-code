@@ -276,6 +276,10 @@ export class RandomWalkSimulator {
     return this.particleManager;
   }
 
+  public getBoundaryConfig() {
+    return this.parameterManager.getBoundaryConfig();
+  }
+
   getPhysicsEngine(): PhysicsEngine | undefined {
     return this.physicsEngine;
   }
