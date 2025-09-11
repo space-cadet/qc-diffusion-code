@@ -1,6 +1,6 @@
 # GPU Collisions Strategy Implementation
 *Created: 2025-09-11, 12:58:51 IST*
-*Last updated: 2025-09-11, 13:01:43 IST*
+*Last updated: 2025-09-11, 23:21:54 IST*
 
 This document describes the 2D GPU-based interparticle collisions strategy used by the Random Walk component. The 1D strategy will be documented in this file as a later addition.
 
@@ -187,4 +187,32 @@ Implementation Tasks:
 Reporting:
 - Produce a markdown summary with tables/plots (particles vs frame time, collisions/sec) under `memory-bank/benchmarks/`.
 - Highlight crossover points where GPU overtakes CPU.
+
+## Planned: CTRW (1D/2D) on GPU — 2025-09-11 23:21:54 IST
+
+- Per-particle CTRW state textures:
+  - `nextCollisionTime`, `lastCollisionTime`, `waitTime` (packed in a RGBA layer or separate 1–2 layers).
+  - Optional seed texture for reproducibility; otherwise use a uniform seed + time hash.
+- RNG in-shader: small GLSL hash PRNG (e.g., iq hash) included in a dedicated `frontend/src/gpu/shaders/rng.glsl`.
+- New pass: `ctrw.glsl` executed each step before position/velocity updates:
+  - Sample exponential waiting time with rate `collisionRate`.
+  - When event occurs, refresh direction (2D) or sign (1D), set `lastCollisionTime`, schedule `nextCollisionTime`.
+- 1D handling on GPU:
+  - Constrain `vy=0`, keep `y` fixed; reduce direction sampling to ±x.
+- Parameter plumbing via `GPUParticleManager.updateParameters`:
+  - `collisionRate`, `jumpLength`, `velocity`, `dimension`.
+- Ordering with existing passes:
+  - `CTRW → velocityUpdate → positionUpdate → collisions` (collisions optional by flag).
+
+## Planned: Strategy Composition on GPU — 2025-09-11 23:21:54 IST
+
+- Composition implemented as fixed pass orchestration inside GPU pipeline (no shader awareness of TS strategies):
+  - Base ballistic (existing position/velocity shaders)
+  - Optional CTRW pass (pre-integration)
+  - Optional collisions pass (existing GPUCollisionManager)
+- Mapping from CPU StrategyFactory selections to GPU pass-enable flags:
+  - `'ctrw'` → enable CTRW pass; `'collisions'` → enable collisions pass.
+  - 1D/2D dimension flag controls kernels and constraints.
+- No changes to `StrategyFactory.ts`/`CompositeStrategy.ts` needed for GPU mode; `useGPU` path bypasses CPU strategies.
+- Public API remains the same; only `GPUParticleManager` gains internal pass toggles and parameter setters.
 

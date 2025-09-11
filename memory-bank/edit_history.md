@@ -5,6 +5,28 @@ _Last Updated: 2025-09-11 13:18:05 IST_
 
 ### 2025-09-11
 
+#### 23:58 - C16a: GPU.IO Architecture Refactoring and Modularization (GPT-5)
+- Updated `frontend/src/gpu/GPUCollisionManager.ts` - Externalized inline shader code to separate GLSL files, imported collision detection, collision pairs, and spatial grid shaders via `?raw` imports
+- Updated `frontend/src/gpu/GPUParticleManager.ts` - Externalized position and velocity update shaders to separate files, extracted utility functions to modular lib/ directory, imported utilities via dedicated modules (ColorUtils, GPUParams, GPUSync)
+- Created `frontend/src/gpu/shaders/positionUpdate.glsl` - Externalized position update shader with boundary condition handling (periodic, reflective, absorbing)
+- Created `frontend/src/gpu/shaders/velocityUpdate.glsl` - Externalized velocity update shader with reflective boundary physics
+- Created `frontend/src/gpu/shaders/collision_detection.glsl` - Externalized collision detection shader with spatial grid optimization and elastic collision physics
+- Created `frontend/src/gpu/shaders/collision_pairs.glsl` - Externalized collision pairs shader for bilateral velocity updates
+- Created `frontend/src/gpu/shaders/collision_compacted.glsl` - Additional collision shader variant with compacted neighbor lists
+- Created `frontend/src/gpu/shaders/collision_simple.glsl` - Simplified collision shader for testing and fallback scenarios
+- Created `frontend/src/gpu/shaders/spatialGrid_neighbors.glsl` - Enhanced spatial grid shader with neighbor list building
+- Created `frontend/src/gpu/lib/SpatialGrid.ts` - Extracted spatial grid utilities (computeGridSize, buildNeighborBuffers) for O(n) collision optimization
+- Created `frontend/src/gpu/lib/ColorUtils.ts` - Extracted color conversion utilities (hexToHsl) for collision visual feedback
+- Created `frontend/src/gpu/lib/GPUParams.ts` - Extracted GPU parameter constants (boundaryConditionMap) for centralized configuration
+- Created `frontend/src/gpu/lib/GPUSync.ts` - Extracted particle synchronization logic (syncParticlesToContainer) for tsParticles integration
+- Updated `memory-bank/implementation-details/gpu-collisions-strategy-implementation.md` - Added planned CTRW and strategy composition sections documenting future GPU architecture enhancements
+- Updated `memory-bank/implementation-details/gpu-io-implementation-plan.md` - Added refactor log section documenting shader externalization and utility modularization
+- Created `memory-bank/tasks/C16a.md` - New task documenting GPU.IO refactoring work with modular architecture implementation tracking
+- Updated `memory-bank/tasks.md` - Added C16a to active tasks registry with MEDIUM priority and C16 dependency, updated timestamps
+- Created `memory-bank/sessions/2025-09-11-night.md` - Session file documenting C16a task creation and refactoring work documentation
+- Updated `memory-bank/session_cache.md` - Updated current session to 2025-09-11-night.md with C16a focus, added C16a to task registry
+- Updated `memory-bank/edit_history.md` - This entry recording comprehensive GPU.IO refactoring and modularization work
+
 #### 13:14 - C16: Enhanced GPU Collision Implementation (GPT-5) and Memory Bank Updates
 - Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Added collision alpha slider (0-10 range) for threshold scaling and showCollisions toggle for visual effects
 - Updated `frontend/src/config/tsParticlesConfig.ts` - Extended collision flash duration from 200ms to 600ms for better visibility

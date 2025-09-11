@@ -512,3 +512,12 @@ The migration to GPU.IO represents a significant architectural improvement that 
 4. **Future-Proof**: Prepare for WebGPU migration and advanced features
 
 The backend-agnostic design ensures the system can operate independently of the Python backend while maintaining the ability to integrate with it for verification and advanced scenarios.
+
+## Refactor Log — 2025-09-11 23:21:54 IST
+
+- Externalized inline shaders from `frontend/src/gpu/GPUParticleManager.ts`:
+  - Created `frontend/src/gpu/shaders/positionUpdate.glsl`
+  - Created `frontend/src/gpu/shaders/velocityUpdate.glsl`
+  - Updated `GPUParticleManager.ts` to import GLSL via `?raw`; behavior unchanged
+- Extracted color helper into `frontend/src/gpu/lib/ColorUtils.ts` and replaced inline helper in `GPUParticleManager.ts`
+- Motivation: reduce file size and improve maintainability without altering runtime behavior; groundwork for subsequent modular split (`GPUState`, `GPUPrograms`, `GPUPasses`, `GPUSync`, `GPUParams`, `GPUDebug`).

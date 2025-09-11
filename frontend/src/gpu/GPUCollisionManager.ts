@@ -1,205 +1,14 @@
 import { GPUComposer, GPULayer, GPUProgram, FLOAT, INT } from 'gpu-io';
+import { computeGridSize, buildNeighborBuffers } from './lib/SpatialGrid';
+import COLLISION_PAIRS_GLSL from './shaders/collision_pairs.glsl?raw';
+import SPATIAL_GRID_GLSL from './shaders/spatialGrid.glsl?raw';
+import COLLISION_DETECTION_GLSL from './shaders/collision_detection.glsl?raw';
 
 // Read shader files
-const SPATIAL_GRID_SHADER = `#version 300 es
-precision highp float;
+const SPATIAL_GRID_SHADER = SPATIAL_GRID_GLSL;
 
-uniform sampler2D u_position;
-uniform ivec2 u_texSize;
-uniform int u_particle_count;
-uniform vec2 u_bounds_min;
-uniform vec2 u_bounds_max;
-uniform float u_cell_size;
-
-in vec2 v_uv;
-out vec4 fragColor;
-
-vec2 indexToUV(int idx, ivec2 texSize) {
-  int x = idx % texSize.x;
-  int y = idx / texSize.x;
-  return (vec2(float(x), float(y)) + 0.5) / vec2(texSize);
-}
-
-ivec2 getGridCell(vec2 pos) {
-  vec2 relPos = pos - u_bounds_min;
-  return ivec2(floor(relPos / u_cell_size));
-}
-
-// Clamp a grid cell to simulation bounds (explicit int casts for GLES)
-ivec2 clampCell(ivec2 cell) {
-  vec2 gridSizeF = (u_bounds_max - u_bounds_min) / u_cell_size;
-  int gx = int(max(1.0, floor(gridSizeF.x)));
-  int gy = int(max(1.0, floor(gridSizeF.y)));
-  ivec2 gridSize = ivec2(gx, gy);
-  ivec2 minC = ivec2(0, 0);
-  ivec2 maxC = gridSize - ivec2(1, 1);
-  return ivec2(clamp(cell.x, minC.x, maxC.x), clamp(cell.y, minC.y, maxC.y));
-}
-
-// Clamp a grid cell to simulation bounds (explicit int casts for GLES)
-ivec2 clampCell(ivec2 cell) {
-  vec2 gridSizeF = (u_bounds_max - u_bounds_min) / u_cell_size;
-  int gx = int(max(1.0, floor(gridSizeF.x)));
-  int gy = int(max(1.0, floor(gridSizeF.y)));
-  ivec2 gridSize = ivec2(gx, gy);
-  ivec2 minC = ivec2(0, 0);
-  ivec2 maxC = gridSize - ivec2(1, 1);
-  return ivec2(clamp(cell.x, minC.x, maxC.x), clamp(cell.y, minC.y, maxC.y));
-}
-
-void main() {
-  ivec2 texCoords = ivec2(gl_FragCoord.xy);
-  int particleIdx = texCoords.y * u_texSize.x + texCoords.x;
-  
-  if (particleIdx >= u_particle_count) {
-    fragColor = vec4(-1.0, -1.0, -1.0, -1.0);
-    return;
-  }
-
-  vec2 uv = indexToUV(particleIdx, u_texSize);
-  vec2 pos = texture(u_position, uv).xy;
-  ivec2 gridCell = clampCell(getGridCell(pos));
-  
-  fragColor = vec4(float(gridCell.x), float(gridCell.y), float(particleIdx), 1.0);
-}`;
-
-const COLLISION_SHADER = `#version 300 es
-precision highp float;
-
-uniform sampler2D u_position;
-uniform sampler2D u_velocity;
-uniform sampler2D u_spatial_grid;
-uniform ivec2 u_texSize;
-uniform int u_particle_count;
-uniform float u_radius;
-uniform float u_current_time;
-uniform vec2 u_bounds_min;
-uniform vec2 u_bounds_max;
-uniform float u_cell_size;
-
-in vec2 v_uv;
-out vec4 fragColor;
-
-vec2 indexToUV(int idx, ivec2 texSize) {
-  int x = idx % texSize.x;
-  int y = idx / texSize.x;
-  return (vec2(float(x), float(y)) + 0.5) / vec2(texSize);
-}
-
-ivec2 getGridCell(vec2 pos) {
-  vec2 relPos = pos - u_bounds_min;
-  return ivec2(floor(relPos / u_cell_size));
-}
-
-bool isInCell(int particleIdx, ivec2 targetCell) {
-  if (particleIdx >= u_particle_count) return false;
-  
-  vec2 gridUV = indexToUV(particleIdx, u_texSize);
-  vec4 gridData = texture(u_spatial_grid, gridUV);
-  
-  if (gridData.z < 0.0) return false;
-  
-  ivec2 cellCoords = ivec2(gridData.xy);
-  return cellCoords == targetCell;
-}
-
-void main() {
-  ivec2 texCoords = ivec2(gl_FragCoord.xy);
-  int selfIdx = texCoords.y * u_texSize.x + texCoords.x;
-  
-  if (selfIdx >= u_particle_count) {
-    fragColor = vec4(0.0);
-    return;
-  }
-
-  vec2 pos = texture(u_position, v_uv).xy;
-  vec2 vel = texture(u_velocity, v_uv).xy;
-  
-  ivec2 myCell = getGridCell(pos);
-  vec2 newVel = vel;
-  float collisionTime = 0.0;
-  
-  for (int dx = -1; dx <= 1; dx++) {
-    for (int dy = -1; dy <= 1; dy++) {
-      ivec2 checkCell = clampCell(myCell + ivec2(dx, dy));
-      
-      for (int i = 0; i < 8; i++) {
-        int raw = checkCell.x * 37 + checkCell.y * 73 + i * 23;
-        int candidateIdx = int(mod(abs(float(raw)), float(u_particle_count)));
-        
-        if (candidateIdx == selfIdx) continue;
-        if (!isInCell(candidateIdx, checkCell)) continue;
-        
-        vec2 otherUV = indexToUV(candidateIdx, u_texSize);
-        vec2 otherPos = texture(u_position, otherUV).xy;
-        vec2 otherVel = texture(u_velocity, otherUV).xy;
-        
-        vec2 dp = pos - otherPos;
-        float dist2 = dot(dp, dp);
-        float collisionDist2 = (2.0 * u_radius) * (2.0 * u_radius);
-        
-        if (dist2 > 0.0 && dist2 < collisionDist2) {
-          float dist = sqrt(dist2);
-          vec2 n = dp / dist;
-          
-          // Check if particles are moving towards each other
-          vec2 relativeVel = vel - otherVel;
-          float relativeSpeed = dot(relativeVel, n);
-          if (relativeSpeed >= 0.0) continue; // Non-approaching or parallel
-          
-          // Separate overlapping particles
-          float overlap = (2.0 * u_radius) - dist;
-          if (overlap > 0.0) {
-            vec2 separation = n * (overlap * 0.5);
-            // Store separation for position correction (using w component)
-            fragColor = vec4(vel - relativeSpeed * n, u_current_time, overlap);
-            return;
-          }
-          
-          // Proper elastic collision for equal masses
-          vec2 impulse = relativeSpeed * n;
-          newVel = vel - impulse;
-          collisionTime = u_current_time;
-          
-          // Handle one collision per frame
-          fragColor = vec4(newVel, collisionTime, 1.0);
-          return;
-        }
-      }
-    }
-  }
-  
-  fragColor = vec4(newVel, collisionTime, 1.0);
-}`;
-
-const COLLISION_PAIRS_SHADER = `#version 300 es
-precision highp float;
-
-uniform sampler2D u_collision_result;
-uniform ivec2 u_texSize;
-uniform int u_particle_count;
-
-in vec2 v_uv;
-out vec4 fragColor;
-
-void main() {
-  ivec2 texCoords = ivec2(gl_FragCoord.xy);
-  int particleIdx = texCoords.y * u_texSize.x + texCoords.x;
-  
-  if (particleIdx >= u_particle_count) {
-    fragColor = vec4(0.0);
-    return;
-  }
-
-  vec4 collisionData = texture(u_collision_result, v_uv);
-  vec2 velocity = collisionData.xy;
-  float collisionTime = collisionData.z;
-  float overlap = collisionData.w;
-  
-  // Apply bilateral velocity updates for proper momentum conservation
-  // This pass ensures both particles in a collision get updated
-  fragColor = vec4(velocity, collisionTime, overlap);
-}`;
+// Externalized collision pairs shader
+const COLLISION_PAIRS_SHADER = COLLISION_PAIRS_GLSL;
 
 export class GPUCollisionManager {
   private composer?: GPUComposer;
@@ -300,115 +109,7 @@ export class GPUCollisionManager {
       // Collision program
       this.collisionProgram = new GPUProgram(composer, {
         name: 'collision',
-        fragmentShader: `#version 300 es
-precision highp float;
-
-uniform sampler2D u_position;
-uniform sampler2D u_velocity;
-uniform sampler2D u_cell_offsets;     // 1-channel tex (prefix sums), length = gridCells+1
-uniform sampler2D u_particle_indices; // 1-channel tex (particle ids), length = particleCount
-uniform ivec2 u_texSize;              // state texture size (position/velocity)
-uniform ivec2 u_offsetsTexSize;       // cellOffsets texture dims
-uniform ivec2 u_indicesTexSize;       // particleIndices texture dims
-uniform ivec2 u_gridSize;             // grid width/height
-uniform int u_particle_count;
-uniform float u_radius;
-uniform float u_alpha;
-uniform float u_current_time;
-uniform vec2 u_bounds_min;
-uniform vec2 u_bounds_max;
-uniform float u_cell_size;
-uniform int u_is1D; // 1 when using 1D collisions (grid height = 1)
-
-in vec2 v_uv;
-out vec4 fragColor;
-
-vec2 indexToUV(int idx, ivec2 texSize) {
-  int x = idx % texSize.x;
-  int y = idx / texSize.x;
-  return (vec2(float(x), float(y)) + 0.5) / vec2(texSize);
-}
-
-ivec2 getGridCell(vec2 pos) {
-  vec2 relPos = pos - u_bounds_min;
-  return ivec2(floor(relPos / u_cell_size));
-}
-
-ivec2 clampCell(ivec2 cell) {
-  vec2 gridSizeF = (u_bounds_max - u_bounds_min) / u_cell_size;
-  int gx = int(max(1.0, floor(gridSizeF.x)));
-  int gy = int(max(1.0, floor(gridSizeF.y)));
-  ivec2 gridSize = ivec2(gx, gy);
-  ivec2 minC = ivec2(0, 0);
-  ivec2 maxC = gridSize - ivec2(1, 1);
-  return ivec2(clamp(cell.x, minC.x, maxC.x), clamp(cell.y, minC.y, maxC.y));
-}
-
-// Read a 1D float from a packed 2D texture (single-channel)
-float tex1D(sampler2D tex, int index, ivec2 texSize) {
-  vec2 uv = indexToUV(index, texSize);
-  return texture(tex, uv).x;
-}
-
-void main() {
-  ivec2 texCoords = ivec2(gl_FragCoord.xy);
-  int selfIdx = texCoords.y * u_texSize.x + texCoords.x;
-  if (selfIdx >= u_particle_count) { fragColor = vec4(0.0); return; }
-
-  vec2 pos = texture(u_position, v_uv).xy;
-  vec2 vel = texture(u_velocity, v_uv).xy;
-
-  ivec2 myCell = clampCell(getGridCell(pos));
-  vec2 newVel = vel;
-  float collisionTime = 0.0;
-
-  for (int dx = -1; dx <= 1; dx++) {
-    for (int dy = -1; dy <= 1; dy++) {
-      if (u_is1D == 1 && dy != 0) continue; // 1D: only sweep along x
-      ivec2 c = clampCell(myCell + ivec2(dx, dy));
-      int cellId = c.x + c.y * u_gridSize.x;
-      int start = int(tex1D(u_cell_offsets, cellId, u_offsetsTexSize));
-      int end   = int(tex1D(u_cell_offsets, cellId + 1, u_offsetsTexSize));
-
-      for (int j = start; j < end; j++) {
-        int candidateIdx = int(tex1D(u_particle_indices, j, u_indicesTexSize));
-        if (candidateIdx == selfIdx) continue;
-        if (candidateIdx < 0 || candidateIdx >= u_particle_count) continue;
-
-        vec2 otherUV = indexToUV(candidateIdx, u_texSize);
-        vec2 otherPos = texture(u_position, otherUV).xy;
-        vec2 otherVel = texture(u_velocity, otherUV).xy;
-
-        vec2 dp = pos - otherPos;
-        float dist2 = dot(dp, dp);
-        float thresh = 2.0 * u_radius * u_alpha;
-        float collisionDist2 = thresh * thresh;
-        if (dist2 > 0.0 && dist2 < collisionDist2) {
-          float dist = sqrt(dist2);
-          vec2 n = dp / dist;
-          vec2 vrel = vel - otherVel;
-          float rel = dot(vrel, n);
-          if (rel >= 0.0) continue; // not approaching
-
-          // overlap correction path (store time+overlap)
-          float overlap = (2.0 * u_radius) - dist;
-          if (overlap > 0.0) {
-            fragColor = vec4(vel - rel * n, u_current_time, overlap);
-            return;
-          }
-
-          vec2 impulse = rel * n;
-          newVel = vel - impulse;
-          collisionTime = u_current_time;
-          fragColor = vec4(newVel, collisionTime, 1.0);
-          return; // one collision per frame
-        }
-      }
-    }
-  }
-
-  fragColor = vec4(newVel, collisionTime, 1.0);
-}`
+        fragmentShader: COLLISION_DETECTION_GLSL
       });
       this.collisionProgram.setUniform('u_position', 0, INT);
       this.collisionProgram.setUniform('u_velocity', 1, INT);
@@ -560,64 +261,25 @@ void main() {
 
   // Compute grid dimensions from bounds and cell size
   private updateGridSize(boundsMin: [number, number], boundsMax: [number, number]) {
-    const width = Math.max(1, Math.floor((boundsMax[0] - boundsMin[0]) / this.cellSize));
-    const baseHeight = Math.max(1, Math.floor((boundsMax[1] - boundsMin[1]) / this.cellSize));
-    const height = this.is1D ? 1 : baseHeight;
-    this.gridSize = { width, height };
+    const gs = computeGridSize(boundsMin, boundsMax, this.cellSize, this.is1D);
+    this.gridSize = { width: gs.width, height: gs.height };
   }
 
   // Build per-cell neighbor lists on CPU and upload into textures
   private buildAndUploadNeighborBuffers(positionLayer: GPULayer) {
     if (!this.cellOffsetsLayer || !this.particleIndicesLayer) return;
-    const texSide = this.texSize[0];
-    const posData = positionLayer.getValues() as Float32Array; // length = texSide*texSide*2
+    const posData = positionLayer.getValues() as Float32Array;
 
-    const n = this.particleCount;
-    const gridW = this.gridSize.width;
-    const gridH = this.is1D ? 1 : this.gridSize.height;
-    const gridCells = gridW * gridH;
+    const { offsets, indices } = buildNeighborBuffers(
+      posData,
+      this.particleCount,
+      { width: this.gridSize.width, height: this.gridSize.height },
+      this.boundsMin,
+      this.cellSize,
+      this.is1D
+    );
 
-    const counts = new Int32Array(gridCells);
-    const indices = new Int32Array(n);
-
-    // First pass: count per-cell occupancy
-    for (let i = 0; i < n; i++) {
-      const x = posData[i * 2];
-      const y = posData[i * 2 + 1];
-      let cx = Math.floor((x - this.boundsMin[0]) / this.cellSize);
-      let cy = this.is1D ? 0 : Math.floor((y - this.boundsMin[1]) / this.cellSize);
-      if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
-      if (cx < 0) cx = 0; else if (cx >= gridW) cx = gridW - 1;
-      if (cy < 0) cy = 0; else if (cy >= gridH) cy = gridH - 1;
-      const cellId = cx + cy * gridW;
-      counts[cellId]++;
-    }
-
-    // Prefix sums (offsets)
-    const offsets = new Int32Array(gridCells + 1);
-    let sum = 0;
-    for (let c = 0; c < gridCells; c++) {
-      offsets[c] = sum;
-      sum += counts[c];
-    }
-    offsets[gridCells] = sum;
-
-    // Second pass: fill compacted indices using running cursors
-    const cursor = new Int32Array(offsets); // copy
-    for (let i = 0; i < n; i++) {
-      const x = posData[i * 2];
-      const y = posData[i * 2 + 1];
-      let cx = Math.floor((x - this.boundsMin[0]) / this.cellSize);
-      let cy = Math.floor((y - this.boundsMin[1]) / this.cellSize);
-      if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
-      if (cx < 0) cx = 0; else if (cx >= gridW) cx = gridW - 1;
-      if (cy < 0) cy = 0; else if (cy >= gridH) cy = gridH - 1;
-      const cellId = cx + cy * gridW;
-      const dst = cursor[cellId]++;
-      indices[dst] = i;
-    }
-
-    // Upload to 2D textures as single-channel floats
+    // Upload to 2D textures as single-channel floats (pad to texture size)
     const offsetsTexElems = this.offsetsTexSide * this.offsetsTexSide;
     const offsetsUpload = new Float32Array(offsetsTexElems);
     for (let i = 0; i < Math.min(offsets.length, offsetsTexElems); i++) offsetsUpload[i] = offsets[i];

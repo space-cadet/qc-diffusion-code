@@ -1,5 +1,10 @@
 import { GPUComposer, GPULayer, GPUProgram, FLOAT, INT } from 'gpu-io';
 import { GPUCollisionManager } from './GPUCollisionManager';
+import POSITION_UPDATE_SHADER from './shaders/positionUpdate.glsl?raw';
+import VELOCITY_UPDATE_SHADER from './shaders/velocityUpdate.glsl?raw';
+import { hexToHsl } from './lib/ColorUtils';
+import { boundaryConditionMap } from './lib/GPUParams';
+import { syncParticlesToContainer } from './lib/GPUSync';
 
 // TODO[C16-Phase2 GPU Collisions]: Minimal MVP plan (comments only, no behavior change)
 // 1) Data layout
@@ -21,93 +26,11 @@ import { GPUCollisionManager } from './GPUCollisionManager';
 // 5) Fallback:
 //    - If shaders fail or capacities exceeded, skip collisions and continue with advection only.
 
-const POSITION_UPDATE_SHADER = `#version 300 es
-precision highp float;
+// POSITION_UPDATE_SHADER imported from external GLSL file
 
-uniform float u_dt;
-uniform sampler2D u_position;
-uniform sampler2D u_velocity;
-uniform vec2 u_bounds_min;
-uniform vec2 u_bounds_max;
-uniform int u_boundary_condition; // 0: periodic, 1: reflective, 2: absorbing
+// VELOCITY_UPDATE_SHADER imported from external GLSL file
 
-in vec2 v_uv;
-out vec4 fragColor;
-
-void main() {
-  vec2 position = texture(u_position, v_uv).xy;
-  vec2 velocity = texture(u_velocity, v_uv).xy;
-  
-  vec2 newPosition = position + velocity * u_dt;
-
-  // Boundary Conditions
-  if (u_boundary_condition == 0) { // Periodic
-    if (newPosition.x < u_bounds_min.x) { newPosition.x += (u_bounds_max.x - u_bounds_min.x); }
-    if (newPosition.x > u_bounds_max.x) { newPosition.x -= (u_bounds_max.x - u_bounds_min.x); }
-    if (newPosition.y < u_bounds_min.y) { newPosition.y += (u_bounds_max.y - u_bounds_min.y); }
-    if (newPosition.y > u_bounds_max.y) { newPosition.y -= (u_bounds_max.y - u_bounds_min.y); }
-  } else if (u_boundary_condition == 1) { // Reflective
-    // Clamp position to bounds; velocity flip is handled in a separate pass
-    newPosition.x = clamp(newPosition.x, u_bounds_min.x, u_bounds_max.x);
-    newPosition.y = clamp(newPosition.y, u_bounds_min.y, u_bounds_max.y);
-  } else if (u_boundary_condition == 2) { // Absorbing (remove)
-    // Mark particle as removed by moving it just outside bounds; sync step will skip rendering
-    bool crossed = (newPosition.x < u_bounds_min.x) || (newPosition.x > u_bounds_max.x) ||
-                   (newPosition.y < u_bounds_min.y) || (newPosition.y > u_bounds_max.y);
-    if (crossed) {
-      newPosition = vec2(u_bounds_min.x - 1.0, u_bounds_min.y - 1.0);
-    }
-  }
-  
-  fragColor = vec4(newPosition, 0.0, 1.0);
-}`;
-
-const VELOCITY_UPDATE_SHADER = `#version 300 es
-precision highp float;
-
-uniform float u_dt;
-uniform sampler2D u_position;
-uniform sampler2D u_velocity;
-uniform vec2 u_bounds_min;
-uniform vec2 u_bounds_max;
-uniform int u_boundary_condition; // 0: periodic, 1: reflective, 2: absorbing
-
-in vec2 v_uv;
-out vec4 fragColor;
-
-void main() {
-  vec2 position = texture(u_position, v_uv).xy;
-  vec2 velocity = texture(u_velocity, v_uv).xy;
-
-  // Default: keep velocity
-  vec2 newVelocity = velocity;
-
-  if (u_boundary_condition == 1) {
-    // Reflective: if the tentative step would cross a boundary, flip corresponding velocity component
-    vec2 tentative = position + velocity * u_dt;
-    if (tentative.x < u_bounds_min.x || tentative.x > u_bounds_max.x) {
-      newVelocity.x = -newVelocity.x;
-    }
-    if (tentative.y < u_bounds_min.y || tentative.y > u_bounds_max.y) {
-      newVelocity.y = -newVelocity.y;
-    }
-  } else if (u_boundary_condition == 2) {
-    // Absorbing: if outside bounds, zero velocity
-    bool dead = (position.x < u_bounds_min.x) || (position.x > u_bounds_max.x) ||
-                (position.y < u_bounds_min.y) || (position.y > u_bounds_max.y);
-    if (dead) {
-      newVelocity = vec2(0.0);
-    }
-  }
-
-  fragColor = vec4(newVelocity, 0.0, 1.0);
-}`;
-
-const boundaryConditionMap: { [key: string]: number } = {
-  'periodic': 0,
-  'reflective': 1,
-  'absorbing': 2,
-};
+// boundaryConditionMap imported from GPUParams
 
 export class GPUParticleManager {
   private composer: GPUComposer;
@@ -362,142 +285,18 @@ export class GPUParticleManager {
   }
 
   syncToTsParticles(tsContainer: any) {
-    if (!tsContainer || typeof tsContainer !== 'object') {
-      console.error('[GPU] Invalid tsParticles container:', tsContainer);
-      return;
-    }
-
-    const particlesContainer: any = (tsContainer as any).particles;
-    if (!particlesContainer) {
-      console.error('[GPU] No particles container on tsParticles');
-      return;
-    }
-
-    // Determine count using public API; fall back to internal array length if needed
-    const tsCount: number = Number(
-      particlesContainer?.count ?? (particlesContainer?._array?.length ?? 0)
-    );
-    if (!Number.isFinite(tsCount) || tsCount <= 0) {
-      // Throttled warning
-      (this as any)._syncWarnCounter = ((this as any)._syncWarnCounter ?? 0) + 1;
-      if ((this as any)._syncWarnCounter % 60 === 0) {
-        console.warn('[GPU] Skipping sync - container has no particles yet');
-      }
-      return;
-    }
-
     const data = this.getParticleData();
     const collisionTimes = this.collisionManager.getCollisionTimes();
-    const syncCount = Math.min(tsCount, this.particleCount);
-
-    // Throttled diagnostic
-    (this as any)._syncLogCounter = ((this as any)._syncLogCounter ?? 0) + 1;
-    if ((this as any)._syncLogCounter % 120 === 0) {
-      console.log('[GPU] Syncing to tsParticles', {
-        gpuParticles: this.particleCount,
-        tsParticles: tsCount,
-        syncing: syncCount,
-        hasCollisionTimes: !!collisionTimes,
-      });
-    }
-
-    // Helper function to convert hex color to HSL
-    const hexToHsl = (hex: string): { h: number; s: number; l: number } => {
-      const r = parseInt(hex.slice(1, 3), 16) / 255;
-      const g = parseInt(hex.slice(3, 5), 16) / 255;
-      const b = parseInt(hex.slice(5, 7), 16) / 255;
-
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h = 0, s = 0, l = (max + min) / 2;
-
-      if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-      }
-
-      return { h: h * 360, s: s * 100, l: l * 100 };
-    };
-
-    // Sync positions and collision visual feedback
-    const allowFlashes = this.showCollisions === true;
-    const maxFlashes = Math.max(50, Math.floor(syncCount * 0.05));
-    let flashesThisFrame = 0;
-    for (let i = 0; i < syncCount; i++) {
-      const tsParticle = particlesContainer.get ? particlesContainer.get(i) : particlesContainer?._array?.[i];
-      if (!tsParticle) continue;
-
-      // Physics positions from GPU textures
-      const px = data[i * 2];
-      const py = data[i * 2 + 1];
-
-      // Skip dead particles for absorbing BC: they are marked just outside bounds
-      if (this.boundaryCondition === 'absorbing') {
-        const dead = (px < this.bounds.xMin - 0.5) || (px > this.bounds.xMax + 0.5) ||
-                     (py < this.bounds.yMin - 0.5) || (py > this.bounds.yMax + 0.5);
-        if (dead) {
-          // Move off-canvas to prevent rendering while keeping container count stable
-          tsParticle.position.x = -1e9;
-          tsParticle.position.y = -1e9;
-          continue;
-        }
-      }
-
-      if (this.canvasMapper) {
-        const mapped = this.canvasMapper({ x: px, y: py });
-        // Clamp to canvas bounds defensively if available
-        const w = tsContainer?.canvas?.size?.width ?? undefined;
-        const h = tsContainer?.canvas?.size?.height ?? undefined;
-        const clamp = (v: number, min: number, max: number) => (v < min ? min : v > max ? max : v);
-        tsParticle.position.x = (w && Number.isFinite(mapped.x)) ? clamp(mapped.x, 0, w) : mapped.x ?? 0;
-        tsParticle.position.y = (h && Number.isFinite(mapped.y)) ? clamp(mapped.y, 0, h) : mapped.y ?? 0;
-      } else {
-        // Fallback: write raw physics values
-        tsParticle.position.x = px;
-        tsParticle.position.y = py;
-      }
-
-      // GPU collision red flash with throttling
-      if (allowFlashes && collisionTimes && tsParticle.color) {
-        const lastCollisionTime = collisionTimes[i] || 0;
-        const timeSinceCollision = this.simulationTime - lastCollisionTime;
-        
-        if (timeSinceCollision < 0.5 && lastCollisionTime > 0 && flashesThisFrame < maxFlashes) { // Flash for 500ms
-          const redColor = hexToHsl("#ff4444"); // Red flash
-          tsParticle.color.h.value = redColor.h;
-          tsParticle.color.s.value = redColor.s;
-          tsParticle.color.l.value = redColor.l;
-          flashesThisFrame++;
-        } else {
-          const blueColor = hexToHsl("#3b82f6"); // Default blue
-          tsParticle.color.h.value = blueColor.h;
-          tsParticle.color.s.value = blueColor.s;
-          tsParticle.color.l.value = blueColor.l;
-        }
-      }
-    }
-
-    // Verify sync for first particle occasionally
-    if ((this as any)._syncLogCounter % 240 === 0) {
-      const ts0 = particlesContainer.get ? particlesContainer.get(0) : particlesContainer?._array?.[0];
-      if (ts0) {
-        console.log('[GPU] Sample p0 after sync', { 
-          x: ts0.position.x, 
-          y: ts0.position.y, 
-          gpuX: data[0], 
-          gpuY: data[1], 
-          mapped: !!this.canvasMapper,
-          collisionTime: collisionTimes?.[0] || 0,
-          timeSinceCollision: collisionTimes?.[0] ? this.simulationTime - collisionTimes[0] : 'N/A'
-        });
-      }
-    }
+    syncParticlesToContainer(
+      tsContainer,
+      data,
+      collisionTimes,
+      this.particleCount,
+      this.canvasMapper,
+      this.bounds,
+      this.simulationTime,
+      this.showCollisions
+    );
   }
 
   reset() {
