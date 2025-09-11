@@ -125,6 +125,7 @@ export class GPUParticleManager {
   private interparticleCollisions: boolean = false;
   private lastCollisionLogTime: number = 0;
   private lastDebugLogTime: number = 0;
+  private showCollisions: boolean = true;
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -425,6 +426,9 @@ export class GPUParticleManager {
     };
 
     // Sync positions and collision visual feedback
+    const allowFlashes = this.showCollisions === true;
+    const maxFlashes = Math.max(50, Math.floor(syncCount * 0.05));
+    let flashesThisFrame = 0;
     for (let i = 0; i < syncCount; i++) {
       const tsParticle = particlesContainer.get ? particlesContainer.get(i) : particlesContainer?._array?.[i];
       if (!tsParticle) continue;
@@ -459,16 +463,17 @@ export class GPUParticleManager {
         tsParticle.position.y = py;
       }
 
-      // GPU collision red flash - same logic as CPU version
-      if (collisionTimes && tsParticle.color) {
+      // GPU collision red flash with throttling
+      if (allowFlashes && collisionTimes && tsParticle.color) {
         const lastCollisionTime = collisionTimes[i] || 0;
         const timeSinceCollision = this.simulationTime - lastCollisionTime;
         
-        if (timeSinceCollision < 0.5 && lastCollisionTime > 0) { // Flash for 500ms
+        if (timeSinceCollision < 0.5 && lastCollisionTime > 0 && flashesThisFrame < maxFlashes) { // Flash for 500ms
           const redColor = hexToHsl("#ff4444"); // Red flash
           tsParticle.color.h.value = redColor.h;
           tsParticle.color.s.value = redColor.s;
           tsParticle.color.l.value = redColor.l;
+          flashesThisFrame++;
         } else {
           const blueColor = hexToHsl("#3b82f6"); // Default blue
           tsParticle.color.h.value = blueColor.h;
@@ -546,11 +551,23 @@ export class GPUParticleManager {
       console.log('[GPU] Interparticle collisions:', this.interparticleCollisions ? 'ENABLED' : 'DISABLED');
     }
 
+    if (typeof params.showCollisions === 'boolean') {
+      this.showCollisions = params.showCollisions;
+      console.log('[GPU] Show Collisions (flashes):', this.showCollisions ? 'ON' : 'OFF');
+    }
+
     // Allow collision manager to react to parameter changes (radius and bounds supported)
     if (params) {
       const collisionParams: any = {};
       if (typeof params.radius === 'number') {
         collisionParams.radius = params.radius;
+      }
+      if (typeof (params as any).alpha === 'number') {
+        collisionParams.alpha = (params as any).alpha;
+      }
+      if (typeof (params as any).dimension === 'string') {
+        collisionParams.dimension = (params as any).dimension;
+        collisionParams.is1D = ((params as any).dimension === '1D');
       }
       if (params.bounds) {
         collisionParams.bounds = this.bounds;

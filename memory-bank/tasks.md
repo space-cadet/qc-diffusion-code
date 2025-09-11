@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-10 23:47:52 IST_
+_Last Updated: 2025-09-11 13:14:35 IST_
 
 ## Active Tasks
 
@@ -178,9 +178,9 @@ _Last Updated: 2025-09-10 23:47:52 IST_
 
 ### C16: GPU.IO Framework Implementation with Rendering Engine Abstraction
 **Description**: Implement GPU.IO-based particle physics framework with complete backend agnosticism and on-the-fly switching between tsParticles and GPU.IO rendering engines
-**Status**: 🔄 IN PROGRESS - Phase 2 Complete **Last**: 2025-09-10 23:47:52 IST
-**Files**: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/gpu/GPUCollisionManager.ts`, `frontend/src/physics/utils/SpatialGrid.ts`
-**Notes**: Phase 2 complete with GPU collision system - collision.glsl and spatialGrid.glsl shaders implemented, collision counting and visualization, O(n) spatial optimization, elastic collision physics with proper separation handling
+**Status**: 🔄 IN PROGRESS - Phase 2 COMPLETE (Enhanced by GPT-5) **Last**: 2025-09-11 13:14:35 IST
+**Files**: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/gpu/GPUCollisionManager.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/types/simulationTypes.ts`
+**Notes**: Phase 2 enhanced by GPT-5 - Added collision alpha parameter (threshold scaling), CPU-GPU hybrid neighbor optimization, collision flash improvements (600ms duration), deterministic collision resolution, enhanced visualization with throttling, complete parameter integration from UI through GPU pipeline
 
 ### C17: Analysis Dashboard and Plotly Integration
 **Description**: Implement dedicated Analysis tab with Plotly.js integration, React Grid Layout interface, and data pipeline connecting simulation results to advanced plotting capabilities

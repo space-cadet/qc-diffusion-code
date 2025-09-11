@@ -1,7 +1,25 @@
 # Edit History
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-10 23:51:33 IST_
+_Last Updated: 2025-09-11 13:18:05 IST_
+
+### 2025-09-11
+
+#### 13:14 - C16: Enhanced GPU Collision Implementation (GPT-5) and Memory Bank Updates
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Added collision alpha slider (0-10 range) for threshold scaling and showCollisions toggle for visual effects
+- Updated `frontend/src/config/tsParticlesConfig.ts` - Extended collision flash duration from 200ms to 600ms for better visibility
+- Updated `frontend/src/gpu/GPUCollisionManager.ts` - Complete architectural rewrite with CPU-GPU hybrid neighbor optimization, spatial grid clamping, alpha parameter support
+- Updated `frontend/src/gpu/GPUParticleManager.ts` - Enhanced collision flash throttling, parameter synchronization, showCollisions integration
+- Updated `frontend/src/gpu/shaders/collision.glsl` - Improved collision detection logic with proper cell clamping and approaching particle detection
+- Updated `frontend/src/types/simulationTypes.ts` - Added alpha and showCollisions parameters to RandomWalkParams interface
+- Created `memory-bank/implementation-details/gpu-collisions-strategy-implementation.md` - Comprehensive technical documentation for GPU collision system
+- Deleted `git.diff` - Cleanup of temporary diff file
+- Updated `memory-bank/tasks/C16.md` - Enhanced with GPT-5 afternoon session details and advanced collision system achievements
+- Updated `memory-bank/tasks.md` - Updated C16 status to Phase 2 COMPLETE (Enhanced by GPT-5) with timestamp and implementation notes
+- Updated `memory-bank/implementation-details/gpu-io-implementation-plan.md` - Added Phase 2 enhancement section documenting GPT-5 contributions
+- Created `memory-bank/sessions/2025-09-11-afternoon.md` - Session file documenting GPT-5 GPU collision system enhancement work
+- Updated `memory-bank/session_cache.md` - Updated current session to afternoon with GPT-5 enhancement focus and session history
+- Updated `memory-bank/edit_history.md` - This entry
 
 ### 2025-09-10
 

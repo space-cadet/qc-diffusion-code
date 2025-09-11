@@ -184,7 +184,7 @@ export const updateParticlesFromStrategies = (
           : Infinity;
         
         // Update particle color properly for tsParticles
-        if (timeSinceCollision < 0.2) { // Flash for 200ms
+        if (timeSinceCollision < 0.6) { // Flash for 200ms
           if (tsParticle.color) {
             const hslColor = hexToHsl("#ff4444"); // Red flash
             tsParticle.color.h.value = hslColor.h;

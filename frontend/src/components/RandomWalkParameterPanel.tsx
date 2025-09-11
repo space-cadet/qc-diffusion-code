@@ -450,24 +450,72 @@ export const RandomWalkParameterPanel = ({
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("collisions") || false}
+                  checked={gridLayoutParams.interparticleCollisions}
                   onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
                     const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "collisions"), "collisions" as const]
-                      : strategies.filter(s => s !== "collisions");
-                    console.log('[STRATEGY] COLLISIONS:', newStrategies);
+                      ? Array.from(new Set([...(gridLayoutParams.strategies || []), 'collisions']))
+                      : (gridLayoutParams.strategies || []).filter((s) => s !== 'collisions');
                     setGridLayoutParams({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                       interparticleCollisions: e.target.checked,
                     });
-                    simulatorRef.current?.updateParameters({ strategies: newStrategies, interparticleCollisions: e.target.checked });
+                    simulatorRef.current?.updateParameters({ 
+                      strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[], 
+                      interparticleCollisions: e.target.checked 
+                    });
                   }}
                   className="mr-2"
                 />
                 Interparticle Collisions
               </label>
+
+              {/* Show Collisions (flash) toggle */}
+              <label className="flex items-center mt-2">
+                <input
+                  type="checkbox"
+                  checked={(gridLayoutParams as any).showCollisions ?? true}
+                  onChange={(e) => {
+                    const show = e.target.checked;
+                    setGridLayoutParams({
+                      ...gridLayoutParams,
+                      showCollisions: show as any,
+                    } as any);
+                    simulatorRef.current?.updateParameters({ showCollisions: show } as any);
+                  }}
+                  className="mr-2"
+                />
+                Show Collisions (flash)
+              </label>
+
+              {/* Collision Alpha Slider */}
+              <div className="mt-3">
+                <label className="block text-sm font-medium mb-1">
+                  Collision Alpha (α):
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={10}
+                    step={'0.001'}
+                    // value={Number.isFinite(gridLayoutParams.alpha as any) ? (gridLayoutParams.alpha as number) : 1.0}
+                    value={gridLayoutParams.alpha}
+                    onChange={(e) => {
+                      const a = Math.max(0, Math.min(10, parseFloat(e.target.value)));
+                      setGridLayoutParams({ ...gridLayoutParams, alpha: a });
+                      simulatorRef.current?.updateParameters({ alpha: a } as any);
+                    }}
+                    className="flex-1"
+                  />
+                  <span className="w-16 text-right font-mono">
+                    {((Number.isFinite(gridLayoutParams.alpha as any) ? (gridLayoutParams.alpha as number) : 1.0)).toFixed(2)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  α = 1.0 → collide at touch (2R). α &lt; 1 allows overlap; α &gt; 1 collides earlier.
+                </p>
+              </div>
               <label className="flex items-center">
                 <input
                   type="checkbox"

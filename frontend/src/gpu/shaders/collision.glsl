@@ -28,6 +28,13 @@ ivec2 getGridCell(vec2 pos) {
   return ivec2(floor(relPos / u_cell_size));
 }
 
+// Clamp a grid cell to simulation bounds
+ivec2 clampCell(ivec2 cell) {
+  vec2 gridSizeF = (u_bounds_max - u_bounds_min) / u_cell_size;
+  ivec2 gridSize = ivec2(max(1.0, floor(gridSizeF.x)), max(1.0, floor(gridSizeF.y)));
+  return clamp(cell, ivec2(0), gridSize - ivec2(1));
+}
+
 // Check if particle at given index is in target grid cell
 bool isInCell(int particleIdx, ivec2 targetCell) {
   if (particleIdx >= u_particle_count) return false;
@@ -60,11 +67,12 @@ void main() {
   // Check 3x3 neighboring cells
   for (int dx = -1; dx <= 1; dx++) {
     for (int dy = -1; dy <= 1; dy++) {
-      ivec2 checkCell = myCell + ivec2(dx, dy);
+      ivec2 checkCell = clampCell(myCell + ivec2(dx, dy));
       
       // Sample up to 8 particles per cell
       for (int sample = 0; sample < 8; sample++) {
-        int candidateIdx = (checkCell.x * 37 + checkCell.y * 73 + sample * 23) % u_particle_count;
+        int raw = checkCell.x * 37 + checkCell.y * 73 + sample * 23;
+        int candidateIdx = int(mod(abs(float(raw)), float(u_particle_count)));
         
         if (candidateIdx == selfIdx) continue;
         if (!isInCell(candidateIdx, checkCell)) continue;
@@ -84,7 +92,7 @@ void main() {
           // Check if particles are moving towards each other
           vec2 relativeVel = vel - otherVel;
           float relativeSpeed = dot(relativeVel, n);
-          if (relativeSpeed <= 0.0) continue; // Moving apart or parallel
+          if (relativeSpeed >= 0.0) continue; // Non-approaching or parallel
           
           // Separate overlapping particles
           float overlap = (2.0 * u_radius) - dist;

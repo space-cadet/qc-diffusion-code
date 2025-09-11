@@ -16,6 +16,10 @@ export interface RandomWalkParams {
   particles: number;
   maxParticles: number;
   minParticles: number;
+  // Collision threshold scaling factor: threshold distance = 2 * radius * alpha
+  alpha?: number; // default 1.0; allowed range [0, 10]
+  // Render toggle for visual collision flashes
+  showCollisions?: boolean; // default true
   // Enable GPU-based simulation/rendering pathway
   useGPU?: boolean;
   graphType: 'lattice1D' | 'lattice2D' | 'path' | 'complete';
