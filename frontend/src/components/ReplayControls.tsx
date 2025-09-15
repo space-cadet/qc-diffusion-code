@@ -50,13 +50,13 @@ export const ReplayControls: React.FC<ReplayControlsProps> = ({
             <option>5x</option>
           </select>
 
-          <span className="ml-4 text-sm">Time: {simulationState.time.toFixed(1)}s / {selectedRun.endTime.toFixed(1)}s</span>
+          <span className="ml-4 text-sm">Time: {(simulationState.time || 0).toFixed(1)}s / {selectedRun.endTime.toFixed(1)}s</span>
         </div>
 
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-600 h-2 rounded-full"
-            style={{ width: `${(simulationState.time / selectedRun.endTime) * 100}%` }}
+            style={{ width: `${((simulationState.time || 0) / selectedRun.endTime) * 100}%` }}
           ></div>
         </div>
 

@@ -114,7 +114,7 @@ export const ParameterPanel = ({
           </div>
           <div className="flex justify-between">
             <span>Time:</span>
-            <span className="font-mono">{simulationState.time.toFixed(1)}s</span>
+            <span className="font-mono">{(simulationState.time || 0).toFixed(1)}s</span>
           </div>
           <div className="flex justify-between">
             <span>Collisions:</span>

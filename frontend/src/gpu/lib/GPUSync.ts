@@ -1,4 +1,5 @@
 import { hexToHsl } from './ColorUtils';
+import { simTime } from '../../physics/core/GlobalTime';
 
 export function syncParticlesToContainer(
   tsContainer: any,
@@ -58,9 +59,9 @@ export function syncParticlesToContainer(
 
     if (allowFlashes && collisionTimes && tsParticle.color) {
       const lastCollisionTime = collisionTimes[i] || 0;
-      const timeSinceCollision = simulationTime - lastCollisionTime;
+      const timeSinceCollision = simTime() - lastCollisionTime;
 
-      if (timeSinceCollision < 0.5 && lastCollisionTime > 0 && flashesThisFrame < maxFlashes) { // Flash for 500ms
+      if (timeSinceCollision < 0.6 && lastCollisionTime > 0 && flashesThisFrame < maxFlashes) { // Flash for 600ms
         const redColor = hexToHsl('#ff4444');
         tsParticle.color.h.value = redColor.h;
         tsParticle.color.s.value = redColor.s;

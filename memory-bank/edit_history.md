@@ -3,6 +3,26 @@
 _Created: 2025-08-20 08:31:32 IST_
 _Last Updated: 2025-09-11 13:18:05 IST_
 
+### 2025-09-15
+
+#### 14:23 - C16b: GPU CTRW Strategy Implementation and UI Safety Enhancements
+- Created `frontend/src/gpu/shaders/ctrw.glsl` - GPU CTRW physics shader with velocity-jump model, exponential collision timing, hash-based PRNG, 1D/2D unified support
+- Updated `frontend/src/gpu/GPUParticleManager.ts` - Added CTRW pipeline with ctrwStateLayer, three-pass rendering (CTRW → position → velocity), parameter uniforms, strategy composition
+- Updated `frontend/src/gpu/lib/GPUSync.ts` - Enhanced collision flash timing with global simulation time, increased flash duration to 600ms
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Enhanced parameter passing for strategies, collisionRate, jumpLength, dimension from UI to GPU
+- Updated `frontend/src/components/ConservationDisplay.tsx` - Added null safety for time display preventing NaN errors
+- Updated `frontend/src/components/HistoryPanel.tsx` - Added null safety for time calculations
+- Updated `frontend/src/components/ParameterPanel.tsx` - Added null safety for time display
+- Updated `frontend/src/components/RandomWalkParameterPanel.tsx` - Enhanced strategy parameter passing for CTRW integration
+- Updated `frontend/src/components/ReplayControls.tsx` - Added null safety for time and progress calculations
+- Created `memory-bank/implementation-details/gpu-ctrw-strategy-implementation.md` - Comprehensive CTRW implementation documentation
+- Updated `memory-bank/implementation-details/gpu-collisions-strategy-implementation.md` - Added 1D strategy implementation details
+- Updated `memory-bank/tasks.md` - Updated C16b status to implementation complete, added C16c as planned task
+- Updated `memory-bank/tasks/C16.md` - Added Phase 2.5 CTRW implementation session details
+- Updated `memory-bank/tasks/C16a.md` - Updated status to COMPLETED, marked completion criteria as achieved
+- Created `memory-bank/tasks/C16b.md` - New task documenting GPU CTRW strategy implementation
+- Updated `memory-bank/tasks/C16c.md` - New task documenting GPU interparticle collision strategy implementation
+
 ### 2025-09-11
 
 #### 23:58 - C16a: GPU.IO Architecture Refactoring and Modularization (GPT-5)

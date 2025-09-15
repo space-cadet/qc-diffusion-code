@@ -51,6 +51,10 @@ export const useParticlesLoader = ({
       // Combine UI params with simulator bounds and collision state
       const fullParams = {
         ...params,
+        strategies: gridLayoutParamsRef.current?.strategies || [],
+        collisionRate: gridLayoutParamsRef.current?.collisionRate || 1.0,
+        jumpLength: gridLayoutParamsRef.current?.jumpLength || 1.0,
+        dimension: gridLayoutParamsRef.current?.dimension || '2D',
         interparticleCollisions: gridLayoutParamsRef.current?.interparticleCollisions || false,
         ...(bounds && { bounds }),
       };

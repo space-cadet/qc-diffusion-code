@@ -1,8 +1,25 @@
 # GPU Collisions Strategy Implementation
 *Created: 2025-09-11, 12:58:51 IST*
-*Last updated: 2025-09-11, 23:21:54 IST*
+*Last updated: 2025-09-15 14:09:32 IST*
 
-This document describes the 2D GPU-based interparticle collisions strategy used by the Random Walk component. The 1D strategy will be documented in this file as a later addition.
+## Task C16c Integration
+
+**Current Status**: GPU collision system partially implemented with spatial partitioning and bilateral momentum conservation. Requires comprehensive testing and validation.
+
+**Key Components**:
+- ✅ Spatial grid neighbor building (CPU-side optimization)
+- ✅ GPU collision detection shader with alpha threshold scaling  
+- ✅ Bilateral collision resolution with momentum conservation
+- ✅ 1D/2D unified implementation with dimensional constraints
+- ✅ Integration with tsParticles flash visualization
+
+**Testing Requirements**:
+- Energy/momentum conservation validation across particle densities
+- Performance benchmarking: CPU vs GPU crossover points
+- Collision accuracy verification against CPU baseline
+- Integration testing with CTRW strategy composition
+
+This document describes the GPU-based interparticle collisions strategy used by the Random Walk component, supporting both 1D and 2D modes with unified implementation.
 
 ## Overview
 
@@ -15,8 +32,9 @@ This document describes the 2D GPU-based interparticle collisions strategy used 
 Key files:
 - `frontend/src/gpu/GPUCollisionManager.ts`
 - `frontend/src/gpu/GPUParticleManager.ts`
-- `frontend/src/gpu/shaders/collision.glsl` (legacy external shader reference)
-- Inline collision shader string inside `GPUCollisionManager.ts` (authoritative)
+- `frontend/src/gpu/shaders/collision_detection.glsl` (collision detection shader)
+- `frontend/src/gpu/shaders/collision_pairs.glsl` (bilateral update shader)
+- `frontend/src/gpu/shaders/spatialGrid.glsl` (spatial grid shader)
 
 ## Data Layout
 
@@ -118,12 +136,29 @@ Grid configuration:
   - `Show Collisions` toggle
 - Propagated via `RandomWalkSimulator.updateParameters` → `GPUParticleManager.updateParameters` → `GPUCollisionManager.updateParameters`.
 
-## 1D Strategy (placeholder)
+## 1D Strategy Implementation
 
-To be added:
-- 1D variant of the neighbor structure (uniform bins along x only).
-- Threshold logic reduces to `d_thresh = 2 * radius * alpha` along a single axis.
-- Shared parameterization (`alpha`, `radius`, `showCollisions`).
+**Status**: ✅ COMPLETED (2025-09-15)
+
+The 1D collision strategy is fully implemented using the same GPU pipeline with dimensional constraints:
+
+### Key Features
+- **Neighbor traversal**: Only sweeps along x-axis (`dy=0` constraint in shader loop)
+- **Physics model**: Identical distance/impulse calculations, naturally handles 1D case
+- **Parameter sharing**: Uses same `alpha`, `radius`, `showCollisions` controls
+
+### Shader Implementation (`collision_detection.glsl`)
+```glsl
+for (int dy = -1; dy <= 1; dy++) {
+  if (u_is1D == 1 && dy != 0) continue; // 1D: only sweep along x
+  // ... neighbor processing
+}
+```
+
+### Integration
+- `u_is1D` uniform set by `GPUCollisionManager` based on dimension parameter
+- UI dimension toggle (1D/2D) automatically enables appropriate collision mode
+- Grid structure adapts: 1D uses grid.height=1, processes x-axis bins only
 
 ## API and Integration Reference
 

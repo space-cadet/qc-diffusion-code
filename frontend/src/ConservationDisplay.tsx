@@ -90,7 +90,7 @@ export default function ConservationDisplay({
       </div>
       
       <div className="mt-2 text-gray-700 text-sm">
-        Time: <span className="font-mono">{currentQuantities.time.toFixed(3)}s</span>
+        Time: <span className="font-mono">{(currentQuantities.time || 0).toFixed(3)}s</span>
       </div>
 
       {/* dt diagnostics */}

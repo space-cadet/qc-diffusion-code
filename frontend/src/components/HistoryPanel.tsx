@@ -31,7 +31,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ simulationState }) =
             <tr className="border-b bg-blue-50">
               <td className="p-2">
                 <div className="flex items-center gap-2">
-                  ⏰ 0.0s - {simulationState.time.toFixed(1)}s
+                  ⏰ 0.0s - {(simulationState.time || 0).toFixed(1)}s
                   <span className="text-xs bg-green-200 px-1 rounded">
                     ● Current
                   </span>

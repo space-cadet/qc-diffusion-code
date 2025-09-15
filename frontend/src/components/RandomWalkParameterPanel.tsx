@@ -126,7 +126,7 @@ export const RandomWalkParameterPanel = ({
           </div>
           <div className="flex justify-between">
             <span>Time:</span>
-            <span className="font-mono">{simulationState.time.toFixed(1)}s</span>
+            <span className="font-mono">{(simulationState.time || 0).toFixed(1)}s</span>
           </div>
           <div className="flex justify-between">
             <span>Scattering:</span>
@@ -441,7 +441,7 @@ export const RandomWalkParameterPanel = ({
                       ...gridLayoutParams,
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[],
                     });
-                    simulatorRef.current?.updateParameters({ strategies: newStrategies });
+                    simulatorRef.current?.updateParameters({ strategies: newStrategies, collisionRate: gridLayoutParams.collisionRate, jumpLength: gridLayoutParams.jumpLength, dimension: gridLayoutParams.dimension });
                   }}
                   className="mr-2"
                 />
@@ -462,7 +462,10 @@ export const RandomWalkParameterPanel = ({
                     });
                     simulatorRef.current?.updateParameters({ 
                       strategies: newStrategies as ("ctrw" | "simple" | "levy" | "fractional" | "collisions")[], 
-                      interparticleCollisions: e.target.checked 
+                      interparticleCollisions: e.target.checked,
+                      collisionRate: gridLayoutParams.collisionRate, 
+                      jumpLength: gridLayoutParams.jumpLength,
+                      dimension: gridLayoutParams.dimension 
                     });
                   }}
                   className="mr-2"

@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-11 23:58:45 IST_
+_Last Updated: 2025-09-15 14:23:30 IST_
 
 ## Active Tasks
 
@@ -26,7 +26,9 @@ _Last Updated: 2025-09-11 23:58:45 IST_
 | C15 | Physics Engine Architecture Migration              | 🔄 IN PROGRESS | HIGH     | 2025-08-28 | C5c, C12, C14   |
 | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
-| C16a | GPU.IO Architecture Refactoring and Modularization | 🔄 IN PROGRESS | MEDIUM | 2025-09-11 | C16 |
+| C16a | GPU.IO Architecture Refactoring and Modularization | ✅ COMPLETED | MEDIUM | 2025-09-11 | C16 |
+| C16b | GPU CTRW Strategy Implementation and Testing | 🔄 IN PROGRESS | HIGH | 2025-09-15 | C16a |
+| C16c | GPU Collision Strategy Implementation and Testing | 📝 PLANNED | HIGH | 2025-09-15 | C16a |
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
 | C18 | Streaming Observable Framework Implementation      | ✅ COMPLETED   | MEDIUM   | 2025-09-03 | C7a             |
 | C19 | Particle Simulation Boundary Conditions Implementation | 🔄 IN PROGRESS | HIGH | 2025-09-06 | C5c, C15a, C2a |
@@ -185,9 +187,21 @@ _Last Updated: 2025-09-11 23:58:45 IST_
 
 ### C16a: GPU.IO Architecture Refactoring and Modularization
 **Description**: Refactor GPU.IO implementation to improve maintainability by externalizing inline shaders and extracting utility functions into separate modules
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-11 23:58:45 IST
+**Status**: ✅ COMPLETED **Last**: 2025-09-15 14:09:32 IST
 **Files**: `frontend/src/gpu/shaders/*.glsl`, `frontend/src/gpu/lib/`, `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/gpu/GPUCollisionManager.ts`
-**Notes**: GPT-5 refactoring work - externalized shaders to separate GLSL files, extracted utilities to lib/ modules (SpatialGrid, ColorUtils, GPUParams, GPUSync), reduced main file complexity without behavior changes
+**Notes**: Refactoring completed - externalized all shaders to GLSL files, extracted utilities to lib/ modules (SpatialGrid, ColorUtils, GPUParams, GPUSync, CollisionMetrics), reduced main file complexity while maintaining functionality
+
+### C16b: GPU CTRW Strategy Implementation and Testing
+**Description**: Implement and test proper GPU-based Continuous Time Random Walk physics with corrected velocity-jump model and timing consistency
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-15 14:23:30 IST
+**Files**: `frontend/src/gpu/shaders/ctrw.glsl`, `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/gpu/lib/GPUSync.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`
+**Notes**: Implementation complete - CTRW shader with proper velocity-jump model, exponential timing, hash-based PRNG, 1D/2D unified support, complete parameter flow from UI to GPU. UI safety fixes applied across components. Ready for validation testing.
+
+### C16c: GPU Collision Strategy Implementation and Testing
+**Description**: Complete implementation and testing of GPU-based interparticle collision system with spatial partitioning and bilateral momentum conservation
+**Status**: 📝 PLANNED **Last**: 2025-09-15 14:09:32 IST
+**Files**: `frontend/src/gpu/shaders/collision*.glsl`, `frontend/src/gpu/GPUCollisionManager.ts`, `frontend/src/gpu/lib/SpatialGrid.ts`
+**Notes**: Spatial grid and collision detection shaders implemented. Requires integration testing, performance validation, and CPU-GPU collision consistency verification.
 
 ### C17: Analysis Dashboard and Plotly Integration
 **Description**: Implement dedicated Analysis tab with Plotly.js integration, React Grid Layout interface, and data pipeline connecting simulation results to advanced plotting capabilities

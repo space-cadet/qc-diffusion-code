@@ -2,6 +2,7 @@ import { GPUComposer, GPULayer, GPUProgram, FLOAT, INT } from 'gpu-io';
 import { GPUCollisionManager } from './GPUCollisionManager';
 import POSITION_UPDATE_SHADER from './shaders/positionUpdate.glsl?raw';
 import VELOCITY_UPDATE_SHADER from './shaders/velocityUpdate.glsl?raw';
+import CTRW_SHADER from './shaders/ctrw.glsl?raw';
 import { hexToHsl } from './lib/ColorUtils';
 import { boundaryConditionMap } from './lib/GPUParams';
 import { syncParticlesToContainer } from './lib/GPUSync';
@@ -36,12 +37,14 @@ export class GPUParticleManager {
   private composer: GPUComposer;
   private positionLayer: GPULayer;
   private velocityLayer: GPULayer;
+  private ctrwStateLayer: GPULayer;
+  private ctrwTempLayer: GPULayer | null = null; // persistent temp layer for CTRW pass
   private positionProgram: GPUProgram;
   private velocityProgram: GPUProgram;
+  private ctrwProgram: GPUProgram;
   private particleCount: number;
   private canvasMapper?: (pos: { x: number; y: number }) => { x: number; y: number };
   private collisionCount: number = 0;
-  private simulationTime: number = 0;
   private boundaryCondition: string = 'periodic';
   private bounds = { xMin: -1, xMax: 1, yMin: -1, yMax: 1 };
   private collisionManager: GPUCollisionManager;
@@ -49,6 +52,10 @@ export class GPUParticleManager {
   private lastCollisionLogTime: number = 0;
   private lastDebugLogTime: number = 0;
   private showCollisions: boolean = true;
+  private useCTRW: boolean = false;
+  private collisionRate: number = 1.0;
+  private jumpLength: number = 1.0;
+  private speed: number = 1.0; // current speed used by velocity-jump CTRW
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -124,6 +131,23 @@ export class GPUParticleManager {
       // Double buffer so we can use velocity as input while writing to the next buffer
       numBuffers: 2
     });
+    
+    this.ctrwStateLayer = new GPULayer(this.composer, {
+      name: 'ctrwState',
+      dimensions: [textureSize, textureSize],
+      type: 'FLOAT',
+      filter: 'NEAREST',
+      numComponents: 4,
+      numBuffers: 2
+    });
+    // Persistent temp layer for CTRW step output (velocity.xy + state.zw)
+    this.ctrwTempLayer = new GPULayer(this.composer, {
+      name: 'ctrwTemp',
+      dimensions: [textureSize, textureSize],
+      type: 'FLOAT',
+      filter: 'NEAREST',
+      numComponents: 4
+    });
 
     this.positionProgram = new GPUProgram(this.composer, {
       name: 'positionUpdate',
@@ -150,6 +174,25 @@ export class GPUParticleManager {
     this.velocityProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
     this.velocityProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
     
+    // CTRW program
+    this.ctrwProgram = new GPUProgram(this.composer, {
+      name: 'ctrw',
+      fragmentShader: CTRW_SHADER
+    });
+    this.ctrwProgram.setUniform('u_position', 0, INT);
+    this.ctrwProgram.setUniform('u_velocity', 1, INT);
+    this.ctrwProgram.setUniform('u_ctrw_state', 2, INT);
+    this.ctrwProgram.setUniform('u_dt', 0.0, FLOAT);
+    this.ctrwProgram.setUniform('u_collision_rate', this.collisionRate, FLOAT);
+    this.ctrwProgram.setUniform('u_jump_length', this.jumpLength, FLOAT);
+    this.ctrwProgram.setUniform('u_current_time', 0.0, FLOAT);
+    // Velocity-jump model: set speed via uniform, initialize to 0 until UI updates arrive
+    this.ctrwProgram.setUniform('u_speed', 1.0, FLOAT);
+    this.ctrwProgram.setUniform('u_is1D', 0, INT);
+    this.ctrwProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+    this.ctrwProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+    this.ctrwProgram.setUniform('u_boundary_condition', boundaryConditionMap[this.boundaryCondition], INT);
+    
     console.log('[GPU] GPUParticleManager initialized successfully');
 
     // Initialize collision manager (no-op for now)
@@ -167,17 +210,26 @@ export class GPUParticleManager {
     const textureSize = Math.ceil(Math.sqrt(this.particleCount));
     const posData = new Float32Array(textureSize * textureSize * 2);
     const velData = new Float32Array(textureSize * textureSize * 2);
+    const ctrwData = new Float32Array(textureSize * textureSize * 4);
     
     for (let i = 0; i < particles.length; i++) {
       posData[i * 2] = particles[i].position.x;
       posData[i * 2 + 1] = particles[i].position.y;
       velData[i * 2] = particles[i].velocity.vx;
       velData[i * 2 + 1] = particles[i].velocity.vy;
+      
+      // Initialize CTRW state: collision times in future, spread over first few timesteps
+      const futureDelay = Math.random() * (5.0 / this.collisionRate); // spread over ~5 mean wait times
+      ctrwData[i * 4] = futureDelay; // nextCollisionTime
+      ctrwData[i * 4 + 1] = Math.random(); // randomSeed
+      ctrwData[i * 4 + 2] = 0; // unused
+      ctrwData[i * 4 + 3] = 0; // unused
     }
     
     // Upload initial data to GPU layers
     this.positionLayer.setFromArray(posData);
     this.velocityLayer.setFromArray(velData);
+    this.ctrwStateLayer.setFromArray(ctrwData);
     
     console.log('[GPU] Particles initialized to GPU textures');
   }
@@ -193,34 +245,77 @@ export class GPUParticleManager {
 
   step(dt: number) {
     // console.log('[GPU] Stepping physics', { dt });
-    this.simulationTime += dt;
     
     // Set scalar uniform and pass samplers via input array order
-    // gpu-io requires the uniform type on first set; use FLOAT for GLSL float
     this.positionProgram.setUniform('u_dt', dt, FLOAT);
     this.velocityProgram.setUniform('u_dt', dt, FLOAT);
-    // Pass 1: update positions (handles wrap/reflect clamp/absorbing mark)
+    
+    // Pass 1: CTRW velocity update (if enabled)
+    if (this.useCTRW) {
+      // Guard against invalid parameters causing particles to freeze
+      const effectiveSpeed = this.speed * this.jumpLength;
+      if (effectiveSpeed <= 0) {
+        const now = performance.now();
+        if (now - this.lastDebugLogTime > 1000) {
+          this.lastDebugLogTime = now;
+          console.warn('[GPU] CTRW enabled but effective speed <= 0; skipping CTRW pass');
+        }
+      } else {
+        this.ctrwProgram.setUniform('u_dt', dt, FLOAT);
+        this.ctrwProgram.setUniform('u_current_time', 0.0, FLOAT);
+        // Single pass updates both velocity and state using persistent temp layer
+        this.composer.step({
+          program: this.ctrwProgram,
+          input: [this.positionLayer, this.velocityLayer, this.ctrwStateLayer],
+          output: this.ctrwTempLayer as GPULayer
+        });
+        // Extract velocity (xy) and state (zw) - fix data extraction bug
+        const tempData = (this.ctrwTempLayer as GPULayer).getValues() as Float32Array;
+        const texSize = Math.ceil(Math.sqrt(this.particleCount));
+        const velData = new Float32Array(texSize * texSize * 2);
+        const stateData = new Float32Array(texSize * texSize * 4);
+        
+        // Only process actual particles to avoid zero-filling beyond particleCount
+        for (let i = 0; i < this.particleCount; i++) {
+          const texIdx = i; // Direct particle index mapping
+          velData[texIdx * 2] = tempData[texIdx * 4];
+          velData[texIdx * 2 + 1] = tempData[texIdx * 4 + 1];
+          stateData[texIdx * 4] = tempData[texIdx * 4 + 2];     // nextCollisionTime
+          stateData[texIdx * 4 + 1] = tempData[texIdx * 4 + 3]; // randomSeed
+          stateData[texIdx * 4 + 2] = 0;                        // unused
+          stateData[texIdx * 4 + 3] = 0;                        // unused
+        }
+        
+        // Preserve existing velocities for particles beyond particleCount
+        const currentVel = this.velocityLayer.getValues() as Float32Array;
+        for (let i = this.particleCount; i < texSize * texSize; i++) {
+          velData[i * 2] = currentVel[i * 2];
+          velData[i * 2 + 1] = currentVel[i * 2 + 1];
+        }
+        
+        this.velocityLayer.setFromArray(velData);
+        this.ctrwStateLayer.setFromArray(stateData);
+      }
+    }
+    
+    // Pass 2: update positions
     this.composer.step({
       program: this.positionProgram,
       input: [this.positionLayer, this.velocityLayer],
       output: this.positionLayer
     });
-    // Pass 2: update velocities (reflect flip, absorbing zero)
+    
+    // Pass 3: boundary velocity updates
     this.composer.step({
       program: this.velocityProgram,
       input: [this.positionLayer, this.velocityLayer],
       output: this.velocityLayer
     });
 
-    // Pass 3: collision detection only if enabled (match CPU behavior)
+    // Pass 3: Interparticle collisions (can combine with CTRW)
     if (this.interparticleCollisions) {
       try {
         const texSize = Math.ceil(Math.sqrt(this.particleCount));
-        // console.log('[GPU] Running collision detection step', { 
-        //   texSize, 
-        //   particleCount: this.particleCount, 
-        //   simulationTime: this.simulationTime 
-        // });
         this.collisionManager.applyCollisions(
           this.composer,
           this.positionLayer,
@@ -229,7 +324,7 @@ export class GPUParticleManager {
           texSize,
           texSize,
           this.particleCount,
-          this.simulationTime
+          0.0
         );
         this.updateCollisionCount();
       } catch (error) {
@@ -248,7 +343,7 @@ export class GPUParticleManager {
       }
 
       let currentCollisions = 0;
-      const currentTime = this.simulationTime;
+      const currentTime = 0.0;
       
       // Debug: check first few collision times
       const debugTimes = [];
@@ -294,7 +389,7 @@ export class GPUParticleManager {
       this.particleCount,
       this.canvasMapper,
       this.bounds,
-      this.simulationTime,
+      0.0,
       this.showCollisions
     );
   }
@@ -302,11 +397,19 @@ export class GPUParticleManager {
   reset() {
     console.log('[GPU] Resetting GPU state');
     this.collisionCount = 0;
-    this.simulationTime = 0;
     const textureSize = Math.ceil(Math.sqrt(this.particleCount));
-    const emptyData = new Float32Array(textureSize * textureSize * 2);
-    this.positionLayer.setFromArray(emptyData);
-    this.velocityLayer.setFromArray(emptyData);
+    const emptyPosData = new Float32Array(textureSize * textureSize * 2);
+    const emptyVelData = new Float32Array(textureSize * textureSize * 2);
+    const emptyCtrwData = new Float32Array(textureSize * textureSize * 4);
+    // Reset CTRW collision times to future
+    for (let i = 0; i < textureSize * textureSize; i++) {
+      const futureDelay = Math.random() * (5.0 / this.collisionRate);
+      emptyCtrwData[i * 4] = futureDelay;
+      emptyCtrwData[i * 4 + 1] = Math.random();
+    }
+    this.positionLayer.setFromArray(emptyPosData);
+    this.velocityLayer.setFromArray(emptyVelData);
+    this.ctrwStateLayer.setFromArray(emptyCtrwData);
   }
 
   updateParameters(params: any) {
@@ -325,6 +428,7 @@ export class GPUParticleManager {
       const code = conditionCode ?? 0;
       this.positionProgram.setUniform('u_boundary_condition', code, INT);
       this.velocityProgram.setUniform('u_boundary_condition', code, INT);
+      this.ctrwProgram.setUniform('u_boundary_condition', code, INT);
       console.log('[GPU] Boundary condition updated:', this.boundaryCondition, '-> code:', code);
     }
     
@@ -336,6 +440,8 @@ export class GPUParticleManager {
       this.positionProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
       this.velocityProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
       this.velocityProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
+      this.ctrwProgram.setUniform('u_bounds_min', [this.bounds.xMin, this.bounds.yMin], FLOAT);
+      this.ctrwProgram.setUniform('u_bounds_max', [this.bounds.xMax, this.bounds.yMax], FLOAT);
       console.log('[GPU] Boundary bounds updated:', { 
         from: oldBounds, 
         to: this.bounds,
@@ -353,6 +459,33 @@ export class GPUParticleManager {
     if (typeof params.showCollisions === 'boolean') {
       this.showCollisions = params.showCollisions;
       console.log('[GPU] Show Collisions (flashes):', this.showCollisions ? 'ON' : 'OFF');
+    }
+
+    // Update CTRW parameters
+    if (params.strategies && Array.isArray(params.strategies)) {
+      this.useCTRW = params.strategies.includes('ctrw');
+      console.log('[GPU] CTRW Strategy:', this.useCTRW ? 'ENABLED' : 'DISABLED');
+    }
+    
+    if (typeof params.collisionRate === 'number') {
+      this.collisionRate = params.collisionRate;
+      this.ctrwProgram.setUniform('u_collision_rate', this.collisionRate, FLOAT);
+    }
+    
+    if (typeof params.jumpLength === 'number') {
+      this.jumpLength = params.jumpLength;
+      this.ctrwProgram.setUniform('u_jump_length', this.jumpLength, FLOAT);
+    }
+    
+    // Velocity for velocity-jump model
+    if (typeof params.velocity === 'number') {
+      this.speed = params.velocity;
+      this.ctrwProgram.setUniform('u_speed', this.speed, FLOAT);
+    }
+    
+    if (typeof params.dimension === 'string') {
+      const is1D = params.dimension === '1D' ? 1 : 0;
+      this.ctrwProgram.setUniform('u_is1D', is1D, INT);
     }
 
     // Allow collision manager to react to parameter changes (radius and bounds supported)
@@ -390,12 +523,16 @@ export class GPUParticleManager {
   getMetrics() {
     return {
       collisionCount: this.collisionCount,
-      simulationTime: this.simulationTime
+      simulationTime: 0.0
     };
   }
 
   dispose() {
     console.log('[GPU] Disposing GPUParticleManager');
+    if (this.ctrwTempLayer) {
+      this.ctrwTempLayer.dispose();
+      this.ctrwTempLayer = null;
+    }
     this.composer.dispose();
   }
 }
