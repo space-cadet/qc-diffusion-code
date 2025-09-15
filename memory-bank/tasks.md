@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-15 19:15:58 IST_
+_Last Updated: 2025-09-15 20:12:09 IST_
 
 ## Active Tasks
 
@@ -26,7 +26,7 @@ _Last Updated: 2025-09-15 19:15:58 IST_
 | C15 | Physics Engine Architecture Migration              | 🔄 IN PROGRESS | HIGH     | 2025-08-28 | C5c, C12, C14   |
 | C15a | Random Walk Physics Engine Implementation Verification | 🔄 IN PROGRESS | HIGH     | 2025-08-31 | C15             |
 | C16 | GPU.IO Framework Implementation with Rendering Engine Abstraction | 🔄 IN PROGRESS | HIGH | 2025-09-01 | C15a, C12 |
-| C16a | GPU.IO Architecture Refactoring and Modularization | ✅ COMPLETED | MEDIUM | 2025-09-11 | C16 |
+| C16a | GPU.IO Architecture Refactoring and Modularization | 🔄 IN PROGRESS | MEDIUM | 2025-09-11 | C16 |
 | C16b | GPU CTRW Strategy Implementation and Testing | 🔄 IN PROGRESS | HIGH | 2025-09-15 | C16a |
 | C16c | GPU Collision Strategy Implementation and Testing | 📝 PLANNED | HIGH | 2025-09-15 | C16a |
 | C17 | Analysis Dashboard and Plotly Integration         | 🔄 IN PROGRESS | MEDIUM   | 2025-09-01 | -               |
@@ -186,10 +186,10 @@ _Last Updated: 2025-09-15 19:15:58 IST_
 **Notes**: Parameter synchronization and density profile integration complete - Reactive parameter propagation, GPU data extraction for density visualization, boundary condition preservation, immediate parameter updates without page reload
 
 ### C16a: GPU.IO Architecture Refactoring and Modularization
-**Description**: Refactor GPU.IO implementation to improve maintainability by externalizing inline shaders and extracting utility functions into separate modules
-**Status**: ✅ COMPLETED **Last**: 2025-09-15 14:09:32 IST
-**Files**: `frontend/src/gpu/shaders/*.glsl`, `frontend/src/gpu/lib/`, `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/gpu/GPUCollisionManager.ts`
-**Notes**: Refactoring completed - externalized all shaders to GLSL files, extracted utilities to lib/ modules (SpatialGrid, ColorUtils, GPUParams, GPUSync, CollisionMetrics), reduced main file complexity while maintaining functionality
+**Description**: Refactor GPU.IO implementation and RandomWalkSim.tsx component for better maintainability
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-15 20:10:15 IST
+**Files**: `frontend/src/hooks/useRandomWalk*.ts`, `frontend/src/components/RandomWalkHeader.tsx`, `frontend/src/RandomWalkSim.tsx`
+**Notes**: RandomWalkSim.tsx refactored from 700+ to 320 lines using extracted hooks and components. State sync infinite loop identified and partially fixed.
 
 ### C16b: GPU CTRW Strategy Implementation and Testing
 **Description**: Implement and test proper GPU-based Continuous Time Random Walk physics with corrected velocity-jump model and timing consistency

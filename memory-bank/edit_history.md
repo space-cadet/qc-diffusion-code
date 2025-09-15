@@ -5,6 +5,17 @@ _Last Updated: 2025-09-11 13:18:05 IST_
 
 ### 2025-09-15
 
+#### 20:11 - C16a: RandomWalkSim.tsx Component Refactoring COMPLETED
+- Created `frontend/src/hooks/useRandomWalkEngine.ts` - Extracted simulator initialization and engine management
+- Created `frontend/src/hooks/useRandomWalkControls.ts` - Extracted start/pause/reset/initialize handlers  
+- Created `frontend/src/hooks/useRandomWalkPanels.ts` - Extracted floating panel state management
+- Created `frontend/src/components/RandomWalkHeader.tsx` - Extracted header UI with engine toggles
+- Created `frontend/src/lib/useRandomWalkStateSync.ts` - Extracted state sync and periodic saves
+- Updated `frontend/src/RandomWalkSim.tsx` - Rewritten to use extracted hooks, reduced from 700+ to 320 lines
+- Fixed `frontend/src/lib/useRandomWalkStateSync.ts` - Removed circular dependency causing infinite loop
+- Updated `memory-bank/tasks/C16a.md` - Added RandomWalkSim refactoring progress
+- Updated `memory-bank/implementation-details/random-walk-simulator-refactor.md` - Documented Phase 4 work
+
 #### 19:13 - C16: GPU Parameter Synchronization and Density Profile Integration Complete (GPT-5)
 - Updated `frontend/src/hooks/useParticlesLoader.ts` - Added reactive parameter propagation useEffect watching all critical parameters (boundaryCondition, dimension, strategies, collisionRate, jumpLength, velocity, dt, interparticleCollisions, showCollisions), enhanced updateGPUParameters with fresh boundary config from simulator, added getGPUManager() method exposure
 - Updated `frontend/src/hooks/useDensityVisualization.ts` - Added GPU mode detection with useGPU and particlesLoaded parameters, GPU data extraction via getParticleData() with Float32Array to particle object conversion, fallback safety for CPU mode when GPU unavailable
