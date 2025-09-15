@@ -1,6 +1,6 @@
 # Particle Boundary Condition System Design
 *Created: 2025-09-06 20:03:13 IST*
-*Last Updated: 2025-09-08 23:32:26 IST*
+*Last Updated: 2025-09-15 19:16:57 IST*
 
 ## Overview
 
@@ -171,6 +171,30 @@ Boundary conditions are working but validation needed:
 - Consistent method signatures across all strategies
 - Simplified composite strategy implementation
 - Enhanced coordinate system integration
+
+## Session 2025-09-15 Evening: Boundary State Preservation Implementation
+
+**Critical Boundary State Issue Resolved:**
+- **Strategy Update Fix**: Modified RandomWalkSimulator.updateParameters() to preserve current boundary config during strategy recreation
+- **State Preservation**: Store boundary config before setupStrategies(), restore after to prevent reset to configuration defaults
+- **ParticleManager Recreation**: Enhanced to recreate ParticleManager with preserved boundaries instead of reset boundaries
+- **GPU Boundary Sync**: Improved PhysicsEngine.updateConfiguration with preserved boundaries preventing "clamped boundary" artifacts
+
+**Technical Implementation:**
+- **currentBoundaryConfig**: Store before strategy setup, restore to new strategies and physics engine
+- **Boundary Preservation**: Prevents boundary conditions from resetting when strategies change
+- **GPU Integration**: Enhanced GPU parameter updates with fresh boundary config preventing stale GPU uniforms
+- **Coordinate System**: ParticleManager recreation with preserved coordinate system using current boundaries
+
+**Files Modified:**
+- `frontend/src/physics/RandomWalkSimulator.ts`: Added boundary preservation logic in updateParameters()
+- `frontend/src/hooks/useParticlesLoader.ts`: Enhanced reactive parameter propagation with fresh boundary config
+- Enhanced parameter flow ensures immediate boundary updates without page reload
+
+**Issues Resolved:**
+- **Boundary Reset Bug**: Strategy changes no longer reset boundary conditions to defaults causing particle clamping
+- **GPU Boundary Sync**: Parameter changes properly propagate boundary config to GPU preventing stale uniforms
+- **State Consistency**: Boundary conditions preserved across strategy updates maintaining simulation continuity
 
 ## Future Enhancements
 

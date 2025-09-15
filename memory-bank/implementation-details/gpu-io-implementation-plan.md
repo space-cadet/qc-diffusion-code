@@ -1,7 +1,7 @@
 # GPU.IO Implementation Plan: Migration from tsParticles
 
 *Created: 2025-09-01 14:32:15 IST*
-*Last Updated: 2025-09-11 13:14:35 IST*
+*Last Updated: 2025-09-15 19:16:34 IST*
 
 ## Executive Summary
 
@@ -521,3 +521,37 @@ The backend-agnostic design ensures the system can operate independently of the 
   - Updated `GPUParticleManager.ts` to import GLSL via `?raw`; behavior unchanged
 - Extracted color helper into `frontend/src/gpu/lib/ColorUtils.ts` and replaced inline helper in `GPUParticleManager.ts`
 - Motivation: reduce file size and improve maintainability without altering runtime behavior; groundwork for subsequent modular split (`GPUState`, `GPUPrograms`, `GPUPasses`, `GPUSync`, `GPUParams`, `GPUDebug`).
+
+## Parameter Synchronization Implementation — 2025-09-15 19:13:54 IST
+
+**Critical Parameter Flow Issues Resolved (GPT-5 Collaboration)**:
+- **Reactive Parameter Propagation**: Added comprehensive useEffect in useParticlesLoader watching all critical parameters (boundaryCondition, dimension, strategies, collisionRate, jumpLength, velocity, dt, interparticleCollisions, showCollisions)
+- **GPU Parameter Updates**: Enhanced updateGPUParameters to include fresh boundary config from simulator, preventing stale GPU uniform issues
+- **CPU Parameter Synchronization**: Added parallel CPU updateParameters call ensuring consistent state across GPU/CPU engines
+- **Density Profile GPU Integration**: Modified useDensityVisualization to extract GPU particle data directly via getParticleData() method
+
+**Technical Implementation Details**:
+- **Parameter Dependency Array**: Watching 9 key parameters excluding particleCount to prevent unnecessary GPU manager recreation
+- **Boundary Config Freshness**: Always include getBoundaryConfig() from simulator in parameter payload ensuring GPU gets current boundaries
+- **GPU Data Extraction**: Added getGPUManager() method to useParticlesLoader exposing GPU manager for density calculations
+- **Data Conversion Pipeline**: Float32Array from GPU textures converted to particle objects for existing density calculation functions
+
+**Architecture Enhancements**:
+- **Immediate Parameter Effect**: Changes to physics parameters, boundary conditions, and strategies now take effect immediately without page reload
+- **State Preservation**: Boundary condition state preserved during strategy updates preventing reset to defaults and "clamped boundary" artifacts
+- **GPU-CPU Consistency**: Both GPU and CPU engines receive identical parameter updates ensuring consistent behavior
+
+**Files Modified**:
+- `frontend/src/hooks/useParticlesLoader.ts`: Added reactive parameter propagation useEffect
+- `frontend/src/hooks/useDensityVisualization.ts`: GPU data extraction for density calculations
+- `frontend/src/components/DensityComparison.tsx`: GPU integration with useGPU flag and particlesLoaded access
+- `frontend/src/physics/RandomWalkSimulator.ts`: Boundary state preservation during strategy updates
+- `frontend/src/RandomWalkSim.tsx`: Enhanced parameter passing to density component
+
+**Issues Resolved**:
+1. **Manual Reload Required**: Parameter changes propagate immediately without browser refresh
+2. **Missing On-the-fly Updates**: Physics parameters update running simulations without restart
+3. **Boundary Condition Loss**: Strategy changes preserve existing boundary state instead of resetting
+4. **GPU Density Profile**: Density calculations now use live GPU particle data instead of empty CPU arrays
+
+**Status**: Complete parameter synchronization achieved. GPU integration fully functional with immediate parameter updates and density profile visualization.

@@ -19,7 +19,9 @@ export const useDensityVisualization = (
   particles: Particle[],
   particleCount: number,
   binSize?: number,
-  dimension: '1D' | '2D' = '2D'
+  dimension: '1D' | '2D' = '2D',
+  useGPU: boolean = false,
+  particlesLoaded?: any
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
@@ -169,41 +171,46 @@ export const useDensityVisualization = (
   }, []);
 
   const updateDensity = useCallback(() => {
-    // console.log('[useDensityVisualization] updateDensity called:', {
-    //   particleCount: particles.length,
-    //   dimension,
-    //   binSize,
-    //   hasParticles: particles.length > 0
-    // });
+    let actualParticles = particles;
+    let actualCount = particleCount;
+
+    // In GPU mode, extract particles from GPU manager
+    if (useGPU && particlesLoaded) {
+      try {
+        const gpuManager = (particlesLoaded as any).getGPUManager?.();
+        if (gpuManager) {
+          const gpuData = gpuManager.getParticleData();
+          if (gpuData && gpuData.length >= 2) {
+            // Convert Float32Array to particle objects
+            const gpuParticles: Particle[] = [];
+            for (let i = 0; i < Math.min(actualCount, gpuData.length / 2); i++) {
+              gpuParticles.push({
+                id: `gpu-${i}`,
+                position: {
+                  x: gpuData[i * 2],
+                  y: gpuData[i * 2 + 1]
+                }
+              } as Particle);
+            }
+            actualParticles = gpuParticles;
+            actualCount = gpuParticles.length;
+          }
+        }
+      } catch (error) {
+        console.warn('[Density] GPU data extraction failed, using CPU fallback:', error);
+      }
+    }
 
     if (dimension === '1D') {
-      const data = getDensityProfile1D(particles, particleCount, binSize || 20);
-      // console.log('[useDensityVisualization] 1D density data:', {
-      //   densityLength: data.density.length,
-      //   xBounds: data.xBounds,
-      //   binSize: data.binSize,
-      //   maxDensity: Math.max(...data.density),
-      //   minDensity: Math.min(...data.density),
-      //   hasValidData: data.density.length > 0
-      // });
+      const data = getDensityProfile1D(actualParticles, actualCount, binSize || 20);
       setDensityData1D(data);
       drawDensity1D(data);
     } else {
-      const data = getDensityProfile2D(particles, particleCount, binSize || 20);
-      // console.log('[useDensityVisualization] 2D density data:', {
-      //   densityRows: data.density.length,
-      //   densityCols: data.density[0]?.length || 0,
-      //   xBounds: data.xBounds,
-      //   yBounds: data.yBounds,
-      //   binSize: data.binSize,
-      //   maxDensity: Math.max(...data.density.flat()),
-      //   minDensity: Math.min(...data.density.flat()),
-      //   hasValidData: data.density.length > 0
-      // });
+      const data = getDensityProfile2D(actualParticles, actualCount, binSize || 20);
       setDensityData2D(data);
       drawDensityHeatmap(data);
     }
-  }, [particles, particleCount, dimension, binSize, drawDensity1D, drawDensityHeatmap]);
+  }, [particles, particleCount, dimension, binSize, useGPU, particlesLoaded, drawDensity1D, drawDensityHeatmap]);
 
   useEffect(() => {
     updateDensity();

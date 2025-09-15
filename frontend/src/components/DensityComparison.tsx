@@ -17,6 +17,7 @@ interface DensityComparisonProps {
   simulationState: {
     status: 'Running' | 'Paused' | 'Stopped' | 'Initialized';
   };
+  particlesLoaded?: any;
 }
 
 export const DensityComparison: React.FC<DensityComparisonProps> = ({
@@ -25,10 +26,12 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
   simulatorRef,
   gridLayoutParams,
   simulationState,
+  particlesLoaded,
 }) => {
   const { 
     randomWalkUIState, 
-    setRandomWalkUIState 
+    setRandomWalkUIState,
+    useGPU 
   } = useAppStore();
   
   // Stable empty particles array to avoid identity changes each render
@@ -60,7 +63,9 @@ export const DensityComparison: React.FC<DensityComparisonProps> = ({
     liveParticles,
     liveCount,
     undefined,
-    gridLayoutParams.dimension
+    gridLayoutParams.dimension,
+    useGPU,
+    particlesLoaded
   );
   const [recordHistory, setRecordHistory] = useState(false);
 

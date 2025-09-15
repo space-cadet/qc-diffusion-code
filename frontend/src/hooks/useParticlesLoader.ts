@@ -7,6 +7,7 @@ export const useParticlesLoader = ({
   simulatorRef,
   tsParticlesContainerRef,
   gridLayoutParamsRef,
+  gridLayoutParams,
   simulationStateRef,
   renderEnabledRef,
   timeRef,
@@ -16,6 +17,7 @@ export const useParticlesLoader = ({
   simulatorRef: React.MutableRefObject<any>,
   tsParticlesContainerRef: React.MutableRefObject<Container | null>,
   gridLayoutParamsRef: React.MutableRefObject<any>,
+  gridLayoutParams: any,
   simulationStateRef: React.MutableRefObject<any>,
   renderEnabledRef: React.MutableRefObject<boolean>,
   timeRef: React.MutableRefObject<number>,
@@ -86,6 +88,52 @@ export const useParticlesLoader = ({
   useEffect(() => {
     return () => cleanup();
   }, [cleanup]);
+
+  // Reactive parameter propagation: push UI changes to running sim (GPU and CPU)
+  useEffect(() => {
+    // Build payload from current UI params
+    const ui = gridLayoutParams || {};
+    const payload: any = {
+      boundaryCondition: ui.boundaryCondition,
+      dimension: ui.dimension,
+      strategies: ui.strategies,
+      collisionRate: ui.collisionRate,
+      jumpLength: ui.jumpLength,
+      velocity: ui.velocity,
+      dt: ui.dt,
+      interparticleCollisions: ui.interparticleCollisions,
+      showCollisions: ui.showCollisions,
+    };
+
+    // Always include fresh bounds from simulator if available
+    const bounds = simulatorRef.current?.getBoundaryConfig?.();
+    if (bounds) payload.bounds = bounds;
+
+    // GPU path: update uniforms/state on the fly (recreate only on particleCount change inside updater)
+    if (useGPU) {
+      updateGPUParameters(payload);
+    }
+
+    // CPU path: forward to simulator if it supports updates
+    try {
+      simulatorRef.current?.updateParameters?.(payload);
+    } catch (e) {
+      // non-fatal; older simulators may not support live updates
+      // console.warn('[CPU] updateParameters not available:', e);
+    }
+    // list relevant dependencies; avoid particle count to prevent unintended recreation here
+  }, [
+    useGPU,
+    gridLayoutParams?.boundaryCondition,
+    gridLayoutParams?.dimension,
+    gridLayoutParams?.strategies,
+    gridLayoutParams?.collisionRate,
+    gridLayoutParams?.jumpLength,
+    gridLayoutParams?.velocity,
+    gridLayoutParams?.dt,
+    gridLayoutParams?.interparticleCollisions,
+    gridLayoutParams?.showCollisions,
+  ]);
 
   const startAnimation = useCallback((container: Container) => {
     // Stop any previous animation loop
@@ -270,6 +318,7 @@ export const useParticlesLoader = ({
   (particlesLoader as any).resetGPU = resetGPU;
   (particlesLoader as any).initializeGPU = initializeGPU;
   (particlesLoader as any).updateGPUParameters = updateGPUParameters;
+  (particlesLoader as any).getGPUManager = () => gpuManagerRef.current;
 
   return particlesLoader;
 };

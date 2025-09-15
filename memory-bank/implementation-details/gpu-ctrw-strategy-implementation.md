@@ -1,6 +1,6 @@
 # GPU CTRW Strategy Implementation
 *Created: 2025-09-15 13:14:24 IST*
-*Last updated: 2025-09-15 14:09:32 IST*
+*Last updated: 2025-09-15 19:16:43 IST*
 
 This document describes the GPU-based Continuous Time Random Walk (CTRW) strategy implementation for both 1D and 2D particle simulations.
 
@@ -196,6 +196,20 @@ if (collisionOccurs) {
 - **Throughput**: Particles processed per second
 - **Memory usage**: State texture and temporary buffer overhead
 - **Frame timing**: CTRW pass contribution to total frame time
+
+## Parameter Synchronization Enhancement — 2025-09-15 19:13:54 IST
+
+### Critical Integration Improvements
+- **Reactive Parameter Propagation**: Enhanced useParticlesLoader with comprehensive parameter watching ensuring CTRW strategy changes take immediate effect
+- **GPU Parameter Updates**: Improved updateGPUParameters to include fresh boundary config from simulator preventing stale GPU uniforms affecting CTRW physics
+- **Strategy Integration**: CTRW now properly integrated with reactive parameter flow changes ensuring immediate effect without page reload
+- **UI Responsiveness**: Parameter changes propagate to GPU CTRW immediately through enhanced parameter dependency tracking
+
+### Technical Implementation
+- **Parameter Dependency**: Added strategies, collisionRate, jumpLength, velocity to useEffect dependency array
+- **Boundary Config**: Enhanced GPU parameter updates to include getBoundaryConfig() ensuring CTRW respects current boundaries
+- **State Preservation**: CTRW strategy changes now preserve boundary conditions instead of resetting to defaults
+- **GPU Integration**: Complete parameter flow from UI through useParticlesLoader to GPU CTRW shader uniforms
 
 ## API Reference
 

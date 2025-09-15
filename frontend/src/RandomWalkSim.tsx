@@ -590,6 +590,7 @@ export default function RandomWalkSim() {
     simulatorRef,
     tsParticlesContainerRef,
     gridLayoutParamsRef,
+    gridLayoutParams,
     simulationStateRef,
     renderEnabledRef,
     timeRef,
@@ -721,6 +722,7 @@ export default function RandomWalkSim() {
               simulationState={{
                 status: randomWalkSimulationState.status
               }}
+              particlesLoaded={particlesLoaded}
             />
           </div>
 

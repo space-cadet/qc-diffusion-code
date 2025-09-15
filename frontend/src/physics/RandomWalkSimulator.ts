@@ -202,15 +202,29 @@ export class RandomWalkSimulator {
                                params.interparticleCollisions !== undefined;
     
     if (needsStrategyUpdate) {
+      // Preserve current boundary config before strategy recreation
+      const currentBoundaryConfig = this.parameterManager.getBoundaryConfig();
+      
       this.setupStrategies();
       this.particleManager.updatePhysicsEngine(this.currentStrategy);
 
       // New engine path: also refresh engine strategies so runtime toggles take effect
       if (this.useNewEngine && this.physicsEngine) {
         // Get physics strategies directly instead of using adapter
-        const physicsStrategies = createPhysicsStrategies(this.parameterManager, this.parameterManager.getBoundaryConfig());
-        this.physicsEngine.updateConfiguration({ strategies: physicsStrategies });
+        const physicsStrategies = createPhysicsStrategies(this.parameterManager, currentBoundaryConfig);
+        this.physicsEngine.updateConfiguration({ 
+          strategies: physicsStrategies,
+          boundaries: currentBoundaryConfig 
+        });
       }
+      
+      // Recreate particle manager with preserved boundary config
+      const coordinateSystem = new CoordinateSystem(
+        { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
+        currentBoundaryConfig,
+        this.parameterManager.dimension
+      );
+      this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem);
     }
     
     this.particleManager.setCanvasSize(this.parameterManager.canvasWidth, this.parameterManager.canvasHeight);

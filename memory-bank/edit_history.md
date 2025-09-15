@@ -5,6 +5,22 @@ _Last Updated: 2025-09-11 13:18:05 IST_
 
 ### 2025-09-15
 
+#### 19:13 - C16: GPU Parameter Synchronization and Density Profile Integration Complete (GPT-5)
+- Updated `frontend/src/hooks/useParticlesLoader.ts` - Added reactive parameter propagation useEffect watching all critical parameters (boundaryCondition, dimension, strategies, collisionRate, jumpLength, velocity, dt, interparticleCollisions, showCollisions), enhanced updateGPUParameters with fresh boundary config from simulator, added getGPUManager() method exposure
+- Updated `frontend/src/hooks/useDensityVisualization.ts` - Added GPU mode detection with useGPU and particlesLoaded parameters, GPU data extraction via getParticleData() with Float32Array to particle object conversion, fallback safety for CPU mode when GPU unavailable
+- Updated `frontend/src/components/DensityComparison.tsx` - Added useGPU from store and particlesLoaded prop for GPU integration, enhanced parameter passing to useDensityVisualization hook
+- Updated `frontend/src/physics/RandomWalkSimulator.ts` - Enhanced updateParameters() to preserve current boundary config during strategy recreation, store boundaries before setupStrategies(), restore to new strategies and physics engine, recreate ParticleManager with preserved boundaries
+- Updated `frontend/src/RandomWalkSim.tsx` - Added particlesLoaded prop to DensityComparison component for GPU manager access
+- Updated `memory-bank/tasks/C16.md` - Added Session 2025-09-15 Evening section documenting parameter synchronization and density profile GPU integration
+- Updated `memory-bank/tasks/C16b.md` - Added parameter flow and integration fixes section documenting enhanced reactive parameter propagation
+- Updated `memory-bank/tasks/C19.md` - Added Session 2025-09-15 Evening section documenting boundary state preservation implementation
+- Updated `memory-bank/tasks.md` - Updated C16, C16b, C19 with enhanced timestamps, status updates, and completion notes
+- Updated `memory-bank/implementation-details/gpu-io-implementation-plan.md` - Added Parameter Synchronization Implementation section documenting critical parameter flow issues resolved
+- Updated `memory-bank/implementation-details/gpu-ctrw-strategy-implementation.md` - Added Parameter Synchronization Enhancement section
+- Updated `memory-bank/implementation-details/particle-boundary-condition-plan.md` - Added Session 2025-09-15 Evening section documenting boundary state preservation
+- Created `memory-bank/sessions/2025-09-15-evening.md` - Session file documenting parameter flow fixes, GPU integration, and boundary preservation work
+- Updated `memory-bank/session_cache.md` - Updated current session to evening with parameter synchronization focus, updated session history
+
 #### 14:23 - C16b: GPU CTRW Strategy Implementation and UI Safety Enhancements
 - Created `frontend/src/gpu/shaders/ctrw.glsl` - GPU CTRW physics shader with velocity-jump model, exponential collision timing, hash-based PRNG, 1D/2D unified support
 - Updated `frontend/src/gpu/GPUParticleManager.ts` - Added CTRW pipeline with ctrwStateLayer, three-pass rendering (CTRW → position → velocity), parameter uniforms, strategy composition

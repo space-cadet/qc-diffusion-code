@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2025-09-15 14:23:30 IST_
+_Last Updated: 2025-09-15 19:15:58 IST_
 
 ## Active Tasks
 
@@ -181,9 +181,9 @@ _Last Updated: 2025-09-15 14:23:30 IST_
 
 ### C16: GPU.IO Framework Implementation with Rendering Engine Abstraction
 **Description**: Implement GPU.IO-based particle physics framework with complete backend agnosticism and on-the-fly switching between tsParticles and GPU.IO rendering engines
-**Status**: 🔄 IN PROGRESS - Phase 2 COMPLETE (Enhanced by GPT-5) **Last**: 2025-09-11 13:14:35 IST
+**Status**: 🔄 IN PROGRESS - Phase 2.5 COMPLETE (Parameter Flow) **Last**: 2025-09-15 19:13:54 IST
 **Files**: `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/gpu/GPUCollisionManager.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`, `frontend/src/types/simulationTypes.ts`
-**Notes**: Phase 2 enhanced by GPT-5 - Added collision alpha parameter (threshold scaling), CPU-GPU hybrid neighbor optimization, collision flash improvements (600ms duration), deterministic collision resolution, enhanced visualization with throttling, complete parameter integration from UI through GPU pipeline
+**Notes**: Parameter synchronization and density profile integration complete - Reactive parameter propagation, GPU data extraction for density visualization, boundary condition preservation, immediate parameter updates without page reload
 
 ### C16a: GPU.IO Architecture Refactoring and Modularization
 **Description**: Refactor GPU.IO implementation to improve maintainability by externalizing inline shaders and extracting utility functions into separate modules
@@ -193,9 +193,9 @@ _Last Updated: 2025-09-15 14:23:30 IST_
 
 ### C16b: GPU CTRW Strategy Implementation and Testing
 **Description**: Implement and test proper GPU-based Continuous Time Random Walk physics with corrected velocity-jump model and timing consistency
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-15 14:23:30 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-15 19:13:54 IST
 **Files**: `frontend/src/gpu/shaders/ctrw.glsl`, `frontend/src/gpu/GPUParticleManager.ts`, `frontend/src/gpu/lib/GPUSync.ts`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/components/RandomWalkParameterPanel.tsx`
-**Notes**: Implementation complete - CTRW shader with proper velocity-jump model, exponential timing, hash-based PRNG, 1D/2D unified support, complete parameter flow from UI to GPU. UI safety fixes applied across components. Ready for validation testing.
+**Notes**: Implementation and parameter integration complete - Enhanced reactive parameter propagation ensures CTRW strategy changes take immediate effect. GPU parameter updates include fresh boundary config. Ready for validation testing.
 
 ### C16c: GPU Collision Strategy Implementation and Testing
 **Description**: Complete implementation and testing of GPU-based interparticle collision system with spatial partitioning and bilateral momentum conservation
@@ -217,9 +217,9 @@ _Last Updated: 2025-09-15 14:23:30 IST_
 
 ### C19: Particle Simulation Boundary Conditions Implementation
 **Description**: Implement comprehensive boundary condition system for particle simulations with unified API supporting periodic, reflective, and absorbing boundaries across 1D/2D modes
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-08 23:32:26 IST
-**Files**: `frontend/src/physics/interfaces/PhysicsStrategy.ts`, `frontend/src/physics/core/BoundaryManager.ts`, `frontend/src/physics/strategies/`
-**Notes**: Interface unification completed - unified PhysicsStrategy interface across all strategies. Simplified coordinate system integration and enhanced constructor standardization.
+**Status**: 🔄 IN PROGRESS **Last**: 2025-09-15 19:13:54 IST
+**Files**: `frontend/src/physics/interfaces/PhysicsStrategy.ts`, `frontend/src/physics/core/BoundaryManager.ts`, `frontend/src/physics/strategies/`, `frontend/src/physics/RandomWalkSimulator.ts`
+**Notes**: Boundary state preservation implemented - Strategy updates now preserve current boundary config instead of resetting to defaults. Enhanced parameter propagation prevents GPU boundary condition loss.
 
 ### C20: Network Diffusion Tab Implementation
 **Description**: Create Network Diffusion tab showing relationship between string substitution systems and graph dynamics
