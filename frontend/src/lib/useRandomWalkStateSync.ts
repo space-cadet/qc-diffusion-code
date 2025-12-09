@@ -65,7 +65,7 @@ export function useRandomWalkStateSync({
     const totalColl = stats?.totalCollisions ?? collisionsRef.current ?? 0;
     const interColl = stats?.totalInterparticleCollisions ?? randomWalkSimulationState.interparticleCollisions ?? 0;
     updateSimulationMetrics(timeRef.current, totalColl, randomWalkSimulationState.status, interColl);
-  }, [isRunning, randomWalkSimulationState.status]);
+  }, [isRunning, randomWalkSimulationState.status, randomWalkSimulationState.interparticleCollisions, updateSimulationMetrics, simulatorRef, timeRef, collisionsRef]);
 }
 
 export default useRandomWalkStateSync;

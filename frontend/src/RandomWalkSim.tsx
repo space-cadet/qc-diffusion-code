@@ -106,12 +106,23 @@ export default function RandomWalkSim() {
     useGPU
   });
 
+  // Memoize refs to prevent unnecessary re-creation on every render
+  const gridLayoutParamsRef = useMemo(
+    () => ({ current: { ...gridLayoutParams, useGPU } }),
+    [gridLayoutParams, useGPU]
+  );
+
+  const simulationStateRef = useMemo(
+    () => ({ current: simulationState }),
+    [simulationState]
+  );
+
   const particlesLoaded = useParticlesLoader({
     simulatorRef,
     tsParticlesContainerRef,
-    gridLayoutParamsRef: { current: { ...gridLayoutParams, useGPU } },
+    gridLayoutParamsRef,
     gridLayoutParams,
-    simulationStateRef: { current: simulationState },
+    simulationStateRef,
     renderEnabledRef,
     timeRef,
     collisionsRef,
