@@ -41,6 +41,7 @@
     "sigma": "3.0.2",
     "stream-browserify": "3.0.0",
     "three": "0.179.1",
+    "ts-quantum": "link:/Users/deepak/code/ts-quantum",
     "tsparticles": "3.9.1",
     "util": "0.12.5",
     "zustand": "5.0.8"
@@ -51,6 +52,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-grid-layout": "1.3.5",
+    "@types/react-plotly.js": "2.6.4",
     "@types/three": "0.179.0",
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/ui": "3.2.4",

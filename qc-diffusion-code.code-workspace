@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../ts-quantum"
 		}
 	],
 	"settings": {}

@@ -77,7 +77,7 @@ interface PdeState {
 }
 
 interface AppState {
-  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis'
+  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk'
   simulationParams: SimulationParams
   gridLayoutParams: RandomWalkParams
   randomWalkSimLayouts: Layout[]
@@ -109,7 +109,18 @@ interface AppState {
     initialConditionsOpen: boolean
     simulationSettingsOpen: boolean
   }
-  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis') => void
+  // Quantum Walk state
+  quantumWalkState: {
+    isRunning: boolean
+    steps: number
+    maxSteps: number
+    initialCoinBias: number // 0 to 1 (probability of |up>)
+    distribution: number[]
+    positions: number[]
+    history: number[][]
+  }
+  setQuantumWalkState: (partial: Partial<AppState['quantumWalkState']>) => void
+  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
@@ -188,6 +199,15 @@ export const useAppStore = create<AppState>()(
         diffusionOpen: true,
         initialConditionsOpen: true,
         simulationSettingsOpen: true,
+      },
+      quantumWalkState: {
+        isRunning: false,
+        steps: 0,
+        maxSteps: 50,
+        initialCoinBias: 0.5,
+        distribution: [],
+        positions: [],
+        history: [],
       },
       gridLayoutParams: {
         particles: 1000,
@@ -308,6 +328,7 @@ export const useAppStore = create<AppState>()(
       setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
       setUseStreamingObservables: (useStreaming) => set({ useStreamingObservables: useStreaming }),
       setUseGPU: (useGPU) => set({ useGPU: useGPU }),
+      setQuantumWalkState: (partial) => set((state) => ({ quantumWalkState: { ...state.quantumWalkState, ...partial } })),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {
@@ -374,6 +395,7 @@ export const useAppStore = create<AppState>()(
         useNewEngine: state.useNewEngine,
         useStreamingObservables: state.useStreamingObservables,
         useGPU: state.useGPU,
+        quantumWalkState: state.quantumWalkState,
       }),
     }
   )
