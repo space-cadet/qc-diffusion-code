@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"build": "pnpm --filter qc-diffusion-frontend build",
+		"build": "NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm --filter @spin-network/graph-core build && NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm --filter qc-diffusion-frontend build",
+		"build:deps": "NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm --filter @spin-network/graph-core build",
 		"clean": "pnpm --filter \"*\" --parallel exec rm -rf dist build .next .nuxt out",
 		"index": "node scripts/index-query.js"
 	},
