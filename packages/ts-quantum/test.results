@@ -1,0 +1,2730 @@
+
+> ts-quantum@1.0.0 test
+> vitest run
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v0.34.6 /Users/deepak/code/ts-quantum
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > visualizes eigendecomposition of a 2×2 real symmetric matrix
+Input Matrix:
+[
+  [2.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 1.0000
+λ2 = 3.0000
+
+Eigenvectors:
+v1 = [0.7071, -0.7071]
+v2 = [-0.7071, -0.7071]
+
+Verifying eigenpair 1:
+λ = 1.0000
+v = [0.7071, -0.7071]
+A·v = [0.7071, -0.7071]
+λ·v = [0.7071, -0.7071]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 3.0000
+v = [-0.7071, -0.7071]
+A·v = [-2.1213, -2.1213]
+λ·v = [-2.1213, -2.1213]
+Verification: PASSED ✓
+
+Reconstruction of original matrix:
+
+Eigenvalue Matrix D:
+[
+  [1.0000, 0.0000],
+  [0.0000, 3.0000]
+]
+
+V·D:
+[
+  [0.7071, -2.1213],
+  [-0.7071, -2.1213]
+]
+
+Reconstructed Matrix V·D·V^T:
+[
+  [2.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+
+Original Matrix:
+[
+  [2.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > visualizes eigendecomposition of the Pauli-X matrix
+Pauli-X Matrix:
+[
+  [0.0000, 1.0000],
+  [1.0000, 0.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = -1.0000
+λ2 = 1.0000
+
+Eigenvectors:
+v1 = [0.7071, -0.7071]
+v2 = [-0.7071, -0.7071]
+
+Verifying eigenpair 1:
+λ = -1.0000
+v = [0.7071, -0.7071]
+A·v = [-0.7071, 0.7071]
+λ·v = [-0.7071, 0.7071]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 1.0000
+v = [-0.7071, -0.7071]
+A·v = [-0.7071, -0.7071]
+λ·v = [-0.7071, -0.7071]
+Verification: PASSED ✓
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > visualizes eigendecomposition of a complex Hermitian matrix
+Complex Hermitian Matrix:
+[
+  [1.0000, 1.0000+1.0000i],
+  [1.0000-1.0000i, 2.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 0.0000
+λ2 = 3.0000
+
+Eigenvectors:
+v1 = [0.8165, -0.4082+0.4082i]
+v2 = [-0.5774, -0.5774+0.5774i]
+
+Verifying eigenpair 1:
+λ = 0.0000
+v = [0.8165, -0.4082+0.4082i]
+A·v = [0.0000, 0.0000]
+λ·v = [0.0000, -0.0000]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 3.0000
+v = [-0.5774, -0.5774+0.5774i]
+A·v = [-1.7321, -1.7321+1.7321i]
+λ·v = [-1.7321, -1.7321+1.7321i]
+Verification: PASSED ✓
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles matrices with degenerate eigenvalues
+Identity Matrix (Degenerate Case):
+[
+  [1.0000, 0.0000],
+  [0.0000, 1.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 1.0000
+λ2 = 1.0000
+
+Eigenvectors:
+v1 = [1.0000, 0.0000]
+v2 = [0.0000, 1.0000]
+
+Verifying eigenpair 1:
+λ = 1.0000
+v = [1.0000, 0.0000]
+A·v = [1.0000, 0.0000]
+λ·v = [1.0000, 0.0000]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 1.0000
+v = [0.0000, 1.0000]
+A·v = [0.0000, 1.0000]
+λ·v = [0.0000, 1.0000]
+Verification: PASSED ✓
+
+Checking orthogonality of eigenvectors:
+⟨v1|v2⟩ = 0.0000
+Orthogonality: PASSED ✓
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > tests eigendecomposition of a 3×3 real symmetric matrix
+3×3 Real Symmetric Matrix:
+[
+  [1.0000, 2.0000, 3.0000],
+  [2.0000, 2.0000, 1.0000],
+  [3.0000, 1.0000, 3.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 1.3845
+λ2 = -1.5283
+λ3 = 6.1439
+
+Eigenvectors:
+v1 = [0.8187, -0.3311, -0.4693]
+v2 = [0.0200, 0.8331, -0.5528]
+v3 = [0.5739, 0.4432, 0.6886]
+
+Verifying eigenpair 1:
+λ = 1.3845
+v = [0.8187, -0.3311, -0.4693]
+A·v = [-1.2512, 0.5060, 0.7172]
+λ·v = [1.1334, -0.4583, -0.6497]
+Verification: FAILED ✗
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > computes eigenvalues only when requested
+Computing eigenvalues only:
+[
+  [3.0000, 1.0000],
+  [1.0000, 3.0000]
+]
+
+Eigenvalues:
+λ1 = 2.0000
+λ2 = 4.0000
+Eigenvectors computed: No
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Y matrix correctly
+Pauli-Y Matrix:
+[
+  [0.0000, 0.0000-1.0000i],
+  [0.0000+1.0000i, 0.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 1.0000
+λ2 = -1.0000
+
+Eigenvectors:
+v1 = [1.0000, 0.0000-1.0000i]
+v2 = [1.0000, 0.0000+1.0000i]
+
+Verifying eigenpair 1:
+λ = 1.0000
+v = [1.0000, 0.0000-1.0000i]
+A·v = [-1.0000, 0.0000+1.0000i]
+λ·v = [1.0000, 0.0000-1.0000i]
+Verification: FAILED ✗
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Z matrix correctly
+Pauli-Z Matrix:
+[
+  [1.0000, 0.0000],
+  [0.0000, -1.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 1.0000
+λ2 = -1.0000
+
+Eigenvectors:
+v1 = [0.0000, 1.0000]
+v2 = [1.0000, 0.0000]
+
+Verifying eigenpair 1:
+λ = 1.0000
+v = [0.0000, 1.0000]
+A·v = [0.0000, -1.0000]
+λ·v = [0.0000, 1.0000]
+Verification: FAILED ✗
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles a nilpotent matrix correctly
+Nilpotent Matrix:
+[
+  [0.0000, 1.0000],
+  [0.0000, 0.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 0.0000
+λ2 = 0.0000
+
+Eigenvectors:
+v1 = [1.0000, 0.0000]
+
+Verifying eigenpair 1:
+λ = 0.0000
+v = [1.0000, 0.0000]
+A·v = [0.0000, 0.0000]
+λ·v = [0.0000, 0.0000]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 0.0000
+Skipping undefined eigenvector (deficient case)
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles a matrix with complex eigenvalues
+Rotation Matrix (complex eigenvalues):
+[
+  [0.0000, -1.0000],
+  [1.0000, 0.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 0.0000+1.0000i
+λ2 = 0.0000-1.0000i
+
+Eigenvectors:
+v1 = [-1.0000, 0.0000+1.0000i]
+v2 = [-1.0000, 0.0000-1.0000i]
+
+Verifying eigenpair 1:
+λ = 0.0000+1.0000i
+v = [-1.0000, 0.0000+1.0000i]
+A·v = [0.0000-1.0000i, -1.0000]
+λ·v = [0.0000-1.0000i, -1.0000]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 0.0000-1.0000i
+v = [-1.0000, 0.0000-1.0000i]
+A·v = [0.0000+1.0000i, -1.0000]
+λ·v = [0.0000+1.0000i, -1.0000]
+Verification: PASSED ✓
+
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > correctly handles a matrix with very different scales
+Matrix with different scales:
+[
+  [1000000.0000, 0.0000],
+  [0.0000, 0.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 0.0000
+λ2 = 1000000.0000
+
+Eigenvectors:
+v1 = [0.0000, 1.0000]
+v2 = [1.0000, 0.0000]
+
+Verifying eigenpair 1:
+λ = 0.0000
+v = [0.0000, 1.0000]
+A·v = [0.0000, 0.0000]
+λ·v = [0.0000, 0.0000]
+Verification: PASSED ✓
+
+Verifying eigenpair 2:
+λ = 1000000.0000
+v = [1.0000, 0.0000]
+A·v = [1000000.0000, 0.0000]
+λ·v = [1000000.0000, 0.0000]
+Verification: PASSED ✓
+
+ ❯ __tests__/eigen.test.ts  (12 tests | 4 failed) 45ms
+   ❯ __tests__/eigen.test.ts > eigenDecomposition Visual Test > tests eigendecomposition of a 3×3 real symmetric matrix
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Y matrix correctly
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Z matrix correctly
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigen.test.ts > eigenDecomposition Visual Test > verifies full matrix reconstruction for a 3×3 Hermitian matrix
+     → expected false to be true // Object.is equality
+stdout | __tests__/eigen.test.ts > eigenDecomposition Visual Test > verifies full matrix reconstruction for a 3×3 Hermitian matrix
+3×3 Hermitian Matrix:
+[
+  [2.0000, 1.0000+1.0000i, 0.0000],
+  [1.0000-1.0000i, 2.0000, 0.0000+1.0000i],
+  [0.0000, 0.0000-1.0000i, 2.0000]
+]
+
+Performing eigendecomposition...
+
+Eigenvalues:
+λ1 = 0.2679
+λ2 = 2.0000
+λ3 = 3.7321
+
+Eigenvectors:
+v1 = [-1.2663, 1.0966-1.0966i, 0.6331+0.6331i]
+v2 = [0.4082-0.4082i, -0.0000, 0.8165]
+v3 = [-0.0547, -0.0474+0.0474i, 0.0274+0.0274i]
+
+Eigenvalue Matrix D:
+[
+  [0.2679, 0.0000, 0.0000],
+  [0.0000, 2.0000, 0.0000],
+  [0.0000, 0.0000, 3.7321]
+]
+
+V·D:
+[
+  [-0.3393, 2.1933-2.1933i, 2.3629+2.3629i],
+  [0.1094-0.1094i, 0.0000, 3.0472],
+  [-0.0147, -0.0948+0.0948i, 0.1021+0.1021i]
+]
+
+V† (Conjugate Transpose):
+[
+  [-1.2663, 0.4082+0.4082i, -0.0547],
+  [1.0966+1.0966i, -0.0000, -0.0474-0.0474i],
+  [0.6331-0.6331i, 0.8165, 0.0274-0.0274i]
+]
+
+Reconstructed Matrix V·D·V†:
+[
+  [8.2323, 1.7908+1.7908i, -0.0600],
+  [1.7908-1.7908i, 2.5774, 0.0774-0.0774i],
+  [-0.0600, 0.0774+0.0774i, 0.0154]
+]
+
+Original Matrix:
+[
+  [2.0000, 1.0000+1.0000i, 0.0000],
+  [1.0000-1.0000i, 2.0000, 0.0000+1.0000i],
+  [0.0000, 0.0000-1.0000i, 2.0000]
+]
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > computes correct eigenvalues and eigenvectors for 2x2 matrix
+Matrix:
+[
+  [2.000, 1.000],
+  [1.000, 2.000]
+]
+Eigenvalues: [1.000, 3.000]
+Eigenvectors:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+Verifying eigenpair 0: {
+  eigenvalue: Complex { re: [33m1[39m, im: [33m0[39m },
+  eigenvector: [
+    Complex { re: [33m0.7071067811865476[39m, im: [33m0[39m },
+    Complex { re: [33m-0.7071067811865475[39m, im: [33m0[39m }
+  ]
+}
+Verifying eigenpair 1: {
+  eigenvalue: Complex { re: [33m3[39m, im: [33m0[39m },
+  eigenvector: [
+    Complex { re: [33m-0.7071067811865475[39m, im: [33m0[39m },
+    Complex { re: [33m-0.7071067811865476[39m, im: [33m0[39m }
+  ]
+}
+Verifying full decomposition
+Eigenvalues: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m3[39m, im: [33m0[39m } ]
+Eigenvector matrix V:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+Diagonal matrix D:
+[
+  [1.000, 0.000],
+  [0.000, 3.000]
+]
+Conjugate transpose V†:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+V·D:
+[
+  [0.707, -2.121],
+  [-0.707, -2.121]
+]
+V·D·V†:
+[
+  [2.000, 1.000],
+  [1.000, 2.000]
+]
+Original matrix:
+[
+  [2.000, 1.000],
+  [1.000, 2.000]
+]
+Reconstructed matrix:
+[
+  [2.000, 1.000],
+  [1.000, 2.000]
+]
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > computes correct eigenvalues and eigenvectors for random 2x2 matrix
+Random Matrix:
+[
+  [1.400, -1.514],
+  [-1.514, 0.832]
+]
+Eigenvalues: [-0.425, 2.657]
+Eigenvectors:
+[
+  [0.639, 0.770],
+  [-0.770, 0.639]
+]
+Verifying full decomposition
+Eigenvalues: [
+  Complex { re: [33m-0.4245576166797707[39m, im: [33m0[39m },
+  Complex { re: [33m2.656965807969574[39m, im: [33m0[39m }
+]
+Eigenvector matrix V:
+[
+  [0.639, 0.770],
+  [-0.770, 0.639]
+]
+Diagonal matrix D:
+[
+  [-0.425, 0.000],
+  [0.000, 2.657]
+]
+Conjugate transpose V†:
+[
+  [0.639, -0.770],
+  [0.770, 0.639]
+]
+V·D:
+[
+  [-0.271, 2.045],
+  [0.327, 1.697]
+]
+V·D·V†:
+[
+  [1.400, 1.514],
+  [1.514, 0.832]
+]
+Original matrix:
+[
+  [1.400, -1.514],
+  [-1.514, 0.832]
+]
+Reconstructed matrix:
+[
+  [1.400, 1.514],
+  [1.514, 0.832]
+]
+Mismatch at [0,1]: Original=-1.514, Reconstructed=1.514
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > computes eigensystem for Pauli X matrix
+PauliX matrix:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+Eigenvalues: [-1.000, 1.000]
+Eigenvectors:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+Eigenvalues: [ Complex { re: [33m-1[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ]
+Eigenvector matrix V:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+Diagonal matrix D:
+[
+  [-1.000, 0.000],
+  [0.000, 1.000]
+]
+Conjugate transpose V†:
+[
+  [0.707, -0.707],
+  [-0.707, -0.707]
+]
+V·D:
+[
+  [-0.707, -0.707],
+  [0.707, -0.707]
+]
+V·D·V†:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+Original matrix:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+Reconstructed matrix:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > handles matrices with degenerate eigenvalues
+Eigenvalues: [
+  Complex { re: [33m1[39m, im: [33m0[39m },
+  Complex { re: [33m1[39m, im: [33m0[39m },
+  Complex { re: [33m1[39m, im: [33m0[39m }
+]
+Eigenvector matrix V:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+Diagonal matrix D:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+Conjugate transpose V†:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+V·D:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+V·D·V†:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+Original matrix:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+Reconstructed matrix:
+[
+  [1.000, 0.000, 0.000],
+  [0.000, 1.000, 0.000],
+  [0.000, 0.000, 1.000]
+]
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > correctly decomposes larger real symmetric matrices
+Vectors before orthonormality check: 0.7369762290995789,0.3279852776056809,-0.5910090485061031,-0.5910090485061027,0.7369762290995787,-0.3279852776056823,0.32798527760568175,0.5910090485061035,0.7369762290995784
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Complex Hermitian Matrices > computes correct eigensystem for Pauli Y matrix
+Verifying Pauli Y eigenpair 0:
+Eigenvalue: 1.000
+Eigenvector: [0.707, 0.000-0.707i]
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Numerical Stability and Edge Cases > handles matrices with zeros
+Matrix with zeros:
+Matrix:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+Eigenvalues: [-1.000, 1.000]
+Eigenvectors:
+[
+  [0.707, -0.707],
+  [0.707, 0.707]
+]
+Eigenvalues: [ Complex { re: [33m-1[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ]
+Eigenvector matrix V:
+[
+  [0.707, -0.707],
+  [0.707, 0.707]
+]
+Diagonal matrix D:
+[
+  [-1.000, 0.000],
+  [0.000, 1.000]
+]
+Conjugate transpose V†:
+[
+  [0.707, 0.707],
+  [-0.707, 0.707]
+]
+V·D:
+[
+  [-0.707, -0.707],
+  [-0.707, 0.707]
+]
+V·D·V†:
+[
+  [0.000, -1.000],
+  [-1.000, 0.000]
+]
+Original matrix:
+[
+  [0.000, 1.000],
+  [1.000, 0.000]
+]
+Reconstructed matrix:
+[
+  [0.000, -1.000],
+  [-1.000, 0.000]
+]
+Mismatch at [0,1]: Original=1.000, Reconstructed=-1.000
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes Pauli Z matrix
+v0 vector: [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ]
+v0[0].re: [33m0[39m
+
+stdout | __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes a Hamiltonian
+Verifying Hamiltonian eigenpair 0:
+Eigenvalue: 0.000
+Eigenvector: [0.000, 0.707, -0.707, 0.000]
+
+ ❯ __tests__/eigendecomposition.test.ts  (20 tests | 7 failed) 69ms
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > computes correct eigenvalues and eigenvectors for random 2x2 matrix
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > correctly decomposes larger real symmetric matrices
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Complex Hermitian Matrices > computes correct eigensystem for Pauli Y matrix
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Complex Hermitian Matrices > handles general complex Hermitian matrices
+     → Expected eigenvectors to be defined
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Numerical Stability and Edge Cases > handles matrices with zeros
+     → expected false to be true // Object.is equality
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes Pauli Z matrix
+     → expected 1 to be less than 1e-10
+   ❯ __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes a Hamiltonian
+     → expected false to be true // Object.is equality
+ ❯ __tests__/integration.test.ts  (8 tests | 3 failed) 12ms
+   ❯ __tests__/integration.test.ts > Quantum Integration Tests > Space and State Integration > handles tensor products of states correctly
+     → b.getAmplitudes is not a function
+   ❯ __tests__/integration.test.ts > Quantum Integration Tests > Operator and Space Integration > correctly extends operators to larger spaces
+     → b.getAmplitudes is not a function
+   ❯ __tests__/integration.test.ts > Quantum Integration Tests > Complex Quantum Circuits > creates and manipulates Bell states
+     → b.getAmplitudes is not a function
+stdout | __tests__/geometry/quantumDistance.test.ts > Bloch Sphere Geometry > quantum distance matches Bloch sphere calculation
+State1:  StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|θ=0.00,φ=0.00⟩'[39m,
+  properties: [90mundefined[39m
+}
+State2:  StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [
+    Complex { re: [33m6.123233995736766e-17[39m, im: [33m0[39m },
+    Complex { re: [33m1[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|θ=3.14,φ=0.00⟩'[39m,
+  properties: [90mundefined[39m
+}
+Quantum Distance:  [33m1.414213562373095[39m
+Bloch Distance:  [33m1.4142135623730951[39m
+Bloch sphere verification:  [33mtrue[39m
+State1:  StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|θ=0.00,φ=0.00⟩'[39m,
+  properties: [90mundefined[39m
+}
+State2:  StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [
+    Complex { re: [33m0.7071067811865476[39m, im: [33m0[39m },
+    Complex { re: [33m0.7071067811865475[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|θ=1.57,φ=0.00⟩'[39m,
+  properties: [90mundefined[39m
+}
+Quantum Distance:  [33m0.7653668647301795[39m
+Bloch Distance:  [33m1[39m
+Bloch sphere verification:  [33mfalse[39m
+
+ ❯ __tests__/geometry/quantumDistance.test.ts  (15 tests | 1 failed) 9ms
+   ❯ __tests__/geometry/quantumDistance.test.ts > Bloch Sphere Geometry > quantum distance matches Bloch sphere calculation
+     → expected false to be true // Object.is equality
+ ❯ __tests__/matrixFunctions.test.ts  (5 tests | 2 failed) 44ms
+   ❯ __tests__/matrixFunctions.test.ts > matrixFunction > applies identity function to return the same matrix
+     → expected false to be true // Object.is equality
+   ❯ __tests__/matrixFunctions.test.ts > matrixFunction > applies square function to eigenvalues correctly
+     → expected false to be true // Object.is equality
+stdout | __tests__/matrixFunctions.test.ts > matrixFunction > applies identity function to return the same matrix
+[
+  [2.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+[
+  [2.0000, -1.0000],
+  [-1.0000, 2.0000]
+]
+
+stdout | __tests__/matrixFunctions.test.ts > matrixFunction > applies square function to eigenvalues correctly
+[
+  [2.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+[
+  [5.0000, -4.0000],
+  [-4.0000, 5.0000]
+]
+
+ ❯ __tests__/angularMomentum/wigner3j.test.ts  (12 tests | 3 failed) 8ms
+   ❯ __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Known values validation > should calculate (1/2 1/2 1; 1/2 -1/2 0) = -1/sqrt(6)
+     → expected 0.408248290463863 to be close to -0.4082482904638631, received difference is 0.816496580927726, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Symmetry properties > should transform correctly under odd permutations
+     → expected 0.7302967433402214 to be close to 0.04564354645876384, received difference is 0.6846531968814575, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Symmetry properties > should be invariant under sign reversal of all m values
+     → expected -0.632455532033676 to be close to -0.158113883008419, received difference is 0.474341649025257, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts  (11 tests | 8 failed) 11ms
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {1/2 1/2 1; 1/2 1/2 0} = -1/3
+     → expected -0.08333333333333333 to be close to -0.3333333333333333, received difference is 0.25, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {1 1 2; 1 1 0} = 1/(2√5)
+     → expected 0.0027777777777777796 to be close to 0.22360679774997896, received difference is 0.2208290199722012, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {3/2 3/2 3; 3/2 3/2 0} = -1/(2√5)
+     → expected -0.000049603174603174596 to be close to -0.22360679774997896, received difference is 0.2235571945753758, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Special cases from theory > should handle zero argument case correctly
+     → expected -0.013888888888888897 to be close to 0.3333333333333333, received difference is 0.3472222222222222, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Special cases from theory > should handle equal pairs case correctly
+     → expected 0.000277777777777778 to be close to 0.1, received difference is 0.09972222222222223, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Symmetry properties > should satisfy Regge symmetry
+     → expected 0.000277777777777778 to be close to 0.0003105649968749709, received difference is 0.00003278721909719291, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Sum rules > should satisfy orthogonality relation
+     → expected 0.00001388888888888891 to be close to 0.3333333333333333, received difference is 0.33331944444444445, but expected 5e-7
+   ❯ __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Sum rules > should satisfy Racah backcoupling rule
+     → expected -0.010416666666666671 to be close to 1, received difference is 1.0104166666666667, but expected 5e-7
+ ❯ __tests__/graph/utils.test.ts  (0 test)
+ ❯ __tests__/graph/QuantumGraph.test.ts  (0 test)
+ ❯ __tests__/qgraph/general-operations.test.ts  (0 test)
+ ❯ __tests__/algorithms/quantumWalk/quantumWalk.test.ts  (0 test)
+ ❯ test/graph/builders/spinNetwork.test.ts  (0 test)
+stdout | unknown test
+state1: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+state2: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+state3: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,-0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Combined state: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m4[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(0.5,0.5),1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: [33m4[39m
+Combined state 2: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m4[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0.7071067811865476[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m-0.7071067811865476[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(0.5,0.5),1,0⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension 2: [33m4[39m
+
+stdout | __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Clebsch-Gordan Coefficients > should return zero for coefficients that violate selection rules
+CG Rule Violation (m ≠ m1 + m2): j1=1, m1=1, j2=1, m2=0, j=2, m=0 => CG = Complex { re: [33m0[39m, im: [33m0[39m }
+CG Rule Violation (j > j1 + j2): j1=1, m1=1, j2=1, m2=1, j=3, m=2 => CG = Complex { re: [33m0[39m, im: [33m0[39m }
+CG Rule Violation (j < |j1 - j2|): j1=2, m1=1, j2=1, m2=0, j=0, m=1 => CG = Complex { re: [33m0[39m, im: [33m0[39m }
+
+stdout | __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Clebsch-Gordan Coefficients > should correctly calculate coefficients for two spin-1/2 particles
+CG Singlet state: j1=1/2, m1=1/2, j2=1/2, m2=-1/2, j=0, m=0 => CG = Complex { re: [33m-0.7071067811865475[39m, im: [33m0[39m } Expected: -1/√2 = [33m-0.7071067811865475[39m
+CG Singlet state: j1=1/2, m1=-1/2, j2=1/2, m2=1/2, j=0, m=0 => CG = Complex { re: [33m0.7071067811865475[39m, im: [33m0[39m } Expected: 1/√2 = [33m0.7071067811865475[39m
+CG Triplet state (m=1): j1=1/2, m1=1/2, j2=1/2, m2=1/2, j=1, m=1 => CG = Complex { re: [33m1[39m, im: [33m0[39m } Expected: 1
+CG Triplet state (m=0): j1=1/2, m1=1/2, j2=1/2, m2=-1/2, j=1, m=0 => CG = Complex { re: [33m0.7071067811865475[39m, im: [33m0[39m } Expected: 1/√2 = [33m0.7071067811865475[39m
+CG Triplet state (m=-1): j1=1/2, m1=-1/2, j2=1/2, m2=-1/2, j=1, m=-1 => CG = Complex { re: [33m1[39m, im: [33m0[39m } Expected: 1
+
+stdout | __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Clebsch-Gordan Coefficients > should correctly calculate coefficients for j1=1, j2=1/2 case
+CG j1=1, j2=1/2 case: j1=1, m1=1, j2=1/2, m2=1/2, j=3/2, m=3/2 => CG = Complex { re: [33m1[39m, im: [33m0[39m } Expected: 1
+CG j1=1, j2=1/2 case: j1=1, m1=1, j2=1/2, m2=-1/2, j=3/2, m=1/2 => CG = Complex { re: [33m1.1547005383792517[39m, im: [33m0[39m } Expected: √(2/3) = [33m0.816496580927726[39m
+
+ ❯ __tests__/angularMomentum/composition.test.ts  (8 tests | 1 failed) 13ms
+   ❯ __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Clebsch-Gordan Coefficients > should correctly calculate coefficients for j1=1, j2=1/2 case
+     → expected 0.33820395745152565 to be less than 1e-10
+stdout | __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Angular Momentum Addition > should have correct amplitude for |j=1, m=1⟩ component
+Complex { re: [33m0[39m, im: [33m0[39m }
+
+ ✓ __tests__/information.test.ts  (19 tests) 18ms
+ ✓ __tests__/hamiltonian.test.ts  (10 tests) 19ms
+stdout | __tests__/hamiltonian.test.ts > Hamiltonian > Spin Hamiltonian > should create correct spin Hamiltonian
+Spin Hamiltonian
+┌───────────────┐
+│ 0.000  1.000 │
+│ 1.000  0.000 │
+└───────────────┘
+Initial state:  0.7071067811865475|0⟩ + 0.7071067811865475|1⟩
+Evolved state:  -0.7071067811865475|0⟩ + -0.7071067811865475|1⟩
+[33mtrue[39m
+
+stdout | __tests__/hamiltonian.test.ts > Hamiltonian > Heisenberg Hamiltonian > should create correct Heisenberg Hamiltonian
+Heisenberg Hamiltonian
+┌─────────────────────────────────┐
+│  1.000   0.000   0.000   0.000 │
+│  0.000  -1.000   2.000   0.000 │
+│  0.000   2.000  -1.000   0.000 │
+│  0.000   0.000   0.000   1.000 │
+└─────────────────────────────────┘
+Up up state:  1|0⟩
+Expectation value:  Complex { re: [33m1[39m, im: [33m0[39m }
+Singlet state:   + 0.7071067811865475|1⟩ + -0.7071067811865475|2⟩
+Singlet Expectation Value:  Complex { re: [33m-2.9999999999999996[39m, im: [33m0[39m }
+
+stdout | __tests__/hamiltonian.test.ts > Hamiltonian > Heisenberg Hamiltonian > evolves product and entangled states correctly
+Heisenberg Hamiltonian:  ┌─────────────────────────────────┐
+│  1.000   0.000   0.000   0.000 │
+│  0.000  -1.000   2.000   0.000 │
+│  0.000   2.000  -1.000   0.000 │
+│  0.000   0.000   0.000   1.000 │
+└─────────────────────────────────┘
+Up up state:  1|0⟩
+Evolved up up state:  -1.0000000000000018|0⟩
+Evolution operator:  ┌─────────────────────────────────┐
+│ -1.000   0.000   0.000   0.000 │
+│  0.000  -1.000   0.000   0.000 │
+│  0.000   0.000  -1.000   0.000 │
+│  0.000   0.000   0.000  -1.000 │
+└─────────────────────────────────┘
+Up down state:   + 1|1⟩
+Evolved up down state:   + -1.0000000000000115|1⟩
+StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m4[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m-1.0000000000000115[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|01⟩'[39m,
+  properties: [90mundefined[39m
+}
+Overlap with up down state:  Complex { re: [33m-1.0000000000000115[39m, im: [33m0[39m }
+
+stdout | __tests__/hamiltonian.test.ts > Hamiltonian > Error handling > should throw on non-Hermitian terms when required
+Is Hermitian?:  [33mfalse[39m
+
+ ✓ __tests__/angularMomentum/states.test.ts  (10 tests) 14ms
+stdout | __tests__/angularMomentum/states.test.ts > Angular Momentum States > Raising and Lowering Operations > should correctly raise states
+Expected state: 1|0⟩
+
+stdout | __tests__/densityMatrix.test.ts > Quantum Channels > Specific Channels > implements phase flip channel correctly
+Channel: ┌───────────────┐
+│ 0.000  0.000 │
+│ 0.000  0.000 │
+└───────────────┘,┌─────────────────┐
+│  1.000   0.000 │
+│  0.000  -1.000 │
+└─────────────────┘
+State: 0.7071067811865475|0⟩ + 0.7071067811865475|1⟩
+Rho: [
+  [0.5000, 0.5000],
+  [0.5000, 0.5000]
+]
+Phase flip result: [
+  [0.5000, -0.5000],
+  [-0.5000, 0.5000]
+]
+
+ ✓ __tests__/densityMatrix.test.ts  (28 tests) 38ms
+ ✓ __tests__/scalability.test.ts  (3 tests) 353ms
+stdout | __tests__/scalability.test.ts > Quantum Module Scalability > State Vector Scaling > should handle increasing qubit counts
+1 qubits (dim 2): 0.50ms, ~0.0MB
+2 qubits (dim 4): 0.12ms, ~0.0MB
+3 qubits (dim 8): 0.09ms, ~0.0MB
+4 qubits (dim 16): 0.16ms, ~0.1MB
+5 qubits (dim 32): 0.82ms, ~0.4MB
+6 qubits (dim 64): 1.14ms, ~0.2MB
+7 qubits (dim 128): 2.83ms, ~0.4MB
+8 qubits (dim 256): 1.15ms, ~1.1MB
+9 qubits (dim 512): 1.71ms, ~0.9MB
+10 qubits (dim 1024): 2.98ms, ~1.8MB
+11 qubits (dim 2048): 5.36ms, ~2.9MB
+12 qubits (dim 4096): 15.91ms, ~-5.0MB
+13 qubits (dim 8192): 29.81ms, ~-11.4MB
+14 qubits (dim 16384): 38.22ms, ~7.5MB
+15 qubits (dim 32768): 98.26ms, ~2.4MB
+16 qubits (dim 65536): 145.53ms, ~3.1MB
+
+stdout | __tests__/scalability.test.ts > Quantum Module Scalability > Tensor Product Scaling > should handle tensor products up to memory limits
+Tensor product 1 qubits: 0.01ms, dim 2, ~0.0MB
+Tensor product 2 qubits: 0.04ms, dim 4, ~0.0MB
+Tensor product 3 qubits: 0.01ms, dim 8, ~0.0MB
+Tensor product 4 qubits: 0.01ms, dim 16, ~0.0MB
+Tensor product 5 qubits: 0.01ms, dim 32, ~0.0MB
+Tensor product 6 qubits: 0.02ms, dim 64, ~0.0MB
+Tensor product 7 qubits: 0.04ms, dim 128, ~0.0MB
+Tensor product 8 qubits: 0.15ms, dim 256, ~0.1MB
+
+stdout | __tests__/scalability.test.ts > Quantum Module Scalability > Operator Scaling > should handle operator creation and application
+Starting 1 qubits (dim 2)...
+Operator 1 qubits: 0.07ms, ~0.0MB
+Starting 2 qubits (dim 4)...
+Operator 2 qubits: 0.01ms, ~0.0MB
+Starting 3 qubits (dim 8)...
+Operator 3 qubits: 0.01ms, ~0.0MB
+Starting 4 qubits (dim 16)...
+Operator 4 qubits: 0.01ms, ~0.0MB
+Starting 5 qubits (dim 32)...
+Operator 5 qubits: 0.01ms, ~0.0MB
+Starting 6 qubits (dim 64)...
+Operator 6 qubits: 0.01ms, ~0.0MB
+Starting 7 qubits (dim 128)...
+Operator 7 qubits: 0.02ms, ~0.0MB
+Starting 8 qubits (dim 256)...
+Operator 8 qubits: 0.03ms, ~0.0MB
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for 2×2 real symmetric matrix
+
+🧪 TEST: 2×2 Real Symmetric Matrix
+
+============================================================
+2×2 Real Symmetric: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [3.0000, 1.0000],
+  [1.0000, 2.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 1.3820 (magnitude: 1.381966)
+  λ1: 3.6180 (magnitude: 3.618034)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ1 = 3.6180 (mag: 3.618034)
+    Position 1: λ0 = 1.3820 (mag: 1.381966)
+
+  By Real Part (descending):
+    Position 0: λ1 = 3.6180 (Re: 3.618034)
+    Position 1: λ0 = 1.3820 (Re: 1.381966)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ❌ NO
+  Sorted by real part: ❌ NO
+  ⚠️ Eigenvalues are in their natural order (implementation-dependent)
+
+🎭 Eigenvectors:
+  v0 (for λ0): [-0.5257, 0.8507]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [0.8507, 0.5257]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 1.3820 ↔ v0 = [-0.5257, 0.8507]
+  λ1 = 3.6180 ↔ v1 = [0.8507, 0.5257]
+
+============================================================
+
+📝 Theoretical eigenvalues: 3.618034, 1.381966
+📝 Computed magnitudes: 3.618034, 1.381966
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for Pauli matrices
+
+🧪 TEST: Pauli Matrices Sorting Analysis
+
+============================================================
+Pauli-X: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [0.0000, 1.0000],
+  [1.0000, 0.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: -1.0000 (magnitude: 1.000000)
+  λ1: 1.0000 (magnitude: 1.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ0 = -1.0000 (mag: 1.000000)
+    Position 1: λ1 = 1.0000 (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ1 = 1.0000 (Re: 1.000000)
+    Position 1: λ0 = -1.0000 (Re: -1.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ✅ YES
+  Sorted by real part: ❌ NO
+
+🎭 Eigenvectors:
+  v0 (for λ0): [0.7071, -0.7071]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [0.7071, 0.7071]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = -1.0000 ↔ v0 = [0.7071, -0.7071]
+  λ1 = 1.0000 ↔ v1 = [0.7071, 0.7071]
+
+============================================================
+
+
+============================================================
+Pauli-Y: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [0.0000, 0.0000-1.0000i],
+  [0.0000+1.0000i, 0.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 1.0000 (magnitude: 1.000000)
+  λ1: -1.0000 (magnitude: 1.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ0 = 1.0000 (mag: 1.000000)
+    Position 1: λ1 = -1.0000 (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ0 = 1.0000 (Re: 1.000000)
+    Position 1: λ1 = -1.0000 (Re: -1.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ✅ YES
+  Sorted by real part: ✅ YES
+
+🎭 Eigenvectors:
+  v0 (for λ0): [1.0000, 0.0000-1.0000i]
+  Verification for eigenpair 0:
+  ❌ Eigenpair verification failed at component 0: error = 2.000e+0
+  v1 (for λ1): [1.0000, 0.0000+1.0000i]
+  Verification for eigenpair 1:
+  ❌ Eigenpair verification failed at component 0: error = 2.000e+0
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 1.0000 ↔ v0 = [1.0000, 0.0000-1.0000i]
+  λ1 = -1.0000 ↔ v1 = [1.0000, 0.0000+1.0000i]
+
+============================================================
+
+
+============================================================
+Pauli-Z: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [1.0000, 0.0000],
+  [0.0000, -1.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 1.0000 (magnitude: 1.000000)
+  λ1: -1.0000 (magnitude: 1.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ0 = 1.0000 (mag: 1.000000)
+    Position 1: λ1 = -1.0000 (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ0 = 1.0000 (Re: 1.000000)
+    Position 1: λ1 = -1.0000 (Re: -1.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ✅ YES
+  Sorted by real part: ✅ YES
+
+🎭 Eigenvectors:
+  v0 (for λ0): [0.0000, 1.0000]
+  Verification for eigenpair 0:
+  ❌ Eigenpair verification failed at component 1: error = 2.000e+0
+  v1 (for λ1): [1.0000, 0.0000]
+  Verification for eigenpair 1:
+  ❌ Eigenpair verification failed at component 0: error = 2.000e+0
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 1.0000 ↔ v0 = [0.0000, 1.0000]
+  λ1 = -1.0000 ↔ v1 = [1.0000, 0.0000]
+
+============================================================
+
+🎯 Pauli-X eigenvalues (sorted): [1.000000, -1.000000]
+🎯 Pauli-Y eigenvalues (sorted): [1.000000, -1.000000]
+🎯 Pauli-Z eigenvalues (sorted): [1.000000, -1.000000]
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for diagonal matrix with known eigenvalues
+
+🧪 TEST: Diagonal Matrix (Known Eigenvalues)
+
+============================================================
+3×3 Diagonal: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [5.0000, 0.0000, 0.0000],
+  [0.0000, 2.0000, 0.0000],
+  [0.0000, 0.0000, 8.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 2.0000 (magnitude: 2.000000)
+  λ1: 5.0000 (magnitude: 5.000000)
+  λ2: 8.0000 (magnitude: 8.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ2 = 8.0000 (mag: 8.000000)
+    Position 1: λ1 = 5.0000 (mag: 5.000000)
+    Position 2: λ0 = 2.0000 (mag: 2.000000)
+
+  By Real Part (descending):
+    Position 0: λ2 = 8.0000 (Re: 8.000000)
+    Position 1: λ1 = 5.0000 (Re: 5.000000)
+    Position 2: λ0 = 2.0000 (Re: 2.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ❌ NO
+  Sorted by real part: ❌ NO
+  ⚠️ Eigenvalues are in their natural order (implementation-dependent)
+
+🎭 Eigenvectors:
+  v0 (for λ0): [0.0000, 1.0000, 0.0000]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [1.0000, 0.0000, 0.0000]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+  v2 (for λ2): [0.0000, 0.0000, 1.0000]
+  Verification for eigenpair 2:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 2.0000 ↔ v0 = [0.0000, 1.0000, 0.0000]
+  λ1 = 5.0000 ↔ v1 = [1.0000, 0.0000, 0.0000]
+  λ2 = 8.0000 ↔ v2 = [0.0000, 0.0000, 1.0000]
+
+============================================================
+
+📝 Expected diagonal elements: [5, 2, 8]
+📝 Computed eigenvalue reals: [2.000000, 5.000000, 8.000000]
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for complex Hermitian matrix
+
+🧪 TEST: Complex Hermitian Matrix
+
+============================================================
+2×2 Complex Hermitian: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [2.0000, 1.0000+1.0000i],
+  [1.0000-1.0000i, 3.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 1.0000 (magnitude: 1.000000)
+  λ1: 4.0000 (magnitude: 4.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ1 = 4.0000 (mag: 4.000000)
+    Position 1: λ0 = 1.0000 (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ1 = 4.0000 (Re: 4.000000)
+    Position 1: λ0 = 1.0000 (Re: 1.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ❌ NO
+  Sorted by real part: ❌ NO
+  ⚠️ Eigenvalues are in their natural order (implementation-dependent)
+
+🎭 Eigenvectors:
+  v0 (for λ0): [2.3094, -1.1547+1.1547i]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [0.5774, 0.5774-0.5774i]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 1.0000 ↔ v0 = [2.3094, -1.1547+1.1547i]
+  λ1 = 4.0000 ↔ v1 = [0.5774, 0.5774-0.5774i]
+
+============================================================
+
+🔍 Hermitian Property Check:
+  λ0 imaginary part: 0.000e+0 ✅
+  λ1 imaginary part: 0.000e+0 ✅
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for degenerate eigenvalues
+
+🧪 TEST: Degenerate Eigenvalues (Identity Matrix)
+
+============================================================
+2×2 Identity (Degenerate): Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [1.0000, 0.0000],
+  [0.0000, 1.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 1.0000 (magnitude: 1.000000)
+  λ1: 1.0000 (magnitude: 1.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ0 = 1.0000 (mag: 1.000000)
+    Position 1: λ1 = 1.0000 (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ0 = 1.0000 (Re: 1.000000)
+    Position 1: λ1 = 1.0000 (Re: 1.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ✅ YES
+  Sorted by real part: ✅ YES
+
+🎭 Eigenvectors:
+  v0 (for λ0): [1.0000, 0.0000]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [0.0000, 1.0000]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 1.0000 ↔ v0 = [1.0000, 0.0000]
+  λ1 = 1.0000 ↔ v1 = [0.0000, 1.0000]
+
+============================================================
+
+🔍 Degeneracy Check:
+  λ0 - 1 = 0.000e+0 ✅
+  λ1 - 1 = 0.000e+0 ✅
+🔍 Orthogonality Check: ⟨v1|v2⟩ = 0.0000
+  Orthogonality error: 0.000e+0 ✅
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting order for complex eigenvalues
+
+🧪 TEST: Complex Eigenvalues (Rotation Matrix)
+
+============================================================
+2×2 Rotation (Complex Eigenvalues): Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [0.0000, -1.0000],
+  [1.0000, 0.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 0.0000+1.0000i (magnitude: 1.000000)
+  λ1: 0.0000-1.0000i (magnitude: 1.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ0 = 0.0000+1.0000i (mag: 1.000000)
+    Position 1: λ1 = 0.0000-1.0000i (mag: 1.000000)
+
+  By Real Part (descending):
+    Position 0: λ0 = 0.0000+1.0000i (Re: 0.000000)
+    Position 1: λ1 = 0.0000-1.0000i (Re: 0.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ✅ YES
+  Sorted by real part: ✅ YES
+
+🎭 Eigenvectors:
+  v0 (for λ0): [-1.0000, 0.0000+1.0000i]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [-1.0000, 0.0000-1.0000i]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 0.0000+1.0000i ↔ v0 = [-1.0000, 0.0000+1.0000i]
+  λ1 = 0.0000-1.0000i ↔ v1 = [-1.0000, 0.0000-1.0000i]
+
+============================================================
+
+🔍 Complex Eigenvalue Check:
+  Expected: 0.0000+1.0000i, Got: 0.0000+1.0000i
+  Real error: 0.000e+0, Imag error: 0.000e+0
+  Expected: 0.0000-1.0000i, Got: 0.0000-1.0000i
+  Real error: 0.000e+0, Imag error: 0.000e+0
+
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes sorting consistency across multiple decompositions
+
+🧪 TEST: Sorting Consistency Check
+🔄 Running eigendecomposition multiple times...
+
+  Run 1:
+    Eigenvalues: [-0.3028, 3.3028, 5.0000]
+
+  Run 2:
+    Eigenvalues: [-0.3028, 3.3028, 5.0000]
+
+  Run 3:
+    Eigenvalues: [-0.3028, 3.3028, 5.0000]
+
+🔍 Consistency Analysis:
+  Run 1 vs Run 2: ✅ Consistent
+  Run 1 vs Run 3: ✅ Consistent
+
+🎯 Overall Consistency: ✅ PASSED
+  ✨ Eigenvalue ordering is deterministic and consistent!
+
+ ✓ __tests__/eigenSorting.test.ts  (8 tests) 37ms
+stdout | __tests__/eigenSorting.test.ts > Eigendecomposition Sorting Order Tests > analyzes eigenvalue precision and numerical stability
+
+🧪 TEST: Numerical Precision Analysis
+
+============================================================
+Large Scale Difference: Eigendecomposition Sorting Analysis
+============================================================
+
+📊 Input Matrix:
+[
+  [0.0000, 1.0000],
+  [1.0000, 100000000.0000]
+]
+
+🔢 Raw Eigenvalues (as returned by eigenDecomposition):
+  λ0: 0.0000 (magnitude: 0.000000)
+  λ1: 100000000.0000 (magnitude: 100000000.000000)
+
+📈 Sorting Analysis:
+
+  By Magnitude (descending):
+    Position 0: λ1 = 100000000.0000 (mag: 100000000.000000)
+    Position 1: λ0 = 0.0000 (mag: 0.000000)
+
+  By Real Part (descending):
+    Position 0: λ1 = 100000000.0000 (Re: 100000000.000000)
+    Position 1: λ0 = 0.0000 (Re: 0.000000)
+
+🎯 Sorting Status:
+  Sorted by magnitude: ❌ NO
+  Sorted by real part: ❌ NO
+  ⚠️ Eigenvalues are in their natural order (implementation-dependent)
+
+🎭 Eigenvectors:
+  v0 (for λ0): [1.0000, -0.0000]
+  Verification for eigenpair 0:
+  ✅ Eigenpair verification passed
+  v1 (for λ1): [0.0000, 1.0000]
+  Verification for eigenpair 1:
+  ✅ Eigenpair verification passed
+
+🔗 Eigenvalue-Eigenvector Correspondence:
+  λ0 = 0.0000 ↔ v0 = [1.0000, -0.0000]
+  λ1 = 100000000.0000 ↔ v1 = [0.0000, 1.0000]
+
+============================================================
+
+🔍 Numerical Stability Check:
+  Eigenvalue magnitude range: 0.000e+0 to 1.000e+8
+  Condition number (approx): Infinity
+  ✅ Eigenpair verification passed
+  ✅ Eigenpair verification passed
+  Eigenpair verification: ✅ All valid
+
+stdout | __tests__/operatorAlgebra.test.ts > Operator Algebra > nestedCommutator > calculates nested commutator structure
+Matrix representation: MatrixOperator {
+  objectType: [32m'operator'[39m,
+  dimension: [33m2[39m,
+  type: [32m'general'[39m,
+  matrix: [ [ [36m[Complex][39m, [36m[Complex][39m ], [ [36m[Complex][39m, [36m[Complex][39m ] ],
+  validateTypeConstraints: [33mtrue[39m
+}
+
+stdout | __tests__/operatorAlgebra.test.ts > Operator Algebra > operatorsCommute > returns false for non-commuting operators
+[
+  [ Complex { re: [33m0[39m, im: [33m2[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m-2[39m } ]
+]
+[33mfalse[39m
+
+ ✓ __tests__/operatorAlgebra.test.ts  (17 tests) 34ms
+stdout | unknown test
+Jx: ┌──────────────────────┐
+│ 0.000  0.707  0.000 │
+│ 0.707  0.000  0.707 │
+│ 0.000  0.707  0.000 │
+└──────────────────────┘
+Jy: ┌───────────────────────────────────────────┐
+│        0.000  0.000-0.707i         0.000 │
+│ 0.000+0.707i         0.000  0.000-0.707i │
+│        0.000  0.000+0.707i         0.000 │
+└───────────────────────────────────────────┘
+Jz: ┌─────────────────────────┐
+│  1.000   0.000   0.000 │
+│  0.000   0.000   0.000 │
+│  0.000   0.000  -1.000 │
+└─────────────────────────┘
+
+stdout | __tests__/angularMomentum/operators.test.ts > Angular Momentum Operators > j=1/2 Matrix Representations > should have correct J± matrix elements
+J+: ┌───────────────┐
+│ 0.000  1.000 │
+│ 0.000  0.000 │
+└───────────────┘
+J-: ┌───────────────┐
+│ 0.000  0.000 │
+│ 1.000  0.000 │
+└───────────────┘
+[
+  [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ],
+  [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ]
+]
+
+stdout | __tests__/angularMomentum/operators.test.ts > Angular Momentum Operators > j=1/2 Matrix Representations > should have correct Jy matrix elements
+Jy: ┌─────────────────────────────┐
+│        0.000  0.000-0.500i │
+│ 0.000+0.500i         0.000 │
+└─────────────────────────────┘
+Matrix: [
+  [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m-0.5[39m } ],
+  [ Complex { re: [33m0[39m, im: [33m0.5[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ]
+]
+
+stdout | __tests__/angularMomentum/operators.test.ts > Angular Momentum Operators > Eigenvalue Equations > should satisfy Jz eigenvalue equation
+Jz ┌─────────────────┐
+│  0.500   0.000 │
+│  0.000  -0.500 │
+└─────────────────┘
+
+stdout | __tests__/angularMomentum/operators.test.ts > Angular Momentum Operators > Commutation Relations > should satisfy [Jx,Jy] = iJz
+Commutator: ┌───────────────────────────────────────────┐
+│ 0.000+1.000i         0.000         0.000 │
+│        0.000         0.000         0.000 │
+│        0.000         0.000  0.000-1.000i │
+└───────────────────────────────────────────┘
+Expected Result: ┌───────────────────────────────────────────┐
+│ 0.000+1.000i         0.000         0.000 │
+│        0.000         0.000         0.000 │
+│        0.000         0.000  0.000-1.000i │
+└───────────────────────────────────────────┘
+
+stdout | __tests__/angularMomentum/operators.test.ts > Angular Momentum Operators > J² Construction > should give same results for both J² construction methods
+J² Direct: ┌──────────────────────┐
+│ 2.000  0.000  0.000 │
+│ 0.000  2.000  0.000 │
+│ 0.000  0.000  2.000 │
+└──────────────────────┘
+J² From Components: ┌──────────────────────┐
+│ 2.000  0.000  0.000 │
+│ 0.000  2.000  0.000 │
+│ 0.000  0.000  2.000 │
+└──────────────────────┘
+
+ ✓ __tests__/angularMomentum/operators.test.ts  (11 tests) 9ms
+ ✓ __tests__/matrixOperations.test.ts  (25 tests) 29ms
+ ✓ __tests__/angularMomentum/indexing.test.ts  (20 tests) 17ms
+stdout | __tests__/angularMomentum/indexing.test.ts > Angular Momentum Indexing Consistency > Matrix Element Verification > should have correct J+ matrix elements for j=1/2
+[
+  [0.0000, 1.0000],
+  [0.0000, 0.0000]
+]
+
+stdout | __tests__/angularMomentum/indexing.test.ts > Angular Momentum Indexing Consistency > Matrix Element Verification > should have correct J- matrix elements for j=1/2
+[
+  [0.0000, 0.0000],
+  [1.0000, 0.0000]
+]
+
+stdout | __tests__/angularMomentum/indexing.test.ts > Angular Momentum Indexing Consistency > Matrix Element Verification > should have correct Jz matrix elements for j=1/2
+[
+  [0.5000, 0.0000],
+  [0.0000, -0.5000]
+]
+
+stdout | __tests__/angularMomentum/indexing.test.ts > Angular Momentum Indexing Consistency > Angular Momentum Coupling Indexing > should produce correct Clebsch-Gordan coefficients
+CG Coefficients:
+cg1:  Complex { re: [33m1[39m, im: [33m0[39m }
+cg2:  Complex { re: [33m0.7071067811865475[39m, im: [33m0[39m }
+cg3:  Complex { re: [33m-0.7071067811865475[39m, im: [33m0[39m }
+
+ ✓ __tests__/operators/sparse.test.ts  (17 tests) 10ms
+stdout | __tests__/operators/sparse.test.ts > Sparse Matrix Utilities > Matrix-Matrix Operations > should multiply sparse matrices
+Matrix A:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'2 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+Matrix B:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'3 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'4 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+Result Matrix:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'3 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'8 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+
+stdout | __tests__/operators/sparse.test.ts > Sparse Matrix Utilities > Conversion Operations > should convert sparse to dense
+Sparse Matrix:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m1[39m, value: [32m'3 + 0i'[39m },
+    { row: [33m1[39m, col: [33m0[39m, value: [32m'4 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+Dense Matrix:
+[ [ [32m'0 + 0i'[39m, [32m'3 + 0i'[39m ], [ [32m'4 + 0i'[39m, [32m'0 + 0i'[39m ] ]
+
+stdout | __tests__/operators/sparse.test.ts > Sparse Matrix Utilities > Matrix Properties > should identify identity matrix
+Identity Matrix:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m2[39m, col: [33m2[39m, value: [32m'1 + 0i'[39m }
+  ],
+  nnz: [33m3[39m
+}
+Non-Identity Matrix:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m2[39m, col: [33m2[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m0[39m, col: [33m1[39m, value: [32m'0.1 + 0i'[39m }
+  ],
+  nnz: [33m4[39m
+}
+
+stdout | __tests__/operators/sparse.test.ts > Sparse Matrix Utilities > Validation and Cleanup > should remove zero entries
+Matrix before removing zeros:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'2 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+Matrix after removing zeros:
+{
+  entries: [
+    { row: [33m0[39m, col: [33m0[39m, value: [32m'1 + 0i'[39m },
+    { row: [33m1[39m, col: [33m1[39m, value: [32m'2 + 0i'[39m }
+  ],
+  nnz: [33m2[39m
+}
+
+stdout | __tests__/operators/specialized.test.ts > Specialized Operators > DiagonalOperator > should detect zero operator
+Zero Diagonal Values:
+[ [32m'0 + 0i'[39m, [32m'0 + 0i'[39m ]
+Non-Zero Diagonal Values:
+[ [32m'0 + 0i'[39m, [32m'1e-15 + 0i'[39m ]
+Zero Diagonal Operator: DiagonalOperator {
+  objectType: [32m'operator'[39m,
+  type: [32m'diagonal'[39m,
+  dimension: [33m2[39m,
+  diagonal: [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ]
+}
+Non-Zero Diagonal Operator: DiagonalOperator {
+  objectType: [32m'operator'[39m,
+  type: [32m'diagonal'[39m,
+  dimension: [33m2[39m,
+  diagonal: [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m1e-15[39m, im: [33m0[39m } ]
+}
+
+Zero Detection Results:
+Zero Operator (default tolerance): [33mtrue[39m
+Non-Zero Operator (default tolerance): [33mtrue[39m
+Non-Zero Operator (tolerance 1e-14): [33mtrue[39m
+
+ ✓ __tests__/operators/specialized.test.ts  (31 tests) 16ms
+ ✓ __tests__/states.test.ts  (17 tests) 7ms
+ ✓ __tests__/oscillator.test.ts  (5 tests) 16ms
+ ✓ __tests__/angularMomentum/composition_visualization.test.ts  (6 tests) 10ms
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Two spin-1/2 particles > should show addition of parallel spins (↑↑)
+
+📊 Adding two spin-1/2 particles with m₁ = m₂ = +1/2 (↑↑)
+
+============================================================
+First spin-1/2:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,0.5⟩
+============================================================
+
+============================================================
+Second spin-1/2:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,0.5⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m4[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(0.5,0.5),1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 4
+Basis: |(0.5,0.5),1,1⟩
+============================================================
+
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Two spin-1/2 particles > should show addition of antiparallel spins (↑↓)
+
+📊 Adding two spin-1/2 particles with m₁ = +1/2, m₂ = -1/2 (↑↓)
+
+============================================================
+Spin up:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,0.5⟩
+============================================================
+
+============================================================
+Spin down:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m0[39m, im: [33m0[39m }, Complex { re: [33m1[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,-0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,-0.5⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m4[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0.7071067811865476[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m-0.7071067811865476[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(0.5,0.5),1,0⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 4
+Basis: |(0.5,0.5),1,0⟩
+============================================================
+
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Spin-1 and spin-1/2 particles > should show addition of maximum m states
+
+📊 Adding spin-1 (m=1) and spin-1/2 (m=1/2) particles
+
+============================================================
+Spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,1⟩
+============================================================
+
+============================================================
+Spin-1/2:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,0.5⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m6[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(1,0.5),1.5,1.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 6
+Basis: |(1,0.5),1.5,1.5⟩
+============================================================
+
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Spin-1 and spin-1/2 particles > should show addition with intermediate m states
+
+📊 Adding spin-1 (m=0) and spin-1/2 (m=1/2) particles
+
+============================================================
+Spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,0⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,0⟩
+============================================================
+
+============================================================
+Spin-1/2:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m0.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 2
+Basis: |0.5,0.5⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m6[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0.8164965809277261[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m-0.5773502691896258[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(1,0.5),1.5,0.5⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1.5[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 6
+Basis: |(1,0.5),1.5,0.5⟩
+============================================================
+
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Two spin-1 particles > should show addition of maximum aligned spins
+
+📊 Adding two spin-1 particles with maximum m values
+
+============================================================
+First spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,1⟩
+============================================================
+
+============================================================
+Second spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,1⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m9[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(1,1),2,2⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m2[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 9
+Basis: |(1,1),2,2⟩
+============================================================
+
+stdout | __tests__/angularMomentum/composition_visualization.test.ts > Angular Momentum Addition Visualization > Two spin-1 particles > should show addition of orthogonal spins
+
+📊 Adding two spin-1 particles with m₁=1, m₂=0
+
+============================================================
+First spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,1⟩
+============================================================
+
+============================================================
+Second spin-1:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m3[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|1,0⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m1[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mfalse[39m
+    }
+  }
+}
+Dimension: 3
+Basis: |1,0⟩
+============================================================
+
+============================================================
+Combined state:
+State vector: StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m9[39m,
+  amplitudes: [
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m1[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m },
+    Complex { re: [33m0[39m, im: [33m0[39m }
+  ],
+  basis: [32m'|(1,1),2,1⟩'[39m,
+  properties: {
+    angularMomentumMetadata: {
+      type: [32m'angular_momentum'[39m,
+      j: [33m2[39m,
+      mRange: [36m[Array][39m,
+      couplingHistory: [36m[Array][39m,
+      jComponents: [36m[Map][39m,
+      isComposite: [33mtrue[39m
+    }
+  }
+}
+Dimension: 9
+Basis: |(1,1),2,1⟩
+============================================================
+
+ ✓ __tests__/stateVector.test.ts  (29 tests) 16ms
+ ✓ __tests__/operator.test.ts  (20 tests) 12ms
+ ✓ __tests__/gates.test.ts  (18 tests) 8ms
+ ✓ __tests__/hilbertSpace.test.ts  (20 tests) 12ms
+stdout | __tests__/hilbertSpace.test.ts > HilbertSpace > Instance Methods > computationalBasisState > creates valid basis states
+HilbertSpace { dimension: [33m2[39m, basis: [ [32m'|0⟩'[39m, [32m'|1⟩'[39m ] } 
+ StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0⟩'[39m,
+  properties: [90mundefined[39m
+} 
+ StateVector {
+  objectType: [32m'state'[39m,
+  dimension: [33m2[39m,
+  amplitudes: [ Complex { re: [33m1[39m, im: [33m0[39m }, Complex { re: [33m0[39m, im: [33m0[39m } ],
+  basis: [32m'|0⟩'[39m,
+  properties: [90mundefined[39m
+}
+[33mtrue[39m
+
+ ✓ __tests__/measurement.test.ts  (8 tests) 7ms
+ ✓ __tests__/validation.test.ts  (15 tests) 7ms
+ ✓ __tests__/composition.test.ts  (13 tests) 4ms
+ ✓ __tests__/core/quantumObject.test.ts  (10 tests) 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/graph/QuantumGraph.test.ts [ __tests__/graph/QuantumGraph.test.ts ]
+ FAIL  __tests__/graph/utils.test.ts [ __tests__/graph/utils.test.ts ]
+ FAIL  __tests__/qgraph/general-operations.test.ts [ __tests__/qgraph/general-operations.test.ts ]
+Error: Failed to load url ../../src/qgraph/QuantumGraph (resolved id: ../../src/qgraph/QuantumGraph) in /Users/deepak/code/ts-quantum/__tests__/graph/utils.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:51968:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/34]⎯
+
+ FAIL  __tests__/algorithms/quantumWalk/quantumWalk.test.ts [ __tests__/algorithms/quantumWalk/quantumWalk.test.ts ]
+Error: Failed to load url @spin-network/graph-core/src/core/builders (resolved id: @spin-network/graph-core/src/core/builders) in /Users/deepak/code/ts-quantum/__tests__/algorithms/quantumWalk/quantumWalk.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:51968:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/34]⎯
+
+ FAIL  test/graph/builders/spinNetwork.test.ts [ test/graph/builders/spinNetwork.test.ts ]
+Error: Failed to load url ../../../src/graph/builders/spinNetwork (resolved id: ../../../src/graph/builders/spinNetwork) in /Users/deepak/code/ts-quantum/test/graph/builders/spinNetwork.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:51968:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/34]⎯
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 29 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/eigen.test.ts > eigenDecomposition Visual Test > tests eigendecomposition of a 3×3 real symmetric matrix
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ verifyEigenpairs __tests__/eigen.test.ts:68:21
+     66|     
+     67|     console.log(`Verification: ${isValid ? 'PASSED ✓' : 'FAILED ✗'}`);
+     68|     expect(isValid).toBe(true);
+       |                     ^
+     69|   }
+     70| }
+ ❯ __tests__/eigen.test.ts:282:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/34]⎯
+
+ FAIL  __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Y matrix correctly
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ verifyEigenpairs __tests__/eigen.test.ts:68:21
+     66|     
+     67|     console.log(`Verification: ${isValid ? 'PASSED ✓' : 'FAILED ✗'}`);
+     68|     expect(isValid).toBe(true);
+       |                     ^
+     69|   }
+     70| }
+ ❯ __tests__/eigen.test.ts:345:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/34]⎯
+
+ FAIL  __tests__/eigen.test.ts > eigenDecomposition Visual Test > handles the Pauli-Z matrix correctly
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ verifyEigenpairs __tests__/eigen.test.ts:68:21
+     66|     
+     67|     console.log(`Verification: ${isValid ? 'PASSED ✓' : 'FAILED ✗'}`);
+     68|     expect(isValid).toBe(true);
+       |                     ^
+     69|   }
+     70| }
+ ❯ __tests__/eigen.test.ts:380:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/34]⎯
+
+ FAIL  __tests__/eigen.test.ts > eigenDecomposition Visual Test > verifies full matrix reconstruction for a 3×3 Hermitian matrix
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigen.test.ts:585:58
+    583|       
+    584|       // Verify they're approximately equal
+    585|       expect(matricesApproxEqual(matrix, reconstructed)).toBe(true);
+       |                                                          ^
+    586|     }
+    587|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > computes correct eigenvalues and eigenvectors for random 2x2 matrix
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigendecomposition.test.ts:240:60
+    238|       // And verify the full decomposition
+    239|       console.log('Verifying full decomposition');
+    240|       expect(verifyDecomposition(matrix, values, vectors)).toBe(true);
+       |                                                            ^
+    241|       
+    242|       // Additional verification that eigenvalues are real (symmetric …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Real Symmetric Matrices > correctly decomposes larger real symmetric matrices
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigendecomposition.test.ts:328:12
+    326|           values[i],
+    327|           vectors[i]
+    328|         )).toBe(true);
+       |            ^
+    329|       }
+    330|       
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Complex Hermitian Matrices > computes correct eigensystem for Pauli Y matrix
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigendecomposition.test.ts:368:64
+    366|         console.log(`Eigenvalue: ${formatComplex(values[i])}`);
+    367|         console.log(`Eigenvector: [${vectors[i].map(formatComplex).joi…
+    368|         expect(verifyEigenPair(pauliY, values[i], vectors[i])).toBe(tr…
+       |                                                                ^
+    369|       }
+    370|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Complex Hermitian Matrices > handles general complex Hermitian matrices
+Error: Expected eigenvectors to be defined
+ ❯ __tests__/eigendecomposition.test.ts:386:15
+    384|       // Since we explicitly requested eigenvectors, they should be de…
+    385|       if (!vectors) {
+    386|         throw new Error('Expected eigenvectors to be defined');
+       |               ^
+    387|       }
+    388| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Numerical Stability and Edge Cases > handles matrices with zeros
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigendecomposition.test.ts:576:60
+    574|       
+    575|       // Verify decomposition
+    576|       expect(verifyDecomposition(matrix, values, vectors)).toBe(true);
+       |                                                            ^
+    577|     });
+    578|     
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes Pauli Z matrix
+AssertionError: expected 1 to be less than 1e-10
+ ❯ __tests__/eigendecomposition.test.ts:639:38
+    637|       console.log('v0 vector:', v0);
+    638|       console.log('v0[0].re:', v0[0].re);
+    639|       expect(Math.abs(v0[0].re - 1)).toBeLessThan(1e-10);
+       |                                      ^
+    640|       expect(Math.abs(v0[1].re)).toBeLessThan(1e-10);
+    641|       
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/34]⎯
+
+ FAIL  __tests__/eigendecomposition.test.ts > Eigendecomposition > Quantum-Specific Applications > correctly decomposes a Hamiltonian
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/eigendecomposition.test.ts:698:69
+    696|         console.log(`Eigenvalue: ${formatComplex(values[i])}`);
+    697|         console.log(`Eigenvector: [${vectors[i].map(formatComplex).joi…
+    698|         expect(verifyEigenPair(hamiltonian, values[i], vectors[i])).to…
+       |                                                                     ^
+    699|       }
+    700|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/34]⎯
+
+ FAIL  __tests__/integration.test.ts > Quantum Integration Tests > Space and State Integration > handles tensor products of states correctly
+TypeError: b.getAmplitudes is not a function
+ ❯ Module.stateVectorApproxEqual __tests__/utils/testHelpers.ts:45:19
+     43|   if (a.dimension !== b.dimension) return false;
+     44|   const aAmps = a.getAmplitudes();
+     45|   const bAmps = b.getAmplitudes();
+       |                   ^
+     46|   // console.log(aAmps, bAmps);
+     47|   return aAmps.every((amp, i) => complexApproxEqual(amp, bAmps[i], tol…
+ ❯ __tests__/integration.test.ts:38:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/34]⎯
+
+ FAIL  __tests__/integration.test.ts > Quantum Integration Tests > Operator and Space Integration > correctly extends operators to larger spaces
+TypeError: b.getAmplitudes is not a function
+ ❯ Module.stateVectorApproxEqual __tests__/utils/testHelpers.ts:45:19
+     43|   if (a.dimension !== b.dimension) return false;
+     44|   const aAmps = a.getAmplitudes();
+     45|   const bAmps = b.getAmplitudes();
+       |                   ^
+     46|   // console.log(aAmps, bAmps);
+     47|   return aAmps.every((amp, i) => complexApproxEqual(amp, bAmps[i], tol…
+ ❯ __tests__/integration.test.ts:86:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/34]⎯
+
+ FAIL  __tests__/integration.test.ts > Quantum Integration Tests > Complex Quantum Circuits > creates and manipulates Bell states
+TypeError: b.getAmplitudes is not a function
+ ❯ Module.stateVectorApproxEqual __tests__/utils/testHelpers.ts:45:19
+     43|   if (a.dimension !== b.dimension) return false;
+     44|   const aAmps = a.getAmplitudes();
+     45|   const bAmps = b.getAmplitudes();
+       |                   ^
+     46|   // console.log(aAmps, bAmps);
+     47|   return aAmps.every((amp, i) => complexApproxEqual(amp, bAmps[i], tol…
+ ❯ __tests__/integration.test.ts:164:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/34]⎯
+
+ FAIL  __tests__/matrixFunctions.test.ts > matrixFunction > applies identity function to return the same matrix
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/matrixFunctions.test.ts:49:43
+     47|     const result = matrixFunction(matrix, identityFn);
+     48|     console.log(formatMatrix(result));
+     49|     expect(matricesEqual(result, matrix)).toBe(true);
+       |                                           ^
+     50|   });
+     51|   
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/34]⎯
+
+ FAIL  __tests__/matrixFunctions.test.ts > matrixFunction > applies square function to eigenvalues correctly
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/matrixFunctions.test.ts:70:51
+     68|     ];
+     69|     
+     70|     expect(matricesEqual(result, expected, 1e-9)).toBe(true);
+       |                                                   ^
+     71|   });
+     72|   
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/34]⎯
+
+ FAIL  __tests__/angularMomentum/composition.test.ts > Angular Momentum Composition > Clebsch-Gordan Coefficients > should correctly calculate coefficients for j1=1, j2=1/2 case
+AssertionError: expected 0.33820395745152565 to be less than 1e-10
+ ❯ __tests__/angularMomentum/composition.test.ts:63:77
+     61|       const c2 = clebschGordan(1, 1, 0.5, -0.5, 1.5, 0.5);
+     62|       console.log('CG j1=1, j2=1/2 case: j1=1, m1=1, j2=1/2, m2=-1/2, …
+     63|       expect(math.abs(math.subtract((c2 as any).re ?? c2, Math.sqrt(2/…
+       |                                                                             ^
+     64|       
+     65|       const c3 = clebschGordan(1, 0, 0.5, 0.5, 1.5, 0.5);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Known values validation > should calculate (1/2 1/2 1; 1/2 -1/2 0) = -1/sqrt(6)
+AssertionError: expected 0.408248290463863 to be close to -0.4082482904638631, received difference is 0.816496580927726, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner3j.test.ts:59:25
+     57|     it('should calculate (1/2 1/2 1; 1/2 -1/2 0) = -1/sqrt(6)', () => {
+     58|       const result = wigner3j(0.5, 0.5, 1, 0.5, -0.5, 0);
+     59|       expect(result.re).toBeCloseTo(-1 / Math.sqrt(6), 6);
+       |                         ^
+     60|       expect(math.abs(result.im)).toBeCloseTo(0, 10);
+     61|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Symmetry properties > should transform correctly under odd permutations
+AssertionError: expected 0.7302967433402214 to be close to 0.04564354645876384, received difference is 0.6846531968814575, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner3j.test.ts:86:27
+     84|       // Odd permutation should give phase (-1)^(j1+j2+j3)
+     85|       const phase = Math.pow(-1, j1 + j2 + j3);
+     86|       expect(original.re).toBeCloseTo(phase * odd1.re, 6);
+       |                           ^
+     87|     });
+     88| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner3j.test.ts > Wigner 3j Symbols > Symmetry properties > should be invariant under sign reversal of all m values
+AssertionError: expected -0.632455532033676 to be close to -0.158113883008419, received difference is 0.474341649025257, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner3j.test.ts:99:27
+     97|       const expectedValue = math.multiply(signReversed, expectedPhase)…
+     98|       
+     99|       expect(original.re).toBeCloseTo(expectedValue.re, 6);
+       |                           ^
+    100|       expect(original.im).toBeCloseTo(expectedValue.im, 6);
+    101|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {1/2 1/2 1; 1/2 1/2 0} = -1/3
+AssertionError: expected -0.08333333333333333 to be close to -0.3333333333333333, received difference is 0.25, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:28:25
+     26|     it('should calculate {1/2 1/2 1; 1/2 1/2 0} = -1/3', () => {
+     27|       const result = wigner6j(0.5, 0.5, 1, 0.5, 0.5, 0);
+     28|       expect(result.re).toBeCloseTo(-1/3, 6);
+       |                         ^
+     29|       expect(math.abs(result.im)).toBeCloseTo(0, 10);
+     30|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {1 1 2; 1 1 0} = 1/(2√5)
+AssertionError: expected 0.0027777777777777796 to be close to 0.22360679774997896, received difference is 0.2208290199722012, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:34:25
+     32|     it('should calculate {1 1 2; 1 1 0} = 1/(2√5)', () => {
+     33|       const result = wigner6j(1, 1, 2, 1, 1, 0);
+     34|       expect(result.re).toBeCloseTo(1/(2*Math.sqrt(5)), 6);
+       |                         ^
+     35|       expect(math.abs(result.im)).toBeCloseTo(0, 10);
+     36|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Known values from Varshalovich > should calculate {3/2 3/2 3; 3/2 3/2 0} = -1/(2√5)
+AssertionError: expected -0.000049603174603174596 to be close to -0.22360679774997896, received difference is 0.2235571945753758, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:40:25
+     38|     it('should calculate {3/2 3/2 3; 3/2 3/2 0} = -1/(2√5)', () => {
+     39|       const result = wigner6j(1.5, 1.5, 3, 1.5, 1.5, 0);
+     40|       expect(result.re).toBeCloseTo(-1/(2*Math.sqrt(5)), 6);
+       |                         ^
+     41|       expect(math.abs(result.im)).toBeCloseTo(0, 10);
+     42|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Special cases from theory > should handle zero argument case correctly
+AssertionError: expected -0.013888888888888897 to be close to 0.3333333333333333, received difference is 0.3472222222222222, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:50:25
+     48|       const result = wigner6j(1, 1, 1, 1, 1, 0);
+     49|       const expected = (-1)**(1+1) * (1 === 1 ? 1/3 : 0); // delta_bc/…
+     50|       expect(result.re).toBeCloseTo(expected, 6);
+       |                         ^
+     51|     });
+     52| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Special cases from theory > should handle equal pairs case correctly
+AssertionError: expected 0.000277777777777778 to be close to 0.1, received difference is 0.09972222222222223, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:57:25
+     55|       const result = wigner6j(1, 1, 2, 1, 1, 2);
+     56|       // Expected value from Varshalovich Table
+     57|       expect(result.re).toBeCloseTo(1/10, 6);
+       |                         ^
+     58|     });
+     59|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Symmetry properties > should satisfy Regge symmetry
+AssertionError: expected 0.000277777777777778 to be close to 0.0003105649968749709, received difference is 0.00003278721909719291, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:71:27
+     69|       const original = wigner6j(1, 1, 2, 1, 1, 2);
+     70|       const regge = wigner6j(1, 1, 1, 2, 2, 1);    // Regge symmetry
+     71|       expect(original.re).toBeCloseTo(regge.re, 6);
+       |                           ^
+     72|     });
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Sum rules > should satisfy orthogonality relation
+AssertionError: expected 0.00001388888888888891 to be close to 0.3333333333333333, received difference is 0.33331944444444445, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:83:19
+     81|         sum += (2*j + 1) * symbol.re * symbol.re;
+     82|       }
+     83|       expect(sum).toBeCloseTo(1/(2*l2 + 1), 6);
+       |                   ^
+     84|     });
+     85| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/34]⎯
+
+ FAIL  __tests__/angularMomentum/wigner6j.test.ts > Wigner 6j Symbols > Sum rules > should satisfy Racah backcoupling rule
+AssertionError: expected -0.010416666666666671 to be close to 1, received difference is 1.0104166666666667, but expected 5e-7
+ ❯ __tests__/angularMomentum/wigner6j.test.ts:95:19
+     93|         }
+     94|       }
+     95|       expect(sum).toBeCloseTo(1, 6);
+       |                   ^
+     96|     });
+     97|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/34]⎯
+
+ FAIL  __tests__/geometry/quantumDistance.test.ts > Bloch Sphere Geometry > quantum distance matches Bloch sphere calculation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ __tests__/geometry/quantumDistance.test.ts:112:23
+    110|       const matches = BlochSphere.verifyQuantumDistance(theta1, phi1, …
+    111|       console.log(`Bloch sphere verification: `, matches);
+    112|       expect(matches).toBe(true);
+       |                       ^
+    113|     });
+    114|   });
+ ❯ __tests__/geometry/quantumDistance.test.ts:109:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/34]⎯
+
+ Test Files  13 failed | 23 passed (36)
+      Tests  29 failed | 422 passed (451)
+   Start at  18:18:33
+   Duration  3.72s (transform 473ms, setup 2ms, collect 16.57s, tests 907ms, environment 4ms, prepare 2.02s)
+

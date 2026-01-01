@@ -1,0 +1,52 @@
+{
+  "entryPoints": [
+    "src/core/index.ts",
+    "src/states/index.ts", 
+    "src/operators/index.ts",
+    "src/angularMomentum/index.ts",
+    "src/qgraph/index.ts",
+    "src/geometry/index.ts",
+    "src/intertwiner/index.ts",
+    "src/utils/index.ts",
+    "examples/index.ts",
+    "__tests__/index.ts"
+  ],
+  "out": "docs/api",
+  "theme": "default",
+  "tsconfig": "tsconfig.json",
+  "skipErrorChecking": true,
+  "includeVersion": true,
+  "readme": "README.md",
+  "navigationLinks": {
+    "GitHub": "https://github.com/space-cadet/spin_network_app"
+  },
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Core",
+    "States", 
+    "Operators",
+    "Angular Momentum",
+    "Quantum Graphs",
+    "Geometry",
+    "Intertwiner",
+    "Utilities",
+    "Examples",
+    "Tests"
+  ],
+  "sort": ["source-order", "alphabetical"],
+  "exclude": [
+    "**/node_modules/**"
+  ],
+  "excludeExternals": true,
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeInternal": false,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "treatWarningsAsErrors": false,
+  "sourceLinkTemplate": "https://github.com/space-cadet/spin_network_app/blob/main/packages/quantum/{path}#L{line}",
+  "entryPointStrategy": "expand"
+}

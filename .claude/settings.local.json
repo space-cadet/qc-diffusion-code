@@ -5,7 +5,8 @@
       "Bash(TZ='Asia/Kolkata' date:*)",
       "Bash(/Users/deepak/.nvm/versions/node/v23.11.0/bin/pnpm add file:../../ts-quantum)",
       "Bash(/Users/deepak/.nvm/versions/node/v23.11.0/bin/pnpm exec tsc:*)",
-      "Bash(/Users/deepak/.nvm/versions/node/v23.11.0/bin/pnpm run build)"
+      "Bash(/Users/deepak/.nvm/versions/node/v23.11.0/bin/pnpm run build)",
+      "Bash(pnpm run build:*)"
     ]
   }
 }

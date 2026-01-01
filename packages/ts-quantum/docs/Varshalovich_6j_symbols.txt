@@ -1,0 +1,5861 @@
+Chapjter9
+i
+I
+6j SYMBOLS AND THE |IACAH COEFFICIENTS
+
+9.1.
+
+DEFINITION
+
+9.1.1. 6 / S y m b o l *
+The Wigner 6; symbols [110] are related to the coefficients of transformations between different coupling
+schemes of three angular momenta. The angular momenta j i , j 3 , j $ may be coupled to give a resultant angular
+momentum j and its projection m in three different ways:
+I) j l + J 2 = j l 2 ,
+
+jl2+J3=j,
+
+H) J2+J3=J23f
+
+Jl+J23=j>
+
+HI) j l + J 3 = j l 3 ,
+
+jl3+J2=j.
+
+(1)
+
+Let 1.7172 {jiTJjsjm) denote the state vectors corresponding to the coupling scheme I. These vectors are eigen­
+vectors of the operators Ji,J2,J3,Ji2iP>y* and may be written as
+
+IjiMixihtjm) -
+
+£
+
+C ^ ^ I ^ ^ ^ J W -
+
+(2)
+
+The state vectors corresponding to the coupling scheme II are eigenvectors of the operators Ji^jli J3ij23»J >3*i
+
+171117139713
+
+Similarly, the state vectors corresponding to the coupling scheme III are eigenvectors of the operators j?,jo, j?,
+\3iMm)37Jm)
+
+=
+
+£
+
+Cj*-. M A m,CjS»":*m.|yimi,»m 3 l *mi>.
+
+(4)
+
+States belonging to each coupling scheme form a complete set of states. A transition from one coupling scheme
+to another is performed by some unitary transformation which relates the states with the same total angular
+momentum j and projection m. The coefficients U of this transformation differ from the 6j symbols only
+by normalization and* phase factors. These factors are chosen in such a way to make the 6/ symbob more
+symmetric (Sec. 9.4).
+290
+
+6f Symbols and the Racah Coefficients
+
+291
+
+One defines the Wigner 6j symbols \ . . . > by the relation
+(33 3 323 )
+(3ito{Ji2)J3J™\h»tote (toz)fmf)
+
+= 8jj*8mmi U{jxj2333\ J12J23)
+
+From Eq. (5) one may obtain [92, 64]
+(yiibO^JjajmlyiyaOiaJiy'm') = %'«mm'(-l) J " +il " J " n ^ 1J
+= Sw 6mm,(-!)*+*+*>+*.
+
+V /(2; 1 2 -fl)(2; 1 3
+
+U{j2jijjs\ji23iz)
+
++ l) { * * f
+
+} ,
+
+(6)
+
+(33 3 3l3 )
+
+(jliJ2J3{to3)jm\j1j3{j13)j2j,mt)
+= Sif Smm,(-1)*+'+*.
+
+= Sjji 6mm' ( - l ) ^ + ^ - ^ » U(jXJdh]3l3J23)
+V ( 2 , i 8 + l ) ( 2 i w + l) { £ * £ * } .
+
+(7)
+
+According to the definition (5) the 6j symbols may be given in terms of the Clebsch-Gordan coefficients
+jiirnujtmi
+
+= %' Smm'(-iy^+^
+
+JimiJ2m2
+
+ii"» l i a s e s
+
+iaWaiawia
+
+y/{23\2 + l)(2jas + l) { l f i l ) .
+
+(8)
+
+Here the sum is over mi,m2,m3,mi2,m23 while m and mf are fixed. This relation completely determines
+absolute values and phases of the 6j symbols. The 6j symbols turn out to be real just as the Clebsch-Gordan
+coefficients are.
+The quantum-mechanical rules of vector addition impose some restrictions on possible values of momenta
+which are arguments of the 6j symbol < . ? .
+
+>.
+
+t 33 3 323 )
+
+(a) All momenta are integer or half-integer nonnegative numbers (with one exception considered in Sec. 9.4).
+(b) Each triad {J1J2J12)* {Ji23sj)i {tojztos) and {J23J1J) should satisfy the triangular condition (Eq. 8.1(1)).
+The unitarity of the recoupling transformations implies the orthogonality and normalization conditions of the
+6j symbols.
+
+Below we shall use Latin letters a, 6,c, etc., to denote arguments of the 6j symbols.
+9.1.2.
+
+Racah Coefficients
+
+Instead of the Wigner 6j symbols the Racah coefficients [91] are often used, especially in spectroscopy
+theory. These coefficients differ from the 6j symbols only by a phase factor:
+
+{ dl ) } = (-l)° +6+<i+e W(abed;cf).
+
+(11)
+
+292
+
+Quantum Theory of Angular Momentum
+
+The Racah coefficients were introduced independently of the 6j symbols. The phase of the Racah coefficients
+coincides with the phase of the coefficients which describe the transformation between I and II coupling schemes
+(Eq. (5)).
+9.1.3.
+
+R Symbols
+
+The 6j symbols and the Racah.coefficients may be iWitten in the form of a 3x4 array \\Ria || (t = 1,2,3; a =
+1,2,3,4) which is called the R-symbol (Shelepin [105])
+Ru
+
+R\2 R\z
+
+RIA
+
+\ #2X R>22 #23 #24 S
+J?31 R32 #33 #34
+
+[^j} S (-ir^^(a^,c/),
+
+(12)
+
+where
+Rn = - c + d + c,
+
+R12 = 6 + d - / ,
+
+#i3 = a + c - / ,
+
+U u = a + 6 - c,
+
+R21 ss - 6 + (J -1- / ,
+
+#22 = c + i - e.
+
+#23 = a - 6 + c,
+
+#24 = a - e + / ,
+
+#31 = -<* + * + / ,
+
+# 3 2 - - < * + & + *,
+
+#33 = c-<* + *,
+
+#34 = 6 - d+ f.
+
+(13)
+
+The inverse relations are
+2a = #13 + #24 = #14 + #23*
+
+2rf == /2n -h R%2 = #12 + #21 >
+
+26 = #12 -f #34 = #14 + #32>
+
+2tf s= J J n + #33 as Rl3 + /J 31>
+
+2c = H22 + #33 = #23 + #32,
+
+? 2 / = /fel + #34 * #24 + # 3 1 .
+
+(14)
+
+All 12 elements /£,•<, are integer nonnegative numbers. The differences between corresponding elemenls of rows
+and columns are constant:
+,
+Ria ~~ Rka = R%$ "~ Rk0 >
+
+( t , * = 1,2,8; a, 0 = 1 , 2 , 3 , 4 ) .
+
+(15)
+
+Ria "" Rifi =* Rka "~ Rkfi %
+
+Note the following relations:
+]Tit t l ==2(<* + e + / ) - a - 6 - c ,
+
+£
+
+t=i
+3
+
+»*i
+3
+
+Jfcd = 2(a + e + e) - 6 - d-
+
+/,
+
+] T # » 2 = 2(6 + c + d) - a - * - / ,
+
+J £ flu = 2(a + 6 + / ) - c - d- e%
+
+tssl
+
+t=l
+
+(16)
+
+^2 Ria = 2(a -I- 6 + c +1* + e + / ) .
+One may also use the following parametrisation of the elements Ria [45]:
+Ria = Ai-B0l.
+Here A{yBa
+
+(17)
+
+are integer nonnegative numbers
+Ai = a + b + d + ct
+
+J?! = a + 6 + c,
+
+i4 3 = a + c + <*+ / ,
+
+ft*a
+
+i4 3 = 6 - h c - f c - f / ,
+
+#3 = 6 + <* + / ,
+
++ e+/,
+
+B 4 = c + i + (J,
+
+(18)
+
+6j Symbols and the Racah Coefficients
+
+293
+
+with
+3
+
+4
+
+(19)
+
+£ ^ = £ f l a = 2(a + & + c + d+e + / ) .
+t=l
+
+o=l
+
+The inverse relations are
+2a = Ai+A2-
+
+£ 3 - B4)
+
+2d=Ax
+
++ A2-Bx
+
+- B2,
+
+26 = Ai + A3 - B2 - B4i
+
+2e = Ax + J4 3 - Bx - £ 3 ,
+
+2c = A 2 + A3 - 5 2 - B3i
+
+2 / = A 2 + A3 - Bi - 5 4 .
+
+(20)
+
+The J2 symbols provide the simplest formulation of the symmetry properties of the 6j symbols and Racah
+coefficients.
+9.2.
+
+GENERAL E X P R E S S I O N S FOR THE %j S Y M B O L S .
+RELATIONS B E T W E E N THE 6; SYMBOLS A N D OTHER F U N C T I O N S
+
+The 6j symbols < ,
+
+- > vanish if at least one of the triads (a6c), (cde),(aef)
+
+and (bdf) does not obey the
+
+triangular conditions 8.1 (1). The expressions for the 6j symbols given below are valid if all these conditions
+are satisfied. Corresponding expressions for the Racah coefficients may be obtained by the use of the relations
+between these coefficients and the 6j symbols 9.1 (11).
+9.2.1.
+
+Expressions for the 6; Symbols in Terms of Finite Sums
+
+In the expressions presented below the sums are over all integer nonnegative values of n so that no factorial
+in denominators has a negative argument. The quantities A(a6c) are defined by Eq. 8.2(1). Numerical values
+of A(abc) are given in Table 8.12.
+I ad be°f I =
+
+v
+^
+
+A{abc)A{cde)A{aef)A{bdf)
+
+(-ir(*+i)'
+In - a - b - c)\[n - c - d - e)Un - a - e - /)!(n - 6 - d - f)Ua + b + d +
+x(a + c - h d - f / - n)\{b + c + e + / ~ n ) !
+(Racah [91])
+
+e-n)\
+(1)
+
+By the replacement n—*a + b + d+e — n one can rewrite Eq. (1) in the form
+{ dl / } = ( - l ) ° + 6 + < , + e
+
+n\{a + b-c-
+
+A(abc)A(cde)A(aef)A(bdf)
+
+( - l ) " ( q + b + d + e+l-n)\
+n)\(-c + d + e - n)l(a + e-f-
+
+x{-a + c-d+f
+
+n)\{b +
+
+d-f-n)\
+
++ n)\(-b + c - e + / + n)!
+(Racah [91])
+
+(2)
+
+294
+
+Quantum Theory of Angular Momentum
+
+Some other expressions for the 6j symbols which cannot be easily reduced to (l) and (2) are [45, 50].
+
+{;:;}=H
+
+«+o+d+/ A(a«/)ANf)
+A{abc)A{cde)
+
+a + 6 + c + n)\(c -d + e + n)\(a -c + d + f - n)!
+Enr n\(a -e + f- ( -n))(-b
++ d + f- n)\{-a + 6 - d + e + n)!(6 + c + « - / + 1 + n ) ! '
+:
+
+(3)
+
+A{abc)A{bdf)
+
+{ " ; } = H \a+c+d+f A{aef)A(cde)
+(a - 6 + d + e- n)\{-b + c + e + f-
+
+n)!(o + c + d + / + l - n ) !
+
+E(-i)
+■ ^ v ' n ! ( a - & + c - n ) ! ( - 6 + d + / - n ) ! ( a + <; + / + l - n ) ! ( c + d + e + l - n ) ! '
+
+{;:;}-<-
+
+i)
+
+a+b+d+.
+
+A{abc)A(cde)A(aef)A(bdf)(a
++ e + / + 1)1(6 + d + / + 1)1
+(a + 6 - c)!(a - 6 + c)!(-c + d + e)!(c + d - e)\(-a + e + /)!(6 - d + / ) !
+
+B-1)" n\{a + e-f-
+
+( - a + e + / + n ) ! ( 6 - d + f + n)\(a + c + df-n)\
+n)\(b + d - / - n)!(-o + c - d + / + n)!(2/ + 1 + n)! '
+
+{;:;}-<-
+
+1)
+
+6+c+e+/
+
+(26 - n)!(6 + c - e + / - n)!(i + c + e + / + 1 - n)!
+f- n)!(o + 6 + c + 1 - n)!(6 + d + / + 1 - n)! '
+
+9.2.2.
+
+#14
+
+ft n (R<«Y-
+
+#21 #22 #23
+
+#24
+
+t=l a=l
+
+#31 #32 #33
+
+#34
+
+R12
+
+(6)
+
+Bargmann Formula [53]
+
+#13
+
+Rn
+
+(5)
+
+A(aic)A(cde)A(ag/)A(6d/)(a + 6 + c + l)!(i + d + / + 1)1
+(a + 6 - e)!(e - d + e)!(c + d - e)!(a - e + / ) ! ( - a + e + /)!(6 + d - / ) !
+
+■D- 1 )" n\(-a + 6 + c - n)!(6 -d+
+
+j a b c \ =
+\ d e f j -
+
+(4)
+
+I
+y,
+
+(-!)"(»+ 1)1
+
+(7)
+
+**.»- nwin(y.)i
+»=1
+
+a=l
+
+Here # , a are elements of the # symbol (Sec. 9.1.3), Ba are given by Eq. 9.1(18), x»,t/a are summation indices,
+n = Z)t=i xi+ lC a =i */<*• The s u m s are over all integer nonnegative values of xt-, t/a which satisfy the conditions
+x% + y<* = #ia- These conditions show that only one of the summation indices is independent. The sum in (7)
+contains r + 1 terms where r = m i n ^ a } . If we take the quantity n (integer nonnegative) as an independent
+summation index, then x t = A{ - n,ya = n - BaiAi and Ba being given by Eq. 9.1(18). In this case the
+Bargmann formula (7) reduces to the Racah formula (1).
+
+6] Symbols and the Racah Coefficients
+9.2.3.
+
+295
+
+Relations Between the 6; Symbols and the Generalized Hypergeometric Functions
+
+The 6j symbols may be written in terms of the hypergeometric functions 4.F3 with unit argument:
+A{abc)A(cde)A(aef)A(bdf){a
+
++ b + d + e + l)!
+
+{;:;}-<- 1)a+6+d+e_{a + b- c)\{-c + d+ e)!(a + e - /)!(& + d- / ) ! ( - a + c-d+ f)\{-b + c - e + / ) !
+x*F9
+
+{;!;}-H>
+
+—a — 6 + c, c — d — e, — a — e + f, — b — d + /
+-a-b-d-e-l,-a
++ c-d + f + l,-b + c-e + f + l
+
+a+c+d+z
+
+x4i;3
+
+(Rose [30])
+
+(8)
+
+A(a e /)A(6ff)(-a + 6 + c ) ! ( C - d + e ) ! ( a - C + d + / ) !
+A{abc)A(cde){a - e + / ) ! ( - 6 + d + / ) ! ( - o + b-d + e)\(b + c + e - / + 1)!
+-o + 6 + c + l , c - d + e+ l,-a + e - / , 6 - d - /
+-a + c-d-f,-a
++ b-d+e+l,b
++ c + e-f + 2
+
+(9)
+
+f O 6 C 1 _ / _ 1 \ a + c + < i + / _A(abc)A(bdf)(a - b + d + e)!(-6 + c + e + f)\(a + c + d + f + 1)!
+
+\ d e f j - ( l>
+
+X4F3
+
+A (aef)A(cde){a - b + c)\(-b + d + f)\(a + e + f + l)!(c + d + e + 1)!
+-a + b — c,b — d— f, —a — e — f — 1,— c — d— e — 1
+—a+ 6 — d— e,b — c — e — f, — a — c — d— f — 1
+
+(10)
+
+tt'l}-™
+
+a+b+d+e
+
+A(abc)A(cde)A(aef)A{bdf)(a
++ e + f + l)!(6 + d+f + l)!(a + c + d - / ) !
+(a + 6 - c)\(a - b + c)\{-c + d + e)!(c + d - e)!(a + t - /)!(& + d - / ) ! ( - a + c - d + / ) ! ( 2 / + 1)!
+
+X4F3
+
+-o-e + / , - 6 - d + / ) - o + e + / + l , 6 - d + / + l
+-a-c-d+
+
+f,-a
+
++ c-d+
+
+(11)
+
+f + l,2f + 2
+
+{::;}=(-)b+c+e+/
+A(abc)A(cde)A{aef)A{bdf)(2b)\{b
++ c - e + f)\(b + c + e + f + 1)!
+{-a + b + c)\(a + b - c)!(c - «f + e)!(c + d- e ) ! ( a - c + / ) ! ( - a + e + /)!(6 + d- f)\{b
+
+X4*S
+
+a — 6 — c, — 6 + d— / , — a — 6 — c — 1,— 6 — d— f — 1
+-26, -b-c + e- f,
+-b-c-e-f-1
+
+Equations (8)-(l2) present Eqs. (2)-(6) in terms of the hypergeometric functions.
+
+-d+f)\
+
+(12)
+
+296
+
+Quantum Theory of A ngukr Momentum
+
+0.2.4. Relations Between the 6; Symbols and the Zjm Symbols
+The 6j symbols may be written as sums of products of the Clebsch-Gordan coefficients (Eq. 9.1(6)) or 3jm
+symbols. The relations between the 6j symbols and the Zjm symbols are
+
+{^;}=D-')™-(^;)(::4)(j^)0i.;;).
+
+(13)
+
+In Eq. (13) the sum is over all possible values of a,fi,i,6,e,<p with only three summation indices being
+independent. Some other sums of the Zjm symbols which yield the 6; symbols will be considered in Chap. 12.
+0.2.5. Quasi-Binomial Representation of the 6j Symbols
+The 6j symbols may be written in terms of quasi-binomials [45, 99] which are defined in Sec. 8.2.2. These
+representations are widely used in tabulating the formulas for the 6/ symbols.
+Let us introduce the following definitions:
+kx = e-dt
+
+B = R2i = -b + d+f,
+
+F = Ri2 = b + d- f,
+
+k2 = a~b,
+
+D = Ru = b-d+f,
+
+E = Ri2 + R21 + J?34 + 1 ~b + d+ f + 1.
+
+(14)
+
+Then the dependence of the 6;' symbols on &i and k2 is given by
+(abc\=(b
+
++ k2
+
+b
+
+c\
+
+\defJ-{
+
+d
+
+d+
+
+hff
+
+r (/ c. +. jfe
+L. 3)(3*i).B(*»-*i)X)(-i)(fcj-*j)£;(-i)(fc,+*»)jp(-i)(*»+fc
+\(2ki]
+l)
+
+IJ
+
+(c + Jbi)!(c - Jbi)!(26 + c + k2 + 1)(»«+D(2<i + e + kx + 1)(3«+D J ( u " ^
+
+* (15)
+
+The quantities u and v may be chosen in different ways. This depends on which equations in Sec. 9.2.1.
+are supposed to be written in a quasi-binomial form [45].
+Equations (1) and (2) are obtained by putting
+u = {c + k1)^{B-k2
+v = (c- k^F^iE
+
++
+k1)^D^,
++ kt + Jfea)*"1).
+
+(16)
+
+« = (c + k^B^^D
++ Jk2 - Jbx)<-*>,
+v = (c - h)^{F + Jk2 + kjl-^EW .
+
+(17)
+
+Equation (3) is obtained, if
+
+or
+
+« = {2d - c + k^-^D^ (F + k2 + Jbx)(-1),
+t> = (2<*+ c + Ax + 1)W{D + k2 - kJ^FW
+Equation (4) corresponds to
+
+.
+
+u = {2d + c + jfcx + 1)W(B - k2 + ibi)* 1 )^ 1 ),
+v = {2d - c + ktf-VBl-ViE + k2 + J^)*"1).
+
+(18)
+
+(19)
+
+Equation (5) is obtained provided
+u = (c + k2)l-V{B - k2 + ki)W{D + Jb3 - Jka)*-1),
+v = (c - Jfe1)<1)(26 + c + ifca + l)M{2d - c + Aj)^ 1 ),
+
+(20)
+
+6j Symbols and the Racah Coefficients
+or
+U =
+
+297
+
+(c + fc1)(1)(26-c + i 2 ) ( - 1 ) ( 2 d - c + fc1)(-1))
+
+t>=(< + * 3 ) ( - 1 ) * , ( 1 ) £ ( 1 ) Equation (6) corresponds to
+
+u = D^E^{2b + c + k2 + l){1),
+v = ( D +fc2- fci)(_1)(JE7 +fc2+ Jfc1)t-1>(26 - c + Jb 2 )(- a ),
+or
+
+u = (c + Jbi)^) (26 + c + k2 + l) ( 1 ) (2d + c + Jbi + 1)W,
+v = (c + fc2)("1)(^ + *2 + A:1)^1)(i7 4-A:2-f-A:i)(~1).
+
+Equation (15) for the 6j symbols is valid, if all the exponents 2&2, k2 — ki and A;2 + A;i are integer nonnegative
+numbers, i.e., if &2 > |fci| > 0. If some of the exponents are negative, the corresponding quasi-power should be
+replaced in accordance with
+„(") _►
+P
+
+9.3.
+
+p(-i)(H) '
+
+„(-*)(") -+
+P
+
+1
+
+for
+
+p(M)
+
+a<0
+
+tOT<T<{)
+
+(24l
+W
+
+I N T E G R A L REPRESENTATIONS OF T H E 6/ SYMBOLS
+
+Squares of the 6; symbols may be expressed by integrals involving the characters of the representations of the
+rotation group [110]
+
+{dl / } = j^IdRldR2dR3Xa(R1)xb(R2)xn^)xd(R2Rs1)xe{R3R:1)xnRiR21)-
+
+(i)
+
+Here
+
+X>\R) = J2D>mm{R) s j ; D L ( a , A i )
+m
+
+m
+
+is the character of the representation of rank j (Sec. 4.14)
+/ }{R)dR = f'da
+J
+Jo
+
+f" sin fidfi f " * , / ( « , fin)Jo
+Jo
+
+Note also the following integral representations for some special 6j symbols
+
+{ a * / } = ( ^ / dRidR2Xc(Ri)xf(R2)xa(R2Ri)xb(R^1Rx),
+
+(2)
+
+f 06 g) f ab j l f ab c "I
+
+\<UcJ\d6/J\e*6/J
+= fe^TT / ^1^2di?3^4X C (^l)X < '(^2)X / («3)X a (^4ii2)X b (^4ii3/? 2 i?lii4)X <J (i?l«4i23) ,
+
+(ab c\(aef\(db
+\de
+
+(3)
+
+f\(dec\
+fj\abej\abcj\abcj
+
+= fe^T
+fdR1dR2dR3dR<dR5Xd(Ri)xe(R2)xf{R3)xa(R4)xa(RB1R3R2)xb(Rt>R*R2Ri)xc(R;1RsRiR3)
+l8* J J
+
+•
+(4)
+
+Quantum Theory of Angular Momentum
+
+298
+9.4.
+
+S Y M M E T R I E S O F T H E 6; S Y M B O L S A N D T H E R A C A H C O E F F I C I E N T S
+
+9.4.1. ^ - S y m b o l s
+The symmetry properties of the 6j symbols and the W-coefficients may be formulated in a fairly simple
+way if these coefficients are written in terms of the R symbols (see Sec. 9.1.3).
+The value of the R symbol is invariant under any permutation of its rows or columns [105]
+# n #12 #13 #14
+#21 #22 #23 #24
+#31 #32 #33 #34
+
+Ril R%2 #t3 #t4
+# 1 * # 1 0 #17 #1$
+I #*1 #*2 #fc3 #*4 || = #2a # 2 0 #?7 #2$
+Rn Ri2 R13 Ru
+#3a # 3 0 #37 #36
+
+(i)
+
+In other words, any permutation of parameters A{ or Ba (see Sec. 9.1.3) leaves the value of the R symbol
+unchanged. These symmetry relations involve 3! x 4! = 144 generally different Racah coefficients.
+9.4.2. 6; Symbols
+The above-mentioned symmetries of the R symbol are equivalent to the following symmetries of the 6;
+symbols.
+(a) Classical Symmetries [110]: The 6j symbol is invariant under any permutation of its columns or under
+interchange of the upper and lower arguments in each of any two columns:
+(ab c ) _ ( a c b 1 f 6 a c 1
+\def)-\dfe}-\edf}-\efdr\fde)-\fed}
+
+fbc a1
+
+fc ab1
+
+( c ba1
+
+fae/1
+\dbcj
+
+J e / a l _ J / a e l _
+\bcdj
+\cdbj~\c
+
+J/eal
+bdj
+
+fa/el
+\dcbj
+
+fea/1
+\bdcj
+
+_ ( d e c 1 _ f d c el
+f e d c 1 _ ( e c d\_
+~ \ab f j ~ \a f b ] - \b a f f~ \b f a}"
+=
+
+(dbf\
+
+fdfb\
+
+fbdf\
+
+ft>fd\
+
+\a e c j
+
+\a c e j
+
+\e a c j
+
+\e c a j
+
+f c d el
+\f abf~
+
+J e e d\
+\f b aj
+
+(2)
+
+ffdb\(fbd\
+\c a e )
+
+\c
+
+eaJ '
+
+These relations involve 3! x 4 = 24 different 6j symbols.
+(b) Regge Symmetries [95]: The relations below are functional ones, i.e. in general they cannot be obtained
+by interchanging the 6j symbol arguments.
+( a b c 1 __ ( a si — b si — c \ _ f *2 — & b *2 — c \
+\d e f j "" \d si-e
+si-f)~\s2-de
+32 - f j
+=
+
+(s3-as3-bcy\=(s2--ds3--esi--f>\__(33--dsi--es2-f)
+[S3 — d 3$- e f J
+\ 52 — a 53 - 6 5i - c J
+
+,~)
+\ 53 — a si — b $2 — c j '
+
+*'
+
+where
+These relations are especially useful when s» equals one of the 6; symbol arguments. Combining the Regge
+symmetries and the classical symmetries, one gets all 144 symmetry relations.
+9.4.3. R a c a h Coefficients
+For the Racah coefficients the symmetry relations are the following.
+(a) Classical Symmetries [91]:
+W(abed; c/)= W(deba; cf)=
+W{edab; c/)= W{bade; cf)
+= W(aebd; fc)=
+W(dbta\ / c ) = W{bdae; / c ) = W{eadb; fc)
+= e1W(acfd;be)= *iW{dfca;be) = 8iW[fdac;be)= ^^(cad/jfcc)
+= exWiafcdicb)^ e 1 W(dc/a;c6)= €XW(cdaf\tb)^ €lW(fadc\tb)
+= e2W(cbef;ad)= e2W(febc;ad)= e2w\efcb\ad)^
+e2W(bcfc;ad)
+= e2W(cebf;da)= c2W(fbec;da)= e2W{bfcc;da)=
+e2W{ecfb;da),
+
+, .
+*'
+
+6j Symbols and the Racah Coefficients
+
+299
+
+where
+ei
+
+= (-l)b+'-c~f
+
+,
+
+e2 = (-i)«+<*-c-/ .
+
+(6)
+
+(b) Regge Symmetries:
+W (abed; cf) = W(s$ — a, s 3 — 6,53 — e, S3 — d\ cf) = eiW^a, Si — 6, Si — e, d\ s x — c, Si — / )
+= $i W(s 2 — d, S3 — e, s 3 - 6, s 2 - a; si - / , si - c) = e2W(s2 - a, 6, c, s 2 — d\ s2 - c, s 2 - / )
+= e 2 W(s 3 - d, si - c, si - 6, s 3 - a; s 2 - /, s 2 - c).
+Here S i , s 2 , s 3 are given by Eq. (4) and e^e2
+
+(7)
+
+by Eq. (6).
+
+9.4.4.
+
+"Mirror" Symmetry
+
+The formulas for the 6j symbols may be extended to include negative integer or half-integer values of
+arguments. In this case one has the following symmetry properties [45] corresponding to the replacement
+j -* -j - 1,
+
+{;!)}-{;J/}-(-')"{;!/}-«-'i" +, {;i/}
+-(-»"-{i:,/}-(->r«{:^}-(-ir{::j}-(-i)-{}:,/}
+-i-»)"{;!*/}--(-ii"{si/}-(-'r{;!,/}-(-i>"»{;j}}-
+
+(8)
+
+Here
+a = —a — 1, fc = —6 — 1 , etc.
+^
+
+= 6 - c _ e + / | ^ 2 = 2(a + d), <p3 = c + d + e + 2/, £>4 = a + 6 + c, <p5 = 2(c + / ) + 1.
+
+(9)
+
+Similarly, for the Racah coefficients one gets
+W(abed;cf) = -W(abed;cf)
+= {-l^^Wiabedicf)
+
+= (-l)+*W{afo3;tf)
+
+= W(abed;cf) =
+
+-W(abed)cf)
+
+= i(-l)+*W(*ltd\cf)
+
+= t(-l)^W(a6?J;ff/)
+
+= t(-l)*»jy(afcc*;ff/) = t ( - l ) * » W ( a 6 ? J ; c / ) = ( - l ) ^ W ( a 6 e J ; c/) = ( - l ) ^ + 1 ^(a6ec*;c/).
+
+(10)
+
+Here
+^ =-6-fc-c-f/,
+9.5.
+
+V>2 = - c + d + e + 2/,
+
+^3=a + 6-c,
+
+^4=2(d+/).
+
+(11)
+
+E X P L I C I T F O R M S OF T H E 6; S Y M B O L S F O R C E R T A I N A R G U M E N T S
+9.5.1.
+
+One of A r g u m e n t s is Equal t o Zero
+
+For the 6j symbols one obtains
+
+/ 0b c 1 _ (
+\defj
+
+y
+
+tfb+e+d
+>
+
+f O0 C1 _ /^a+d+e
+
+l<*e/J
+
+l
+
+'
+
+f a 6 0 1 _ /,*«+«+/
+
+l^e/J
+
+^
+
+S
+
+bc&ef
+
+y/(2b + l)(2e+l)'
+g
+
+ac£ff
+
+V(2a+l)(2d+l)'
+^ab^e
+
+y/{2a+l){2d+l)'
+
+i a b °\ = (-l)a +6+e
+\0e/J
+
+V
+
+;
+
+/ ° 6 C \ = (_l)«+M-«l
+
+WO/J
+
+*
+
+'
+
+/ ° 6 C \ = (_l)«+H-c
+
+\deOJ
+
+l
+
+'
+
+hftce
+^/(2b + l)(2c + 1 ) '
+g
+
+a/fr:d
+
+V(2a+l)(2c+l)'
+*oe^M
+
+^ ( 2 o +1)(26 + 1) '
+
+(1)
+
+300
+
+Quantum Theory of A ngular Momentum
+Analogous relations for the Racah coefficients are
+
+In this case all other arguments are supposed to satisfy the triangular condition.
+9.5.2. One of Arguments is Equal to the Sum of Two Others
+If one of the 6j symbol arguments is equal to sum of two others from the same triad (abc), {ede), (aef), [bdf),
+one may use the classical symmetries of the 6;' symbol (Eqs. 9.4(2)) to express it in the form
+
+{ d ! ° / b } = (-1)a+b+d+e
+
+W{abed; a + bf) = (_!)«+»+<*+«
+
+(2o)!(26)i(o + b + d + e + l)!(a + b - d + «)!(o + 6 + d'- e)!(-o + e + /)l(-fe + d+f)\
+1*
+{2a + 2b + l)\{-a-b + d + e)\(a + e-f)\{a-e
++ f)\[a + e + f+l)\{b + d-f)\{b-d
++ f)\{b + d + f + l)]\
+(3)
+In particular,
+faba + b}_(
+\dea + ej
+
+.a+b+d+e
+'
+
+y
+
+[
+(26)!(2C)!(a + b + d- e)l(a-b + d + e)\
+1*
+[(2o + 26 + l)!(2o + 2« + l)!(-o - 6 + d+ e)!(-o + b + d - e)\\ '
+(ab a + 6
+\dea+e-lf~{
+
+\ _
+
+l}
+
+,ua+b+d+e
+
+x^2a(o + 6 + d + e + l)(a + 6 - d + e ) ( 2 o + 2 6 + i ) ! ( 2 o + 2 e ) ! ( _ o _ 6 + i + e ) ! ( _ o + 6 + d _ e + i ) ! j
+faba + b]
+\ a e a + 6/
+
+. u,a+h+e
+l
+
+l)
+
+(ab a + 6 1 _ .
+[
+\oeo +6-lJ
+fa6a+6l_,
+\o6 / J _ l
+U & a + 6)
+l6a / /
+
+(2a)!(6 + C)!
+(2o + 26 + !)!(-& + e)!'
+
+,7a+b+e (2o - 1)!(6 + < - ! ) ! [2o • 2b{b + e)(2o + b - e)(2o + b + e + 1)
+'
+(2a + 26)!(-6 + e)! [
+(2a + 2 t + 1 ) ( - 6 + e +1)
+j
+
+>2a+2b
+(2a)!(26)l
+'
+(a + 6 - /)!(a + 6 + / + 1)!'
+
+X
+
+,
+l
+
+)2o+2fc
+
+'
+
+(2a)!(26)l
+| ( 2 a - / ) ! ( 2 a + / + l)!(26-/)!(26 + / + l)!]*'
+
+faoa+o)
+, n 2 a + 2 t (2a)!(2o)I
+l a U +i } - 1 ^
+(2a+26+l)!'
+
+W
+
+,^
+
+[ l
+
+(?)
+
+W
+
+U
+
+(W)
+
+6j Symbols and the Racah Coefficients
+,
+1
+
+U2a+2b
+
+(2a)!(26)!
+
+'
+
+(ii)
+
+(2o + 26)!'
+
+2o+26
+
+1
+
+(a >*),
+
+2a+l
+t
+
+1 \2a+2b
+
+26
+(2a + l)(2a + 2)'
+
+{:!.!>'.}-'-*»""»^'tu^1 1}
+
+f
+o
+6 a + 61 = /
+v
+\ a + 6 + e e a + eJ
+9.5.3.
+
+301
+
+1x2(a+5+c)
+
+'
+
+(o£i i)
+
+- '
+
+1
+[( 2 a + 26 + l)(2a + 2e + 1)]* '
+
+(13)
+/ 14 x
+V
+
+'
+
+One of Arguments is Smaller by Unity than the Sum of Two Others
+
+If the 6j symbol has one argument which is one less than the sum of two others from the same triad
+(a6c), (cde)} [aef)} (bdf), one may use the classical symmetries of the 6j symbol (Eqs. 9.4.(2)) to bring it into
+the form
+
+{d \ ° + / " * } = (-i)a+b+d+'w(ab<d>a+b -1/)
+=
+
+:
+
+i_qa+b+d+. 2 { a f c ( o + fc) + ( 0 + 6 ) / ( / + i) _ ad(d + i) _ 6 e ( e + i)}
+
+[
+(2a - 1)1(26 - l)!(a + 6 + d + e)!(a + 6 - d + e - l)!(a + 6 + d - e - l ) ! ( - a + e + / ) ! ( - 6 + d + / ) !
+1*
+[ ( 2 a + 2 6 ) ! ( - a - 6 + d + e + l ) ! ( a + e - / ) ! ( a - e + /)!(a + e + / + l ) ! ( 6 + d - / ) ! ( 6 - d + / ) ! ( t + d + / + l ) ! .
+(15)
+In particular
+
+{ d ! a t e - l } = (-l)O+6+d+e2{0(a+6 + e - 1 ) ( 0 + 6 + e) - 0d(d+1) - 26e}
+[
+( 2 6 - l ) ! ( 2 e - l ) ! ( a + ft + d - e - l ) ! ( q - 6 + d + e - l ) !
+1*
+[(2a + 26)!(2a + 2 e ) ! ( - a - 6 + d + e + l ) ! ( - a + 6 + d - e + l)lJ '
+
+V
+
+'
+
+| a 6 a + 6 - l | = ( _ 1 ) 2 o + 2 6 2 { a 6 ( a + 6) + ( a + 6 ) / ( / + 1 ) _ a 2 ( a + 1)
+ft*fft n i l
+
+(2a-1)1(26-1)1
+
+-M» + i)> (a + t _ / ) l ( a + 6 + / + 1 ) I .
+J a 6 a + 6 - l \
+
+,
+
+\ba
+
+1
+
+f
+
+U2a+2b9(u
+
+H" )
+
+f
+a
+6a + 6 - l l
+\a+6+e-1 e a+ e-1J
+
+, M,,f , u
+
+„.,
+
+2{(a + »)/(/ + 1) - 2a6} ^
+,
+v
+
+*2(a+6+e)
+'
+
+Some other cases are given by Eqs. (5), (7), (11).
+
+(is)
+
+(2a - 1)1(26 - 1)1
+
+_ / ) | ( j 8 + , + 1)!(26 _ / ) ! ( 2 6 + , + x > 1 j * > (19)
+
+26-2e
+(2a + 26)(2a + 26 - l)(2a + 2c)(2a + 2c - 1) J
+
+(20)
+
+302
+
+Quantum Theory ofAngular Momentum
+9.5.4.
+
+Arguments a, 6, d} e are Equal in Pairs
+
+If a = 6 and d — e or a = c and 6 = d, the Wigner 6; symbol may be rewritten as [56]
+{ 6 6 / } = { 6 Vc } = H ) ^ ^ ' / )
+= f_ir+b+c+/
+K
+
+'
+
+" (-l)2a+26W(a6a6;/c)
+
+[
+(2a - c)l(2t - c)l
+[(2a + c + l ) ! ( 2 6 + c + l)!
+
+Vc{a,f,b),
+
+(21)
+
+where c is integer, and Vc(a, f, 6) = Vc(b, f, a). According to Eq. 9.6(6), the quantities Vc satisfy the recursion
+relation
+Vc+1 =
+
+2
+
+-^±VlVc
+c+ 1
+
+- c(2c + l)Ve - - 4 r [ 4 a ( a + 1) + 1 - c2][46(6 + l) + 1 - c 2 ] ^ .
+c -t-1
+
+(22)
+
+6 = 6(6 + 1),
+
+(23)
+
+Let us denote
+a = a(a + 1),
+
+x = / ( / + l) - a ( a + 1) - 6(6 + 1) = / - a - 6.
+
+Then for some special values of c the functions Vc are given by
+V0(a,f,b)
+
+= l,
+
+(24)
+
+r
+
+V 1 (a,/,6) = - 2 i ,
+
+(25)
+
+2
+
+V 2 (a,/,6) = 6x + 6 x - 8 a 6 ,
+3
+
+(26)
+
+2
+
+V3(a, f, b) = - 2 0 x - 80x - 16x[3 + a + b - 3a6] + 80a6,
+4
+
+3
+
+(27)
+
+2
+
+V4(a, / , 6) = 70x + 700x + 40x [39 + 5a + 5^ - 6a6]
+
+V
+In th\-t
+V3a_1(«I/,*)-(-l)
+
++ 80x[9 + 6a + 66 - 17a6] - 48a6[27 + 4a + 46 - 2a6],
+
+(28)
+
+rt+-»fita'+7
+ft
+(2a)!(2a-l)!(2a + 26)!(-a + 6 + / ) !
+2{a + / - 6 } ( 2 6 _ 2 a + 1 ) ! ( a + 6 _ / ) ! ( a _ 6 + / ) , ( a + 6 + / + 1 ) ! ,
+
+^
+
+(a<6+0,
+
+(2a - 26 + l)!(a + 6 - / ) ! ( - a + 6 + /)!(a + 6 + / + 1)!'
+
+(3Q)
+
+(b,a+l),
+V In fh\-t
+K2o(a,/,6)-(
+
+I}-"*/
+(2a)!(2a)!(2a + 2 6 + l ) ! ( - a + 6 + / ) !
+I)
+(26 - 2 o )!(a + 6 - /)!(a - 6 + /)!(a + 6 + / + 1)!'
+
+{31j
+
+(<*<&),
+
+V (nfh\-(
+U-+"'
+(2fc)!(26)!(2a + 26 + l)l(a - 6 + / ) !
+/
+^ ( a , /,») - (-1)
+_
+( 2 a 2 6 ) ! ( a + 6 _ / ) ! ( _ a + 6 + / ) ! ( a + 6 + / + 1)! •
+(6<a).
+
+(82)
+
+6j Symbols and the Racah Coefficients
+
+For special values of / one has
+vt
+AM
+(26)!(2a+c+l)!
+^a,a-M)=(2a+1)!(26_c)!,
+
+(«>*),
+
+. . . .
+(2a)!(26 + c + l)i
+M
+yc(a,6-a,fe)=(26+1)!(2a_c),,
+
+(«<6),
+
+V e ( a , a - 6 + l 1 6) = 2 { 2 6 ( a + l ) - ( a - 6 + l ) c ( e + l ) > f c | | ^ t l + J ) i ,
+(o > b - 1),
+
+V4a,b-a+l,b)
+
+(a-b-l)c{c+l)}{^0^±^-,
+
+= 2{2a(b+l) +
+(6 > a - 1),
+
+V c (a,a + 6 - l , 6 ) =
+
+(-ir12{(a+6)C(c+l)-2afe}|22°"1|g2^
+
+V e (a,a + M ) - ( - l )
+
+(2a_c)!(26-c)!-
+
+See also Eqs. (9) and (19).
+9.6.
+
+R E C U R S I O N RELATIONS
+9.6.1.
+
+Relations in W h i c h A r g u m e n t s are C h a n g e d b y 1/2
+
+[(a + 6 + c + l ) ( - a + 6 + c){c + d + e + l)(c + d - e)]* { J * J }
+a
+
+6-lc-A
+
+= -2c[(6 + d + / + l ) ( 6 + d - / ) ] *
++[{a + b - c+ l){a-
+
+b + c){-c + d+ e + l){c - d + e)}$ | j * ' " ^ l ,
+
+( a - & - d + e)[(a+6 + c+l)(C + d + e + l ) ] * { ^ * ' }
+a-|
+
+6
+
+c-i
+
+d
+
+e~\
+
+f
+
+- [ ( a - 6 + c)(c - d + e)(o + e - f){a + e + f + 1)]*
+
++ [ ( - o + 6 + c)(c + d- e){b + d- f)(b + d+f
+
++ 1)]*
+
+[ ( - o + 6 + c ) ( a - 6 + c + l)(o + « - / + l)(6 + d + / + l)]* I j j j j
+a + | 6 - | c
+= [(c + d - e)(c - d + e + l)(a + e + / + 2)(6 + d - / ) ] *
+d-§ e+i
+b
+
++ ( a - 6 - d + e + l ) [ ( - o + 6 + c)(b - d + / ) ] *
+
+o + 2 ~h
+d
+
+e
+
+c
+
+/ - §
+
+/
+
+304
+
+Quantum Theory of Angular Momentum
+
+(2d+l)(2/+l)[(a + 6 + c + l ) ( a - 6 + c ) ] * { ; ^ }
+• - 1 6 C - 1
+= - [ ( a + e + / + l)(a - t + f){b + d+f+
+
+l ) ( - 6 + d + f){c + d + t + l)(c + d - *)]*
+a - i 6 c - I
+
+- [ ( - a + « + / + l)(a + « - / ) ( 6 - d + / + l)(6 + < f - / ) ( c + d + « + l)(c + d - « ) | * \
+
+fa-§b
+
+c-\
+
+- [ ( a + e + / + l)(a - t + /)(6 + < * - / + 1)(6 - <i + / ) ( - c + d + e + l)(c - <f + e ) ] H
++ [ ( - o + e + f + l){a + e - f){b + d+ f + 2){-b + d + f + l)(-c + d + e + l){c - d+ e)]l
+
+a - i i c - 1
+x<
+
+>.
+
+(4)
+
+<*+* < / + §
+9.6.2.
+
+Relations in Which Arguments are Changed b y 1
+
+(2c + l){2[a(o + l)d{d + 1) + 6(6 + l)e(e + 1) - c(c + l ) / ( / + 1)]
+-[a(a + 1) + 6(6 + i) - e(c + l))[d(d + 1) + e(e + 1) - c(c + 1)\) {* bg < }
+= -c[(o + 6 + c + 2 ) ( - a + 6 + c + l)(o - 6 + c + l)(o + 6 - c)
+x(<* + e + c + 2 ) ( - d + e + c + l ) ( ( i - e + c+l)(<* + e - c ) ] * | j J ' + 1 }
+- ( c + l)[(o + 6 + c + l ) ( - a + 6 + c)(o - 6 + c)(a + 6 - c + 1)
+x(<f + c + c + l ) ( - d + e + c)((*-e + C)(d + e - c + l)]* j ° * c ~ * 1 .
+
+(5)
+
+In particular
+(2c + l ) { - 2 a ( a + 1) - 26(6 + 1) + 2 / ( / + l) + c(c + 1)} j J £ < }
+= (c + l ) [ ( 2 a + c + 2)(2a-c)(26 + c + 2 ) ( 2 6 - c ) ] * | j J ' + 1 }
++c[(2a + c + l)(2a - c + 1)(26 + c + 1)(26 - c + 1)]* j J J C " * | ,
+
+(2c + l ) { [ a ( a + l ) + 6 ( 6 + l ) - c ( c + l ) ] 2 - 2 [ a 2 ( a + l ) 2 + 62(6 + l ) 2 - c ( c + l ) / ( / + l ) ] } | ^ * j
+
+(6)
+
+|
+
+= c(a + b + c + 2 ) ( - o + 6 + c + l)(o - 6 + c + l)(a + 6 - c) j " J C ~t * |
++ (c + l)(a + 6 + c + l ) ( - a + 6 + c ) ( a - 6 + c)(a + 6 - c + l ) [ " J c ~ 1 | .
+
+(7)
+
+6f Symbols and the Racah Coefficients
+9.7.
+
+305
+
+GENERATING FUNCTION
+
+The 6j symbols turn out to be the coefficients of a power series expansion of the generating function /(r^a)
+[53], which depends on 12 variables r^a(i = 1,2,3; a = 1,2,3,4),
+
+fM =
+
+i+ 3
+
+4
+
+4
+
+3
+
+£ii'<«+En". 1"-E*i*.){;!;}n n<«>.)-*=1 a = l
+
+a=l t=l
+
+«
+
+The exponents i^ a are elements of the R symbol. The relation between Ria and arguments a, 6, c, etc. is given
+by Eqs. 9.1(13)-9.1(14). The normalization factors N are
+r
+
+4
+
+-,*
+
+n (*« + i)»
+N(Ria) =
+
+(2)
+
+ftft(*<«)'
+*=1 a = l
+
+where Ba are given by Eqs. 9.1(18).
+9.8.
+
+S U M S INVOLVING THE "6; SYMBOLS
+
+In this section only the most important sums involving products of the 6j symbols are presented. We shall
+use the notation {abc} for the symbol which is equal to 1 if a, 6, c satisfy the triangular conditions 8.1(1) and is
+zero otherwise. In the equations below the sum is over all possible values (integer or half-integer) of X which
+obey all triangular conditions.
+
+Z(2X+l){aaKbbXc} } = (-ir{abc},
+
+(1)
+
+5>ir* x (2*+i){jjf}-w(2«+i)(2*+i),
+
+(2)
+
+x
+
+(3)
+
+(4)
+
+»-^ + "{:"}{:"}{:f*}- ?!•}■
+
+(5)
+
+(6)
+(JR = a + 6 + c + cf+e + / + p + g + r)
+—
+has}
+c — p b
+f r - g
+I q e d a d e h
+p q r s
+b c f g
+
+£<«+»{:if}{:;?}{;{?}{:if}-<-ir"«'
+D-» M («+'){:if}{:^}{;if}{:i
+
+X
+s
+
+(?)
+
+(8)
+
+Quantum Theory of Angular Momentum
+
+306
+
+Many other sums, involving the 6j symbols as well as the 3jm symbols and the 9j symbols, will be given in
+Chap. 12.
+9.9.
+
+A S Y M P T O T I C S OF THE 6; SYMBOLS FOR LARGE A N G U L A R M O M E N T A
+
+9.9.1.
+
+Asymptotic Relations Between the 6; Symbols and the Clebsch-Gordan Coefficients
+
+If R :» 1 and a, 6, c etc. are arbitrary, one gets the following asymptotic relation
+i\a+6+<i+e
+b
+c
+\
+(-i)
+«
+e+ R /-hi?/
+y/2R(2c + 1)
+
+( a
+\d+R
+
+(1)
+
+where a = / — e,P = d — / , 7 = cf — e.
+For the 6; symbols and the Zjm symbols this relation assumes the form [47]
+( a
+
+b
+
+c
+
+\
+
+(-i)a+o+c+2( < H« + /) /
+
+\d + R e + R f + rf™
+
+y^ft
+
+a
+
+b
+
+\e-f
+
+c
+
+\
+
+f-dd-e)
+
+(2)
+
+The asymptotic relation between the R symbols which correspond to the 6j symbols and the Clebsch-Gordan
+coefficients is written as
+-c + d + e + 2R
+-b + d+ f + 2R
+-a + e + f + 2R
+
+b + d-f
+c + d-e
+-a+b+c
+
+(__l)a+M-c+2(d+e+/)
+
+»
+
+V2l
+
+-a+b+c
+a+ e-/
+a-e + f
+
+a + e-f
+a + b-c
+a-b + c a-e + f
+c-d+e
+b-d+f
+a — 6 + c a-f 6 - c
+b-d+f
+c + d-e
+b + d-f
+c-d + e
+
+(3)
+
+In particular, when d = c = / = 0 one obtains [60]
+
+(a b c \
+
+\RRRJ
+9.9.2.
+
+«
+
+(-i)c
+
+„<*>
+
+v^2^Ty
+
+a0W
+
+'
+
+(4)
+
+Asymptotic Expressions for the 6; Symbols
+
+The asymptotic behaviour of the 6; symbols < ,
+
+- > for large angular momenta is closely associated with
+
+geometric properties of the tetrahedron whose edges are a + | , 6 + | , etc. (Fig. 9.1).
+
+/s4=d+i
+
+Fig. 9.1. The tetrahedron associated with asymptotic behaviour of the 6j symbols.
+
+307
+
+6f Symbols and the Racah Coefficients
+(a) The Ponzano-Regge
+
+Formula [89] (semiclassical approximation to the 6j symbols): If a, 6, c, d, e, / >> 1,
+
+then
+
+&}h^~[£»e»+(\'{v2>o)-
+
+(5)
+
+Here
+1
+Ji2 = a + 2 >
+
+.
+1
+Ji3 = o + 2 >
+
+Ji4 =
+
+j23 = J+2>
+
+J24=.e+r>
+
+j34 = a + 2 >
+
+iik = ifci,
+
+c
+
+1
++2»
+(6)
+
+jii = 0 .
+
+V is the volume of the tetrahedron, 0 ^ is the angle between two external normals to the planes adjacent
+to the edge ji^.
+The tetrahedron volume is equal to
+
+0 hi hi ha 1
+J34 0 & fa !
+v2 = 23(3!)2 & J?4 0 jl2 1
+#23 ^13 ^12 0 1
+1 1 1 1 0
+
+(7)
+
+5<5fc sin 0j fc = -Fjifc ,
+
+(8)
+
+The angles Qik are given by
+(t ^ fc)
+
+Here Si is the area of the triangle opposite to the vertex pi (Fig. 9.1). One can evaluate Si, using the standard
+formulas. For example,
+
+0 y?2 ; ?3 1
+y?2
+0 & 1
+S
+l = 7 ^ 0 l 2 + ;i3 + Jl4)(yi2 + Jl3 ~ Jl4)0l2 - J13 + J14) (-J12 + Jl3 + J u ) = ~ 7 ^
+16
+16 ; ? 3 & 0 1
+1 1 1 0
+
+(9)
+
+The asymptotic expressions (5) are valid only if V2 > 0 (classically allowed domain). If V2 < 0 (classically
+forbidden domain, when an associated tetrahedron does not exist), the asymptotic expression becomes
+
+Ja6 c 1
+\ d e / J » 2 v / l27jl r cos $ exp
+
+^
+
+jifclm Qik
+
+,
+
+(V2<0),
+
+(10)
+
+t,fc=i
+
+where
+
+* = E (** - 5)Re0<* •
+
+(11)
+
+In this case the 6j symbols are exponentially small even if the triangular condition is satisfied.
+Near the classical domain boundary, where V2 « 0, Eqs. (5), (10) are of little use, although one may use
+the improved expressions [89]
+
+{ d ! / } w 2 ~ '
+
+(n5«)
+
+{cos$Ai(*) + s i n $ B i ( * ) } ,
+
+(12)
+
+308
+
+Quantum Theory of Angular Momentum
+
+Ai(z) and Bi(z) being the Airy-functions [27],
+
+f
+
+[-(w) 2 (*n$)
+
+if73>o,
+(13)
+
+z — <
+
+Note that the Ponzano-Regge approximation is sufficiently accurate even at comparatively small angular mo­
+menta a, 6, c etc. Asymptotic expressions similar to (12) but extended over the entire domain of angular
+momenta are obtained in Ref. [140].
+(b) The Edmonds' Formula [16]: If /, m, n are arbitrary integers or half-integers and a, 6, c >► / , m, n, then
+f
+
+a
+
+b
+
+c]
+
+{_l)a+b+c+f+m
+
+jf
+mnl
+
+\ 6 + m a + n / J * N / | 2 a + l ) ( 2 6 + l)
+
+''
+
+(14)
+
+where d}mn(Q) ia the rotation matrix (Chap. 4), 6 is an angle between the tetrahedron edges a + n+ | and
+6 + m + ± ( F i g . 9.2)
+^
+a ( 0 + i ) + t(6 + i ) - c ( c + i)
+cost
+
+2s/a{a + l)b{b=+^
+
+'
+
+0+/I+J-
+
+Fig. 0.2. The angle 6 which enter* Eq. 9.9(14).
+In particular, if m = n = 0, a, 6, c > / and / is an arbitrary integer, then (14) turns into the Racah formula
+[93],
+_i\a+6+c+/
+fab
+c\
+(-i)
+P/(cos6),
+*
+(l6)
+\bafj
+V{2a + l)(2b+l)~'y"~~"
+.;,£
+where P/ is the Legendre polynomial. If, in addition, / is large (a,6, c > / > 1), one can substitute into (16)
+asymptotic expressions for the Legendre polynomials to obtain
+
+(wK
+
+i)
+
+a+b+e+f
+
+1*
+
+L*(2a + 1)(26 + 1)(2/ + 1) s i n 6 J cos
+
+[(/♦*)•-!]•
+
+(")
+
+This expression may also be written in the form (cf. Eq. (5))
+(abc\
+
+(-!)«+*•«+/
+« -—'.
+—cos
+
+IH)-*
+
+(18)
+
+where the tetrahedron volume is given by
+
+*-\H)H)H)"-
+
+(19)
+
+309
+
+6j Symbols and the Racah Coefficients
+
+(c) If a, 6, c, d, c, / > 1, m, n, p one has
+(20)
+where V is the tetrahedron volume (7)
+(21)
+
+Qi is the angle between two external normals to the planes adjacent to the edge U + \ (Fig. 9.3), with
+li = d, / 2 = *> 's = /• The angles 0* can be evaluated from
+cos 0^ = cos <pik cos <pu - cos <pki
+sin p,-fc sin spsi
+
+(22)
+
+where combinations i,fc, / are obtained by cyclic permutations of 1,2,3.
+
+'•++=/+-*•a T a —c-r 2
+
+/.+ +=<*+ +
+
+Fig. 9.3. Geometrical interpretation of the angles in Eqs. 9.9(20)-9.9(23).
+
+In Eq. (22) <pik = <Pki is the angle between the edges U + ^ and /* + | of the tetrahedron (Fig. 9.3)
+C08W
+
+_ M ^ + i) + M<* + i ) - A ( a + i)
+
+™
+
+(23)
+
+2^i,-(z< + i)ifc(ifc + 1 )
+
+with i^k^l
+and ji = a, ja = 6, J3 = c.
+(d) In particular, for m = n = p = 0 Eq. (20) yields the Wigner formula [43]
+
+\ de/ /
+
+24*V
+
+,
+
+(24)
+
+(o, 6, c, d, e, / » 1).
+
+This formula is valid only on the average because the 6j symbols oscillate rapidly with momentum variations
+in the region of large angular momenta.
+(e) If a, 6, c, etc. are fixed and R -+ 00, one has [89]
+
+Ub + R c + R)
+\de+Rf+RJ
+
+.
+
+y
+
+(o - 6 + c)\(a - e + f)\[e + d- e)\(-b +
+' (a + 6 - c)\{a + t - / ) ! ( - c + d + e)\{b +
+(2i?)- 1 -l 6 +«- c -/l
+1+ 0
+|6 + e - c - / | !
+)t
+
+(i)]-
+
+d+f)\
+d-f)\
+
+J«i([n(c+/-6-«)
+
+(25)
+
+Quantum Theory of Angular Momentum
+
+310
+
+In this case
+(p = a + d + min {6 -I- c, c + / } ,
+f 1,
+if x > 0 ,
+S i g n X =
+\-l,
+ifx<0.
+
+9.10.
+
+(26)
+
+RELATIONS B E T W E E N THE WIGNER 6; S Y M B O L S A N D
+A N A L O G O U S F U N C T I O N S OF OTHER A U T H O R S
+
+Racah [91]:
+^(a6ed;c/) = ( - i r ^ ^ | ^ ^ } ,
+Jahn [73]:
+U{abed;cf) = [{2c+l){2f
+
++
+
+l)]lW{abed\cf)t
+
+Biedenharn, Blatt and Rose [56]:
+Z{abed;cf) = r a + ' + ' [ ( 2 a + l)(26 + l)[2d+ l)(2e +
+
+9.11.
+
+l)]$Cfal0W{abcd;cf).
+
+TABLES OF ALGEBRAIC E X P R E S S I O N S FOR THE 6; S Y M B O L S
+
+Algebraic expressions for the 6j symbols < ,
+
+. > with d = £, 1, | , 2, | , 3, | , 4 are presented in Tables 9.1-9.8.
+
+We use the following notations
+s= a+ 6+c
+X = - a ( a + 1) + 6(6 + 1) + c(c + 1).
+The tables of algebraic formulas for the 6j symbols and Racah coefficients are also given in Refs. [3, 45,
+56].
+9.12.
+
+N U M E R I C A L VALUES OF THE 6; SYMBOLS
+
+Numerical values of the 6j symbols < ,
+
+. > with a, 6, c,d, c, / < 3 are presented in Tables 9.9-9.11. These
+
+values are given exactly (i.e., as square roots of rational fractions) and in decimals. All arguments a, 6, c, d, c, f
+are supposed to differ from zero. Otherwise one should use Eqs. 9.5(1). Arguments of the 6/ symbols given in
+Tables 9.9-9.11 satisfy the following conditions:
+Table 9.9. 1. a, b,d} e are half-integers; c, / are integers.
+2. a > 6,d, e and c > / .
+3. If a = 6, then d > t\ if c = / , then 6 > e.
+Table 9.10. 1. a, 6,c are integers; d, c, / are half-integers.
+2. a > 6 > c.
+3. If a = 6, then d > c; if 6 = c, then c > / .
+Table 9.11. 1. All arguments a, 6, c, d, e, / are integers.
+2. a > 6, c, d, c, / ; 6 > c, c, / .
+3. If a = 6, then d > c; if 6 = c, then c > / ; if a = d, then c > / .
+Any 6jf symbol can be written in one of these forms by using the classical symmetries (Sec. 9.4.2).
+
+311
+
+6j Symbols and the Racah Coefficients
+Tables 9.1.-9.8. Algebraic Expressions for the 6/ Symbols.
+Table 9.1.
+a b c
+
+1/2 e f
+e = c-
+
+e = c + l/2
+
+/
+6+1/2
+6 — 1/2
+
+/ nn1 1 f
+(« + 2 ) ( « - 2 a + l )
+7/,
+(-1'
+2 L(26 + l)(6 + l)(2c + l)(c + i) J
+2c) (s — 26 + 1) 7A
+\[ 6(26(s +—l)(2c
++ l)(c + 1) J
+
+(
+
+1/2
+
+I f (s-2c + l)(s-2b)
+7/,
+' 2L(26+i)(6 + l)c(2c-fl)J
+(, + ! ) ( « _ 2a)
+
+-f
+
+(-1)«
+
+(-!)• T[
+2 [_&(26 + l)c(2c + 1)J
+
+Table 9.2.
+a b c )
+
+( 1 e /J
+=C+ 1
+
+/
+
+7/2
+4x. i r
+(*+.2)(* + 3)(f- 2 a + 1) ( s - 2 a + 2 )
+2 L (2b + 1) (6 + 1) (26 + 3) (2c l)(c + l)(2c + 3)J
+1 T ( • 2) (s — 2c) (s — 26 + 1) (s - 2a 4 1) 7/,
+,+1
+H) TLT6 (26 + 1) (6 + 1) (2c + 1) (c + 1) (2c + 3) J
+1 r (s 2c — 1) (g — 2c) (s — 26 + 1) (g — 26 + 2)
+(26 - 1) 6 (26 + 1) (2c + 1) (c + 1) (2c + 3)
+
+6+1
+
+-1)
+
+6
+
+J"
+
+6—1
+/
+
+( - 1 ) «+l
+
+6+1
+
+1)
+K(26(s ++2)1)(s(6—+2c1)+(261)+(s3)—c 26)(2c (s+ —1)la(c ++iyrit
+i)J
+
+6—1
+
+*
+(-1)' , 1
+2 [6 (26 + 1) (6 + 1) c (2c + 1) (c + 1)]V.
+i n . 1 r(t + l)(«-2c)(«-26 + l)(«-2a)7/.
+l—1
+' 2 L (26 - 1) 6 (26 + 1) c (2c + 1) (c + 1) J
+
+/
+
+e= c— 1
+
+b
+
+(-!)*
+
+6+ 1
+
+ir. (s — 2c + 1) (s — 2c + 2) (s — 26 — 1) (s — 26)?
+
+2 L (26 + 1) (6 + 1) (26 + 3) (2c - 1) c (2c + 1)
+1 r (« + 1 ) ( « - 2 e + !)(«-2ft) ( t - 2 a ) 7 / .
+- 1 ' 2 L6(26 + l ) ( 6 + l ) ( 2 c - l ) c ( 2 c + l ) J
+1_ r
+s (s + 1) (s — 2a — 1) (s — 2a)
+(-!)• 2 L (26 - 1) 6 (26 + 1) (2c - 1) c (2c + 1)
+2L
+
+b
+
+I"
+
+6— 1
+
+Table 9.3.
+a b c
+3/2 e f
+
+e = c + 3/2
+
+f
+6 + 3/2
+
+(s + 2) (s + 3) (s + 4) (s — 2a + 1) (s — 2a + 2) (s — 2a + 3)
+(26 + 1) (26 + 2) (26 + 3) (26 + 4) (2c + 1) (2c + 2) (2c + 3) (2c + 4)
+/ n o r 3 ^ + 2 ) ( s + 3 ) ( j ? - 2 c ) ( s ^ 2 6 + 1 ) ^ - 2 a + l ) ( ^ - 2 a + 2)7/a
+v - 1 ) L 26 (26 + 1) (26 + 2) (26 + 3) (2c + 1) (2c + 2) (2c + 3) (2c + 4) J
+
+(-1)*
+
+6+1/2
+6—1/2
+-3/2
+
+3 (s + 2) (s — 2c — 1) (s — 2c) (s — 26 + 1) (s — 26 + 2) (s — 2a + 1)
+(26 — 1) 26 (26 + 1) (26 + 2) (2c + 1) (2c + 2) (2c + 6) (2c + 4)
+(s — 2c — 2) (s — 2c — 1) (s — 2c) (s — 26 + 1) (s — 26 + 2) (s — 26 + 3)
+(26 — 2) (26 — 1) 26 (26 + 1) (2c + 1) (2c + 2) (2c + 3) (2c + 4)
+
+(-l)*+i [■
+
+(-!)•
+
+■]'•
+
+312
+
+Quantum Theory of Angular Momentum
+Table 9.3. (Cont.)
+c = c + l/2
+
+f
+6 + 3/2
+6 + 1/2
+6 - 1/2
+6 — 3/2
+
+(
+
+r 3 ( s + 2)(s + 3 ) ( s - 2 c + l ) ( s - 2 6 ) ( s - 2 a + l ) ( s - 2 a + 2)7/,
+~* ' L (26 + 1) (26 + 2) (26 + 3) (26 + 4) 2c ( 2 c + 1) ( 2 c + 2) ( 2 c + 3) J
+
+, u.,oy
+(i + 2 ) ( i - 2 a + l)
+7/,
+9hrJ
+( - 1 ) {6A — zoc) [ 26 (26 + 1) (26 + 2) (26 + 3) 2c (2c + 1) (2c + 2) (2c + 3) J
+T
+(s— 2c) (s — 26 + 1)
+7/s
+( - 1 ) ' + 1 {3X + 2 (6 + 1) c) y {2b _ ^ 2b (2b + 1 } ( 2 6 + 2 ) 2 c ( 2 c + 1) (2c + 2) (2c + 3) J
+r 3 (s + 1) (s - 2c - 1) (s — 2c) (5 — 26 + 1) (s — 26 + 2) (s - 2a) 7/,
+
+("~1)# [
+
+(2b — 2 ) (2b ~ 1) 2& (26 + !) 2 c (2c + 1) (2c + 2) (2c + 3)
+e = c — 1/2
+
+/
+6 + 3/2
+6 + 1/2
+6-1/2
+6-3/2
+
+-1)' + 1 [
+
+3 (s + 2) (5 — 2c + 1) (5 — 2c + 2) (5 — 26 — 1) (5 — 26) (s — 2a + 1) 7/i
+(26 + 1) (26 + 2) (26 + 3) (26 + 4) (2c — 1) 2c (2c + 1) (2c + 2)
+
+]"
+
+I n - i f 3X 4- 26 fc + i n r
+(,-2c + l)(i-26)
+<—1;
+idA -t- z* (c -t- i j ; [^ 2 6 (2h + ^ ( 2 6 + 2 ) ( 2 6 + 3 ) ( 2 c _ ^ 2 c ( 2 c +
+
+6 + 1/2
+6-1/2
+6-3/2
+
+7/,
+t) (2c +
+
+2)
+
+j
+
+(-.!)•+! {3X - 2 (6 + 1) (c + 1)} L (26 - 1) 26 (26 + 1) (26 + 2) (2c - 1) 2c (2c + 1) (2c + 2) J
+1
+
+f 3(f + l ) « ( t - 2 c ) ( « - 2 6 + l ) ( i - 2 a - l ) ( f - 2 a )
+7/»
+*' L (2^ — 2) (26 — 1) 2b (26 + 1) (2c — 1) 2c (2c + 1) (2c + 2) J
+e = c — 3/2
+
+/
+
+6+3/2
+
+J
+
+(5 — 2c + 1) (5 — 2c + 2) (5 -. 2c + 3) (s — 26 — 2) (* — 26 — 1) (s — 26) 7/1
+(26 + 1) (26 + 2) (26 + 3) (26 + 4) (2c — 2) (2c — 1) 2c (2c + 1)
+3 (S + 1) (s — 2c + 1) (g — 2c + 2) (s — 26 — 1) (s — 26) (5 — 2a) 7/t
+(-1)'[- 26 (26 + 1) (26 + 2) (26 + 3) (2c — 2) (2c - 1) 2c (2c + 1 ) J
+
+T
+
+(-I)' [■
+
+T 3(s + l)s(*-2c + l ) ( * - 2 6 ) ( * - 2 q - l ) ( s - 2 a ) 7/«
+<~"lj L (26 — 1) 26 (26 + 1) (26 + 2) (2c — 2) (2c — 1) 2c (2c + 1) J
+— 1)(5 — a ) 7/,
+r (i-l)t(f + l)(f-2a-2)(j-2a-l)(i-2a)
+(
+}
+L (26 — 2) (26 — 1) 26 (26 + 1) (2c — 2) :
+(2c— -1) 2c (2c + 1) J
+
+Table 9.4.
+( a 6
+b cc \
+
+1 22 ee // J
+:C + 2
+
+/
+
+6+ 2
+
+6+1
+6
+6—1
+6— 2
+
+f (# + 5) 1 ( 5 - 2 a + 4 ) ! (26)1 (2c) 1 7/,
+' L (* + 1) ! (* ~2a)
+2a)! !(26
+(26+ +5)5)! !(2c
+(2c+ +i 5) ! J
+(s — 2c) (s - 26 + 1) (s — 2a + 3) 1 (26 — 1) ! (2c) !
++1
+(-1)' 2
+(s + l) j (S — 2a) ! (26 + 4) ! (2c + 5) !
+6 (s + 3) ! (s - 2c) ! (s — 26 + 2) 1 (s — 2a + 2) ! (26 - 2) ! (2c) ! 7/1
+(s + 1) ! (5 — 2c — 2) ! (s — 26) ! (5 — 2a) ! (26 + 3) ! (2c + 5) ! J
+(s + 2)(s- 2c) ! (s - 26 + 3) 1 (s — 2a + 1) (26 - 3) ! (2c) ! 7,
++1
+(-1)' 2[
+(5 — 2c — 3) ! (s — 26) ! (26 + 2) ! (2c + 5) !
+(s - 2c) ! (s — 26 +4)1(26 — 4) ! (2c) !
+•4) ! ( s — 2 6 ) ! ( 2 6 + 1 ) ! (2c5)!j
++
+K
+
+r c+*)!
+
+-„•[
+
+?
+
+313
+
+6j Symbols and the Racah Coefficients
+
+Table 9.4. (Cont.)
+
+f
+
+e= c+l
+,
+
+6+2
+
+Z
+
+/ ^.+i//y
+r T ( * + 3)i(*-2a + 2)i(26-l)i(2c-l)!7/2
+(_l).+i4{X —&c>L ( 7 + 1 ) ! ( s - 2 a ) ! (26 + 4) !(2c + 4)! J
+
+6+1
+6
+
+* ! " ( * + *) ! (' - 2c + *> (J - 2V (s-2a + 3)\ (26) ! (2c - 1) 1 7/ a
+l
+(s + 1) ! ( s - 2 a ) ! ( 2 6 + 5) ! ( 2 c + 4 ) !
+J
+
+^
+~~1}
+
+{
+
+P 6 (5 + 2) (^ — 2c) (s — 26 + 1) (s — 2a + 1) (26 — 2) ! (2c — 1) 1 7/,
+(26 + 3)!(2c + 4)!
+s
+2 ) I ( _ 26 + 2) ! (26 - 3) ! (2c - 1) ! 7/,
+( - i r i 4 { x + c(6 + i ) } ^ ( 5 _ C2 c _ 2S ) ! ( 5 _ 2 6 ) ! ( 2 6 + 2 ) ! ( 2 c + 4 )
+
+-J"
+
+(-1)«2
+
+r( —
+
+6—1
+
+rl
+
+r(« + l ) ( » —
+- 2 e2c)
+) l (! «(s- -2 f r + 3 ) l ( « - 2 a ) ( 2 6 - 4 ) l ( 2 e - l ) | - T / .
+(sS —2c
+_ 2c —3)
+3) !!(s—26)
+(s — 26] !! (26
+(26"+1)"I
+(2c ++ 4)!
+4) !
+L
++ 1)! (2c
+J
+
+6—2
+
+/
+
+s f 6 (^ + 3) ! (^ — 2c + 2) 1 (s — 26) ! (s — 2a + 2)! (26) ! (2c — 2) ! TV,
+( - 1 ) * [_ (5 + 1) ! (s — 2c) ! (s — 26 — 2) ! (s — 2a) ! (26 + 5) ! (2c + 3) ! J
+<wo/v . ,,r6(^ + 2)(^-2c + l ) ( s - 2 6 ) ( 5 - 2 a + l ) ( 2 6 - l ) ! ( 2 c - 2 ) 1 7 / >
+
+(-1) 2 <* + *> L
+
+(26 + 4)!(2c + 3)!
+
+J
+
+T (26 — 2) ! (2c — 2) ! 7/a
+( - 1 ) ' 2 {3* (X - 1) - 46 (6 + 1) c (c + 1)} [(26 + 3)l(2c + 3 ) l J
+f6 (5 + 1) (s — 2c) (s - 26 + 1) (s — 2a) (2b — 3) ! (2c — 2) ! 7/»
+(—l)«+i 2 { * — & — !}
+(26 + 2) ! (2c + 3) !
+J
+a r 6 (s + 1) 1 (s — 2c) \(s — 2b + 2) 1 (^ — 2a) ! (26 — 4) ! (2c — 2) ! 7/>
+(—*)' [ (5 — 1) ! (s — 2c — 2) ! (s — 2b) \(s — 2a — 2)\ (2b + 1) ! (2c + 3) ! J
+
+= c —1
+(_l).+i2[-
+
+(s + 2) (s - 2c + 3) ! (s — 26) ! (s — 2a + 1) (26) ! (2c — 3) ! 7/»
+(s — 2c) ! (s — 26 — 3) ! (26 + 5) ! (2c + 2) !
+J
+(S _ 2C + 2) ! (s — 26) ! (26 — 1) 1 (2c — 3) !
+
+( _l). + i 4 {X + &(c + l))[-
+
+!
+p" 6 (s + 1) (5 — 2c + 1) (s — 26) (s — 2a) (26 — 2) ! (2c — 3)]'■
+(26 + 3)! ( 2 c + 2)!
+-c-l}[-
+
+(—iy+12{x
+( _i)m
+
+^+.2c)!(s_26_^
+
+(s + 1) ! ( y — 2 a ) ! ( 2 6 - 3 ) ! (2c — 3) !
+4 <Z - (6 + 1) (c + 1)} [(s _ 1} , ( # _ 2a _ 2 ) , ^ ^ J T J ^ P T !
+
+-l)'2[
+
+•]'•
+
+(s + 1) ! (s — 2c) (s — 26 + 1) (s — 2a) ! (26 — 4) ! (2c - 3) I 7/i
+(s — 2) ! (s — 2a — 3) ! (26 + 1) ! (2c + 2) !
+J
+--c — 2
+
+f (s-2c+4)!(s-26)!(26)!(2c-4)!
+7/.
+V 1(8 — 2c) ! (s — 26 — 4) ! (26 + 5) ! (2c + 1) ! J
+(s + 1) (s — 2c + 3) ! (s — 26) ! (s — 2a) (26 — 1) ! (2c — 4) ! 7/1
+(-1)'2[
+(* — 2c) ! (s — 26 - 3) ! (26 + 4) ! (2c + 1) !
+J
+6 (s + 1) ! (s — 2c + 2) ! (s - 2b) ! (s - 2a) ! (26 - 2) ! (2c — 4) ! 7/.
+(-1)* [■(s — 1) ! (s— 2c) \(s — 2b — 2)\ (s—2a —2)! (26 + 3) ! (2c + l ) !
+(« + ! ) ! (J — 2c + l ) ( s - 26) (^ - 2 a ) ! ( 2 6 - 3 ) ! (2c — 4) 11'/,
+anl
+(~1)*2[(5 _ 2) ! (s — 2a — 3) ! (26 + 2) ! (2c + 1) !
+f (5 + 1) ! (s-2a) ! ( 2 6 - 4 ) ! (2c - 4) ! 7/2
+(-1)*
+L (s — 3) ! (s — 2a — 4) ! (26 + 1) ! (2c + 1) ! J
+1
+
+J"
+
+7/t
+
+Table 9.5.
+a b c
+5/2 e f
+e = c + 5/2
+
+/
+
+f
+(s + 6) ! ( s - 2 g + 5) 1(26)1 (2c) ! 7/,
+* j L (' + 1) 1(« — 2a)! (26 + 6)1 (2c + 6) 1 J
+' 5 (s + 5) 1 (s - 2c) (s - 26 + 1) (s - 2a + 4) 1 (26 — 1) 1 (2c) ! 7/,
+(-i)'u
+(s + 1) ! (s - 2a) ! (26 + 5) ! (2c + 6) 1
+J
+10 (s + 4) 1 (s - 2c) i (s - 26 + 2) 1 (s — 2a + 3) 1 (26 - 2) 1 (2c) 1 7/2
+(s + 1) 1 (s — 2c — 2) ! (s - 26) 1 (s — 2a) ! (26 + 4) ! (2c + 6) !
+10 (s + 3) 1 (s — 2c) 1 (s — 26 + 3) ! (s — 2a + 2) 1 (26 — 3) 1 (2c) 1 7/,
+(s + 1) 1 (s — 2c - 3) 1 (s — 2b) ! (s — 2a) 1 (26 + 3) 1 (2c + 6) ! J
+5 (5 + 2) (5 — 2c) 1 (s — 26 + 4) 1 (s — 2a + 1) (26 - 4) 1 (2c) 1 7/«
+(5 — 2c — 4) 1 (5 — 26) 1 (26 + 2) ! (2c + 6) 1
+r (s-2c)
+1 ( . - 2 6 + 5) I ( 2 6 - 5 ) 1 (2c) 1 7/,
+("-1' L (s - 2c — 5) ! (s — 2b) ! (26 + 1) I (2c + 6) ! J
+
+6+5/2
+6+3/2
+6+1/2
+
+r
+
+(-!)'[•
+
+6 — 1/2
+
+"-J
+
+6 - 3/2
+6 — 5/2
+
+g f 5 (s +
+
+6 + 5/2
+
+(~~1>* L
+/
+
+6 + 3/2
+
+6-1/2
+
+5) 1 (s — 2c + 1) (s — 26) (s — 2a + 4) 1 (26) 1 (2c — 1) 1 7/,
+
+(* + 1) * (* — 2a) * (2& + 6) ! (2c + 5) !
+
+4x,,*v
+PI. J ( ' + 4 ) l ( * - 2 a + 3 ) l ( 2 6 ~ l ) l ( 2 c - l ) 1 7 / r
+(, + l) ! (S - 2a) ! (26 + 5) 1 (2c + 5) 1 J
+{ 5A - bbc) L
+
+(-l)
+
+2 (s + 3) 1 (s — 2c) (s — 26 + 1) (5 -^ 2a + 2) 1 (26 — 2) 1 (2c — 1) 1 7/,
+(5 + 1) 1 (5 — 2a) 1 (26 + 4) ! (2c + 5)1
+J
+2 (5 + 2) (5 — 2c) 1 (5 — 26 + 2) 1 (s — 2a + 1) (26 — 3) 1 (2c — 1) I 7/,
+( _ l ) * ( 5 X + 2c(6 + 4 ) } [
+( s _ _ 2 c - 2 ) 1 (s - 26) 1 (26 + 3) 1 (2c + 5) 1
+
+-]'
+
+6-5/2
+
+—2626++ 4)4)11(s(s——2a)
+2a)(26
+(26——5)5)11( (2c — 1) 1 7A
+f r 5 (s + 1) (s — 2c) 1(5(5—
+_ 2c — 4) ! (s — 26) 1 (26 + 1) I (2c + 5) I
+(~1)# [
+(sS —
+J
+
+/
+
+e = c + 1/2
+
+6 + 1/2
+
+I
+
+J
+
+6-3/2
+
+6 + 3/2
+
+3
+8
+
+/ n . M « y x f i n._L n J ( ' ~ 2 c ) 1 (5 - 26 + 3 ) 1 (26 - 4) l ( 2 c - 1 ) 1 7/,
+( - 1 ) n { 5 X + 6 c ( 6 + l ) } | _ ((5 _— 2c
+6 ++ 2)1
+c + +5) 5)I J1.
+2c -—3)3)11 (5(5-—26)
+26)11( 2(26
+2) 1( 2(2c
+
+6 + 5/2
+
+c
+3
+
+e = c + 3/2
+
+/
+
+6+1/2
+
+to
+
+ri0(5 + 4 ) l ( 5 - 2 c + 2 ) l ( 5 - 2 6 ) l ( 5 - 2 a + 3)l(26)l(2c-2)17/a
+L (5 + 1)1 ( 5 - 2 c ) 1 ( 5 - 2 6 - 2 ) 1 ( 5 - 2 a ) 1 ( 2 6 + 6 ) I ( 2 c + 4)1 J
+2 (5 + 3) 1 (5 — 2c + 1) (5 — 26) (5 — 2a + 2) 1 (26 — 1) 1 (2c — 2) ! 7/,
+(-l)'"{5A--26(c-3)}[(5 -f- 1) ! (5 - 2a) ! (26 + 5) I (2c + 4) 1
+( 5 + 2) (5 — 2a + l)(26 2) 1 (2c — 2) 1 7/,
+(—l) t+1 2 {bX2 - 2X (26c — 6 - c + 3) - 26c (26c + 46 + 4c + 3)} f
+(26 + 4) 1 (2c + 4) !
+(
+
+}
+
+■j
+
+Hi
+
+3
+
+Table 9.5. {Com.)
+e = c + l/2
+
+.»p
+
+(5 — 2c) (s — 26 + 1) (26 — 3) ! (2c — 2) ! 7/>
+( - 1 ) ' 2 {5X2 + 2X (26c - 6 + 3c - 4) - 2 c (6 + 1) (26c ~r 4 6 - 2c + 1)} | ±
+(26 + 3) i (2c + 4) i
+J
+2(s + l)(s — 2c) \(s — 2b + 2)\(s — 2a) (26 — 4) ! (2c - 2) ! "T/,
+(_l)«+i(5Jr + 2(6 + l ) ( c - 3 ) } [ (s — 2c — 2) ! (5 — 26) ! (26 + 2) ! (2c + 4) !
+J
+(
+
+10 (<? + !)( (s — 2c) \(s — 2b + 3) 1 (s — 2a) ! (26 — 5) 1 (2c — 2) ! "IV,
+~" 1) * I (s — 1) \(s — 2c — 3) ! (s — 2b) ! (s — 2a — 2)! (26 + 1) ! (2c + 4) ! J
+
+'t
+
+e = c — 1/2
+f p 10 (s + 3 ) 1 (s — 2c + 3) ! (s - 2b) 1 (s — 2a + 2) I (26) ! (2c - 3) ! 7/»
+(— 1 ) t L (s + 1) I (5 — 2c) ! (s — 26 — 3) ! (s — 2a) ! (26 + 6) ! (2c + 3) ! J
+2(s + 2)(s—2c + 2)\(s — 2b) 1 (s — 2a + 1) (26 — 1) i (2c — 3) 1 ~T/2
+( - l ) « { 5 X + 26(c +
+(5 — 2c) ! (s — 2b — 2) I (26 + 5) ! (2c + 3) !
+J
+r (s — 2c + 1) Is — 26) (26 — 2) ! (2c — 3) !
+(~l)«2{5X2 + 2X(26c + 3 6 - c - 4 ) - 2 6 ( c + l ) ( 2 6 c - 2 6 + 4c + l ) } ^
+(26 + 4) ! (2c + 3) !
+
+m[
+
+4?
+3
+
+(
+
+(-l)s 2 (5X2 - 2X (26c + 36 + 3c + 7) - 2 (6 + 1) (c + 1) (26c - 26 - 2 c - 3)} [ *
+
++
+
+1}
+
+^ ^ / f
+
+( 2 7 + 3 / f ° ~~
+
+F2(s + i)\(s2c) (s - 2b + !)(* — 2a) ! (26 - 4) ! (2c - 3) ! 7/2
+(—l)«+i { 5 X - 2 (6 + l ) ( c -+ " 1
+(s — l ) ! ( s —2<z —2) ! (26 + 2) ! (2c + 3) !
+r 10 (s -f 1) ! (s — 2c) I (a — 26 + 2) ! (s - 2a) ! (26 - 5) ! (2c — 3) ! 7/.
+(~ 1 )* L (s — 2) ! (s — 2c — 2) ! (s — 26) ! (s — 2a — 3) ! (26 + 1) ! (2c -f 3) ! J
+
+I
+
+e = c — 3/2
+f 5 (i + 2 ) (« -2c
+(~*>
+
+|_
+
++ 4) 1 (s - 2 6 ) 1 (s - 2a + 1) (26) ! (2c - 4) ! 7A
+
+(s — 2 c ) ! ( s —26 — 4 ) ! (26 + 6) ! (2c + 2) !
+
+J
+
+) ! {2b
+c
+/(-!)•+»
+i « « «{5X
+v_i+
+_ « 66
+i . /(c +
+-i- 1))
+i u fL (* ~_ 2 c + ! 3,) _' ( $26~ -2 6 3)
+~ + i]5)' !( 2(2c
+~+4 ) 2)! !7J; '
+! (26
+(s
+2c)
+(
+
+, iwn«ra.?fh
+
+p ( * + l)('-2c + 2)l(s-26)!(s-2a)(26-2)!(2c-4)!7/,
+
+( - 1 ) " 1 {oX + 2 (6 - 3) (c + 1)) £
+
+(s
+
+( _ i ) . i i {5X- — 2 (ft +
+
+( s _ 1 ) ! ( s _ 2 a - 2 ) ! ( 2 6
+
+(_l).+i
+
+4) (c + i » |_
+
+(5X - 6 (6 + 1) (c + 1)} [
+
+_ 2 c ) ! (s - 26 - 2) ! (26 + 4) ! (2c + 2) !
++ 3)!(2c + 2 ) !
+
+1"
+
+_ 2 ) l ( s - 2 a - 3 ) l ( 2 6 + 2)!(2c + 2)i j
+
+(s —
+( s 2b + 1) (8 — 2a) ! (26 — 5) 1 (2c — 4) ! 7A
+(-])'[ 5(s + l) 1(s (s——3) 2c)
+! (s — 2a — 4) ! (26 + 1) ! (2c + 2) !
+
+J
+J
+
+3)
+
+'
+
+f
+
+Table 9.5.
+e = c — 5/2
+
+f
+
+. 2c + 5) 1 (s - 26) 1 (26) 1 (2c - 5) !
+"" ir L (* - 2c) ! (* - 26 — 5) ! (26 + 6) ! {2c + 1) !
+5 (s + 1) (s - 2c + 4) 1 (s — 26) 1 (f — 2a) (26 - 1) 1 (2c — 5) 1
+(s - 2c) 1 (s - 26 - 4)! (26 + 5)! (2c + 1) !
+10 (s + 1) 1 (s - 2c + 3) 1 (5 — 26) 1 (# — 2a) 1 ( 2 6 - 2 ) 1 (2c - 5) 1
+(s — 1) 1(5 — 2 c ) I (s — 2 6 - 3 ) ! ( f — 2a —2)!(26 + 4)!(2c+l) !
+r 10 ( 5 + 1) 1 (5 — 2c + 2) 1 (5 — 26) 1 (f — 2a) I (26 — 3) I (2c — 5) 1 A7,
+(-^'L (* — 2) ! (s — 2c) 1 (5 — 26 — 2) ! (5 — 2 a — 3 ) ! (26 + 3) ! (2c + 1) ! J
+r 5 (5 + 1) I (5 - 2c + 1) (5 - 26) (5 — 2a) 1 (26 - 4) 1 (2c - 5) 1 7/,
+(-"-1' L
+( 5 - 3 ) ! ( 5 - 2 a - 4 ) ! ( 2 6 + 2)!(2c + l)l
+J
+, n . f (* + l)l(5-2a)l(26-5)l(2c-5)l 7/t
+I""1' L(* — 4) ! (5 — 2a — 5) ! (26 + 1) ! (2c + 1) !J
+
+■]"
+
+'-"•[(^
+
+6 + 5/2
+
+(
+
+-,[.
+
+6 + 3/2
+
+]"
+
+r
+
+-,,[■
+
+6 + 1/2
+6 — 1/2
+6 — 3/2
+6 — 5/2
+
+Table 9.6.
+j aa bb c \
+\ 3 e f )
+
+6+ 3
+
+6+ 1
+
+6-1
+6— 2
+
+(
+
+~" '
+
+(-1)'[
+(-1)' [
+
+6-3
+
+2
+•$.
+
+-]'
+
+HI
+
+J"
+
+3
+
+■1"
+
+c= c + 2
+
+/
+6+ 3
+
+3
+
+(s + 7) 1 (5 — 2a + 6) 1 (26) 1(2c)
+(2c)1 1 7/»
+:c + 7)lj
+t""1) L (* + *) i(* — 2a) 1(26 + 7) ! (2c
+,+1 6 (5 + 6) 1 (5 — 2c) (5 - 26 + 1) (5 — 2a + 5) 1 (26 - 1) 1 (2c) ! 7/»
+(5 + 1) ! (5 — 2a) ! (26 + 6) ! (2c + 7) !
+15 (5 + 5) 1 (s — 2c) 1 (5 — 26 + 2) 1 (5 — 2a + 4) 1 (26 — 2) 1 (2c) ( 7/1
+(5 + 1) ! (5 — 2c — 2) ! (5 — 26) ! (s — 2a) ! (26 + 5) ! (2c + 7) I
+r' 5 (5 + 4) 1 (5 -— 2c) 1 (5 -— 226
+6 + 3) 1(5(5-—2 a2a++ 3)3) 1(26
+! !(2c)
+1 (26- —3 ) 3)
+(2c) 1]/,
+1
+L (5 + l ) l ( 5 - 2 c — 3 ) 1 ( 5 - 2 6 ) 1 ( 5 — 2 a ) l(26 + 4)!(2c + 7)l J
+J15 (5 + 3) 1 (5 - 2c) 1 (5 - 26 + 4 ) I (5 — 2a + 2) 1 (26 — 4) 1 (2c) ! 7/,
+(5 + 1) 1 (5 — 2c — 4) 1 (5 — 26) I (5 — 2a) 1 (26 + 3) 1 (2c + 7) 1
++1 6 (5 + 2) (5 — 2c) 1 (5 — 26 + 5) 1 (5 — 2a + 1) (26 — 5) 1 (2c) 1
+(5 _ 2c — 5) ! (5 — 26) ! (26 + 2) 1 (2c + 7) I
+(5 — 2c) 1 (5 — 26 + 6) 1 (26 — 6) 1 (2c) 1 7/»
+9 f
+("-1)* L (* — 2c — 6) 1 (5 - 26) I (26 + 1) ! (2c + 7) I J
+
+(-1) [
+(-I)' [
+
+6+ 2
+
+(-!)'
+
+f
+a
+
+Cr=C-\- 3
+
+/
+
+6
+
+(Cont.)
+
+I"
+
+' G (5 + 6) ! (5 — 2c + 1) (5 — 26) (5 — 2a + 5) 1 (26) 1 (2c - 1) 1
+(5 + 1 ) 1 ( 5 — 2a) 1(26 + 7) 1 (2c + 6) 1
+
+Table 9.6. (Cont.)
+e= c + 2
+(g 4 . 5) j (S — 2a + 4) ! (26 — 1) ! (2c — 1) 1 TV,
+<-!)•♦« 2 {3X - 46c) [ - ^ j + i p - ^ _ 2 f l ) , (26 + 6) 1 (2c + 6)1
+I
+J
+, „,/QV
+^ f 10 (5 + 4) !1( (5
+5 -—
+2 c2c)
+) ( (s
+5 --2 62b ++ 1)1)( (s5 - 2 2a
+a ++ 33)
+) ! !( (26
+2 - 2 )2)1 1( (2c
+2 c --1 )1)! 7 A
+9 ,.
+( - 1 ) (3X —2c(6 — ^
+(* + 1) I (* — 2a) ! (26 + 5) ! (2c + 6) !
+J
+( _ l ) " i 2 { X + 2c) [•
+
+30 (s + 3) 1 (s — 2c) I (s — 26 + 2) 1 (5 — 2a + 2) ! (26 — 3) 1 (2c — i) 1 17:
+(5 + 1) ! (5 — 2c — 2) ! (s — 26) ! (5 — 2a) ! (26 + 4) ! (2c + 6) !
+J
+
+/ 4X./QV i_9 /* J _ ^ T r i 0 ( < + 2 ) ( * - 2 c ) l ( > - 2 d + 3 ) l ( > - 2 a + l ) ( 2 6 - 4 ) l ( 2 c - l ) l 7 / ,
+( - 1 ) ' {3X + 2c (6 + 3)} L
+(, _ 2c - 3) I (* - 26) ! (26 + 3) ! (2c + 6) !
+J
+# I*.+IO/QV_I_/
+
+_
+
+r ( ^ 2 c ) ! ( . ~ 2 6 + 4)!(26^5)!(2c~-J)!-17
+
+1 u
+( - l ) ^ 2 {3X + 4c /(67 + L 1)}
+L(5__2c_4)|(,_26)!{26 + 2)!(2c + 6)!J 2
+f r 6 (s 4-1) (5 — 2c) ! (5 — 26 + 5) ! (5 — 2a) (26 — 6) 1 (2c — 1) ! 7/,
+("~1)* L
+(5 — 2c — 5) ! (s — 26) ! (26 + 1) ! (2c -f 6) !
+J
+
+e= c+ i
+a r 15 (s + 5) ! (s — 2c + 2) ! (5 — 26) ! (5 — 2a + 4) ! (26) ! (2c — 2) ! TV,
+("~1)* [ (« + 1) !(« — 2c) ! (s — 26 — 2) ! (s — 2a) ! (26 + 7) ! (2c + 5) ! J
+
+/ 4../QV
+ou
+<,nri0(f + 4 ) l ( f - 2 C + l ) ( * - 2 6 ) ( f T 2 a + 3 ) l ( 2 6 - l ) l ( 2 c - 2 ) f
+( « ! ) • {3X - 26 (c - 2)} ^
+(s + l ) ! ( s - 2 a ) ! ( 2 6 + 6)!(2c + 5 ) !
+( - 1 ) ' (15X2 — 10X (26c - 6 - c + 2) - 46c (6c + 76 + 7c + 4)) [
+( ~ l ) ^ 2 { 5 ( X + c - 2 ) ( A : + c ) - ( 2 6 - l ) ( 2 6 + 3)c(c + 2)}[-
+
+(s + 3) ! (s — 2a + 2) ! (26 — 2) ! (2c — 2) ! 7/«
+
+P-Y
+
+(s + j) ! (s — 2a) ! (26 + 5) ! (2c + 5)
+3 (s + 2) (5 — 2c) (s — 26 + 1) (5 — 2a + 1) (26 — 3) 1 (2c — 2) ! TV,
+
+(26 + 4) ! (2c + 5) !
+
+J
+
+T (s — 2c) ! (s — 26 + 2) ! (26 — 4) ! (2c — 2) ! 7/,
+! (26 + 3) 1 (2c + 5) t J
+( _ 1 ) . (15X* + 10* (26c - 6 + 3c - 3) - 4 (6 + 1) c (6c + 76 - 6c + 3)} [ \s __ 2 < / J 2 ) , ( , Z2b)
+i n m n y ^ / ^ i w ,
+r i O ( t + D ( * - 2 c ) I ( f - 2 6 + 3) I ( # - 2 a ) ( 2 6 - 5 ) 1 ( 2 c - 2 ) 1 7/.
+( - 1 ) « {3X + 2 (6 + 1) (c - 2)} L
+J
+( * _ 2 c - 3 ) ! ( 5 - 2 6 ) ! (26 + 2) ! (2c + 5) !
+t r 15 (5 + 1) 1 (5 — 2c) 1 (s — 26 + 4) ! (s — 2a) 1 (26 — 6) 1 (2c — 2) 1 7/,
+("" 1)# [ (s — 1) ! (s — 2c — 4) I (5 — 26) ! (5 — 2a — 2) ! (26 + 1) ! (2c + 5) ! J
+e= c
+(-1)
+
+r 5 ( * + 4) 1 ( f - 2 c + 3) 1 ( 5 - 2 6 ) 1 (8 -2a + 3) ! (26) 1 (2c - 3) ! 7/«
+^L (5 + 1)! (5 — 2c)! (5 — 26 — 3 ) ! ( s — 2a) !(26 + 7) !(2c + 4) I J
+
+/ n-i'-fY.i
+f 3 0 ( 5 + 3) ! ( 5 - 2 c + 2) ! ( 5 - 2 6 ) 1 ( 5 - 2 a + 2 ) ! ( 2 6 - 1 ) ! ( 2 c - 3 ) ! ! / ,
+(—1)
+^ (A 4- zo) ^
+(^ -4- 1) ! (^ — 2c) ! (5 — 26 — 2) ! (s — 2a) ! (26 + 6) ! (2c + 4) !
+
+■Y
+
+(-i)'^2{5(A- + 6 - 2 ) ( X + 6 ) - 6 ( 6 + 2)(2c-l)(2c + 3 ) } [ ^ ± ^
+
+(s — 2c + 1) (5 — 26) (5 — 2a + 1) (26 — 2) ! (2c — 3) 1 7/t
+
+(26 + 5) ! (2c + 4) !
+
+J
+
+Table 9.6. (Cont.)
+
+f
+b
+6—1
+6-2
+6-3
+
+( - 1 ) ' + U (5*3 _ 20X* - 4X [36 (6 + 1) c (c + 1) - 6 (6 + ^^
+t W2HIY
+h 1WV
+h *\
+tW <w>,
+4W9 I , , J 3 (5 + 1) (5 - 2c) (5 - 26 + 1) (5 - 2a) (26 - 4) ! (2c - 3) I 7A
+(—i) 2 ( 5 (A — 6 — 1) (X — 6 — 3) — (6* — 1) (2c — 1) (2c + 3)} I
+(26 + 3) !(2c + 4) !
+J
+/
+
+1
+
+nmo/v
+n „ , , „ T 30(s + 1) I (# —2c) 1 (• —26 + 2) 1 (* — 2a) 1 (2fr — 5) 1 (2c — 3) 1 7/,
+*'
+* 1* - ^ l* + !)) L (5 - 1) ! (^ - 2c - 2) ! {s - 26) ! (s - 2a - 2) ! (26 + 2) ! (2c + 4) ! J
+(s + 1) 1 (s — 2c) 1 (5 — 26 + 3) 1 (5 — 2a) ! (26 — 6) 1 (2c — 3) ! 7/,
+T 5(5
+2) ! (s — 2c — 3) ! (5 — 26) ! (5 — 2a — 3) ! (26 + 1) ! (2c + 4) !
+
+]'
+
+e= c— 1
+6+ 3
+6+ 2
+6+1
+6
+6—1
+6—2
+6-3
+
+r 15 (s + 3) 1 (s — 2c + 4) 1 (5—26) 1 (5 — 2a + 2) 1 (26) ! (2c — 4) 1 7/»
+~ ' L (* + ! ) !!( (s
+*—
++ +7)7)! (2c + 3) ! J
+— ^c)
+2c) II(5(s—
+—2626——4)4)! (s
+! (s——2a)
+2a)! (26
+! (26
+10 (5 + 2) (5 — 2c + 3) 1 (s — 26) 1 (5 — 2a + 1) (26 - 1) ! (2c — 4) 1 7/,
+( - l ) ' { 3 X + 26(c + 3)}
+(5 — 2c) I (5 — 26 — 3) ! (26 + 6) ! (2c + 3) !
+r (s — 2c + 2) ! (s — 26) ! (26 — 2) I (2c — 4) ! 7/»
+( - i n i 5 y + 10*(2tc + 3 6 - c - 3 ) - 4 » ( C + l ) ( t c - t t + 7 c + ^
+(
+
+-T
+
+(-l).2(5(*-c-3)(*-c-l)-(26-l)(26
+
++
+
+3
+
+)
+
+-]'
+
+e= c—2
+,
+
+n ^ f
+1}
+
+6 ( 5
+
++ ^ ( * ~ 2 c + 5 ) 1 ( 5 - 2 6 ) 1 (5 - 2 a + 1) (26) ( (2c - 5) ! 7/»
+( s - 2 c ) ! ( 5 - 2 6 — 5) ! (26 + 7) ! (2c + 2) !
+J
+
+6+ 3
+
+[
+
+6+ 2
+
+( r ; n , Y 1 i/if. , i n r ( ^ 2 c + 4 ) l ( 5 - 2 6 ) t ( 2 6 - l ) ! ( 2 c - 5 ) ! 7 A
+(-)•+' 2 {3X + 46 (c + 1)) L ( , _ 2 c ) ! ( * - 2 6 - 4 ) ! ( 2 6 + 6)!(2c + 2 ) l J
+
+*+l
+6
+6-1
+
+L
+
+t-i\M
+i)
+{
+
+1'
+
+10(5 + 1)(5 — 2c + 3) 1 (5 — 26) ! (5 — 2a) (26 — 2) ! (2c - 5) 1 7/2
+(5 — 2c) ! (5 — 26 — 3) ! (26 + 5) ! (2c + 2) !
+? / v _ 9 /, J. , x , r 30(5 + l ) ! ( 5 - 2 c + 2 ) l ( 5 - 2 6 ) ! ( 5 - 2 a ) l ( 2 6 - 3 ) ! ( 2 c - 5 ) ! 7/,
+^ A
+z^c-j- i ; ) ^ ( 5 _ 1 ) | ( 5 _ 2 c ) ! ( 5 — 26 — 2 ) ! (5 — 2a — 2)! ( 2 6 + 4) ! (2c + 2) ! J
+
+(-l)'+'{3* + 2(6-2)(c + l)}[
+
+f 10 (5 + 1) 1 (5 — 2c + l) (5 — 26) (5 — 2a) ! (26 — 4) 1 (2c — ,r>) ! 7/,
+(5 — 2) ! (s — 2a — 2)\ (26 + 3) ! (2c + 2) !
+
+( - i r * { 3 X - 2 ( 6 + 3)(c + l)}Jj
+
+a
+c
+
+3
+
+3
+8
+
+$,
+*
+
+^
+
+(-1)« (15X« - 10X (26c + 36 + 3c + 6) - 4 (6 + 1) (c + 1) (6c - 66 - 6c - 9)} [ ( , ^ + ,'>,' ^ " ^
+f» ^
+f^"^
+,
+1) ! (« — 2a - 2) ! (26 + 3) ! (2c -f 3) !
+10 (s + 1) 1 (s - 2c) (s - 26 + 1) (« - 2a) ! (26 - 5) ! (2c - 4) ! II,
+( - 1 ) ' + 1 {3X - 2 (6 + l)(« + 3))[
+(s _ 2) ! (s — 2a — 3) ! (26 + 2) ! (2c + 3) !
+r 15 (s + 1) I {s - 2c) I (s — 26 + 2) 1 (s — 2a) 1 (26 - 6) ! (2c - 4) ! TV,
+(_1)
+L (* — 3) I (s - 2c — 2) I (s — 26) I (* — 2a - 4) I (26 + 1) ! (2c + 3) ! J
+
+/
+
+S
+
+]"
+
+f
+
+c
+
+I3
+
+<*
+
+3
+
+Table 9.6. (Cont)
+e = c —2
+(s + 1) 1 (s - 2a) 1 (26 - 5) 1 (2c — 5) 1
+(s — 3) I (s • 2a — 4) ! (26 + 2) i (2c + 2) ! J
+( _ 1 ) f r 6 ( « + l ) l ( i - 2 c ) ( j - 26 + 1) (s - 2a) \ (26 - 6) ! (2c — 5) 1 7/ 2
+(* — 4) I (s — 2a — 5) 1 (26 + 1) 1 (2c + 2)
+
+( _ l ) « + i 2 { 3 X - 4 ( 6 + i)(c + l)}[-
+
+(g _ 2c -f- 6) 1 (g — 26) 1 (26) 1 (2c — 6) 1
+Ar [-1)'
+"~
+L (5 - 2c) ! (5 - 26 - 6) ! (26 + 7) ! (2c + :l ) ! j
+r 6 (5 + 1) (s — 2c + 5) 1 (s — 26) 1 (s - 2a) (26 — 1) 1 (2c — 6) 1 7/,
+(-1)* [_
+(s — 2c) ! (s — 26 — 5) I (26 + 6) 1 (2c + 1)1
+J
+15 (s + 1) 1 (s — 2c + 4) 1 (s — 26) 1 (s — 2a) 1 (26 — 2) 1 (2c — 6) 1 '
+(~1)' (s — 1) I (s — 2c) ! (s — 26 — 4) 1 (s — 2a — 2) ! (26 + 5) 1 (2c + 1)
+' 5 (s + 1) 1 (s - 2c + 3) 1 (s - 26) 1 (s — 2a) 1 (26 — 3) 1 (2c — 6) 1 7A
+(-1)'2
+(5 — 2) ! (s — 2c) 1 (s — 26 — 3) ! (s — 2a — 3) 1 (26 + 4) 1 (2c + 1) !
+f 15 (5 + 1) 1 (s - 2c + 2) 1 (s - 26) 1 (s - 2a) 1 (26 — 4) 1 (2c LLl
+— 6)/!
+s
+' L ( — 3) 1 (s — 2c) ! (« - 26 — 2) 1 (s — 2a — 4) 1 (26 + 3) 1 (2c +
+6 (* + 1) 1 (s — 2c + 1) (s — 26) (s - 2a) I (26 — 5) 1 (2c — 6) 1
+(-!)'
+(S — 4) 1 (5 — 2a - 5) ! (26 + 2) 1 (2c + 1) 1
+(s + 1) 1 (s — 2a) 1 (26 — 6) 1 (2c - 6) .1
+(s — 5) 1 (s — 2a - 6) 1 (26 + 1) 1 (2c + 1) 1
+(
+
+(-!)• [
+
+]"
+
+Table 9.7.
+b bec \
+a
+{ 7/2
+7/2 e / J
+|
+
+r (s + 8) 1 (s - 2 a + 7) 1(26)1 (2c) 1
+L ( ^ + 1 ) U 5 - 2 a ) 1 ( 2 6 + 8)! ( 2 c + 8)
+7 (s + 7) I (s — 2c) (s — 26 + 1) (s — 2a + 6) 1 (26 — 1) 1 (2c) 1 "j1/,
+(-1)* [■
+(5 + 1) 1 (s — 2a) 1 (26 + 7) 1 (2c + 8) 1
+J
+21 (s + 6) 1 (s — 2c) 1 (s — 26 + 2) 1 (s — 2a + 5) 1 (26 — 2) 1 (2c) ! 7
+(« + 1) 1 (s — 2c — 2) 1 (s — 26) 1 (s — 2a) 1 (26 + 6) 1 (2c + 8) ! J
+35 (s + 5) 1 (s - 2c) 1 (5 - 26 + 3) 1 (s — 2a + 4) 1 (26 — 3) 1 (2c) 1 7/2
+(5 + 1) j (S — 2c - 3) 1 (s - 2b) I (s — 2a) ! (26 + 5) I (2c + 8) ! J
+35 (5 + 4) 1 (s — 2c) 1 (5 - 26 + 4) 1 (s — 2a + 3) 1 (26 — 4) 1 (2c) 1 7/,
+(s + 1) 1 (s — 2c — 4) 1 (s — 26) 1 (s — 2a) 1 (26 + 4) 1 (2c + 8) ! J
+21(5 + 3)1 (s — 2 c ) l ( s — 26 + 5) 1 (s — 2a + 2) 1 ( 2 6 - 5 ) 1 (2c) ! 7/1
+(s + 1) 1 (s — 2c — 5) 1 (s — 26) 1 ($ — 2a) 1 (26 + 3) I (2c + 8) !
+]
+
+5-
+
+I
+
+I
+3
+
+e = c + 7/2
+{
+
+3
+
+-}'•
+
+Table 9.7. (Cont.)
+
+(-1)*+1[
+
+6 — 5/2
+
+7 (s + 2) (s — 2c) 1 (s — 26 + 6) 1 (s — 2a + 1) (26 — 6) 1 (2c) ! 7/,
+(, _ 2c — 6) I (5 — 26) ! (26 + 2) I (2c + 8) !
+(s — 2c) 1 (5 — 26 + 7) 1 (26 — 7) 1 (2c) 1
+(, _ 2c — 7) I (* — 26)! (26 + 1) ! (2c + 8)IJ
+
+<-!)• [
+
+6-7/2
+
+e = c + 5/2
+
+/
+6 + 7/2
+6 + 5/2
+6 + 3/2
+6 + 1/2
+6-1/2
+6-3/2
+6 — 5/2
+6-7/2
+
+n.r7(5 +
+{ 1}
+
+7)l(5^-2c + l ) ( 5 - 2 6 ) ( 5 - 2 a + 6 ) l ( 2 6 ) l ( 2 c - l ) n ' A
+(5 + 1) ! (, — 2a) I (26 + 8) I (2c + 7) !
+J
+, nf/7y
+f (5 + 6)1 ( 5 - 2 a + 5) 1(26-1)1 ( 2 c - 1 ) 1 7/,
+(s + l ) l ( t - 2 a ) 1(26 + 7) l(2c + 7) I J
+( _ 1 } (/A-lUcft)^
+J 3 (s + 5) 1 (s — 2c) (5 — 26 + 1) (5 — 2a + 4) f (26 - 2) ! (2c — 1) 1 7/,
+(-l)'+i { 7 X - 2c (36 -5»[
+(, + i) ! (5 — 2a) ! (26 + 6) ! (2c + 7) !
+~
+
+L
+
+-J
+
+6 + 5/2
+
+<o
+
+l_1} ( / A — zc(0-»j)^
+( t + j ) ! ( 5 —2c —2)1(5 —26)! (5 —2a) !(26 + 5) ! (2c + 7) ! J
+, n f + 1 / 7 Y , o ,, , n n r 5 ( 5 + 3 ) l ( i - 2 c ) l ( 5 - 2 6 + 3 ) l ( s - 2 a + 2 ) l ( 2 6 - 4 ) l ( 2 c - l ) n V :
+(-1) (7A + <Jc (6 + y)) [^ (5 + 1} 1 (J _ 2c - 3) ! (5 - 26) ! (5 - 2a) \ (26 + 4) ! (2c + 7) !
+J
+
+i
+
+I
+
+t m / 7 Y ± 9 n r , , o n f 3 (5 + ^ C * - 2 g l i (' - 2 6 + 4) ! (* ~ 2 « + *> <2* ~ 5 > ! < 2 g ^ *> ! 7 A
+I—i) l>* + *c [dt> + Bj) ^
+(S _ 2c — 4) ! (s — 26) ! (26 + 3) I (2c + 7) !
+J
+( - i ) w {7* + 10c (6 + i)) L ( , - 2 c - 5 ) l . ( f - 2 6 ) ! ( 4 6 + . 2 ) l ( 4 c + 7)lJ
+r 7 (5 + 1) (5 - 2c) I (5 - 26 + 6) 1 (s — 2a) (26 - 7) 1 (2c - 1) 1 "T/»
+( 1}
+~
+L
+(5 — 2c — 6) f (5 — 26) ! (26 + 1) ! (2c + 7) I
+J
+
+3
+
+e =» c + 3/2
+
+/
+6 + 7/2
+
+J % ^r21 (5
+
+I""1'
+
+/ nwny
+
++ 6) 1 (5 - 2 c + 2) 1 (*-26) 1 (1 - 2 a + 5) 1 (26) 1 (2c - 2) 1 7/,
+L (# + i ) ! ( t —2c)l ( 5 - 2 6 - 2 ) ! ( 5 - 2 a ) l (26 + 8) !(2c + 6)! J
+
+2fc/Q,
+
++1)(# 26)(g 2a+4)1(26 1)!(2c 2)1 />
+^ r 3 < i + 5 ) 1 < f (5^ +2 c 1)!
+^ ^
+~ 7
+(5 - 2a) ! (26 + 7) ! (2c + 6) !
+
+(-l)t+i {7X - 26 (3c - 5)} [^
+
+6 + 3/2
+
+(5 + l ) t ( 5 - 2 a ) l ( 2 6 + 7)!(2c +
+6 ) l J
+((5 + 4) 1 (5 - 2a + 3) 1 (26 - 2) 1 (2c - 2) 1 7/,
+( - ! ) • « {21 vi _ 6 X (66c - 36 - 3c + 5) + 46c (6c - 116 - lie - 5)} [ * ( +j? {}' ( 7 ^ 2 a ) 1 (26 + 6) 1 (2c + 6) 1
+
+]"
+
+r
+
+6-1/2
+
+15(5 + 3) I (5 - 2c) (5 — 26+1) (s—2a+2) 1 (26—3) 1 (2c-2) 1 7/1
+(—l) f {7-Y*-2^(26c-6 - 9c + 8) - 4c [c(6* + 36 - 4) + 36* + 26 + 2]}[
+(5 + 1) I (5 - 2a) I (26 + 5) ! (2c + 6) 1
+l W'(7V«±8)r/9*,
+t.j.u
+m
+_
+^
+i
+^
+A
+n
+.
+i
+nt-.i
+ir
+.
+ri5(«
++
+2
+)
+(
+«
+- 2 c ) l ( « - 2 6 + 2 ) t ( « - 2 « + 1 ) ( 2 6 - 4 ) l ( 2 c - 2 ) l 7/,
+n
+(-lr + , {7A»+2X(2*e-6+lle—»)—4e{*#»— 6 - . g ) + 36* + 46.f n3J}^
+fr
+— 2c-^H-fr — 2»H ft*-f 4» 1 (2* + 6) 1
+J
+
+6-3/2
+
+( - I ) ' {21X» + 6* (66c - 36 + 9c - 8) + 4c (6 + D {be - 116 + 12c - 6)} [ g Z £ - 3 ) 7 ( ^ ) 1 (26 + 1 ) 1 ( £ + 6) 1 f
+
+6+1/2
+
+O
+
+e = c + 7/2
+
+/
+
+Table 9.7. (Cont.)
+e = c + 3/2
+3 (g + 1) (5 - 2c) 1 (s - 26 + 4) ! (s - 2a) (26 - 6) 1 (2c - 2) 1
+(s — 2c — 4) ! (s — 26) ! (26 + 2) ! (2c + 6) !
+- 2c) 1 (s - 26 + 5) 1 (s — 2a) 1 (26 — 7) 1 (2c - 2) 1 7/,
+— 2c — S) I (s — 26) ! (s — 2a — 2) ! (26 + 1) ! (2c 6)lJ
++
+
+]"
+
+( - l ) ' + i { 7 X + 2(6 + l) ( 3 c - 5 ) } [
+[
+
+}
+
+L(s — l)\(s
+
+c= c+l/2
+8 r 35 (s + 5) ! (s — 2c + 3) 1 (s — 26) 1 (s — 2a + 4) 1 (26) 1 (2c — 3) 17A
+"" 1)4 L (* + 1) Hs — 2c) ! (5 — 26 — 3) I (s — 2a) I (26 + 8) ! (2c + 5) ! J
+5 (s + 4) 1 (s — 2c + 2) 1 (s — 26) 1 (5 — 2a + 3) 1 (26 — 1) 1 (2c — 3) 1
+( — l ) * { 7 X - 2 6 ( c -8)}[
+(s + 1) I (s — 2c) \ (s — 26 — 2) I (s — 2a) ! (26 + 7) ! (2c + 5) I
+(_!)» (7X 2 _ 2X (26c — 96 — c + 8) — 46 [6 (c2 + 3c — 4) + 3c2 + 2c + 2}X
+r 15 (s + 3) 1 (5 — 2c + 1) (s — 26) (s - 2a + 2) 1 (26 — 2) 1 (2c — 3)fit 1
+X
+L
+(s + 1) I (s — 2a) I (26 + 6) ! (2c + 5) !
+2
+2
+( - 1 ) ' { 3 5 X 3 - 1 0 X 2 (36c - 3 6 - 3 c + 1 7 ) - 2 0 X ( 3 6 2 c 2 - 662c + 66c2 — 262 — 2c2 + 6 + c — 6) + 86c (362c2 + 362c + 36c2 ■ . 66 — 6c +
+(s + 2) (s — 2a + 1) (26 — 3) 1 (2c — 3) 1 7/i
+136c+ 196 + 1 9 c + 22)}
+(26 + 5) ! (2c + 5) !
+(~1)* +1 {35X3 + 1 0 x 2 (36c - 36 + 6c — 20) - 20X (362c2 + 662c — 262 - 5c2 + 126c - 56 + 7c — 9) — 8 (6 + 1) c (362c2 + 36 2 c + 36c2
+n
+(s — 2c) (s — 2b + 1) (26 —_4) ! (2c - 3) ! 7/i
+— 662 — 6c2 — 76c — 316 +9 c - 3 ) } [ (26 + 4) ! (2c + 5) !
+(-1)* {7X2 + 2X (26c - 96 + 3c - 17) - 4 (6 + 1) [6 (c2 + 3c - 4) - 2c2 - c - 6 ] } X
+' 15 (s + 1) (s - 2c) 1 (s — 26 + 2) 1 (s — 2a) (26 - 5) 1 (2c — 3) !
+X
+(S — 2c — 2) ! (s — 26) ! (26 + 3) ! (2c + 5) !
+p 5Q(S + 1) 1 (S — 2c) 1 (s - 26 + 3) 1 (s — 2a) ! (26• 6) ! (2c - 3) !
+(_-l)«+i {7X + 2 (6 + 1) (c - 8)} [ ( 5 _ _ 1 ) | ( s _ 2 c - 3 ) I ( s - 2 6 ) l ( s - 2 a - 2 ) ! ( 2 6 + 2)!(2c + 5 ) !
+r 35 (S _j_ j) j (S — 2c) 1 (s — 26 + 4) 1 (s - 2a) 1 (26 — 7) 1 (2c - 3) 1 7/i
+(
+-2)\(s — 2c — 4) ! (s — 26) ! (s — 2a - 3) ! (26 + 1) ! (2c + 5) ! J
+(
+
+]'•
+
+■"I
+
+e= c-l/2
+
+(-1)'
+
+35 (S -j, 4) 1 (s — 2c + 4) 1 (s — 26) 1 (s — 2a + 3) 1 (26) 1 (2c —
+LT4)A 1
+(s + 1) I (s — 2c) I (s — 26 — 4) I (s ~ 2a) I (26 + 8) I (2c + 4) I
+
+4U+1/7F.L9A/ _i_
+
+r
+
+f 5 (* + 3) 1 ( * - 2 c + 3) l ( t - 26) I (> - 2a + 2) I (26 - 1) 1 (2c - 4) 1
+( 5 + 1 } j ( s _ 2 c J j ( f _ 26 — 3) I (* — 2a) ! (26 + 7) ! (2c + 4) !
+
+nn
+f—l\«+i
+1)
+(/A -+- ZG (c 4- y)) [^
+
+(—1) ,+1 {7X* + 2X (26c + 116 - c - 9) — 46 [6 (c* - c - 6) + 3ca + 4c + 3]} X
+15 (s + 2) (s — 2c + 2) \ (s — 26) 1 (s — 2a + 1) (26 — 2) 1 (2c — 4) I
+X
+(s — 2c) 1 (s — 26 — 2) ! (26 + 6) I (2c + 4) !
+
+T
+
+3
+
+8.
+
+9
+
+Table 9.7. (Cont.)
+e = c — 1/2
+
+f
+
+( - l ) * + l {35A'3 + 1 0 X 2 (36c + 66 - 3c — 20) — 20AT (362c2 + 66c2 — 56* — 2c2 + 126c + 76 — 5c — 9) — 86 (c + 1) (362c2 + 362c + 36c2 —
+fir2
+
+M
+
+6+1/2
+
+7 6 , 4-Q6
+
+<H,
+
+„n[
+
+_ 662 - 6c2 - 76c + 96 - 31c - 3)} ^
+
+(* ~ 2c + I) (s - 2b) (2b - 3) \ (2c - 4) \ ITU
+
+(26 + 5) ! (2c + 4) !
+
+J
+
+(-1)* + 1 (35A'3 _ 10A '2 ( 3 6 c + 66 + 6c + 26) - 20X (362c2 - 562 - 5ca — 126c — 176 - 17c - 21) + 8 (6 + 1) (c + 1) (362c2 + 362c + 36c2 -
+
+- ,. - e- + ,». - „. - a. - ,s„ [ " + " V+i)U^')'f "4'' I"
+
+6— 1/2
+
+( - 1 ) * {IX2 - 2X (26c + 116 + 3c + 20) - 4 (6 + 1) [6 (c2 — c - 6) - 2ca — 5c - 9]} X
+[~ 15 (s + 1) 1 (s — 2c) (s - 26 + 1) (s — 2a) 1 (26 — 5) 1 (2c - 4) 1 7/»
+X
+L
+(* —1) 1(« —2a — 2) I ( 2 6 + 3 ) ! ( 2 c + 4 ) 1
+J
+
+b - 3/2
+
+b - 5/2
+6 — 7/2
+
+,
+{
+
+n,+i,7y
+2fh l i w . - i - n n T 5(* + l ) K * —2e)l ( 5 - 2 6 + 2) 1 (# — 2a) 1 (26 — 6) 1 (2e — 4) I IV,
+i)
+{iA - z ^ -f- i) (c -f- yj) [ ( , _ 2 ) ! (f — 2c — 2) I (* — 26) I (5 - 2a - 3) ! (26 + 2) ! (2c + 4) I J
+r 35 (s + 1) 1 (s — 2c) 1 (s — 26 + 3) I {s — 2a) 1 (26 — 7) 1 (2c — 4) 1 7/,
+( *) L (s — 3) ! (s — 2c - 3) ! (s — 26) ! (s — 2a - 4) ! (26 + 1) ! (2c + 4) I J
+
+f
+
+/
+
+e = c - 3/2
+
+3
+
+5) t 7/a
+(-I)' [ (5 + 1) I (s — 2c) ! (s — 26 — 5) ! (s — 2a) 1 (26 + 8) I (2c-■3)1
++ i J
+
+21 (s + 3) 1 (s - 2c + 5) 1 (s — 26) 1 (5 — 2a + 2) 1 (26) 1 (2c
+
+8
+
+6 + 7/2
+
+3 (5 + 2) (s — 2c + 4) I (s — 26) 1 (s — 2a + 1) (26 — 1) 1 (2c — 5) 1 7/»
+(s — 2c) ! (* — 26 — 4) ! (26 + 7) I (2c + 3) !
+J
+r (s — 2c + 3) 1 Is — 26) 1 (26 — 2)! (2c — 5) i 7/,
+(-l)M21X» + 6X(6frc + 9 6 - 3 c - 8 ) + 4 6 f c ^
+
+i
+I
+
+6 + 5/2
+6 + 3/2
+6 + 1/2
+
+6 - 1/2
+6 - 3/2
+6 - 5/2
+6 — 7/2
+
+( - l ) ' { 7 * + 26(3c + 8)}[
+
+( - 1 ) ' {7X* + 2X (26c + 36 - 9c - 17) - 4 (c + 1) [c (6» + 36 - 4) - 262 + 6 - 6]} X
+15 (s + 1) (s — 2c + 2) 1 (s - 26) 1 (s — 2a) (26 — 3) 1 (2c — 5) 7,
+!
+X
+(* — 2c)I (* — 26 — 2) I (26 + 5) t (2c + 3 ) I
+(—1)' {7** — 2X (26c + 36 + lie +20) —4 (c + 1) [c (6* — 6 — 6) — 26* — 56 - 9]} X
+15 (s + 1) I (s - 2c + 1) (1 - 26) (1 — 2a) 1 (26 - 4) 1 (2c - 5) 1 7/,
+X J
+(* — 1) ! (s — 2a — 2) I (26 + 4) I (2c + 3) !
+2a) 1 (26 - 5) 1 ( 2 c ~ 5) 1
+( - 1 ) ' (21X 2 - 6X (66c + 96 + 9c + 17) + 4 (6 + 1) (c + 1) (6c + 126 + 12c + 18)} [ ^ l ^ f r _ 2 a ^ 3) I (26 + 3) I (2c + 3) !
+• 3 (s + 1) 1 (s — 2c) (s — 2b + 1) (s — 2a) 1 (26 — 6) 1 (2c - 5) 1 7/,
+( - ! ) • « <7* - 2 (6 + 1) (3c + 8)} [1
+( , - 3 ) l ( — 2 — - 4 ) 1 ( 2 6 + 2) I (2c + 3) I
+
+■r
+
+(
+
+f 21 (s + 1) 1 (5 — 2c) 1 (s — 26 + 2) 1 (s — 2a) 1 (26 — 7) I (2c — 5) I 7/,
+~~ 1)# L(* ~ *) ! (s — 2c — 2) I (s — 26) I (s — 2a — 5) ! (26 + 1) I (2c + 3) I J
+
+/
+6 + 7/2
+
+T
+
+[
+
+e = c — 5/2
+1
+
+'
+
+r7(* + 2 ) ( s - 2 c + 6 ) ! ( « - 2 6 ) l ( « - 2 a + l)(26)l(2c
+I
+(* - 2c)! (s - 26 - 6) I (26 + 8)! (2c + 2) !
+
+r
+
+6) ! T/,
+
+J"
+
+3
+
+Table 9.7. (Cont.)
+e = c — 5/2
+r
+
+(S -2c
+
++ 5)! (s - 2 6 ) ! (26 - 1) ! ( 2 c - 6 ) ! 7/ 2
+
+(-!)•« {IX + 106(c + 1)} [ ( ^ 2 c ) 7 ( / _ , 2 6 _ 5 ) | \ 2 b + 7 ; ) ! ( 2 c + 2 ) 1 J
+(^l)«+i{7X + 2 ( 3 6 ~ 5 ) ( c +
+
+.,»[
+
+r
+
+3 (s + 1) (s — 2c + 4) 1 (s - 26) 1 (5 — 2a) (26 - 2) ! (2c - 6) i 7/,
+(s — 2c) I (s — 26 — 4) ! (26 + 6) ! (2c + 2) !
+
+i u>»nYMO,h
+m / . - u m f 5(» + D I ( « - 2 c + 3) I ( « - » ) I ( « - 2 a ) ! ( 2 6 - 3 ) 1 ( 2 c - 6 ) I 7/,
+( - 1 ) + {7X + 2 (6 - 8) (c + 1)} [_ ( s _ j) ( ( s _ 2c) \ (s _ 26 - 3) ! (s - 2a - 2) ! (26 + 5) ! (2c + 2) ! J
+( - ! ) • « {7* - 2 (6 + 9) (c + 1)}
+
+5 (s + 1 ) I (s — 2e + 2)1 (s — 26) 1 (s — 2a) I (26 — 4) ! (2c— 6) 1 ~tl,
+
+L ( » - 2 ) i (s — 2c) ! (s — 26 — 2) ! (s — 2a — 3) ! (26-f 4) ! (2c+2)
+
+\J
+
+3 (s + 1) 1 (s — 2c + 1) (s — 26) (s — 2a) 1 (26 — 5) I (2c — 6) ! 7A
+( - l ) * + 1 { 7 X - 2 ( 3 6 + 8)(c + .»[■
+(s — 3) I (* — 2a — 4) ! (26 + 3) ! (2c + 2) !
+
+]"
+
+(-1)'+1{7A:-10(6+I)(c +
+
+(-«■[•*
+
+r
+
+((ss + 1) 1 (s - 2a) ! (26 — 6) ! (2c - 6) I
+4) ! (s — 2a — 5) ! (26 + 2) ! (2c + 2)
+
+■]"
+
+(g + l ) l ( i - 2c) (s — 26 + 1) (s — 2a) ! (26 — 7) 1 (2c - 6) 1 7/»
+(, —5) I. (, - 2a - 6) ! (26 + 1) ! (2c + 2) I
+J
+
+£
+3
+
+>0
+
+■7/2
+
+(s _ 2c + 7) 1 (s — 26) I (26) 1 (2c — 7) 1
+(
+~ i r L (s — 2c) ! (5 - 26 — 7) ! (26 + 8) ! (2c + 1) !
+7 (s + 1) (s - 2c + 6) 1 (s — 26) ! (s — 2a) (26 — 1) 1 (2c — 7) 17
+(-1)'
+(s — 2c) \ (s - 26 — 6) I (26 + 7) I (2c + 1) !
+J
+21 (s + 1) ! (s — 2c + 5) 1 (s — 2b) 1 (s — 2a) ! (26 - 2) ! (2c — 7) !
+8
+(-1) [- s — l)\(s — 2c) ! (s — 26 — 5) ! (s — 2a — 2) ! (26 + 6) ! (2c + 1)■]"
+!
+- 7)1A! ~]72
+' r 35 (s
+Q + 1) 1 (s — 2c + 4) 1 (s — 26) ! (s — 2a) 1 (26 - 3) 1 (2c7)1
+( — 1 ) l(s — 2) ! (s —2c) !(s —26 —4) ! (s — 2a — 3) ! (26 + 5) ! (2c + 1)U
+35 (5 + 1) ! (* — 2c + 3) I (s — 26) ! (s — 2a) ! (26 - 4) ! (2c — 7) ! 1lA
+( 1)
+~ ' [ (s — 3) ! (s — 2c) ! (s — 26 — 3) ! (s — 2a — 4) ! (26 + 4) ! (2c + 1) !
+P 21 (s + 1) 1 (s - 2c + 2) 1 (s - 26) ! (s — 2a) 1 (26 - 5) 1 (2c - 7) i
+(""1)* L (s — 4) ! (* — 2c) ! (s — 26 — 2) ! (s — 2a — 5) ! (26 + 3) ! (2c + 1)
+" 7 (* + 1) I (* — 2c + 1) (* — 26) (s — 2a) 1 (26 — 6) ! (2c — 7) ! 7/,
+(s — 5) ! (s - 2a - 6) I (26 + 2) 1 (2c + 1) !
+(8 -f 1) ! (« - 2a) ! (26 - 7) ! (2c - 7) !
+2
+(-!)'[■ (s - 6) ! (s - 2a - 7) ! (26 + 1) ! (2c + Jl ) !7/
+j
+
+■*[■£
+
+rf
+
+[
+
+■]'
+
+[-
+
+rl"
+
+-!)•[-
+
+r
+
+9
+*3
+
+Table 9.8.
+j a b c1
+
+14 e / /
+/
+
+e= c + 4
+,
+
+f (* + 9) l ( * - 2 a + 8) 1(26)1 (2c) 1 7/,
+L (* + 1) I (• - 2a) 1 (26 + 9) ! (2c + 9) ! J
+2 (5 + 8) 1 (s - 2c) (t - 26 + 1) (s - 2a + 7) 1 (26 - 1) 1 (2c) 1
+(-!)•+* 2
+(S + i) I (s — 2a) ! (26 + 8) I (2c + 9) !
+, . , . „ n ( « + 7 ) l ( « - 2 c ) l ( « - 2 t + 2)l(«-2q-|-6)l(26-2)l(2c)t-V/,
+V ' L (» + l ) l ( « - 2 c - 2 ) ! ( f - 2 6 ) l ( « - 2 « ) l ( 2 * + 7)l(2c + 9)! J
+ri4(« + 6 ) l ( » - 2 c ) l ( « - 2 6 + 3 ) l ( » - 2 a + 5 ) l ( 2 f c - 3 ) l ( 2 c ) ! 7 / ;
+1
+'
+L ( * + l ) M » — 2 c - 3 ) ! ( « — 26) I ( » - 2 « ) 1(26+ 6) I (2c+ 9)! J
+70 (5 + 5) 1 (s — 2c) t (s - 26 + 4) f (5 - 2a + 4) 1 (26 - 4) ! (2c) ! 7/,
+(5 + 1) ! (# — 2c — 4) I (* — 26) ! (* — 2a) ! (26 + 5) ! (2c + 9) !
+ri4(5 + 4 ) l ( . - 2 c ) l ( f - 2 6 + 5 ) l ( « - 2 a + 3 ) l ( 2 6 - 5 ) l ( 2 c ) l
+l)
+L (« + 1) ! (* — 2c — 5) ! (t — 26) ! (f — 2a) 1 (26 + 4) ! (2c + 9) !
+7 (s + 3) 1 (5 — 2c) ! (5 — 26 + 6) 1 (s - 2a + 2) 1 (26 - 6) ! (2c) !
+M)'2[- (* + 1) ! (5 — 2c — 6) ! (s — 26) ! (s — 2a) ! (26 + 3) ! (2c + 9) I
+(-!)•+" 2[-2 (5 + 2)((s_-- 2c2c)—1 7)(s !- (s26- +26)7)!1(26(s +—2)2a! +(2c1)+(269)-! 7) 1 (2c) 1
+5
+r ( * - 2 c ) l ( s - 2 6 + 8 ) l ( 2 6 - 8 ) l ( 2 c ) l 7A
+{ l)
+~
+L (* — 2c — 8) I (1 — 26) ! (26 + 1) ! (2c + 9) ! J
+
+6+4
+
+{
+
+n.
+1}
+
+]'■
+
+6-f3
+6+ 2
+6+ 1
+
+-»•[
+
+b
+6-1
+
+I"
+
+J"
+i"
+
+6-2
+6-3
+6-4
+/
+
+, _ , . r 2 (s + 8) 1 (5 - 2 c + l ) ( i - 2 6 ) (5 -2a + 7) 1(26)1 (2c - 1 ) 1 7 / ,
+~~1} ZL
+(* + l ) l ( t - 2 a ) I ( 2 6 + 9)l(2c + 8)l
+J
+( + 7) 1 (t — 2a + 6) I (26 - 1) 1 (2c - 1) 1 7/»
+(-l)'+14{2X-36c}[ f
+(* + 1) ! (t — 2a) ! (26 + 8) I (2c + 8) I J
+4
+6> - 2c) (5 - 26 + 1) (5 - 2a + 5) 1 (26 - 2) 1 (2c - 1) ! 7/»
+C
+l
+Ti
+2a) 1 (26 + 7) 1 (2c + 8) I
+J
+
+6+ 2
+
+(-.)-2(2^- (a-3 r[' " + '"- „„
+
+6+ 1
+
+(
+
+6-2
+
+«,
+^
+
+{
+
+6+ 3
+
+6-1
+
+8
+
+c= c+ 3
+
+6+ 4
+
+6
+
+£>
+
+W+IA»Y
+
+<-i)
+
+wfc
+
+-.n f 7 <5 + 5> ' ( ' ~ 2 c ) I (^ — 26 + 2) 1(5 - 2 a + 4 ) 1 ( 2 6 - 3) 1 (2c - 1) !
+
+]'•
+
+4 {*& - c (6 - &)) ^ ( , + !) j (, _ 2c - 2) 1 (f - 26) I (* - 2a) 1 (26 + 6) I (2c + 8) I
+35 (s + 4) 1 (s - 2c) 1 (s - 26 + 3) 1 (s - 2a + 3) 1 (26 -- 4) 1 (2c - 1) 1 7/»
+(-l)«4<X + 3c}[
+(i + 1) ! (« _ 2c — 3) ! (t — 26) ! (t — 2a) ! (26 + 5) 1 (2c + 8) 1 J
+7 (, + 3) j ( t _ 2c) 1 (s - 26 + 4) 1 (s - 2a + 2) 1 (26 — 5) 1 (2c - 1) 1 7/,
+( - ! ) • « 4 {2* + c (6 + 6)} [- (* + i) f (» _ 2c - 4) t f* - 26) 1 (* - 2a) f f f f r + 4) f (2c + 8 ) !
+J
+14 (s + 2) (1 - 2c) 1 (5 - 26 + 5) 1 (s - 2a + 1) (26 - 6) 1 (2c - 1) 1 T/»
+(-l)*2{2A' + c(26 + 5)}[(* — 2c — 5) I (* — 26) I (26 + 3) I (2c + 8 ) 1
+J
+
+Table 9.8. (Cont.)
+6= C+ 3
+
+(-1)'2[
+
+— 2c) I (s - 26 + 6) ! (26 - 7) ! (2c - 1) !
+
+" > [ ^ 2c - 6) ! (s — 26) ! (26 + 2) ! (2c + 8) !T
+2 (s 4- 1) (s — 2c) 1 (s — 26 + 7) 1 (* — 2a) (26 - 8) ! (2c - 1) ! 7A
+
+( - ! ) • + ! 4 {2X + 3c (6 +
+
+(S _ 2c — 7) ! (5 — 26) ! (26 + 1) ! (2c + 8) !
+
+J
+
+e= c+ 2
+/
+
+„[ Us + 1) \ (s -2c + 2) \ (s -2b) \ (s -2a + 6) \ (2b) \ (2c -2) 111*
+L (s + l)\(s — 2c)\(s — 2b — 2)\(s — 2a) ! (26 + 9) ! (2c + 7) ! J
+f 14 (s + 6) 1 (s - 2c + 1) (s — 26) (s - 2a + 5) 1(26 - \) \ (2c - 2) ! TA
+(—1)«2{2X — 6(2c- 3
+{
+
+u .
+}
+
+■ "L
+
+(* + 1) ! (« ~ 2a) ! (26 + 8) ! (2c + 7) !
+
+(-1)* 2 {14X2 - IX (46c - 26 - 2 c + 3) + 46c (26c - 8 6 -8c
+
+(-l)-2(7A'2 +
+
+J
+
+r (s + 5) ! (s
+— 2a + 4); ! l(26 — 2) !K(2c —
+- 2)2) 1! 7/ a
+- 3 ) } I ■ ($
+^ + ' 1)V! (s — 2a)
+' ! (26 + 7) !' (2c + 7) } '
+
+7)!
+
+J
+
+(_l)«+i 2 {14X2 - IX (26c - 6 — 6c + 5) — 2c [2c (6 — 1) (6 + 10) + 1362 + 56 + 10]} X
+r 2(s + 4)\(s — 2c) (s — 26 + 1) (s — 2a + 3) 1 (26 — 3) ! (2c - 2) ! "IV,
+X
+L
+(s + 1) !(s —2a) ! (26 + 6) ! (2c + 7) !
+J
+r 10 (s + 3) ! (s — 2c) !\(s(s —
+— 2b
+26 ++ 2)\(s2) ! (s - 2a
+2a++ 2)2)! !(26
+(26—
+—4)4)! (2c
+! (2c——2)2)! 17,
+!
+7 X ( 4 c - 3 ) - 4 6 c ( 6 + l ) ( c + 3) + 1 8 c ( 2 c - l ) } [
+\ ^ + {} ^ _ ^ ^ 2 ) , ( , ^ ^ ^ _ 2fl) , ^ {+ &) , ( ^ ^ 7 ) ,
+j
+
+(_l)«+i 2 {14X2 + 7X (26c — 6 + 8c — 6) — 2c [2c (6 + 2) (6 — 9) + 1362 + 216 + 18]} X
+" 2 (s + 2) (* - 2c) ! (5 — 26 + 3)J_(* — 2a + 1) (26 — 5) ! (2c — 2) ! "17,
+X j
+(» _ 2c — 3) I (* — 26) ! (26 + 4) ! (2c + 7) !
+f~ (s — 2c) ! (5 — 26 + 4) ! (26 — 6) ! (2c — 2) ! 17*
+2
+(-1)^ 2 {14X + IX (Abe - 26 + 6c - 5) + 4c (6 + 1) (26c - 86 + 10c - 5)} [ j f _ J J ^ , ( , J ^ , ^ + 3 j , ^ + ? j | '
+
+[
+
+T
+
+r 14 (s + 1) (s — 2c) ! (5 — 26 + 5) ! (s — 2a) (26 — 7) ! (2c — 2) ! 17,
+(—!)•+! 2 {2X + ( 6 + 1 ) (2c - 3 ) } I- V ^ M
+~
+X_J_A
+LL
+L_L
+J I
+(* - 2c — 5) ! (s — 26) ! (26 + 2) ! (2c + 7) !
+T 7 (s + 1) 1 (s - 2c) 1 (. - 26 + 6) ! (s - 2a) ! (26 - 8) ! (2c - 2) !
+I 1) * [_ (S _ i) | (S _ 2c - 6) ! (s — 26) ! (s -2a2) ! (26 + 1) ! (2c + 7)
+
+rl"
+
+:C + 1
+14 (s + 6) ! (s — 2c + 3) 1 (s — 26) 1 (s — 2a + 5) 1 (26) 1 (2c — 3) 1 "]7i
+(s + 1)! (s — 2c)\(s — 2 6 - 3 ) ! (5 - 2a) ! (26 + 9) ! (2c + 6) ! J
+7 (s + 5) ! (s - 2c + 2) ! (s - 26) ! (* - 2a + 4) 1 (26 - 1) ! (2c - 3) ! 7/i
+-l)«+i 4 {2X - 6 (c - 5)} ^ ( 5 + 1} , ( s _ 2c) ! (s — 26 — 2) ! (s — 2a) ! (26 + 8) ! (2c + 6) !
+(-1)^2
+
+(_l)«+i 2 (14X2 - 7X (26c - 66 - c + 5) - 26 [26 (c - 1) (c + 10) + 13c2 + 5c + 10]} X
+• 2 (s + 4) 1 (s - 2c + 1) (*.- 26) (s - 2a + 3) ! (26 — 2) 1 (2c — 3) 1 17»
+X
+(5 + 1)! ( s - 2 a ) ! (26 + 7) ! ( 2 c + 6) !
+J
+
+Table 9.8. (Cont.)
+
+OJ
+
+C==C-f 1
+
+(-1)»+* 4 {14A*3 — 7A2 (36C - 36 - 3c + 11) — 2X (662c2 + 3362c + 336c2 — 186c - 1162 - lie 2 + 136 + 13c - 30) + 46c (362c2 + 662c ^
+r (S + 3) ! (s — 2a + 2) ! (26 — 3) ! (2c - 3) ! 7/:
++ 66c2 + 56c - 962 _ 9 c 2 + 1 7 6 + 1 7 c + 2 0 )} [ V (s + i} , ($ _ 2a) 1 (26 + 6) ! (2c + (i) ! J
+(-1)* 4 {7 A'3 + 7 A2 (3c - 7) — 2A" (662c2 + 1262c + 66c* 4- 126c — 462 — 19c2 — 46 + 32c — 27) - 4c (362c2 - 62c + 36c2 - be - 1G62 r 5 ( . + 2)(^-2c)(5-26 + l ) ( ^ 2 a + l)(26-4)!(2c-3)!-lVa
+- 6c2 - 166 + 9c - 3)} [
+(26 + 5)!(2c + 6 ) !
+J
+(_l)«+i 4 (14A3 -f 7A2 (36c - 36 + 6c - 14) - 2X (662c2 + 3362c - 216c2 + 846c - 1162 - 3Sc2 - 356 + 61c - 54) - 4c (b + 1) (36V2 f
+T (s — 2c) ! (s — 26 + 2) ! (26 - 5) ! (2c - 3) ! li,
++ Qb*c + 76c - 962 _ 12c « _ 356 + 18c - 6)} [ ( 5 _ 2 c - 2) ! (s - 26) ! (26 + 4) ! (2c + 0) U
+( - 1 ) ' 2 {14A2 + IX (26c - 66 + 3c - 11) - 2 (6 + 1) 126 (c - 1) (c + 10) - l i e 2 + 13c - 30]} X
+-2(s + l) [s — 2c) 1 {s - 26 + 3) ! (s - 2a) ( 2 6 - 6) ! (2c — 3) ! "\l*
+(s - 2c - 3) I (s - 26) ! (26 + 3) ! (2c + 6) I
+X
+r 7 (s + 1) 1 (s - 2c) 1 (5 - 26 + 4) ! (s - 2a) 1 (26 - 7) ! (2c - 3) ! 1U
+( - 1 ) , + 1 4 {2 A + (6 + 1) (c - 5)} L (, _ i) | (, - 2c - 4) ! (* - 26) ! (s - 2a - 2) ! (26 + 2) ! (2c + 6) I J
+
+'-J
+
+<o
+
+14 (5 -f 1) 1 (s - 2c) I (s - 26 + 5) I (8 - 2a) ! (26 - 8) 1 (2c - 3) 1 7/»
+
+M)'2[ (, _ 2) I (s - 2c - 5) I (s - 26) I (s - 2a - 3) ! (26 + 1) ! (2c + 6) t •]'
+
+o
+
+e= c
+
+(—1)*2{7A: 2 +7X(46
+
+r 70 (s + 5) 1 (s - 2c + 4) 1 (s - 26) 1 (s - 2a + 4) ! (26) ! (2c - 4) ! -j'/,
+( - 1 ) ' L (* + 1) I (» - 2c) ! (* - 26 - 4) ! (* - 2a) ! (26 + 9) ! (2c + 5) ! J
+' 35 (f + 4) I (f - 2c + 3) 1 (t - 26) 1 (* - 2a + 3) 1 ( 2 6 - 1 ) 1 (2c - 4) ! "]■/«
+- (, + 1) | (, _ 2c) ! (* - 26 — 3) I (« - 2 a ) ! (26 + 8) ! (2c + 5) I J
+r 10 (s + 3) ! (« — 2c + 2) 1 (s - 26) ! (s - la + 2) 1 (26 - 2) ! (2c - 4) ! -?/,
+3) - 46c (6 + 3) (c + 1) + 186 (26 - 1)} ^
+( s + 1) ! (s _ 2c) ! (s - 26 - 2) ! (s - 2a) ! (26 \- 7) ! (2c + 5) !
+J
+
+( - 1 ) ' 4 {7A-* + 7X 2 (36 - 7) - 2A (66V + 662c + 126c3 + 126c - 196* - 4c2 + 326 - 4c - 27) - 46 (36V + 36*c - 6c2 - 6c - G62 - lGc2 +
+r5(« + 2 ) ( * - 2 c + l ) ( s - 2 6 ) ( s - 2 « + l)(26-3)!(2c-4)!-]'/:
++ 9 6 ~ 1 6 c - 3 )} [
+(26 + 6) ! (2c + 5) !
+J
+( - 1 ) * 2 {35AT* - 350X* - 20X2 [66 (6 + 1) c (c -f 1) - 56 (6 + 1) - 5c (c + 1) - 39] + 40X [176 (6 -|- 1) c (c + 1) - (i6 (6 -|- 1) r (26 - 4) ! (2c - 4) I 1'A
+_ 6c (c + 1) - 9] + 246 (6 + 1) e (c + 1) [26 (6 + 1) c (c + 1) - 46 (6 + 1) - 4c (c + 1) - 27J) [_ (26 + 5) ! (2c + 5) ! J
+(_i)«+i 4 {7X? _ 7X2 (36 + 10) - 2X (662c2 + 662c - 1962 - 10c2 - 706 - 10c — 78) + 4 (6 + 1) (36V- -|- 362c -|- 76c2 + 76c - 062 - 12c2 r 5 (s + 1) (s - 2c) (» - 26 + 1) (t - 2a) (26 - 5) ! (2c - 4) 1 lh
+- 216 - 12c - 18)} ^
+(26 + 4 ) ! ( 2 c + 5 ) !
+J
+( - ! ) • 2 {7X> - IX (46 + 7) - 4 (6 + 1) (b - 2) c (c + 1) + 18 (6 + 1) (26 + 3)} X
+f 10
+10 (s
+0 + 1) i (s - 2c) 1 (s - 26 + 2) 1 (s - 2a) I (26 - 6) ! (2c - 4) 1
+1) ! (* - 2c - 2) I (s - 26) I ($ - 2a - 2) I (26 + 3) ! (2c -|- 5) !
+X
+
+Le-
+
+■1"
+
+3
+
+Table 9.8 (Cont.)
+e= c
+
+/ nmA/v
+n , j , m r 35(g + l ) l ( g - 2 c ) l ( g - 2 6 + 3 ) l ( g - 2 a ) l ( 2 6 - 7 ) l ( 2 c - 4 ) i T>
+<_!, 4 ( A - d <& -f- l ) ; ^ ( 5 __ 2 ) 1 (g - 2c - 3) 1 (g - 26) ! (s - 2a - 3) I (26 + 2) ! (2c + 5) ! J
+n . T 70 (* + 1) 1 (* - 2c) i (g - 26 + 4) 1 (g - 2a) ! (26 — 8) 1 (2c - 4) 1 7/ 2
+t-" 1 ' L (s - 3) I (* - 2c - 4) I (s - 26) ! (g — 2a - 4) ! (26 + 1) ! (2c + 5) ! J
+
+e= c—1
+
+I
+
+^
+
+Z
+
+f 14 (g + 4) 1 (s - 2c + 5) 1 (s —2d) 1 (g - 2a + 3) 1 (26) 1 (2c - 5) ! 7/2
+L (g + 1) !(g —2c) ! ( g - 2 6 - 5 ) !(g —2a) 1(26 + 9) !(2c + 4) ! J
+
+(_l)«+i4(2X + 6(c +
+
+6»[
+
+7 (* + 3) 1 (* - 2c + 4) 1 (s — 26) ! (s - 2a -+- 2) ! (26 — 1) ! (2c - 5) ! 7/ 2
+(g + 1) ! (s - 2c) ! (s - 26 — 4) ! (s - 2a) ! (26 + 8) ! (2c + 4) !
+
+o
+
+(-l)»+i (14X2 + 7X (26c + 86 - c - 6) - 26 [26 (c + 2) (c - 9) + 13c2 + 21c + 18]} X
+■ 2 (g + 2) (g — 2c + 3) 1 (g - 26) 1 (s - 2a + 1) (26 — 2) 1 (2c - 5) 1 7/,
+X
+(g — 2c) ! (5 — 26 — 3) 1(26 + 7) ! (2c + 4 ) !
+J
+-l)"- 1 4 (14X3 + 7X2 (36c + 66 - 3c — 14)
+
+2X (662c2 — 2162c + 336c2 + 846c — 3862 — l i e 2 + 646 - 35c - 54) — 46 (c
+
++ 66c2 + 76c — 1262 — 9c2 -f 186
+
+2 2
+
+2
+
+(
+
+1) (362c2 +
+
+2c 2)! {s 2b)! 26 3 ) ! (2c 5 { i / 2
+
+*
+
+m r * ~~
+
++
+
+-
+
+< -
+
+- >i
+
+Dc
+
+°i) L (5 _ 2c) ! (g - 26 - 2) ! (26 + 6) ! (2c + 4) ! J
+
+2
+
+l)»+i 4 (7X3 _ 7X2 ( 3 c + io) _ 2 X (66 c + 66c — 106 — 19c2 — 106 — 70c — 78) -f 4 (c + 1) (362c2 + 762c + 36c2 + 76c - 1262 —
+fi,« i0h
++
+l)(s--2c+l)(s--2b)(s--2a)(2b-4)\(2c-S)\ll2
+9ir
+i^[5(s
+_ 6c2 - 126 - 21c - 18)} L
+(26 + 5)!(2c + 4)I
+J
+2
+2 2
+2
+2
+2
+2
+(—i)»+i 4 (14X3 - 7X (36c + 66 + 6c + 20) — 2X (66 c — 216 c - 216c — 1266c — 386 - 38c - 1406 — 140c - 156) -f
+
++ M> + m. + .)(3 t v-, te - 12t .- 12l .-« t -4 2 ,-3 6)) [ ( /:|,;''!i7/:»^-|»;'f; 27 ^ ) ,]'(-1)* 2 (14X2 - 7X (2bc + 86 + 3c + 14) - 2 (6 + 1) [26 (c + 2) (c - 9) - l i e 2 - 35c - 54]} X
+I" 2 (s + 1) 1 (s — 2c) (s — 26 + 1) (s — 2a) 1 (26 — 6) 1 (2c — 5) ! 7/2
+
+X
+
+(s — 2) ! (s — 2a — 3) ! (26 + 3) ! (2c + 4) !
+
+_ r r
+
+J
+
+n.+u/9y
+, m r 7(* + 1 ) 1 ( * - 2 c ) l ( g - 2 6 + 2)l(g-2a)l (26-7)1
+f M j W ,
+{ ^ i r i 4 { 2 X - ( 6 + l ) ( c + 6 ) } | _ ( 5 _ 3 ) U ^ 2 c _ 2 ) U s _ 2 6 ) 1 ( 5 _ 2 a _ 4 ) { ( 2 6 + 2)!
+/
+
+14(g + l ) l ( g - 2 c ) l ( g - 2 6 + 3 ) l ( g - 2 a ) l ( 2 6 - 8 ) l ( 2 c - 5 ) l 7/,
+n . ^ r
+( *) ^ L ( s - 4 ) ! ( g - 2 c - 3 ) ! ( g - 2 6 ) ! (g - 2a - 5) 1 ( 2 6 + 1 ) I ( 2 c + 4)! J
+
+9
+IS
+
+Table 9.8. (Cont.)
+c = c —2
+
+/
+6+4
+6+ 3
+
+6+2
+
+6+ 1
+
+1
+
+}
+
+r7(5 + 3 ) l ( s - 2 c + 6 ) ! ( s - 2 6 ) l ( 5 - 2 a + 2 ) l ( 2 6 ) l ( 2 c ^ 6 ) ! T / ,
+L (5 + 1)1(5 —2c) I ( s - 2 6 - 6 ) 1 ( 5 — 2a) I ( 2 6 + 9 ) !(2c + 3) I J
+
+, n , ? f n Y . Mn. . rnri4(5+2)(5-2c+5)l(f~26)l(5-2a + l)(26-l)l(2c-6)!1'A
+( - 1 ) 2(2X + 6 ( 2 c + 5 ) > L
+J
+( 5 . . 2 c ) ! ( , - 2 6 - 5 ) I (26 + 8) ! (2c + 3) !
+
+(-1)' 2 {14X* + IX (46c + 66 - 2c - 5) + 46 (c + 1) (26c + 106 -8cr (S — 2c + 4) 1 (s — 26) 1 (26 - 2) 1 (2c — 6) 1 If*
+X
+L (s - 2c) I (* - 26 - 4) ! (26 + 7) ! (2c + 3) I J
+
+5)} X
+
+(—l)f 2 {14X* + 7X (26c + 36 — 6c - 11) - 2 (c + 1) [2c (6 — 1) (6 + 10) - 1162 + 136 - 30[} X
+2 (5 + 1) (s -2c + 3) I (5 - 26) 1 (s — 2a) (26 — 3) 1 (2c — 6) !
+X
+(5 — 2c) 1 (s — 26 — 3) I (26 + 6) I (2c + 3) I
+
+T
+
+a
+e
+
+( - l ) * 2 { 7 X 2 - 7 X ( 4 c + 7 ) - 4 6 ( 6 + l ) ( c + l ) ( c - 2 ) + 18(c + l)(2c + 3)} X
+f 10 (5 + 1) 1 (s — 2c + 2) 1 (s - 26) 1 (s — 2a) 1 (26 — 4) 1 (2c — 6) 1 7/»
+X
+L (5 - 1) ! (5 - 2c) ! (s - 26 — 2) I (s — 2a — 2) ! (26 + 5) ! (2c + 3) ! J
+6-1
+
+6-2
+6-3
+
+( - l ) ' 2 { 1 4 A ' * - 7 X ( 4 6 c + 06 + 6c + l l ) + 4(6 + l ) ( c + l ) ( 2 6 c ^ ^
+t 1W9/9Y
+/f. I n / r . j , n r i M 5 +
+( - ! ) • " 2 {2X - (6 4-1) (2c + 5)} [
+
+r
+
+l)l(5-2c)(s-26+l)(^2a)l(26-7)!(2c-6)(l/,
+( , _ 4) I ( * - 2 a - 5 ) ! (26 + 2 ) ! ( 2 c + 3 ) 1
+J
+
+/
+
+c= c—3
+
+6+4
+
+' 2 (5 + 2) (8 - 2c + 7) 1 (8 - 26) 1 (8 — 2a + 1) (26) 1 (2c — 7) 17/.
+(—l)'* 1 2 L
+( 5 _ 2 c) 1 (* — 26 — 7) 1 (26 + 9) 1 (2c + 2) I
+
+6+1
+
+t
+
+(s
+(26—
+- 6)
+6) !( (2c
+(2c —
+- 6) !!
+(5 + j)
+1) |! (*s — 2a) 1! (26
+
+r 7(s + l ) l ( 5 - 2 c ) l ( 5 - 2 6 + 2 ) l ( 5 - 2 a ) l ( 2 6 - 8 ) l ( 2 c - 6 ) ! 7/,
+I *J Z L (5 - 5) ! (s - 2c — 2) 1 (s — 26) ! (s - 2a — 6) I (26 + 1) ! (2c + 3) ! J
+
+6+2
+
+I
+
+(-1)9 2 {14X* - IX (26c + 36 + 8c + 14) — 2(c + 1) [2c (b + 2 ) (6 - 9) - 116* - 356 - 54]} X
+r 2 (5 + 1) 1 (8 — 2c + 1) (t — 26) (8 — 2a) 1 (26 — 5) 1 (2c — 6) 1 "[/»
+X
+L
+(* - 2 ) ! (# - 2a - 3) ! (26 + 4) I (2c + 3) I
+J
+
+6-4
+
+6+3
+
+3
+
+o , , . i n r ( 5 - 2 c + 6 ) l ( , - 2 6 ) l ( 2 6 - l ) l ( 2 c - 7•7)17/»
+)17A
+n ~ . l f r Y i
+" ! ) + 4 { 2 * + 3b (C + 1}> L ( 5 - 2 c ) l ( , - 2 6 - 6 ) I ( 2 6 + 8)l(2c + ; 2 ) l J
+f l 4 < (y + l ) ( * - 2 c + 5) ! (s — 26) 1 (5 — 2a) (26 - 2) ! (2c 7) ! 7/=
+( - i r ' 2 < 2 X + ( 2 6 - 3 ) ( c + l)}
+(s ~ 2c) 1 (5 - 26 - 5) 1 (26 + 7) ! (2c + 2) !
+r 7 (5 + 1) 1 (s - 2c + 4) 1 (s — 26) 1 (s — 2a) ! (26 — 3) 1 (2c - 7) ! II*
+(-!)•+! 4 { 2 * + ( 6 - 5 ) (c +
+'' L (5 — 1) 1 (5 — 2c) 1 (s — 26 — 4) 1 (* — 2a — 2) ! (26 + 6) ! (2c + 2) ! J
+,
+(
+
+1"
+
+fU
+
+BE
+
+Table 9.8. (Cont.)
+e= c— 3
+/ 4W1//Y
+Q / ■ ^ T 35 (^ + 1) 1 (> — 2c + 3) 1 (* — 26) 1 (> — 2a) 1 (26 — 4) 1 (2c — 7) 1 IV,
+(_!,
+4 IA - 6 [c + 1)) ^ ( s _ 2 ) j ( s _ 2 c ) j ( s _ 2h _ 3 ) j ( , _ 2 a - 3) ! (26 + 5) ! (2c + 2) ! J
+/ i\»iAt9X
+r/.J-r.W. x m r 7 ( f + 1) l ( t - 2 c + 2 ) 1 ( f - 2 6 ) 1 ( f - 2 a ) 1 (2fr-5) 1 ( 2 c - 7 ) 1 TV.
+(-1)
+4 {2X - (6 + 6) (c + 1)} L ( s _ 3 ) , { s _ 2 c ) , ( s _ 26 — 2) ! (5 — 2a — 4) ! (26 + 4) ! (2c + 2) ! J
+( - l ) ' + 1 2 { 2 X - ( 2 6 + 5)(c +
+
+—2a) ! (26 — 6) ! (2c — 7) 1 7/,
+.„[ 14(s + l) (i(s_.—4)2!c(s+ 1—) (52a——26)(s
+5) ! (26 + 3) ! (2c + 2) !
+T
+5
+
+/ n'+iA/ov
+-WJ.IW. Linf
+(* + ^ ! (* — 2a) l (26 — 7) I (2c — 7) I
+(-1)'+* 4 {2X - 3 (6 + 1) (c + 1)} L ( 5 _ 5 ) ! ( 5 _ 2 a - 6 ) ! ( 2 6 + 2)!(2c + 2)
+
+r]"
+
+" 2 (5 + 1) 1 (5 - 2c) (5 — 26 + 1) (s - 2a) ! (26 - 8) 1 (2c - 7) 1 TV,
+(s — 6) ! (s — 2a — 7) ! (26 + 1) ! (2c + 2) !
+J
+
+(-1)'2[-
+
+#r
+
+(s — 2c + 8) 1 {s — 26) 1 (26) ! (2c — 8) 1 17,
+
+( — *)* L (« — 2 c ) ! (« — 26 — 8) I (26 + 9) ! (2c -f 1) ! J
+
+2 (g + 1) (s - 2c + 7) I (s - 26) ! (s — 2a) (26 - 1) 1 (2c - 8) 1
+(s — 2c) ! (s - 26 — 7) ! (26 + 8) ! (2c + 1) !
+
+']"
+
+(-1)*2
+
+7 (s + 1) 1 (s — 2c + 6) 1 (s — 26) ! (s — 2a) ! (26 — 2) 1 (2c — 8) 1 "17=
+
+(-1)'2[- (5 _ 1) ! (s — 2c) ! (s — 26 — 6) ! (* — 2a — 2) ! (26 + 7) ! (2c + 1) ! J
+
+14 (s + 1) ! (s — 2c + 5) ! (s — 26) ! (s — 2a) 1 (26 — 3) 1 (2c - 8) ! I'A.
+
+(-1)«2[- ;* — 2) ! (s — 2c) ! (5 - 26 — 5) ! (* — 2a — 3) ! (26 + 6) ! (2c + 1) ! J
+
+70 (s -f 1) I (s — 2c + 4) 1 (s — 26) 1 (s — 2a) ! (26 — 4) ! (2c — 8) ! 7/2
+(* — 3) ! (s — 2c) ! (s — 26 — 4) ! (s — 2a — 4) ! (26 + 5) ! (2c + 1) ! J
+14 (s + 1) \(s - 2c + 3) 1 (s - 26) 1 (s — 2a) ! (26 - 5) ! (2c - 8) ! "17c
+
+(-l) f 2[ (5 ._ 4) I (S __ 2c) ! (s — 26 — 3) ! (s — 2a — 5) ! (26 + 4) ! (2c + 1) 1 J
+
+7 (s + 1) ! (s — 2c + 2) ! (s — 26) t (s - 2a) 1 (26 — 6) 1 (2c — 8) ! 7/2
+
+(-1)'2[- (s — 5) ! (s — 2c) \(s — 2b — 2) ! (s — 2a — 6) ! (26 + 3) ! (2c + 1) ! J
+M)'2[
+
+2 (s + 1) 1 (s — 2c + 1) (* — 26) (s — 2a) i (26 — 7) ! (2c — 8) ! It*
+(s - 6) ! (s - 2a — 7) ! (26 + 2) I (2c + 1) !
+J
+r
+(> + l) 1 (> — 2a) 1 (26 — 8) 1 (2c —8) 1 7/«
+~~1} l(s-7)\
+(s- 2a - 8 ) ! (26 + 1) !(2c + l ) l J
+
+{
+
+Quantum Theory of Angular Momentum
+
+330
+
+Tables 9.9-9.11. Numerical Values of the 6/ Symbols.
+
+Table 9.9.
+d
+
+f a
+
+b
+
+{ d
+
+e
+
+a
+
+b
+
+c\ d
+
+a
+
+b
+
+c
+
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+
+1/2
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+1 1/2 1/2 1
+1 1/2 1/2 1
+1 3/2 1/2 1
+1 1/2 1/2 1
+1 3/2 1/2 1
+1 3/2 3/2 1
+1 1/2 3/2 1
+1 3/2 3/2 1
+1 5/2 3/2 1
+1 3/2 3/2 1
+1 1 5/2 3/2 1
+1 5/2 5/2 1
+
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+
+1/2
+1/2
+3/2
+3/2
+1/2
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+3/2
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+0.158114) 5/2 5/2 2
+2 1/2 3/2 1
+1/2/275
+2 3/2 1/2 1
+0.250000 5/2 5/2 2
+1/2.2
+2 3/2 1/2 1
+-0.223607 5/2 5/2 2
+-1/2/f
+2 3/2 3/2 1
+0.050000 3/2 3/2 3
+1/2.2-5
+—0.258199 5/2 1/2 3
+2 | 1/2 3/2 1
+-1/1/375
+2 1/2 5/2 1
+0.197203 5/2 1/2 3
+/ f / 2 • 3 vT
+2 1 3/2 3/2 1
+—0.091287 5/2 3/2 3
+-1/2V2-3-5
+2 1/2 3/2 1
+/ f / 2 • 2 v^3~T5
+0.170783 5/2 3/2 3
+2 1/2 5/2 1
+0.149071 5/2 3/2 3
+1/3VT
+2 3/2 3/2 1
+y/Tl2-5 /§"
+0.152753 5/2 3/2 3
+—13/2.3-5/277 -0.115813 5/2 3/2 3
+2 3/2 5/2 1
+2 j 5/2 3/2 1
+1/2-2.5
+0.050000 5/2 5/2 3
+2 3/2 3/2 1
+-0.152753 5/2 5/2 3
+—1/772 • 5 /if
+2 5/2 3/2 1
+—0.106904 5/2 5/2 3
+- v T / 5 vT
+2 ! 5/2 5/2 1
+0.109524 5/2 5/2 3
+23/2 . 3 - 5 - 7
+3 3/2 3/2 1
+3/2-2-5
+0.150000 3/2 3/2 3
+3 1/2 5/2 1
+)/S/2-3>/T
+! 0.140859 5/2 1/2 3
+3 3/2 3/2 1
+1/2/273
+0.204124 5/2 3/2 3
+3 1/2 5/2 1
+—/f/3/f
+—0.178174 5/2 3/2 3
+3 3/2 3/2 1
+-/J/5/T
+—0.163299 5/2 3/2 3
+3
+3/2 5/2 1
+1 / 2 . 3 . 5 / 2 7 7 1 0.008909 5/2 5/2 3
+3
+5/2 3/2 1
+-1/2.5
+-0.100000 5/2 5/2 3
+3
+3/2 3/2 1
+1/2-5
+0.100000 5/2 5/2 3
+3
+5/2 3/2 1
+0.130931 5/2 5/2 3
+/ 3 /5 yff
+3 1 5/2 5/2 1 1 — 1 1 / 2 . 3 . 5 . 7 1 —0.052381
+
+e
+
+f
+
+1/2 • 3
+-1/3
+-1/2.2-3
+
+/IT/2 • 3 / J
+1/2-3
+—11/2.2.3.5
+-1/2.2
+-1/2.5
+-1/2.2.3.5
+/T/2.6/2"
+1/3.5
+-31/2-3-5.7
+
+;}
+0.166667
+-0.333333
+-0.083333
+0.263523
+0.166667
+—0.183333
+-0.250000
+-0.100000
+—0.016667
+
+3/2 1/2 2
+3/2 3/2 2
+3/2 3/2 2
+5/2 1/2 2
+5/2 1/2 2
+5/2 3/2 2
+5/2 3/2 2
+5/2 3/2 2
+5/2 3/2 2
+0.187083 5/2 3/2 2
+0.066667 5/2 5/2 2
+-0.147619 5/2 5/2 2
+
+e
+
+/
+
+3/2 1/2 2 1
+3/2 1/2 2
+3/2 3/2 2
+3/2 1/2 2
+5/2 1/2 2
+1/2 3/2 2
+3/2 1/2 2
+3/2 3/2 2
+5/2 1/2 2
+5/2 3/2 2
+3/2 1/2 2
+3/2 3/2 2
+5/2
+5/2
+5/2
+3/2
+3/2
+5/2
+
+1/2 2
+3/2 2
+5/2 2
+3/2 2
+3/2 2
+1/2 2
+
+1/2 5/2 2
+3/2 3/2 2
+3/2 5/2 2
+5/2 1/2 2
+5/2 3/2 2
+3/2 3/2 2
+5/2 1/2 2
+5/2 3/2 2
+5/2 5/2 2
+3/2 3/2 3
+5/2 1/2 3
+3/2 3/2 3
+5/2 1/2 3
+5/2 3/2 3
+3/2 3/2 3
+5/2 1/2 3
+5/2 3/2 3
+5/2 5/2 3
+
+( a
+
+b
+
+c
+
+\d
+
+e
+
+1 )
+
+1/2-2.5
+-1/2-5
+3/2-2-5
+-1/5
+-1/2.3.5
+3/2-2-5
+JT/2.5/2"
+-1/2.5
+1/3-5
+-47/2.2.3.5.7
+
+0.050000
+—0.100000
+0.150000
+-0.200000
+-0.033333
+0.150000
+
+—1/2.5/37?
+
+0.187083
+-0.100000
+0.066667
+-0.111905
+—0.163299
+-0.021822
+
+-1/2 • 5
+2.2/5.7
+—1/2.2.3.5
+
+-0.100000
+0.114286
+—0.016667
+
+1/2-2.5
+1/2/27377
+1/2-3
+-1//37577
+
+—/J/5 /T
+
+0.050000
+0.059761
+0.166667
+-0.097590
+-0.106904
+
+11/2-2.5/3^7
+,
+—2 / J / 3 / 5 7 7
+23/2 - 3 - 5 - 7
+3-3/2-5.7
+/If/2 / 5 7 7
+— / J / 5 • 7 /2"
+—29/2 . 2 . 3 . 5 . 7
+1/2-2-5.7
+1/2-3-7
+—1/5.7
+—1/3.7
+71/2.2.2.3.5.7
+3-3/2-2-5-7
+1/2-7
+—1/2-5
+79/2-2-3-3-5.7
+
+0.120020
+-0.159364
+0.109524
+0.128571
+0.146385
+—0.034993
+—0.069048
+0.007143
+0.023810
+-0.02S571
+—0.047619
+0.0S4524
+0.0642S6
+0.071429
+—0.100000
+0.062698
+
+- v T / 5 /IT
+
+331
+
+6/ Symbols and the Racah Coefficients
+Table 9.10.
+d e
+
+a b c
+
+(a
+
+/
+
+b
+
+1 d e
+
+O
+
+a b c
+
+d e
+
+/
+
+( a
+
+b
+
+{ d
+
+e
+
+TT~
+
+1 1 1
+1 1 1
+1 1 1
+1 1 1
+1 1 1
+1 1 1
+1 1 1
+
+1/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+1/2
+1/2
+3/2
+3/2
+3/2
+5/2
+5/2
+
+1/2
+1/2
+1/2
+3/2
+3/2
+3/2
+5/2
+
+-1/3
+-1/2-3
+
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+3/2
+5/2
+5/2
+5/2
+3/2
+3/2
+5/2
+
+5/2
+1/2
+3/2
+5/2
+3/2
+5/2
+1/2
+
+—2-2>/Il3-SJT
+
+-0.142539
+
+1/V2-3-5
+—y/2/5 ^3
+
+0.182574
+—0.163299
+0.130931
+0.021822
+-0.053452
+0.039841
+
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+3/2
+5/2
+5/2
+
+1/2
+3/2
+1/2
+3/2
+1/2
+3/2
+5/2
+3/2
+3/2
+5/2
+
+0.288675 3 2 1 5/2
+—0.204124 i 3 2 1 5/2
+0.091287 3 2 2 1/2
+—0.163299 j 3 2 2
+1/2
+—0.223607 3 2 2 I 1/2
+-i/2 • r
+0.187083 3 2 2 3/2
+^772 • 5 \/I
+—0.124722 3 2 2 j 3/2
+—y/T/3.5 vT
+—0.040825 3 2 2 3/2
+- 1 / 2 . 5 v/273
+0.100000 3 2 2 3/2
+1/2.5
+- 2 - 2 y/2l3-S^T —0.142539 3 2 2 5/2
+
+5/2
+5/2
+3/2
+5/2
+5/2
+3/2
+5/2
+5/2
+5/2
+3/2
+
+3/2
+5/2
+3/2
+3/2
+5/2
+3/2
+1/2
+3/2
+5/2
+3/2
+
+—2.2.2/3-5.7
+3 v/375 • 7 V2
+—1/5 >ll
+
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+2
+2
+
+1/2
+
+—0.223607 3 2 2
+—0.149071 3 2 2
+—0.158114 [ 3 2 2
+
+5/2 5/2 1/2
+5/2 5/2 3/2
+5/2 5/2 5/2
+
+vT/2 • 3 ^5"
+—3/2 • 5 /vT
+1/5 vT
+—1/2-3-5vT
+— 1/2-5 v/J
+vT/2 • 5 v/2^3
+— 1/5^2"
+
+2
+2
+2
+2
+2
+
+2
+2
+2
+2
+2
+
+3/2
+5/2
+3/2
+5/2
+1/2
+3/2
+5/2
+1/2
+3/2
+5/2
+1/2
+3/2
+5/2
+1/2
+3/2
+1/2
+3/2
+1/2
+3/2
+5/2
+
+—1/2 y/b
+—1/3 Vb
+—1/2 v/2^5
+
+2
+2
+2
+2
+2
+
+1/2
+1/2
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+
+0.197203
+—0.212132
+0.141421
+—0.023570
+-0.057735
+0.108012
+—0.141421
+0.176383 |
+—0.13S587
+0.075593 :
+0.1870S3
+0.000000
+0.100000
+—0.133631
+—0.163299
+0.058321
+0.058321
+
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 1
+3 3 2
+3 3 2
+3 3 2
+3 3 2
+3 3 2
+3 3 2
+3 3 2
+
+1/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+
+3 3 2
+
+3
+3
+3
+3
+3
+
+2
+2
+2
+2
+2
+
+1
+1
+1
+1
+1
+
+1/3 ^2"
+
+0.235702
+
+3 3 2
+
+5/2 5/2 3/2
+5/2 5/2 5/2
+
+-11/2. 2-5. 7
+-1/2.3.5.7
+
+1/2 v^5"
+- 1 / 3 >/b
+1/3 v/2^7
+1/2-5
+
+0.223607
+-0.149071
+0.089087
+0.100000
+
+3 3 3
+3 3 3
+3 3 3
+3 3 3
+3 3 3
+
+3/2
+5/2
+5/2
+5/2
+5/2
+
+-0.078246
+'—y/Tliy/^Tb
+—0.117369
+—3 VaT/2 • 7 ^2^5
+—0.130410
+—•5"/7 V2T3
+1/2-7 V2 • 3 • 5
+0.013041
+0.073899
+17/2-3.7 ^ 2 ^ 5
+
+1/2
+3/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+5/2
+3/2
+3/2
+5/2
+5/2
+5/2
+5/2
+5/2
+
+1/2 1/2 5/2
+1/2 3/2 3/2
+1/2 3/2 5/2
+3/2
+3/2
+
+1/2 5/2
+3/2 3/2
+
+vT/2 • 3 vT
+—1/3^2^5
+—1/2 v'JTS
+y/T/2 • 3 vT
+- 1 / 3 •STT
+
+—0.333333
+—0.166667
+0.263523
+—0.105409
+-0.158114
+0.197203
+—0.056344
+
+3 2 1
+3 2 1
+3 2 1
+3 2 1
+3 2 1
+3 2 1
+3 2 1
+
+1/2 VJ
+—1/2 )/2T3
+1/2 V2 . 3 • 5
+—V^/5 >/3
+
+Y/7"/3 • 5
+
+—11/2.3-5 vT
+1/5 >/T
+y/T/2 • 5 V2"
+0
+1/2-5
+—1/2 VI77
+—y/I/b ^3
+1/7 v^73
+I/7V2T3
+
+1/2
+1/2
+3/2
+3/2
+3/2
+3/2
+5/2
+5/2
+5/2
+1/2
+3/2
+3/2
+1/2
+3/2
+3/2
+5/2
+
+5/2
+5/2
+3/2
+5/2
+3/2
+5/2
+1/2
+3/2
+5/2
+5/2
+3/2
+5/2
+5/2
+3/2
+5/2
+1/2
+
+3/2 3/2
+3/2 3/2
+5/2 1/2
+5/2 3/2
+5/2 5/2
+
+vT/5 vT
+1/2-5^7
+—1/5 VY^l
+1/3 V2 - 5 • 7
+
+-1/5 VI
+1/5^2"
+- 1 / 5 V2
+—I/V/5T7
+1/5 • f
+*T/5 • 7
+—3/5 • 7 vT
+
+—0.076190
+0.104978
+—0.141421
+—0.141421
+0.141421
+—0.141421
+-0.169031
+0.075593
+0.040406
+—0.060609
+
+—1/^2-3-5-7
+-0.069007
+0.107222
+13/2-5-7^3"
+-0.090914
+—3 • 3/2 - 5 - 7 V2
+—0.178174
+—v^/3 vT
+—0.140859
+—Vb /2 • 3 VT
+—0.169031
+—l/v/5^7
+0.098601
+vT/2 • 2 • 3 V5"
+-l/v^.3-5.7
+-0.069007
+0.103510
+V3l2 V2 • 5 • 7
+—0.150585
+—^2^5/3 - 7
+17/2 - 3 - 7 V2^5
+0.127997
+—0.090351
+—V2I1 Vb
+0.146385
+0.130931
+0.032733
+vT/2 - 2 • 5 VT
+0.097590
+l/v/3.5.7
+0.104978
+3^375 • 7 yfl
+— 17/2.5-7^2^3 —0.099146
+0.142857
+1/7
+
+\l3J2 VJT7
+VJ/bVT
+
+—0.078571
+—0.004762
+
+332
+
+Quantum Theory of Angular Momentum
+Table 9.11.
+
+a
+
+b
+
+c
+
+d
+
+1
+
+1
+
+1
+
+1
+
+c
+
+/
+
+1
+
+1
+
+\ a
+
+b
+
+. d
+
+e
+
+1/2-3
+
+TM
+
+1
+
+0.166667
+1
+
+2
+2
+
+1
+1
+
+1
+1
+
+1
+2
+
+1
+1
+
+1
+1
+
+1/2-3
+1/2-3-5
+
+0.166667
+0.033333
+
+2
+2
+2
+2
+
+2
+2
+2
+2
+
+1
+1
+1
+1
+
+1
+1
+2
+2
+
+1
+1
+1
+2
+
+1
+2
+1
+1
+
+—1/2 vT
+1/2-3 vT
+-1/2-5
+1/2-3
+
+—0.223607
+0.074536
+-0.100000
+0.166667
+
+2
+2
+2
+2
+
+2
+2
+2
+2
+
+2
+2
+2
+2
+
+1
+2
+2
+2
+
+1
+1
+2
+2
+
+1
+1
+1
+2
+
+y/f/2-5 v^3"
+0.152753
+vT/2 • 5 V3*
+0.152753
+-1/2-5
+-0.100000
+-3/2.5.7
+-0.042857
+
+3
+3
+3
+3
+3
+
+2
+2
+2
+2
+2
+
+1
+1
+1
+1
+1
+
+1
+1
+2
+2
+3
+
+1
+2
+1
+2
+2
+
+2
+1
+2
+1
+1
+
+1/3.5
+1/3.5.7
+
+0.149071
+0.200000
+0.043644
+0.066667
+0.009524
+
+3
+3
+3
+3
+3
+3
+
+2
+2
+2
+2
+2
+2
+
+2
+2
+2
+2
+2
+2
+
+1
+1
+2
+2
+3
+3
+
+2
+2
+2
+2
+2
+2
+
+1
+2
+1
+2
+1
+2
+
+-V2"/5 v^"
+0
+- ^ 2 / 5 ^7"
+2.2/5.7
+-1/5-7
+1/2-7
+
+—0.163299
+0.000000
+-0.106904
+0.114286
+-0.028571
+0.071429
+
+1/3 vT
+1/5
+1/5V^3*T7
+
+a
+
+b
+
+c
+
+d
+
+e
+
+/
+
+2
+3
+2
+1
+2
+1
+1
+
+3
+3
+
+3
+3
+
+1
+1
+
+3
+3
+3
+3
+3
+
+3
+3
+3
+3
+3
+
+2
+2
+2
+3
+3
+
+1
+1
+1
+2
+2
+2
+3
+
+3
+3
+3
+3
+3
+3
+3
+3
+
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+
+2
+2
+2
+2
+2
+2
+
+1
+1
+2
+2
+2
+2
+2
+3
+3
+3
+3
+3
+
+1
+1
+1
+1
+2
+'2
+2
+1
+2
+2
+3
+3
+
+2
+3
+2
+3
+1
+2
+3
+2
+1
+2
+1
+2
+
+3
+3
+3
+3
+3
+
+3
+3
+
+2
+2
+3
+3
+3
+3
+3
+
+2
+2
+2
+2
+3
+3
+3
+
+1
+2
+1
+2
+1
+2
+3
+
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+3
+
+3
+3
+
+2
+2
+2
+2
+2
+2
+
+3
+3
+3
+3
+3
+
+(a
+
+6
+
+c
+
+I <* e
+
+f
+
+—v^/3 vT
+1/2 • 3 JT1
+-1/V3 . 5 . 7
+—2 vT/3 ^5^7
+1/V2.5.7
+—1/37
+11/2237
+
+v^/5 vT
+l/2v/2~T7
+
+v^J/5 vT
+—1/2 V2 - 5 • 7
+2 ^2^3/5 • 7
+
+—vT/5 • 7 V2
+—11/2.5.7V^2^3
+2/5.7
+v^/7 ^275
+-1/2-5
+—3/2 - 2 7
+19/2 . 2 - 3 5 - 7
+-V^3 /7 vT
+—v/iT/2 • 7 V^F
+—1/7 VT
+2/7 v^3T5
+1/2-7
+1/2.3.7
+-1/2.7
+
+1
+—0.178174
+0.044544
+—0.097590
+—0.159364
+0.119523
+—0.047619
+0.130952
+0.106904
+0.133631
+0.130931
+—0.059761
+0.139971
+-0.034993
+-0.064153
+0.057143
+0.078246
+—0.100000
+—0.107143
+0.045238
+—0.110657
+—0.055328
+—0.101015
+0.073771
+0.071429
+0.023810
+—0.071429
+
+

@@ -1,0 +1,137 @@
+:root {
+    --primary: #3498db;
+    --secondary: #2ecc71;
+    --background: #f8f9fa;
+    --text: #2c3e50;
+    --bar-color: #3498db;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--background);
+}
+
+.controls {
+    margin: 2rem 0;
+}
+
+.gate-grid {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.visualization {
+    margin-top: 2rem;
+}
+
+.amplitude-display {
+    height: 250px;
+    margin: 1rem 0;
+    position: relative;
+    width: 100%;
+}
+
+#amplitudes {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border: 1px solid #ddd;
+}
+
+.code-display {
+    margin-top: 2rem;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.code-display h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.code-display pre {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.code-display code {
+    color: inherit;
+}
+
+.gate-button {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    margin: 0.3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.gate-button:hover {
+    transform: translateY(-2px);
+}
+
+.reset-button {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    margin-top: 1rem;
+}
+
+.phase-row {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: -0.5rem;
+    padding: 0 16.67%;
+}
+
+.phase-circle {
+    text-align: center;
+}
+
+.phase-circle p {
+    margin: 0 0 0.5rem 0;
+}
+
+.phase-clock {
+    width: 80px;
+    height: 80px;
+}
+
+.axis-label {
+    position: absolute;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.axis-label.y {
+    top: 50%;
+    left: 10px;
+    transform: rotate(-90deg) translateX(50%);
+}
+
+.visualization-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+

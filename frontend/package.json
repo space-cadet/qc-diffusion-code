@@ -41,7 +41,7 @@
     "sigma": "3.0.2",
     "stream-browserify": "3.0.0",
     "three": "0.179.1",
-    "ts-quantum": "link:/Users/deepak/code/ts-quantum",
+    "ts-quantum": "workspace:*",
     "tsparticles": "3.9.1",
     "util": "0.12.5",
     "zustand": "5.0.8"

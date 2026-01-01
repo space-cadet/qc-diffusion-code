@@ -1,0 +1,24 @@
+plugins:
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
+
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+defaults:
+  - scope:
+      path: "docs"
+      type: "pages"
+    values:
+      layout: "default"
+
+# Force Jekyll to process files without front matter
+include:
+  - "_*"
+
+# Enable processing of markdown files without front matter
+plugins:
+  - jekyll-optional-front-matter

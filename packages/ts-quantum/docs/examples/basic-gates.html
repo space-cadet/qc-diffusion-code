@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Quantum Gates - ts-quantum Demo</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="styles/basic-gates.css">
+</head>
+<body>
+    <h1>Basic Quantum Gates Demo</h1>
+    <p>Explore single-qubit quantum gates using the ts-quantum library. The bars show amplitudes and the clock dials show phases of the basis states \(|0\rangle\) and \(|1\rangle\).</p>
+
+    <div class="controls">
+        <h2>Quantum Gates</h2>
+        <div class="gate-grid">
+            <button class="gate-button" id="hadamard">H (Hadamard)</button>
+            <button class="gate-button" id="pauliX">X (NOT)</button>
+            <button class="gate-button" id="pauliY">Y</button>
+            <button class="gate-button" id="pauliZ">Z</button>
+        </div>
+        <button class="gate-button reset-button" id="reset">Reset to \(|0\rangle\)</button>
+        
+        <div class="explanation">
+            <h3>Gate Descriptions:</h3>
+            <p>\(H\): Creates equal superposition \(|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)\)</p>
+            <p>\(X\): Bit flip: \(|0\rangle \leftrightarrow |1\rangle\)</p>
+            <p>\(Y\): Complex rotation: \(|0\rangle \rightarrow i|1\rangle\), \(|1\rangle \rightarrow -i|0\rangle\)</p>
+            <p>\(Z\): Phase flip: \(|1\rangle \rightarrow -|1\rangle\)</p>
+        </div>
+    </div>
+
+    <div class="visualization">
+        <h2>Quantum State Visualization</h2>
+        <div class="visualization-container">
+            <div class="phase-row">
+                <div class="phase-circle">
+                    <p>\(|0\rangle\) phase:</p>
+                    <canvas id="phase0" class="phase-clock"></canvas>
+                </div>
+                <div class="phase-circle">
+                    <p>\(|1\rangle\) phase:</p>
+                    <canvas id="phase1" class="phase-clock"></canvas>
+                </div>
+            </div>
+            <div class="amplitude-display">
+                <canvas id="amplitudes"></canvas>
+                <div class="axis-label y">Amplitude</div>
+            </div>
+        </div>
+        <div class="state-display">
+            <h3>State Vector</h3>
+            <div id="stateDisplay">Initializing...</div>
+        </div>
+        <div class="explanation" id="explanation">
+            Current state: \(|0\rangle\) (computational basis state)
+        </div>
+    </div>
+
+    <div class="code-display">
+        <h3>ts-quantum Code</h3>
+        <pre><code>// Import ts-quantum components
+import { StateVector, PauliX, PauliY, PauliZ, Hadamard } from 'ts-quantum';
+
+// Initialize quantum state
+let currentState = StateVector.computationalBasis(2, 0);
+
+// Apply quantum gates
+currentState = Hadamard.apply(currentState);
+currentState = PauliX.apply(currentState);
+currentState = PauliY.apply(currentState);
+currentState = PauliZ.apply(currentState);
+
+// Access state properties
+const amplitudes = currentState.amplitudes;
+const magnitude = Math.sqrt(amp.re * amp.re + amp.im * amp.im);
+const phase = Math.atan2(amp.im, amp.re);</code></pre>
+    </div>
+
+    <script type="module">
+        // Import ts-quantum
+        const tsQuantum = await import('https://cdn.skypack.dev/ts-quantum@0.9.0');
+        const { StateVector, PauliX, PauliY, PauliZ, Hadamard } = tsQuantum;
+
+        // Initialize state
+        let currentState = StateVector.computationalBasis(2, 0);
+        
+        // Get DOM elements
+        const stateDisplay = document.getElementById('stateDisplay');
+        const explanation = document.getElementById('explanation');
+        const amplitudesCanvas = document.getElementById('amplitudes');
+        const phase0Canvas = document.getElementById('phase0');
+        const phase1Canvas = document.getElementById('phase1');
+        
+        // Setup canvases
+        const ampCtx = amplitudesCanvas.getContext('2d');
+        const phase0Ctx = phase0Canvas.getContext('2d');
+        const phase1Ctx = phase1Canvas.getContext('2d');
+
+        // Function to format complex number for MathJax
+        function formatComplexMath(c) {
+            const re = parseFloat(c.re.toFixed(3));
+            const im = parseFloat(c.im.toFixed(3));
+            
+            if (Math.abs(im) < 1e-10) return re.toString();
+            
+            let str = '';
+            if (Math.abs(re) > 1e-10) str += re;
+            if (im > 0 && Math.abs(re) > 1e-10) str += '+';
+            if (Math.abs(Math.abs(im) - 1) < 1e-10) {
+                str += im > 0 ? 'i' : '-i';
+            } else {
+                str += `${im}i`;
+            }
+            return str;
+        }
+
+        // Function to draw clock dial
+        function drawPhaseClock(ctx, phase, magnitude) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const radius = Math.min(width, height) * 0.4;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw clock circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#ccc';
+            ctx.stroke();
+
+            // Draw clock center
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+            ctx.fillStyle = '#666';
+            ctx.fill();
+
+            // Draw phase hand only if magnitude is significant
+            if (magnitude > 1e-10) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + radius * Math.cos(phase),
+                    centerY - radius * Math.sin(phase)
+                );
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            }
+
+            // Draw 12 o'clock marker
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - radius - 5);
+            ctx.lineTo(centerX, centerY - radius + 5);
+            ctx.strokeStyle = '#666';
+            ctx.stroke();
+        }
+
+        // Function to update state display
+        function updateDisplay() {
+            // Update text display with MathJax
+            const amps = currentState.amplitudes.map(formatComplexMath);
+            stateDisplay.innerHTML = `\\[|\\psi\\rangle = ${amps[0]}|0\\rangle + ${amps[1]}|1\\rangle\\]`;
+            
+            // Typeset the math
+            MathJax.typeset();
+
+            // Update visualizations
+            drawAmplitudes();
+            
+            // Draw phase clocks
+            currentState.amplitudes.forEach((amp, i) => {
+                const magnitude = Math.sqrt(amp.re * amp.re + amp.im * amp.im);
+                const phase = Math.atan2(amp.im, amp.re);
+                const ctx = i === 0 ? phase0Ctx : phase1Ctx;
+                drawPhaseClock(ctx, phase, magnitude);
+            });
+        }
+
+        // Function to draw amplitude bars
+        function drawAmplitudes() {
+            const width = amplitudesCanvas.width;
+            const height = amplitudesCanvas.height;
+            
+            // Clear canvas
+            ampCtx.clearRect(0, 0, width, height);
+            
+            // Draw x-axis
+            ampCtx.beginPath();
+            ampCtx.moveTo(0, height - 20);
+            ampCtx.lineTo(width, height - 20);
+            ampCtx.strokeStyle = '#ccc';
+            ampCtx.stroke();
+
+            // Draw amplitude bars
+            const barWidth = width/6;
+            const spacing = width/3;
+
+            currentState.amplitudes.forEach((amp, i) => {
+                const magnitude = Math.sqrt(amp.re * amp.re + amp.im * amp.im);
+                const x = spacing + i * spacing - barWidth/2;
+                const barHeight = magnitude * (height - 20) * 0.7; // Scale down bar height
+                
+                ampCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bar-color');
+                ampCtx.fillRect(x, height - 20 - barHeight, barWidth, barHeight);
+                
+                // Draw state labels under each bar
+                ampCtx.fillStyle = '#666';
+                ampCtx.font = '14px Arial';
+                ampCtx.textAlign = 'center';
+                ampCtx.fillText(`|${i}⟩`, spacing + i * spacing, height - 5);
+            });
+        }
+
+        // Event handlers for gates
+        document.getElementById('hadamard').onclick = () => {
+            currentState = Hadamard.apply(currentState);
+            explanation.innerHTML = 'Applied Hadamard gate: Creates superposition \\(\\frac{1}{\\sqrt{2}}(|0\\rangle + |1\\rangle)\\)';
+            updateDisplay();
+        };
+
+        document.getElementById('pauliX').onclick = () => {
+            currentState = PauliX.apply(currentState);
+            explanation.innerHTML = 'Applied X gate: Flips between \\(|0\\rangle\\) and \\(|1\\rangle\\)';
+            updateDisplay();
+        };
+
+        document.getElementById('pauliY').onclick = () => {
+            currentState = PauliY.apply(currentState);
+            explanation.innerHTML = 'Applied Y gate: \\(|0\\rangle \\rightarrow i|1\\rangle\\), \\(|1\\rangle \\rightarrow -i|0\\rangle\\)';
+            updateDisplay();
+        };
+
+        document.getElementById('pauliZ').onclick = () => {
+            currentState = PauliZ.apply(currentState);
+            explanation.innerHTML = 'Applied Z gate: Phase flip on \\(|1\\rangle\\)';
+            updateDisplay();
+        };
+
+        document.getElementById('reset').onclick = () => {
+            currentState = StateVector.computationalBasis(2, 0);
+            explanation.innerHTML = 'Reset to initial state \\(|0\\rangle\\)';
+            updateDisplay();
+        };
+
+        // Handle canvas resize
+        function resizeCanvas() {
+            // Set amplitude canvas size
+            amplitudesCanvas.width = amplitudesCanvas.clientWidth;
+            amplitudesCanvas.height = amplitudesCanvas.clientHeight;
+            
+            // Set phase clock canvas sizes
+            phase0Canvas.width = phase0Canvas.clientWidth;
+            phase0Canvas.height = phase0Canvas.clientHeight;
+            phase1Canvas.width = phase1Canvas.clientWidth;
+            phase1Canvas.height = phase1Canvas.clientHeight;
+            
+            updateDisplay();
+        }
+
+        window.onload = () => {
+            resizeCanvas();
+            updateDisplay();
+        };
+
+        window.onresize = resizeCanvas;
+    </script>
+</body>
+</html>
