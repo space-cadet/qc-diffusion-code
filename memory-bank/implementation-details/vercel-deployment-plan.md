@@ -1,11 +1,11 @@
 # Vercel Deployment Plan for QC-Diffusion Code Subproject
 
 *Created: 2025-08-23 17:46:03 IST*
-*Last Updated: 2025-08-23 18:52:31 IST*
+*Last Updated: 2026-01-11 16:15:00 IST*
 
 ## Overview
 
-This document outlines the deployment strategy for the standalone qc-diffusion-code repository to Vercel, including monorepo configuration, dependency management, and build process optimization.
+This document outlines the deployment strategy for the standalone qc-diffusion-code repository to Vercel. Recently updated to a root-level configuration to resolve monorepo build loops and ensure proper dependency ordering.
 
 ## Repository Structure
 
@@ -34,13 +34,12 @@ qc-diffusion-code/
 - **Install Command**: `pnpm install`
 
 ### vercel.json Configuration
-Located at `frontend/vercel.json`:
+Located at root `/vercel.json` (moved from `frontend/` to resolve build loops):
 ```json
 {
-  "buildCommand": "pnpm install && pnpm build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
-  "devCommand": "pnpm dev",
+  "buildCommand": "cd packages/ts-quantum && pnpm build && cd ../graph-core && pnpm build && cd ../frontend && tsc -b && vite build",
+  "outputDirectory": "frontend/dist",
+  "devCommand": "pnpm --filter qc-diffusion-frontend dev",
   "framework": null,
   "rewrites": [
     {
@@ -120,7 +119,22 @@ This configuration provides a convenient build script at the root level and remo
 - Updated Vercel project settings to use `frontend/dist` as the output directory
 - This approach aligns Vercel's expectations with Vite's default output without requiring changes to the Vite configuration
 
-## Successful Deployment Implementation
+## Build Loop Resolution (2026-01-11)
+
+**Issue**: Vercel builds were getting stuck in a recursive loop where `pnpm build` triggered filters that called back to the same build script.
+
+**Root Cause**: 
+1. `vercel.json` was in `frontend/` but configured for root context.
+2. `frontend/package.json` had a build script that tried to build siblings using `../packages`.
+3. Root `package.json` used `pnpm --filter` which could re-trigger the loop.
+
+**Solution Implemented**:
+1. Moved `vercel.json` to the project root.
+2. Explicitly defined the build sequence in root `package.json` and `vercel.json` to bypass recursion.
+3. Simplified `frontend/package.json` to only build its own assets.
+4. Corrected all relative paths to be relative to the project root.
+
+## Successful Deployment Implementation (v3.0.0 Update)
 
 ### Phase 1: Monorepo Configuration
 1. ✅ Created `pnpm-workspace.yaml` at repo root with packages: frontend, backend, packages/*
