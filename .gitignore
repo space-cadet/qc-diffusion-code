@@ -46,3 +46,18 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db
+frontend/vite-profile-0.cpuprofile
+
+# TypeScript compiled files
+**/*.d.ts
+**/*.d.ts.map
+**/*.js.map
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Package build outputs
+packages/*/dist/
+packages/*/vite.config.d.ts
+packages/*/vite.config.d.ts.map
+packages/*/vite.config.js

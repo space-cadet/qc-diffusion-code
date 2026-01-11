@@ -1,0 +1,6 @@
+export * from './strategies/CTRWStrategy1D';
+export * from './strategies/CTRWStrategy2D';
+export * from './types/Particle';
+export * from './types/CollisionEvent';
+export * from './ParticleManager';
+export * from './RandomWalkSimulator';

@@ -11,7 +11,7 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
 ```json
 {
   "tag_index": {
-    "random-walk": ["1d-random-walk-sim-plan","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walks-diff-eq"],
+    "random-walk": ["1d-random-walk-sim-plan","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walks-diff-eq","quantum-walk-implementation"],
     "collisions": ["interparticle-collision-plan"],
     "gpu": ["gpu-amr-integration","visual-pde-gpu-solver-plan"],
     "amr": ["gpu-amr-integration"],
@@ -20,11 +20,13 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "ui": ["observer-design-plan","random-walk-ui-interface"],
     "observables": ["observer-design-plan"],
     "architecture": ["observer-design-plan","pde-bcs-final-plan","random-walk-class-redesign","pde-bcs-architecture-claude4","pde-bcs-architecture-deepseek","pde-bcs-architecture-gpt5"],
-    "deployment": ["vercel-deployment-plan"]
+    "deployment": ["vercel-deployment-plan"],
+    "quantum": ["quantum-walk-implementation"]
   },
   "task_index": {
     "C12": ["interparticle-collision-plan"],
-    "C14": ["interparticle-collision-plan"]
+    "C14": ["interparticle-collision-plan"],
+    "C24": ["quantum-walk-implementation"]
   }
 }
 ```
@@ -34,6 +36,7 @@ One JSON object per line. Fields: id, title, path, summary, tags, tasks?, update
 
 ```jsonl
 { "id":"1d-random-walk-sim-plan", "title":"1D Random Walk Simulation Implementation Plan", "path":"memory-bank/implementation-details/1d-random-walk-sim-plan.md", "summary":"Adds a dedicated 1D CTRW strategy, 1D visualization, and UI toggles for dimension and interparticle collisions; strategy selection wired in RandomWalkSimulator.", "tags":["random-walk","strategy","ui"], "updated":"2025-08-27 15:03:12 IST" }
+{ "id":"quantum-walk-implementation", "title":"Quantum Walk Explorer Implementation", "path":"memory-bank/implementation-details/quantum-walk-implementation.md", "summary":"Comprehensive React implementation of quantum random walk with parameter panel, classical comparison, decoherence logic, and unified styling matching existing application components.", "tags":["quantum","random-walk","ui","implementation"], "tasks":["C24"], "updated":"2026-01-11 14:50:46 IST" }
 { "id":"gpu-amr-integration", "title":"GPU AMR Integration Analysis", "path":"memory-bank/implementation-details/gpu-amr-integration.md", "summary":"Surveys tessellation, screen-space LOD, and displacement mapping to bring adaptive mesh refinement into GPU PDE workflows; proposes phased tessellation-based AMR.", "tags":["gpu","amr","pde","performance"], "updated":"2025-08-20 14:33:33 IST" }
 { "id":"interparticle-collision-plan", "title":"Inter-Particle Collision Implementation Plan", "path":"memory-bank/implementation-details/interparticle-collision-plan.md", "summary":"Composite framework: ballistic base + elastic interparticle collisions; Phase 1.1 bug fixes separating scattering vs collisions and correcting 1D pair handling.", "tags":["random-walk","collisions","strategy"], "tasks":["C12","C14"], "updated":"2025-08-28 13:36:51 IST" }
 { "id":"observer-design-plan", "title":"Observer Design and Implementation Plan", "path":"memory-bank/implementation-details/observer-design-plan.md", "summary":"Observer pattern for numerical observables with zero-cost when inactive, snapshot consistency, lazy evaluation, and ObservableManager orchestration.", "tags":["observables","ui","architecture"], "updated":"2025-08-24 22:21:48 IST" }

@@ -1,0 +1,84 @@
+import { Parser } from 'expr-eval';
+export class ExpressionEvaluator {
+    static createContext(particle, bounds, time) {
+        return {
+            position: {
+                x: particle.position.x,
+                y: particle.position.y,
+                magnitude: Math.sqrt(particle.position.x ** 2 + particle.position.y ** 2)
+            },
+            velocity: {
+                vx: particle.velocity.vx,
+                vy: particle.velocity.vy,
+                magnitude: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2)
+            },
+            speed: Math.sqrt(particle.velocity.vx ** 2 + particle.velocity.vy ** 2),
+            radius: particle.radius,
+            id: particle.id,
+            lastCollisionTime: particle.lastCollisionTime,
+            nextCollisionTime: particle.nextCollisionTime,
+            collisionCount: particle.collisionCount,
+            interparticleCollisionCount: particle.interparticleCollisionCount,
+            waitingTime: particle.waitingTime,
+            bounds,
+            time,
+            initial: particle.initial ? {
+                position: {
+                    x: particle.initial.position.x,
+                    y: particle.initial.position.y,
+                    magnitude: Math.sqrt(particle.initial.position.x ** 2 + particle.initial.position.y ** 2)
+                },
+                velocity: {
+                    vx: particle.initial.velocity.vx,
+                    vy: particle.initial.velocity.vy,
+                    magnitude: Math.sqrt(particle.initial.velocity.vx ** 2 + particle.initial.velocity.vy ** 2)
+                },
+                timestamp: particle.initial.timestamp,
+            } : undefined
+        };
+    }
+    static evaluateFilter(expression, context) {
+        try {
+            const expr = this.parser.parse(expression);
+            // Cast to any to satisfy expr-eval's Value map type
+            return Boolean(expr.evaluate(context));
+        }
+        catch {
+            return false;
+        }
+    }
+    static evaluateSelect(expression, context) {
+        try {
+            const expr = this.parser.parse(expression);
+            const result = expr.evaluate(context);
+            return typeof result === 'number' ? result : 0;
+        }
+        catch {
+            return 0;
+        }
+    }
+    static applyReduce(values, reduceFunction) {
+        if (values.length === 0)
+            return 0;
+        switch (reduceFunction) {
+            case 'sum':
+                return values.reduce((sum, val) => sum + val, 0);
+            case 'mean':
+            case 'avg':
+                return values.reduce((sum, val) => sum + val, 0) / values.length;
+            case 'count':
+                return values.length;
+            case 'min':
+                return Math.min(...values);
+            case 'max':
+                return Math.max(...values);
+            case 'std':
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
+                return Math.sqrt(variance);
+            default:
+                return values.reduce((sum, val) => sum + val, 0);
+        }
+    }
+}
+ExpressionEvaluator.parser = new Parser();

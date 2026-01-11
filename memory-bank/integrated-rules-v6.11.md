@@ -1,6 +1,6 @@
 # Integrated Code Rules and Memory Bank System, v6.11 (Essential Instructions Priority)
 
-*Last Updated: 2025-11-22 18:25:00 IST*
+*Last Updated: 2026-01-11 01:23:54 IST*
 
 YOU WILL KEEP IT REALLY SIMPLE, STUPID (KIRSS). IF YOU THINK A SOLUTION IS SIMPLE ENOUGH, MAKE IT EVEN SIMPLER.
 YOU WILL NEVER UPDATE ANY FILES, INCLUDING MEMORY BANK FILES, WITHOUT EXPLICIT USER APPROVAL
@@ -361,6 +361,7 @@ ${PROJECT_ROOT}/                 # Project root directory
 ```
 
 ### 4.8 Edit History Template (edit_history.md)
+NOTE: `edit_history.md` is a GENERATED VIEW (newest entries on top) built from chunk files in `memory-bank/edits/YYYY-MM-DD/`. Do not manually edit `edit_history.md`.
 ```markdown
 # Edit History
 *Created: YYYY-MM-DD HH:MM:SS TZ*
@@ -387,6 +388,28 @@ ${PROJECT_ROOT}/                 # Project root directory
 - **Filepath** MUST be in backticks AND relative to project root
 - No summary statements or evaluative content
 
+ **Canonical Storage (Chunk Files):**
+ - Canonical entries live as one file per entry in: `memory-bank/edits/YYYY-MM-DD/<HHMMSS>-<id>.md`
+ - Chunk files are append-only by creation (never edit existing chunk files)
+ - Each chunk file MUST include provenance for merge traceability:
+   - `source_branch`
+   - `source_commit` (full 40-char SHA)
+
+ **Edit Chunk File Template (`memory-bank/edits/.../*.md`):**
+ ```markdown
+ ---
+ kind: edit_chunk
+ id: <unique-id>
+ created_at: YYYY-MM-DD HH:MM:SS TZ
+ task_ids: [Txx, Tyy]
+ source_branch: <branch-name>
+ source_commit: <40-char-sha>
+ ---
+ 
+ #### HH:MM:SS TZ - TaskID: Description
+ - Modified `file/path` - Specific technical change description
+ ```
+
 ### 4.9 Error Log Template (errorLog.md)
 ```markdown
 # Error Log
@@ -405,10 +428,39 @@ ${PROJECT_ROOT}/                 # Project root directory
 ## 5. Technical Standards
 
 ### 5.1 Executable Paths
+
+#### Local Environment (Desktop/macOS)
 - Node: `/Users/deepak/.nvm/versions/node/v23.11.0/bin/node`
 - NPM: `/Users/deepak/.nvm/versions/node/v23.11.0/bin/npm`
 - PNPM: `/Users/deepak/.nvm/versions/node/v23.11.0/bin/pnpm`
 - Python: `/Users/deepak/miniconda3/bin/python`
+
+#### CRITICAL: Claude Code Web Environment Setup
+**Node.js and pnpm are available on Claude web but require activation:**
+
+1. **Activation Requirement**: Node.js/pnpm tools are pre-installed but NOT in PATH by default
+2. **Solution**: Source activation script BEFORE using tools:
+   ```bash
+   source /usr/local/bin/use-node-22
+   ```
+3. **Available Versions**: `use-node-20`, `use-node-21`, `use-node-22`
+4. **Verification**: Run `node --version` and `pnpm --version` after sourcing
+5. **Scope**: Activation applies only to current shell session - must be re-sourced in new sessions
+
+**Example Workflow:**
+```bash
+# ❌ FAILS - pnpm: command not found
+pnpm install
+
+# ✅ SUCCEEDS - activate first, then run
+source /usr/local/bin/use-node-22
+pnpm install --no-frozen-lockfile
+```
+
+**Impact on Dependency Management:**
+- Lockfile regeneration requires Node.js activation
+- Running tests/builds requires Node.js activation
+- Package upgrades must activate Node before running pnpm commands
 
 ### 5.2 XML Tool Format Standards
 1. **Structure**:
@@ -521,17 +573,14 @@ Follow this workflow to update memory bank files:
    - Update `changelog.md` if features or bugs were addressed
 
 7. **Update Edit History**
-   - PREPEND new entry to top of `edit_history.md`
-   - **CRITICAL**: Use the STRICT regex-compatible format required by the database parser:
-   - Header: `#### HH:MM:SS TZ - TaskID: Description` (Timezone is MANDATORY)
-   - Bullets: `- Action `filepath` - Description`
-     - **Action** MUST be one of: `Created`, `Modified`, `Updated`, `Deleted`
-     - **Filepath** MUST be wrapped in backticks AND relative to project root
-   - Example:
-     ```
-     #### 18:30:00 IST - T19: Fix navigation bug
-     - Modified `public/js/router.js` - Fixed history stack handling
-     ```
+   - Create a new edit chunk file in `memory-bank/edits/YYYY-MM-DD/<HHMMSS>-<id>.md`
+   - Chunk file MUST include `source_branch` and `source_commit` in YAML frontmatter
+   - Chunk body MUST follow the STRICT regex-compatible entry format:
+     - Header: `#### HH:MM:SS TZ - TaskID: Description` (Timezone is MANDATORY)
+     - Bullets: `- Action `filepath` - Description`
+       - **Action** MUST be one of: `Created`, `Modified`, `Updated`, `Deleted`
+       - **Filepath** MUST be wrapped in backticks AND relative to project root
+   - Regenerate `edit_history.md` as a GENERATED VIEW (newest entries on top) from chunk files
    - No summary statements or evaluative content
 
 8. **Generate Brief Commit Message**

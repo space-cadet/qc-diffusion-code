@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import PdeParameterPanel from "./PdeParameterPanel";
 import PlotComponent from "./PlotComponent";
 import RandomWalkSim from "./RandomWalkSim";
+import QuantumWalkPage from "./QuantumWalkPage";
 import AnalysisPage from "./components/AnalysisPage";
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
@@ -201,6 +202,16 @@ export default function App() {
             Random Walk Sim
           </button>
           <button
+            onClick={() => setActiveTab('quantumwalk')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'quantumwalk'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Quantum Walk
+          </button>
+          <button
             onClick={() => setActiveTab('analysis')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'analysis'
@@ -246,6 +257,8 @@ export default function App() {
           </div>
         ) : activeTab === 'randomwalksim' ? (
           <RandomWalkSim />
+        ) : activeTab === 'quantumwalk' ? (
+          <QuantumWalkPage />
         ) : (
           <AnalysisPage />
         )}
