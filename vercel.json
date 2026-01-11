@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd packages/ts-quantum && pnpm build && cd ../graph-core && pnpm build && cd ../frontend && tsc -b && vite build",
+  "buildCommand": "cd packages/ts-quantum && pnpm build && cd ../graph-core && pnpm build && cd ../../frontend && tsc -b && vite build",
   "outputDirectory": "frontend/dist",
   "devCommand": "pnpm --filter qc-diffusion-frontend dev",
   "framework": null,
