@@ -1,17 +1,6 @@
 import React from 'react';
-
-interface HistoryPanelProps {
-  simulationState: {
-    time: number;
-    status: string;
-    isRunning: boolean;
-    collisions: number;
-  };
-}
-
-export const HistoryPanel: React.FC<HistoryPanelProps> = ({ simulationState }) => {
-  return (
-    <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
+export const HistoryPanel = ({ simulationState }) => {
+    return (<div className="bg-white border rounded-lg p-4 h-full overflow-auto">
       <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
         📖 Simulation History
       </h3>
@@ -136,6 +125,5 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ simulationState }) =
           </tbody>
         </table>
       </div>
-    </div>
-  );
+    </div>);
 };

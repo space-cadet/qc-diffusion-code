@@ -1,96 +1,50 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAppStore } from "../stores/appStore";
-import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
-
-import type { SimulationState } from '../types/simulation';
-import type { RandomWalkParams } from '../types/simulationTypes';
-
-interface ParameterPanelProps {
-  simulatorRef: React.RefObject<RandomWalkSimulator>;
-  gridLayoutParams: RandomWalkParams;
-  setGridLayoutParams: (params: RandomWalkParams) => void;
-  simulationState: SimulationState;
-  setSimulationState: (state: SimulationState) => void;
-  handleStart: () => void;
-  handlePause: () => void;
-  handleReset: () => void;
-  handleInitialize: () => void;
-}
-
-export const ParameterPanel = ({
-  simulatorRef,
-  gridLayoutParams,
-  setGridLayoutParams,
-  simulationState,
-  setSimulationState,
-  handleStart,
-  handlePause,
-  handleReset,
-  handleInitialize,
-}: ParameterPanelProps) => {
-  const { randomWalkUIState, setRandomWalkUIState } = useAppStore();
-  
-  const updateUIState = (updates: Partial<typeof randomWalkUIState>) => {
-    setRandomWalkUIState({ ...randomWalkUIState, ...updates });
-  };
-  return (
-    <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
+export const ParameterPanel = ({ simulatorRef, gridLayoutParams, setGridLayoutParams, simulationState, setSimulationState, handleStart, handlePause, handleReset, handleInitialize, }) => {
+    const { randomWalkUIState, setRandomWalkUIState } = useAppStore();
+    const updateUIState = (updates) => {
+        setRandomWalkUIState({ ...randomWalkUIState, ...updates });
+    };
+    return (<div className="bg-white border rounded-lg p-4 h-full overflow-auto">
       <h3 className="drag-handle text-lg font-semibold mb-4 cursor-move">
         Parameters
       </h3>
 
       {/* Simulation Controls - Moved to top */}
       <div className="mb-6 space-y-3">
-        <button
-          onClick={handleInitialize}
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
-        >
+        <button onClick={handleInitialize} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors duration-200">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
           Initialize
         </button>
         
         <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={handleStart}
-            disabled={simulationState.isRunning}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
+          <button onClick={handleStart} disabled={simulationState.isRunning} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z"/>
             </svg>
             Start
           </button>
           
-          <button
-            onClick={handlePause}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
-          >
-            {simulationState.isRunning ? (
-              <>
+          <button onClick={handlePause} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md transition-colors duration-200">
+            {simulationState.isRunning ? (<>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
                 </svg>
                 Pause
-              </>
-            ) : (
-              <>
+              </>) : (<>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
                 Resume
-              </>
-            )}
+              </>)}
           </button>
         </div>
         
-        <button
-          onClick={handleReset}
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
-        >
+        <button onClick={handleReset} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md transition-colors duration-200">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
           Reset
         </button>
@@ -100,13 +54,11 @@ export const ParameterPanel = ({
           <div className="flex justify-between items-center">
             <span className="font-medium">Status:</span>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                simulationState.status === "Running"
-                  ? "bg-green-500"
-                  : simulationState.status === "Paused" 
-                  ? "bg-amber-500"
-                  : "bg-gray-400"
-              }`} />
+              <div className={`w-2 h-2 rounded-full ${simulationState.status === "Running"
+            ? "bg-green-500"
+            : simulationState.status === "Paused"
+                ? "bg-amber-500"
+                : "bg-gray-400"}`}/>
               <span className="font-medium text-gray-900">
                 {simulationState.status}
               </span>
@@ -131,71 +83,36 @@ export const ParameterPanel = ({
           </label>
           <div className="flex gap-4">
             <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="continuum"
-                checked={gridLayoutParams.simulationType === "continuum"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    simulationType: e.target.value as "continuum" | "graph",
-                  })
-                }
-                className="mr-2"
-              />
+              <input type="radio" name="simulationType" value="continuum" checked={gridLayoutParams.simulationType === "continuum"} onChange={(e) => setGridLayoutParams({
+            ...gridLayoutParams,
+            simulationType: e.target.value,
+        })} className="mr-2"/>
               Continuum
             </label>
             <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="graph"
-                checked={gridLayoutParams.simulationType === "graph"}
-                onChange={(e) =>
-                  setGridLayoutParams({
-                    ...gridLayoutParams,
-                    simulationType: e.target.value as "continuum" | "graph",
-                  })
-                }
-                className="mr-2"
-              />
+              <input type="radio" name="simulationType" value="graph" checked={gridLayoutParams.simulationType === "graph"} onChange={(e) => setGridLayoutParams({
+            ...gridLayoutParams,
+            simulationType: e.target.value,
+        })} className="mr-2"/>
               Graph
             </label>
           </div>
 
         {/* Initial Distribution (only for Continuum) - Collapsible */}
-        {gridLayoutParams.simulationType === "continuum" && (
-          <div className="border rounded p-3 bg-gray-50">
-            <button
-              type="button"
-              onClick={() => updateUIState({ isDistributionOpen: !randomWalkUIState.isDistributionOpen })}
-              className="flex items-center justify-between w-full text-sm font-medium text-left mb-2"
-            >
+        {gridLayoutParams.simulationType === "continuum" && (<div className="border rounded p-3 bg-gray-50">
+            <button type="button" onClick={() => updateUIState({ isDistributionOpen: !randomWalkUIState.isDistributionOpen })} className="flex items-center justify-between w-full text-sm font-medium text-left mb-2">
               <span>Initial Distribution</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${randomWalkUIState.isDistributionOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg className={`w-4 h-4 transition-transform ${randomWalkUIState.isDistributionOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            {randomWalkUIState.isDistributionOpen && (
-              <div className="space-y-3">
+            {randomWalkUIState.isDistributionOpen && (<div className="space-y-3">
                 <div>
                   <label className="block text-sm mb-1">Type:</label>
-                  <select
-                    value={gridLayoutParams.initialDistType}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        initialDistType: e.target.value as RandomWalkParams['initialDistType'],
-                      })
-                    }
-                    className="w-full border rounded px-2 py-1 text-sm"
-                  >
+                  <select value={gridLayoutParams.initialDistType} onChange={(e) => setGridLayoutParams({
+                    ...gridLayoutParams,
+                    initialDistType: e.target.value,
+                })} className="w-full border rounded px-2 py-1 text-sm">
                     <option value="uniform">Uniform</option>
                     <option value="gaussian">Gaussian</option>
                     <option value="ring">Ring / Annulus</option>
@@ -205,362 +122,208 @@ export const ParameterPanel = ({
                 </div>
 
                 {/* Gaussian params */}
-                {gridLayoutParams.initialDistType === 'gaussian' && (
-                  <div className="grid grid-cols-2 gap-2">
+                {gridLayoutParams.initialDistType === 'gaussian' && (<div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-xs">σx (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distSigmaX}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distSigmaX: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distSigmaX} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distSigmaX: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
                     <div>
                       <label className="block text-xs">σy (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distSigmaY}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distSigmaY: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distSigmaY} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distSigmaY: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
-                  </div>
-                )}
+                  </div>)}
 
                 {/* Ring params */}
-                {gridLayoutParams.initialDistType === 'ring' && (
-                  <div className="grid grid-cols-2 gap-2">
+                {gridLayoutParams.initialDistType === 'ring' && (<div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-xs">r₀ (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distR0}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distR0: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distR0} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distR0: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
                     <div>
                       <label className="block text-xs">Δr (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distDR}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distDR: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distDR} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distDR: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
-                  </div>
-                )}
+                  </div>)}
 
                 {/* Stripe params */}
-                {gridLayoutParams.initialDistType === 'stripe' && (
-                  <div>
+                {gridLayoutParams.initialDistType === 'stripe' && (<div>
                     <label className="block text-xs">Thickness (px)</label>
-                    <input
-                      type="number"
-                      value={gridLayoutParams.distThickness}
-                      onChange={(e) =>
-                        setGridLayoutParams({
-                          ...gridLayoutParams,
-                          distThickness: parseFloat(e.target.value),
-                        })
-                      }
-                      className="w-full border rounded px-2 py-1 text-sm"
-                    />
-                  </div>
-                )}
+                    <input type="number" value={gridLayoutParams.distThickness} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distThickness: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
+                  </div>)}
 
                 {/* Grid params */}
-                {gridLayoutParams.initialDistType === 'grid' && (
-                  <div className="grid grid-cols-3 gap-2">
+                {gridLayoutParams.initialDistType === 'grid' && (<div className="grid grid-cols-3 gap-2">
                     <div>
                       <label className="block text-xs">nx</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distNx}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distNx: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distNx} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distNx: parseInt(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
                     <div>
                       <label className="block text-xs">ny</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distNy}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distNy: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distNy} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distNy: parseInt(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
                     <div>
                       <label className="block text-xs">Jitter (px)</label>
-                      <input
-                        type="number"
-                        value={gridLayoutParams.distJitter}
-                        onChange={(e) =>
-                          setGridLayoutParams({
-                            ...gridLayoutParams,
-                            distJitter: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
+                      <input type="number" value={gridLayoutParams.distJitter} onChange={(e) => setGridLayoutParams({
+                        ...gridLayoutParams,
+                        distJitter: parseFloat(e.target.value),
+                    })} className="w-full border rounded px-2 py-1 text-sm"/>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                  </div>)}
+              </div>)}
+          </div>)}
         </div>
 
         {/* Random Walk Strategy - Collapsible */}
         <div>
-          <button
-            type="button"
-            onClick={() => updateUIState({ isStrategyOpen: !randomWalkUIState.isStrategyOpen })}
-            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
-          >
+          <button type="button" onClick={() => updateUIState({ isStrategyOpen: !randomWalkUIState.isStrategyOpen })} className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded">
             <span>Random Walk Strategy:</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${randomWalkUIState.isStrategyOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg className={`w-4 h-4 transition-transform ${randomWalkUIState.isStrategyOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
             </svg>
           </button>
-          {randomWalkUIState.isStrategyOpen && (
-            <div className="space-y-2 ml-2">
+          {randomWalkUIState.isStrategyOpen && (<div className="space-y-2 ml-2">
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("ctrw") || false}
-                  onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
-                    const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "ctrw"), "ctrw"]
-                      : strategies.filter(s => s !== "ctrw");
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      strategies: newStrategies as RandomWalkParams['strategies'],
-                    });
-                  }}
-                  className="mr-2"
-                />
+                <input type="checkbox" checked={gridLayoutParams.strategies?.includes("ctrw") || false} onChange={(e) => {
+                const strategies = gridLayoutParams.strategies || [];
+                const newStrategies = e.target.checked
+                    ? [...strategies.filter(s => s !== "ctrw"), "ctrw"]
+                    : strategies.filter(s => s !== "ctrw");
+                setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategies: newStrategies,
+                });
+            }} className="mr-2"/>
                 CTRW (Continuous Time Random Walk)
               </label>
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("collisions") || false}
-                  onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
-                    const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "collisions"), "collisions"]
-                      : strategies.filter(s => s !== "collisions");
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      strategies: newStrategies as RandomWalkParams['strategies'],
-                    });
-                  }}
-                  className="mr-2"
-                />
+                <input type="checkbox" checked={gridLayoutParams.strategies?.includes("collisions") || false} onChange={(e) => {
+                const strategies = gridLayoutParams.strategies || [];
+                const newStrategies = e.target.checked
+                    ? [...strategies.filter(s => s !== "collisions"), "collisions"]
+                    : strategies.filter(s => s !== "collisions");
+                setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategies: newStrategies,
+                });
+            }} className="mr-2"/>
                 Interparticle Collisions
               </label>
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("simple") || false}
-                  onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
-                    const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "simple"), "simple"]
-                      : strategies.filter(s => s !== "simple");
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      strategies: newStrategies as RandomWalkParams['strategies'],
-                    });
-                  }}
-                  className="mr-2"
-                />
+                <input type="checkbox" checked={gridLayoutParams.strategies?.includes("simple") || false} onChange={(e) => {
+                const strategies = gridLayoutParams.strategies || [];
+                const newStrategies = e.target.checked
+                    ? [...strategies.filter(s => s !== "simple"), "simple"]
+                    : strategies.filter(s => s !== "simple");
+                setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategies: newStrategies,
+                });
+            }} className="mr-2"/>
                 Simple Random Walk
               </label>
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("levy") || false}
-                  onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
-                    const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "levy"), "levy"]
-                      : strategies.filter(s => s !== "levy");
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      strategies: newStrategies as RandomWalkParams['strategies'],
-                    });
-                  }}
-                  className="mr-2"
-                />
+                <input type="checkbox" checked={gridLayoutParams.strategies?.includes("levy") || false} onChange={(e) => {
+                const strategies = gridLayoutParams.strategies || [];
+                const newStrategies = e.target.checked
+                    ? [...strategies.filter(s => s !== "levy"), "levy"]
+                    : strategies.filter(s => s !== "levy");
+                setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategies: newStrategies,
+                });
+            }} className="mr-2"/>
                 Lévy Flight
               </label>
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={gridLayoutParams.strategies?.includes("fractional") || false}
-                  onChange={(e) => {
-                    const strategies = gridLayoutParams.strategies || [];
-                    const newStrategies = e.target.checked
-                      ? [...strategies.filter(s => s !== "fractional"), "fractional"]
-                      : strategies.filter(s => s !== "fractional");
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      strategies: newStrategies as RandomWalkParams['strategies'],
-                    });
-                  }}
-                  className="mr-2"
-                />
+                <input type="checkbox" checked={gridLayoutParams.strategies?.includes("fractional") || false} onChange={(e) => {
+                const strategies = gridLayoutParams.strategies || [];
+                const newStrategies = e.target.checked
+                    ? [...strategies.filter(s => s !== "fractional"), "fractional"]
+                    : strategies.filter(s => s !== "fractional");
+                setGridLayoutParams({
+                    ...gridLayoutParams,
+                    strategies: newStrategies,
+                });
+            }} className="mr-2"/>
                 Fractional Brownian Motion
               </label>
-            </div>
-          )}
+            </div>)}
         </div>
 
         {/* Boundary Conditions - Collapsible */}
         <div>
-          <button
-            type="button"
-            onClick={() => updateUIState({ isBoundaryOpen: !randomWalkUIState.isBoundaryOpen })}
-            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
-          >
+          <button type="button" onClick={() => updateUIState({ isBoundaryOpen: !randomWalkUIState.isBoundaryOpen })} className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded">
             <span>Boundary Conditions:</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${randomWalkUIState.isBoundaryOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg className={`w-4 h-4 transition-transform ${randomWalkUIState.isBoundaryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
             </svg>
           </button>
-          {randomWalkUIState.isBoundaryOpen && (
-            <div className="space-y-2 ml-2">
+          {randomWalkUIState.isBoundaryOpen && (<div className="space-y-2 ml-2">
               <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="boundaryCondition"
-                  value="periodic"
-                  checked={gridLayoutParams.boundaryCondition === "periodic"}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                    })
-                  }
-                  className="mr-2"
-                />
+                <input type="radio" name="boundaryCondition" value="periodic" checked={gridLayoutParams.boundaryCondition === "periodic"} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                boundaryCondition: e.target.value,
+            })} className="mr-2"/>
                 Periodic (wrap around)
               </label>
               <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="boundaryCondition"
-                  value="reflective"
-                  checked={gridLayoutParams.boundaryCondition === "reflective"}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                    })
-                  }
-                  className="mr-2"
-                />
+                <input type="radio" name="boundaryCondition" value="reflective" checked={gridLayoutParams.boundaryCondition === "reflective"} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                boundaryCondition: e.target.value,
+            })} className="mr-2"/>
                 Reflective (bounce back)
               </label>
               <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="boundaryCondition"
-                  value="absorbing"
-                  checked={gridLayoutParams.boundaryCondition === "absorbing"}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      boundaryCondition: e.target.value as "periodic" | "reflective" | "absorbing",
-                    })
-                  }
-                  className="mr-2"
-                />
+                <input type="radio" name="boundaryCondition" value="absorbing" checked={gridLayoutParams.boundaryCondition === "absorbing"} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                boundaryCondition: e.target.value,
+            })} className="mr-2"/>
                 Absorbing (particles disappear)
               </label>
-            </div>
-          )}
+            </div>)}
         </div>
 
         <div>
           <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={gridLayoutParams.showAnimation}
-              onChange={(e) =>
-                setGridLayoutParams({
-                  ...gridLayoutParams,
-                  showAnimation: e.target.checked,
-                })
-              }
-              className="mr-2"
-            />
+            <input type="checkbox" checked={gridLayoutParams.showAnimation} onChange={(e) => setGridLayoutParams({
+            ...gridLayoutParams,
+            showAnimation: e.target.checked,
+        })} className="mr-2"/>
             Show Animation
           </label>
         </div>
 
         {/* Graph Parameters (only show when graph is selected) */}
-        {gridLayoutParams.simulationType === "graph" && (
-          <div className="border rounded p-3 bg-gray-50">
+        {gridLayoutParams.simulationType === "graph" && (<div className="border rounded p-3 bg-gray-50">
             <h4 className="font-medium mb-2">Graph Parameters</h4>
             <div className="space-y-3">
               <div>
                 <label className="block text-sm mb-1">Graph Type:</label>
-                <select
-                  value={gridLayoutParams.graphType}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      graphType: e.target.value as any,
-                    })
-                  }
-                  className="w-full border rounded px-2 py-1 text-sm"
-                >
+                <select value={gridLayoutParams.graphType} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                graphType: e.target.value,
+            })} className="w-full border rounded px-2 py-1 text-sm">
                   <option value="lattice1D">1D Chain</option>
                   <option value="lattice2D">2D Lattice</option>
                   <option value="path">Path Graph</option>
@@ -569,19 +332,10 @@ export const ParameterPanel = ({
               </div>
               <div>
                 <label className="block text-sm mb-1">Size:</label>
-                <input
-                  type="range"
-                  min="5"
-                  max="50"
-                  value={gridLayoutParams.graphSize}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      graphSize: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
+                <input type="range" min="5" max="50" value={gridLayoutParams.graphSize} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                graphSize: parseInt(e.target.value),
+            })} className="w-full"/>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>5</span>
                   <span className="font-medium">
@@ -592,74 +346,39 @@ export const ParameterPanel = ({
               </div>
               <div className="space-y-2">
                 <label className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={gridLayoutParams.isPeriodic}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        isPeriodic: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
+                  <input type="checkbox" checked={gridLayoutParams.isPeriodic} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                isPeriodic: e.target.checked,
+            })} className="mr-2"/>
                   Periodic Boundaries
                 </label>
                 <label className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={gridLayoutParams.showEdgeWeights}
-                    onChange={(e) =>
-                      setGridLayoutParams({
-                        ...gridLayoutParams,
-                        showEdgeWeights: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
+                  <input type="checkbox" checked={gridLayoutParams.showEdgeWeights} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                showEdgeWeights: e.target.checked,
+            })} className="mr-2"/>
                   Show Edge Weights
                 </label>
               </div>
             </div>
-          </div>
-        )}
+          </div>)}
 
         {/* Physics Parameters - Collapsible */}
         <div>
-          <button
-            type="button"
-            onClick={() => updateUIState({ isParametersOpen: !randomWalkUIState.isParametersOpen })}
-            className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded"
-          >
+          <button type="button" onClick={() => updateUIState({ isParametersOpen: !randomWalkUIState.isParametersOpen })} className="flex items-center justify-between w-full text-sm font-medium text-left mb-2 p-2 hover:bg-gray-50 rounded">
             <span>Physics Parameters:</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${randomWalkUIState.isParametersOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg className={`w-4 h-4 transition-transform ${randomWalkUIState.isParametersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
             </svg>
           </button>
-          {randomWalkUIState.isParametersOpen && (
-            <div className="space-y-4 ml-2">
+          {randomWalkUIState.isParametersOpen && (<div className="space-y-4 ml-2">
               {/* Particle Count */}
               <div>
                 <label className="block text-sm font-medium mb-2">Particles:</label>
-                <input
-                  type="range"
-                  min="50"
-                  max="2000"
-                  step="1"
-                  value={gridLayoutParams.particles}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      particles: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
+                <input type="range" min="50" max="2000" step="1" value={gridLayoutParams.particles} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                particles: parseInt(e.target.value),
+            })} className="w-full"/>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>50</span>
                   <span className="font-medium">{gridLayoutParams.particles}</span>
@@ -672,20 +391,10 @@ export const ParameterPanel = ({
                 <label className="block text-sm font-medium mb-2">
                   λ (Collision Rate):
                 </label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="10.0"
-                  step="0.1"
-                  value={gridLayoutParams.collisionRate}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      collisionRate: parseFloat(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
+                <input type="range" min="0.1" max="10.0" step="0.1" value={gridLayoutParams.collisionRate} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                collisionRate: parseFloat(e.target.value),
+            })} className="w-full"/>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>0.1</span>
                   <span className="font-medium">
@@ -700,20 +409,10 @@ export const ParameterPanel = ({
                 <label className="block text-sm font-medium mb-2">
                   a (Jump Length):
                 </label>
-                <input
-                  type="range"
-                  min="0.01"
-                  max="1.0"
-                  step="0.01"
-                  value={gridLayoutParams.jumpLength}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      jumpLength: parseFloat(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
+                <input type="range" min="0.01" max="1.0" step="0.01" value={gridLayoutParams.jumpLength} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                jumpLength: parseFloat(e.target.value),
+            })} className="w-full"/>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>0.01</span>
                   <span className="font-medium">{gridLayoutParams.jumpLength}</span>
@@ -726,28 +425,17 @@ export const ParameterPanel = ({
                 <label className="block text-sm font-medium mb-2">
                   v (Velocity):
                 </label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="5.0"
-                  step="0.1"
-                  value={gridLayoutParams.velocity}
-                  onChange={(e) =>
-                    setGridLayoutParams({
-                      ...gridLayoutParams,
-                      velocity: parseFloat(e.target.value),
-                    })
-                  }
-                  className="w-full"
-                />
+                <input type="range" min="0.1" max="5.0" step="0.1" value={gridLayoutParams.velocity} onChange={(e) => setGridLayoutParams({
+                ...gridLayoutParams,
+                velocity: parseFloat(e.target.value),
+            })} className="w-full"/>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>0.1</span>
                   <span className="font-medium">{gridLayoutParams.velocity}</span>
                   <span>5.0</span>
                 </div>
               </div>
-            </div>
-          )}
+            </div>)}
         </div>
 
 
@@ -757,18 +445,14 @@ export const ParameterPanel = ({
           <div className="flex justify-between">
             <span>D (Diffusion):</span>
             <span>
-              {(
-                gridLayoutParams.velocity ** 2 /
-                (2 * gridLayoutParams.collisionRate)
-              ).toFixed(3)}
+              {(gridLayoutParams.velocity ** 2 /
+            (2 * gridLayoutParams.collisionRate)).toFixed(3)}
             </span>
           </div>
           <div className="flex justify-between">
             <span>Mean Free Path:</span>
             <span>
-              {(
-                gridLayoutParams.velocity / gridLayoutParams.collisionRate
-              ).toFixed(3)}
+              {(gridLayoutParams.velocity / gridLayoutParams.collisionRate).toFixed(3)}
             </span>
           </div>
           <div className="flex justify-between">
@@ -777,6 +461,5 @@ export const ParameterPanel = ({
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
 };

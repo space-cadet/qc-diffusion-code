@@ -1,24 +1,6 @@
 import React from 'react';
-
-interface ExportPanelProps {
-  simulationState: {
-    time: number;
-    status: string;
-    isRunning: boolean;
-  };
-  onExport: (format: 'csv' | 'json' | 'hdf5') => void;
-  onCopy: () => void;
-  onShare: () => void;
-}
-
-export const ExportPanel: React.FC<ExportPanelProps> = ({
-  simulationState,
-  onExport,
-  onCopy,
-  onShare
-}) => {
-  return (
-    <div className="bg-white border rounded-lg p-4 h-full">
+export const ExportPanel = ({ simulationState, onExport, onCopy, onShare }) => {
+    return (<div className="bg-white border rounded-lg p-4 h-full">
       <h3 className="drag-handle text-lg font-semibold mb-4 flex items-center cursor-move">
         📊 Data Export
       </h3>
@@ -27,22 +9,13 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
         <div>
           <label className="block mb-1">Export Format:</label>
           <div className="flex gap-2">
-            <button 
-              className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
-              onClick={() => onExport('csv')}
-            >
+            <button className="px-2 py-1 bg-blue-500 text-white rounded text-xs" onClick={() => onExport('csv')}>
               CSV
             </button>
-            <button 
-              className="px-2 py-1 bg-gray-100 rounded text-xs"
-              onClick={() => onExport('json')}
-            >
+            <button className="px-2 py-1 bg-gray-100 rounded text-xs" onClick={() => onExport('json')}>
               JSON
             </button>
-            <button 
-              className="px-2 py-1 bg-gray-100 rounded text-xs"
-              onClick={() => onExport('hdf5')}
-            >
+            <button className="px-2 py-1 bg-gray-100 rounded text-xs" onClick={() => onExport('hdf5')}>
               HDF5
             </button>
           </div>
@@ -52,27 +25,27 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
           <label className="block mb-2">Data to Export:</label>
           <div className="space-y-1 text-xs">
             <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" defaultChecked/>
               Particle positions
             </label>
             <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" defaultChecked/>
               Density field ρ(x,t)
             </label>
             <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" defaultChecked/>
               Velocity field u(x,t)
             </label>
             <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" defaultChecked/>
               Collision events
             </label>
             <label className="flex items-center gap-1">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" defaultChecked/>
               Parameters & metadata
             </label>
             <label className="flex items-center gap-1">
-              <input type="checkbox" />
+              <input type="checkbox"/>
               Individual trajectories
             </label>
           </div>
@@ -87,26 +60,16 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
         </div>
 
         <div className="flex gap-2">
-          <button 
-            className="px-3 py-1 bg-green-500 text-white rounded text-xs"
-            onClick={() => onExport('csv')}
-          >
+          <button className="px-3 py-1 bg-green-500 text-white rounded text-xs" onClick={() => onExport('csv')}>
             📥 Download
           </button>
-          <button 
-            className="px-2 py-1 bg-gray-100 rounded text-xs"
-            onClick={onCopy}
-          >
+          <button className="px-2 py-1 bg-gray-100 rounded text-xs" onClick={onCopy}>
             📋
           </button>
-          <button 
-            className="px-2 py-1 bg-gray-100 rounded text-xs"
-            onClick={onShare}
-          >
+          <button className="px-2 py-1 bg-gray-100 rounded text-xs" onClick={onShare}>
             🔗
           </button>
         </div>
       </div>
-    </div>
-  );
+    </div>);
 };
