@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"build": "cd packages/ts-quantum && pnpm build && cd ../graph-core && pnpm build && cd ../../frontend && tsc -b && vite build",
+		"build": "pnpm --filter ts-quantum build && pnpm --filter graph-core build && pnpm --filter frontend build",
 		"clean": "pnpm --filter \"*\" --parallel exec rm -rf dist build .next .nuxt out",
 		"index": "node scripts/index-query.js"
 	},
