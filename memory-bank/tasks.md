@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2026-01-11 16:15:00 IST_
+_Last Updated: 2026-01-12 17:01:21 IST_
 
 ## Active Tasks
 
@@ -43,6 +43,11 @@ _Last Updated: 2026-01-11 16:15:00 IST_
 | C22 | Strategy System Implementation and Architecture    | 🔄 IN PROGRESS | HIGH     | 2025-09-09 | C5c, C12, C19   |
 | C23 | Comprehensive Testing Framework Enhancement   | 🔄 IN PROGRESS | HIGH     | 2025-09-10 | C15a, C21     |
 | C24 | Quantum Walk Explorer Implementation              | ✅ COMPLETED   | HIGH     | 2025-01-11 | C5b, C17       |
+| C25 | Random Walk Page Architecture Review and Fix     | 🔄 IN PROGRESS | CRITICAL | 2026-01-12 | C5b, C5c, C16b |
+| C25a | Critical Bug Fixes (Graph Physics, Replay, Race) | 📝 PLANNED | CRITICAL | 2026-01-12 | C25 |
+| C25b | Type Safety Improvements                         | 📝 PLANNED     | HIGH     | 2026-01-12 | C25 |
+| C25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | C25a |
+| C25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | C25c |
 
 ## Task Details
 
@@ -287,3 +292,33 @@ _Last Updated: 2026-01-11 16:15:00 IST_
 | C0  | Code Subproject Memory Bank Initialization | 2025-08-20 08:42:01 IST |
 | C11 | PDE Solver Choice Implementation (merged into C2a) | 2025-08-25 13:03:55 IST |
 | C21 | Build and Dependency Vulnerability Resolution       | 2025-09-09 11:08:11 IST |
+
+### C25: Random Walk Page Architecture Review and Fix
+**Description**: Complete end-to-end review identifying 31 issues (3 critical, 12 high, 13 medium, 3 low). Fixes broken features and improves code quality.
+**Status**: � IN PROGRESS **Last**: 2026-01-12 17:01:21 IST
+**Files**: `memory-bank/tasks/C25.md`, `memory-bank/sessions/2026-01-12-afternoon.md`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/hooks/useRandomWalkControls.ts`
+**Notes**: Task file updated to follow template format with proper timestamps. Session file created. Memory bank updates in progress. Critical path: P3-006 (Graph GPU), P1-011 (Replay), P1-007 (Race). Est. 40-50 hours over 3 weeks.
+
+### C25a: Critical Bug Fixes
+**Description**: Fix 3 critical bugs blocking features: graph physics frozen on GPU, replay controls hardcoded, animation startup race condition
+**Status**: 📝 PLANNED **Last**: 2026-01-12 16:54:42 IST
+**Files**: `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/hooks/useRandomWalkControls.ts`
+**Notes**: P3-006 (4-6h), P1-011 (4-6h), P1-007 (2-3h). Total: 10-15 hours
+
+### C25b: Type Safety Improvements  
+**Description**: Add ParticlesLoader interface, remove 7 `any` type casts, improve type safety across codebase
+**Status**: 📝 PLANNED **Last**: 2026-01-12 16:54:42 IST
+**Files**: `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/hooks/useRandomWalkControls.ts`
+**Notes**: P6-001 (2-3h), P6-002 (2-3h). Total: 4-6 hours
+
+### C25c: Dependency and State Fixes
+**Description**: Add missing useGPU dependency, fix GPU mode switching, consolidate bidirectional state sync
+**Status**: 📝 PLANNED **Last**: 2026-01-12 16:54:42 IST
+**Files**: `frontend/src/hooks/useRandomWalkEngine.ts`, `frontend/src/RandomWalkSim.tsx`
+**Notes**: P1-001 (0.5h), P5-002 (0.5h), P1-008 (4-6h). Total: 5-7 hours
+
+### C25d: Architecture Refactoring
+**Description**: Long-term refactoring - split useParticlesLoader into focused hooks, consolidate state management
+**Status**: 📝 PLANNED **Last**: 2026-01-12 16:54:42 IST
+**Files**: `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`
+**Notes**: P7-002 (8-10h), P7-003 (6-8h). Total: 14-18 hours. Phase 3-4 priority.
