@@ -35,6 +35,7 @@ interface WindowRect {
 }
 
 interface RandomWalkSimulationState {
+  isRunning: boolean
   time: number
   collisions: number
   interparticleCollisions: number
@@ -53,6 +54,15 @@ interface RandomWalkSimulationState {
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number }
   }>
   observableData: Record<string, any>
+  selectedHistoryIndex: number
+  history: Array<{
+    startTime: number
+    endTime: number
+    parameters: RandomWalkParams
+    particleData: RandomWalkSimulationState['particleData']
+    densityHistory: RandomWalkSimulationState['densityHistory']
+    observableData: RandomWalkSimulationState['observableData']
+  }>
   gpuState?: {
     positions: Float32Array
     velocities: Float32Array
@@ -115,6 +125,7 @@ interface AppState {
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
   setRandomWalkUIState: (state: Partial<RandomWalkUIState>) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
+  setSelectedHistoryIndex: (index: number) => void
   setObservablesWindow: (rect: WindowRect) => void
   setCustomObservablesWindow: (rect: WindowRect) => void
   setZCounter: (value: number) => void
@@ -128,6 +139,7 @@ interface AppState {
   setUseNewEngine: (useNew: boolean) => void
   setUseStreamingObservables: (useStreaming: boolean) => void
   setUseGPU: (useGPU: boolean) => void
+  setIsRunning: (isRunning: boolean) => void
   updateSimulationMetrics: (time: number, collisions: number, status: RandomWalkSimulationState['status'], interparticleCollisions: number) => void
   saveSimulationSnapshot: (
     particleData: RandomWalkSimulationState['particleData'],
@@ -249,6 +261,7 @@ export const useAppStore = create<AppState>()(
         densityAutoUpdate: false,
       },
       randomWalkSimulationState: {
+        isRunning: false,
         time: 0,
         collisions: 0,
         interparticleCollisions: 0,
@@ -256,6 +269,8 @@ export const useAppStore = create<AppState>()(
         particleData: null,
         densityHistory: [],
         observableData: {},
+        selectedHistoryIndex: -1,
+        history: [],
       },
       // Default position/size for Observables floating window
       observablesWindow: {
@@ -287,6 +302,12 @@ export const useAppStore = create<AppState>()(
       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
       setRandomWalkUIState: (partial) => set((state) => ({ randomWalkUIState: { ...state.randomWalkUIState, ...partial } })),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
+      setSelectedHistoryIndex: (index) => set((state) => ({
+        randomWalkSimulationState: {
+          ...state.randomWalkSimulationState,
+          selectedHistoryIndex: index
+        }
+      })),
       setObservablesWindow: (rect) => set({ observablesWindow: rect }),
       setCustomObservablesWindow: (rect) => set({ customObservablesWindow: rect }),
       setZCounter: (value) => set({ zCounter: value }),
@@ -308,6 +329,12 @@ export const useAppStore = create<AppState>()(
       setUseNewEngine: (useNew) => set({ useNewEngine: useNew }),
       setUseStreamingObservables: (useStreaming) => set({ useStreamingObservables: useStreaming }),
       setUseGPU: (useGPU) => set({ useGPU: useGPU }),
+      setIsRunning: (isRunning) => set((state) => ({
+        randomWalkSimulationState: {
+          ...state.randomWalkSimulationState,
+          isRunning
+        }
+      })),
       updateSimulationMetrics: (time, collisions, status, interparticleCollisions) => 
         set((state) => ({
           randomWalkSimulationState: {

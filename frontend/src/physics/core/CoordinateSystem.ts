@@ -33,9 +33,7 @@ export class CoordinateSystem {
     const hPhys = (this.boundaries.yMax - this.boundaries.yMin) || 1;
 
     const x = ((physics.x - this.boundaries.xMin) / wPhys) * this.canvasSize.width;
-    const y = this.dimension === '1D'
-      ? this.canvasSize.height / 2
-      : ((physics.y - this.boundaries.yMin) / hPhys) * this.canvasSize.height;
+    const y = ((physics.y - this.boundaries.yMin) / hPhys) * this.canvasSize.height;
     return { x, y };
   }
 

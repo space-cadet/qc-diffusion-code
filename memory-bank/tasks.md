@@ -1,7 +1,7 @@
 # Task Registry
 
 _Created: 2025-08-20 08:31:32 IST_
-_Last Updated: 2026-01-12 17:01:21 IST_
+_Last Updated: 2026-01-12 18:19:28 IST_
 
 ## Active Tasks
 
@@ -295,9 +295,9 @@ _Last Updated: 2026-01-12 17:01:21 IST_
 
 ### C25: Random Walk Page Architecture Review and Fix
 **Description**: Complete end-to-end review identifying 31 issues (3 critical, 12 high, 13 medium, 3 low). Fixes broken features and improves code quality.
-**Status**: � IN PROGRESS **Last**: 2026-01-12 17:01:21 IST
-**Files**: `memory-bank/tasks/C25.md`, `memory-bank/sessions/2026-01-12-afternoon.md`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/hooks/useRandomWalkControls.ts`
-**Notes**: Task file updated to follow template format with proper timestamps. Session file created. Memory bank updates in progress. Critical path: P3-006 (Graph GPU), P1-011 (Replay), P1-007 (Race). Est. 40-50 hours over 3 weeks.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-01-12 18:19:28 IST
+**Files**: `memory-bank/tasks/C25.md`, `memory-bank/sessions/2026-01-12-evening.md`, `memory-bank/implementation-details/random-walk-*.md`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/RandomWalkSim.tsx`, `frontend/src/hooks/useRandomWalkControls.ts`
+**Notes**: Implementation docs and task files updated with current session progress. Architecture review integration documented across all affected components. Critical path: P3-006 (Graph GPU), P1-011 (Replay), P1-007 (Race). Est. 40-50 hours over 3 weeks.
 
 ### C25a: Critical Bug Fixes
 **Description**: Fix 3 critical bugs blocking features: graph physics frozen on GPU, replay controls hardcoded, animation startup race condition

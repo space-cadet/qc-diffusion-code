@@ -1,7 +1,8 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { updateParticlesFromStrategies } from '../config/tsParticlesConfig';
 import { GPUParticleManager } from '../gpu/GPUParticleManager';
-export const useParticlesLoader = ({ simulatorRef, tsParticlesContainerRef, gridLayoutParamsRef, gridLayoutParams, simulationStateRef, renderEnabledRef, timeRef, collisionsRef, useGPU }) => {
+import { useAppStore } from '../stores/appStore';
+export const useParticlesLoader = ({ simulatorRef, tsParticlesContainerRef, gridLayoutParamsRef, gridLayoutParams, renderEnabledRef, timeRef, collisionsRef, useGPU }) => {
     const animationFrameId = useRef();
     const gpuManagerRef = useRef(null);
     const resetGPU = useCallback(() => {
@@ -111,17 +112,13 @@ export const useParticlesLoader = ({ simulatorRef, tsParticlesContainerRef, grid
         let lastRenderTime = performance.now();
         let accumulatedTime = 0; // For fixed physics timestep
         const animate = () => {
-            const isRunning = simulationStateRef.current?.isRunning;
+            // Get isRunning directly from store
+            const isRunning = useAppStore.getState().randomWalkSimulationState.isRunning;
             const shouldRender = renderEnabledRef.current;
-            // Only continue animation loop if simulation is running
-            if (isRunning) {
-                animationFrameId.current = requestAnimationFrame(animate);
-            }
-            else {
-                // Stop the animation loop when simulation is paused
-                animationFrameId.current = undefined;
-                return;
-            }
+            
+            // Always continue animation loop to maintain rendering capability
+            animationFrameId.current = requestAnimationFrame(animate);
+            
             const currentRenderTime = performance.now();
             const renderDeltaTime = (currentRenderTime - lastRenderTime) / 1000;
             lastRenderTime = currentRenderTime;

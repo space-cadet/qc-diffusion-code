@@ -1,7 +1,7 @@
 # RandomWalkSimulator Refactoring Plan
 
 _Created: 2025-08-31 00:35:27 IST_
-_Last Updated: 2025-09-15 20:12:09 IST_
+_Updated: 2026-01-12 18:19:28 IST_
 
 ## Overview
 
@@ -83,6 +83,30 @@ This document outlines the incremental refactoring of the `RandomWalkSimulator.t
 - Infinite loop in state synchronization (partially fixed)
 - Component functionality needs verification
 - TypeScript compilation errors resolved
+
+### Phase 5: Architecture Review and Bug Fixes (In Progress - 2026-01-12)
+
+**Current Changes**: Comprehensive architecture review identified 31 issues across RandomWalkSim and related components.
+
+**Files Modified**:
+- `frontend/src/RandomWalkSim.tsx` - Main component fixes and improvements
+- `frontend/src/hooks/useRandomWalkEngine.ts` - Engine management fixes
+- `frontend/src/hooks/useRandomWalkControls.ts` - Control logic improvements
+- `frontend/src/components/ExportPanel.tsx` - Export functionality fixes
+- `frontend/src/components/ReplayControls.tsx` - Replay control improvements
+- `frontend/src/components/ParticleCanvas.tsx` - Canvas rendering fixes
+
+**Key Issues Being Addressed**:
+- P3-006: Graph physics frozen on GPU mode (4-6h)
+- P1-011: ReplayControls hardcoded data (4-6h)  
+- P1-007: Animation startup race condition (2-3h)
+- P6-001: Add ParticlesLoader interface (2-3h)
+- P6-002: Remove 7 `any` type casts (2-3h)
+- P1-001: Add useGPU dependency (0.5h)
+- P5-002: Fix GPU mode switching (0.5h)
+- P1-008: Consolidate isRunning state (4-6h)
+
+**Status**: Architecture review complete, implementation in progress with focus on critical bug fixes.
 
 ## Future Considerations
 

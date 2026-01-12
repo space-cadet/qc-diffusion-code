@@ -56,6 +56,7 @@ export class GPUParticleManager {
   private collisionRate: number = 1.0;
   private jumpLength: number = 1.0;
   private speed: number = 1.0; // current speed used by velocity-jump CTRW
+  private simulationTime: number = 0.0; // track actual simulation time for collision counting
 
   constructor(canvas: HTMLCanvasElement, particleCount: number) {
     console.log('[GPU] Initializing GPUParticleManager', { particleCount });
@@ -243,8 +244,42 @@ export class GPUParticleManager {
     return velData;
   }
 
+  // Async method to extract CTRW data without blocking main loop
+  private async extractCTRWData(): Promise<void> {
+    if (!this.ctrwTempLayer) return;
+    
+    const tempData = (this.ctrwTempLayer as GPULayer).getValues() as Float32Array;
+    const texSize = Math.ceil(Math.sqrt(this.particleCount));
+    const velData = new Float32Array(texSize * texSize * 2);
+    const stateData = new Float32Array(texSize * texSize * 4);
+    
+    // Only process actual particles to avoid zero-filling beyond particleCount
+    for (let i = 0; i < this.particleCount; i++) {
+      const texIdx = i; // Direct particle index mapping
+      velData[texIdx * 2] = tempData[texIdx * 4];
+      velData[texIdx * 2 + 1] = tempData[texIdx * 4 + 1];
+      stateData[texIdx * 4] = tempData[texIdx * 4 + 2];     // nextCollisionTime
+      stateData[texIdx * 4 + 1] = tempData[texIdx * 4 + 3]; // randomSeed
+      stateData[texIdx * 4 + 2] = 0;                        // unused
+      stateData[texIdx * 4 + 3] = 0;                        // unused
+    }
+    
+    // Preserve existing velocities for particles beyond particleCount
+    const currentVel = this.velocityLayer.getValues() as Float32Array;
+    for (let i = this.particleCount; i < texSize * texSize; i++) {
+      velData[i * 2] = currentVel[i * 2];
+      velData[i * 2 + 1] = currentVel[i * 2 + 1];
+    }
+    
+    this.velocityLayer.setFromArray(velData);
+    this.ctrwStateLayer.setFromArray(stateData);
+  }
+
   step(dt: number) {
     // console.log('[GPU] Stepping physics', { dt });
+    
+    // Update simulation time
+    this.simulationTime += dt;
     
     // Set scalar uniform and pass samplers via input array order
     this.positionProgram.setUniform('u_dt', dt, FLOAT);
@@ -262,39 +297,17 @@ export class GPUParticleManager {
         }
       } else {
         this.ctrwProgram.setUniform('u_dt', dt, FLOAT);
-        this.ctrwProgram.setUniform('u_current_time', 0.0, FLOAT);
+        this.ctrwProgram.setUniform('u_current_time', this.simulationTime, FLOAT);
         // Single pass updates both velocity and state using persistent temp layer
         this.composer.step({
           program: this.ctrwProgram,
           input: [this.positionLayer, this.velocityLayer, this.ctrwStateLayer],
           output: this.ctrwTempLayer as GPULayer
         });
-        // Extract velocity (xy) and state (zw) - fix data extraction bug
-        const tempData = (this.ctrwTempLayer as GPULayer).getValues() as Float32Array;
-        const texSize = Math.ceil(Math.sqrt(this.particleCount));
-        const velData = new Float32Array(texSize * texSize * 2);
-        const stateData = new Float32Array(texSize * texSize * 4);
-        
-        // Only process actual particles to avoid zero-filling beyond particleCount
-        for (let i = 0; i < this.particleCount; i++) {
-          const texIdx = i; // Direct particle index mapping
-          velData[texIdx * 2] = tempData[texIdx * 4];
-          velData[texIdx * 2 + 1] = tempData[texIdx * 4 + 1];
-          stateData[texIdx * 4] = tempData[texIdx * 4 + 2];     // nextCollisionTime
-          stateData[texIdx * 4 + 1] = tempData[texIdx * 4 + 3]; // randomSeed
-          stateData[texIdx * 4 + 2] = 0;                        // unused
-          stateData[texIdx * 4 + 3] = 0;                        // unused
-        }
-        
-        // Preserve existing velocities for particles beyond particleCount
-        const currentVel = this.velocityLayer.getValues() as Float32Array;
-        for (let i = this.particleCount; i < texSize * texSize; i++) {
-          velData[i * 2] = currentVel[i * 2];
-          velData[i * 2 + 1] = currentVel[i * 2 + 1];
-        }
-        
-        this.velocityLayer.setFromArray(velData);
-        this.ctrwStateLayer.setFromArray(stateData);
+        // Extract data asynchronously to avoid blocking main loop
+        this.extractCTRWData().catch(err => 
+          console.error('[GPU] CTRW data extraction failed:', err)
+        );
       }
     }
     
@@ -324,7 +337,7 @@ export class GPUParticleManager {
           texSize,
           texSize,
           this.particleCount,
-          0.0
+          this.simulationTime
         );
         this.updateCollisionCount();
       } catch (error) {
@@ -343,7 +356,7 @@ export class GPUParticleManager {
       }
 
       let currentCollisions = 0;
-      const currentTime = 0.0;
+      const currentTime = this.simulationTime;
       
       // Debug: check first few collision times
       const debugTimes = [];
@@ -397,6 +410,7 @@ export class GPUParticleManager {
   reset() {
     console.log('[GPU] Resetting GPU state');
     this.collisionCount = 0;
+    this.simulationTime = 0.0;
     const textureSize = Math.ceil(Math.sqrt(this.particleCount));
     const emptyPosData = new Float32Array(textureSize * textureSize * 2);
     const emptyVelData = new Float32Array(textureSize * textureSize * 2);
@@ -523,7 +537,7 @@ export class GPUParticleManager {
   getMetrics() {
     return {
       collisionCount: this.collisionCount,
-      simulationTime: 0.0
+      simulationTime: this.simulationTime
     };
   }
 

@@ -2,13 +2,13 @@ import { useCallback, useRef, useEffect } from 'react';
 import type { Container } from '@tsparticles/engine';
 import { updateParticlesFromStrategies } from '../config/tsParticlesConfig';
 import { GPUParticleManager } from '../gpu/GPUParticleManager';
+import { useAppStore } from '../stores/appStore';
 
 export const useParticlesLoader = ({
   simulatorRef,
   tsParticlesContainerRef,
   gridLayoutParamsRef,
   gridLayoutParams,
-  simulationStateRef,
   renderEnabledRef,
   timeRef,
   collisionsRef,
@@ -18,7 +18,6 @@ export const useParticlesLoader = ({
   tsParticlesContainerRef: React.MutableRefObject<Container | null>,
   gridLayoutParamsRef: React.MutableRefObject<any>,
   gridLayoutParams: any,
-  simulationStateRef: React.MutableRefObject<any>,
   renderEnabledRef: React.MutableRefObject<boolean>,
   timeRef: React.MutableRefObject<number>,
   collisionsRef: React.MutableRefObject<number>,
@@ -26,6 +25,7 @@ export const useParticlesLoader = ({
 }) => {
   const animationFrameId = useRef<number>();
   const gpuManagerRef = useRef<GPUParticleManager | null>(null);
+  const graphPhysicsRef = useRef<any>(null); // Add graph physics ref
 
   const resetGPU = useCallback(() => {
     if (gpuManagerRef.current) {
@@ -33,6 +33,10 @@ export const useParticlesLoader = ({
       timeRef.current = 0;
       collisionsRef.current = 0;
     }
+  }, []);
+
+  const setGraphPhysicsRef = useCallback((ref: any) => {
+    graphPhysicsRef.current = ref;
   }, []);
 
   const initializeGPU = useCallback((particles: any[]) => {
@@ -147,17 +151,18 @@ export const useParticlesLoader = ({
     let accumulatedTime = 0; // For fixed physics timestep
 
     const animate = () => {
-      const isRunning = simulationStateRef.current?.isRunning;
+      // Get isRunning directly from store
+      const isRunning = useAppStore.getState().randomWalkSimulationState.isRunning;
       const shouldRender = renderEnabledRef.current;
       
-      // Only continue animation loop if simulation is running
-      if (isRunning) {
-        animationFrameId.current = requestAnimationFrame(animate);
-      } else {
-        // Stop the animation loop when simulation is paused
-        animationFrameId.current = undefined;
-        return;
+      // CRITICAL LOG: Is the loop running at all?
+      if ((animate as any)._firstRun !== false) {
+          console.log('[useParticlesLoader Log] Animation loop active', { isRunning, shouldRender, useGPU, hasContainer: !!container });
+          (animate as any)._firstRun = false;
       }
+      
+      // Always continue animation loop to maintain rendering capability
+      animationFrameId.current = requestAnimationFrame(animate);
       
       const currentRenderTime = performance.now();
       const renderDeltaTime = (currentRenderTime - lastRenderTime) / 1000;
@@ -181,6 +186,11 @@ export const useParticlesLoader = ({
             simulatorRef.current.step(physicsTimeStep);
           }
           
+          // Also step graph physics if available and simulation type is graph (runs on both GPU and CPU paths)
+          if (graphPhysicsRef.current && gridLayoutParamsRef.current?.simulationType === 'graph') {
+            graphPhysicsRef.current.step(physicsTimeStep);
+          }
+          
           accumulatedTime -= physicsTimeStep;
           timeRef.current += physicsTimeStep;
         }
@@ -201,8 +211,16 @@ export const useParticlesLoader = ({
         accumulatedTime = 0;
       }
 
-      // PHASE B: Rendering - only when needed and visible
-      if (shouldRender && container) {
+    // PHASE B: Rendering - always render when container exists and animation enabled
+      if (container && gridLayoutParamsRef.current?.showAnimation !== false) {
+        if ((animate as any)._frameCounter % 100 === 0) {
+          console.log('[useParticlesLoader Log] Phase B Rendering', { 
+            useGPU, 
+            hasGpuManager: !!gpuManagerRef.current,
+            particleCount: container.particles?.count,
+            isRunning
+          });
+        }
         if (useGPU && gpuManagerRef.current) {
           // Ensure mapper is set if simulator becomes available later
           if (simulatorRef.current && (gpuManagerRef.current as any).setCanvasMapper && !(gpuManagerRef.current as any)._mapperSet) {
@@ -213,16 +231,31 @@ export const useParticlesLoader = ({
               console.log('[GPU] Canvas mapper set (late) from ParticleManager');
             }
           }
-          // Verify container is ready for GPU sync
           if (container.particles && container.particles.count > 0) {
+            if (!(container as any)._frameCounter) (container as any)._frameCounter = 0;
+            (container as any)._frameCounter++;
+            (window as any)._gpuFrameCount = (container as any)._frameCounter; // Fallback for GPUSync
+            
+            const hasMapper = !!(gpuManagerRef.current as any).canvasMapper;
+            if ((container as any)._frameCounter % 100 === 0) {
+              console.log('[useParticlesLoader Log] GPU Sync loop:', {
+                frameCount: (container as any)._frameCounter,
+                hasMapper,
+                particleCount: container.particles.count,
+                useGPU,
+                isRunning
+              });
+            }
             gpuManagerRef.current.syncToTsParticles(container);
           } else {
             console.warn('[GPU] Skipping sync - container not ready');
           }
         } else {
+          // CPU mode - update particles from strategies
           updateParticlesFromStrategies(container, true, isRunning || false);
         }
         
+        // Always draw for smooth UI updates
         (container as any).draw?.(false);
       }
     };
@@ -319,6 +352,7 @@ export const useParticlesLoader = ({
   (particlesLoader as any).initializeGPU = initializeGPU;
   (particlesLoader as any).updateGPUParameters = updateGPUParameters;
   (particlesLoader as any).getGPUManager = () => gpuManagerRef.current;
+  (particlesLoader as any).setGraphPhysicsRef = setGraphPhysicsRef;
 
   return particlesLoader;
 };

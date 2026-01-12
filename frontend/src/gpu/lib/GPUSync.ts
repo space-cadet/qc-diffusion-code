@@ -43,10 +43,34 @@ export function syncParticlesToContainer(
       continue;
     }
 
+    const hasMapper = !!canvasMapper;
+    
+    // Diagnostic logging for the first particle every 100 frames
+    // Check for frameCounter on the container or a global window object for fallback
+    const frameCount = (tsContainer as any)._frameCounter || (window as any)._gpuFrameCount || 0;
+    
+    if (i === 0 && frameCount % 100 === 0) {
+      console.log('[GPU Sync Log] p0 diagnostic:', {
+        particleIdx: i,
+        physics: { px, py },
+        hasMapper,
+        frameCount
+      });
+    }
+
     if (canvasMapper) {
       const mapped = canvasMapper({ x: px, y: py });
       const w = tsContainer?.canvas?.size?.width ?? undefined;
       const h = tsContainer?.canvas?.size?.height ?? undefined;
+
+      if (i === 0 && frameCount % 100 === 0) {
+        console.log('[GPU Sync Log] p0 mapping:', {
+          mapped: { mx: mapped.x, my: mapped.y },
+          canvas: { w, h },
+          bounds
+        });
+      }
+
       const clamp = (v: number, min: number, max: number) => (v < min ? min : v > max ? max : v);
       if (tsParticle.position) {
         tsParticle.position.x = (w && Number.isFinite(mapped.x)) ? clamp(mapped.x, 0, w) : mapped.x ?? 0;

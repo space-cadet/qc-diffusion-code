@@ -82,8 +82,8 @@ export function useRandomWalkEngine({
         if (bounds) {
           const widthPhysics = Math.max(bounds.xMax - bounds.xMin, 1);
           const heightPhysics = Math.max(bounds.yMax - bounds.yMin, 1);
-          const x = ((bounds.xMin - bounds.xMin) / widthPhysics) * w;
-          const y = ((bounds.yMin - bounds.yMin) / heightPhysics) * h;
+          const x = 0; // Physics space starts at 0, so overlay starts at 0
+          const y = 0; // Physics space starts at 0, so overlay starts at 0
           const rectW = (widthPhysics / widthPhysics) * w;
           const rectH = (heightPhysics / heightPhysics) * h;
           setBoundaryRect({ x, y, w: rectW, h: rectH });

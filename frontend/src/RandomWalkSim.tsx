@@ -25,47 +25,57 @@ import "react-resizable/css/styles.css";
 const ReactGridLayout = WidthProvider(RGL);
 export default function RandomWalkSim() {
     // Get parameters from Zustand store (persistent)
-    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU } = useAppStore();
+    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU, setSelectedHistoryIndex, setIsRunning } = useAppStore();
+    const { selectedHistoryIndex } = randomWalkSimulationState;
+    const selectedRun = randomWalkSimulationState.history?.[selectedHistoryIndex] || null;
+
+    const handleSelectRun = (index: number) => {
+        setSelectedHistoryIndex(index);
+    };
+
     // State declarations
     const [boundaryRect, setBoundaryRect] = useState(null);
     const [tempNotice, setTempNotice] = useState(null);
-    const [isRunning, setIsRunning] = useState(false);
     const [simReady, setSimReady] = useState(false);
-    // Create combined simulation state
-    const simulationState = useMemo(() => ({
-        isRunning,
-        ...randomWalkSimulationState,
-    }), [isRunning, randomWalkSimulationState]);
+    // Use isRunning from store instead of local state
+    const isRunning = randomWalkSimulationState.isRunning;
     // Container ref
     const tsParticlesContainerRef = useRef(null);
     // Runtime state refs
     const timeRef = useRef(0);
     const collisionsRef = useRef(0);
     const renderEnabledRef = useRef(true);
+
     const setSimulationState = (state) => {
         if (typeof state === 'function') {
-            const newState = state(simulationState);
+            const newState = state(randomWalkSimulationState);
             setIsRunning(newState.isRunning);
             setRandomWalkSimulationState({
+                isRunning: newState.isRunning,
                 time: newState.time,
                 collisions: newState.collisions,
                 interparticleCollisions: newState.interparticleCollisions ?? 0,
                 status: newState.status,
                 particleData: newState.particleData || [],
                 densityHistory: newState.densityHistory || [],
-                observableData: newState.observableData || {}
+                observableData: newState.observableData || {},
+                selectedHistoryIndex: newState.selectedHistoryIndex ?? -1,
+                history: newState.history || [],
             });
         }
         else {
             setIsRunning(state.isRunning);
             setRandomWalkSimulationState({
+                isRunning: state.isRunning,
                 time: state.time,
                 collisions: state.collisions,
                 interparticleCollisions: state.interparticleCollisions ?? 0,
                 status: state.status,
                 particleData: state.particleData || [],
                 densityHistory: state.densityHistory || [],
-                observableData: state.observableData || {}
+                observableData: state.observableData || {},
+                selectedHistoryIndex: state.selectedHistoryIndex ?? -1,
+                history: state.history || [],
             });
         }
     };
@@ -84,17 +94,23 @@ export default function RandomWalkSim() {
         tsParticlesContainerRef,
         gridLayoutParamsRef: { current: { ...gridLayoutParams, useGPU } },
         gridLayoutParams,
-        simulationStateRef: { current: simulationState },
         renderEnabledRef,
         timeRef,
         collisionsRef,
         useGPU
     });
+    
+    // Wire graph physics ref to particles loader after it's initialized
+    useEffect(() => {
+        if (particlesLoaded && (particlesLoaded as any).setGraphPhysicsRef) {
+            (particlesLoaded as any).setGraphPhysicsRef(graphPhysicsRef);
+        }
+    }, [particlesLoaded, graphPhysicsRef]);
     const { handleStart, handlePause, handleReset, handleInitialize } = useRandomWalkControls({
         simulatorRef,
         tsParticlesContainerRef,
         gridLayoutParams,
-        simulationState,
+        simulationState: randomWalkSimulationState,
         setSimulationState,
         updateSimulationMetrics,
         saveSimulationSnapshot,
@@ -177,16 +193,13 @@ export default function RandomWalkSim() {
         <ReactGridLayout className="layout" layout={randomWalkSimLayouts} onLayoutChange={onLayoutChange} cols={12} rowHeight={50} isDraggable={true} isResizable={true} margin={[10, 10]} containerPadding={[0, 0]} draggableHandle=".drag-handle">
           {/* Parameters Panel */}
           <div key="parameters">
-            <RandomWalkParameterPanel simulatorRef={simulatorRef} gridLayoutParams={gridLayoutParams} setGridLayoutParams={setGridLayoutParams} simulationState={simulationState} setSimulationState={setSimulationState} handleStart={handleStart} handlePause={handlePause} handleReset={handleReset} handleInitialize={handleInitialize}/>
+            <RandomWalkParameterPanel simulatorRef={simulatorRef} gridLayoutParams={gridLayoutParams} setGridLayoutParams={setGridLayoutParams} simulationState={randomWalkSimulationState} setSimulationState={setSimulationState} handleStart={handleStart} handlePause={handlePause} handleReset={handleReset} handleInitialize={handleInitialize}/>
           </div>
 
           {/* Canvas Panel */}
           <div key="canvas">
-            <ParticleCanvas key={`canvas-${gridLayoutParams.dimension}`} gridLayoutParams={gridLayoutParams} simulationStatus={simulationState.status} tsParticlesContainerRef={tsParticlesContainerRef} particlesLoaded={particlesLoaded} graphPhysicsRef={graphPhysicsRef} dimension={gridLayoutParams.dimension}/>
+            <ParticleCanvas key={`canvas-${gridLayoutParams.dimension}`} gridLayoutParams={gridLayoutParams} simulationStatus={randomWalkSimulationState.status} tsParticlesContainerRef={tsParticlesContainerRef} particlesLoaded={particlesLoaded} graphPhysicsRef={graphPhysicsRef} dimension={gridLayoutParams.dimension}/>
           </div>
-
-          {/* Observables Panel placeholder */}
-          <div key="observables"/>
 
           {/* Density Panel */}
           <div key="density">
@@ -204,31 +217,27 @@ export default function RandomWalkSim() {
 
           {/* History Panel */}
           <div key="history">
-            <HistoryPanel simulationState={simulationState}/>
+            <HistoryPanel simulationState={randomWalkSimulationState}/>
           </div>
 
           {/* Replay Panel */}
           <div key="replay">
-            <ReplayControls simulationState={simulationState} selectedRun={{
-            startTime: 5.2,
-            endTime: 12.8,
-            parameters: {
-                collisionRate: 3.0,
-                jumpLength: 0.1,
-                velocity: 1.2,
-            },
-        }}/>
+            <ReplayControls 
+              simulationState={randomWalkSimulationState} 
+              selectedRun={selectedRun}
+              onSelectRun={handleSelectRun}
+            />
           </div>
 
           {/* Export Panel */}
           <div key="export">
-            <ExportPanel simulationState={simulationState} onExport={(format) => console.log(`Exporting in ${format} format`)} onCopy={() => console.log("Copying data")} onShare={() => console.log("Sharing data")}/>
+            <ExportPanel simulationState={randomWalkSimulationState} onExport={(format) => console.log(`Exporting in ${format} format`)} onCopy={() => console.log("Copying data")} onShare={() => console.log("Sharing data")}/>
           </div>
         </ReactGridLayout>
 
         {/* Floating Observables Panel */}
         <FloatingPanel title="Observables" position={{ x: observablesWindow.left, y: observablesWindow.top }} size={{ width: observablesWindow.width, height: observablesWindow.height }} zIndex={observablesWindow.zIndex} isCollapsed={observablesCollapsed} onToggleCollapse={handleObservablesToggleCollapse} onDragStop={handleObservablesDragStop} onResizeStop={handleObservablesResizeStop} onMouseDown={handleObservablesMouseDown}>
-          {useStreamingObservables ? (<StreamObservablesPanel simulatorRef={simulatorRef} simReady={simReady}/>) : (<ObservablesPanel simulatorRef={simulatorRef} isRunning={simulationState.isRunning} simulationStatus={simulationState.status} simReady={simReady}/>)}
+          {useStreamingObservables ? (<StreamObservablesPanel simulatorRef={simulatorRef} simReady={simReady}/>) : (<ObservablesPanel simulatorRef={simulatorRef} isRunning={randomWalkSimulationState.isRunning} simulationStatus={randomWalkSimulationState.status} simReady={simReady}/>)}
         </FloatingPanel>
 
         {/* Floating Custom Observables Panel */}

@@ -154,84 +154,8 @@ const ParticleCanvasComponent = ({ gridLayoutParams, simulationStatus, particles
             });
         }
     }, [container, gridLayoutParams.particles]);
-    // Custom animation loop (render only; physics updates are driven by parent)
-    useEffect(() => {
-        console.log("[PC] effect start", {
-            hasContainer: !!container,
-            showAnimation: gridLayoutParams.showAnimation,
-            simulationStatus,
-        });
-        if (!container || !gridLayoutParams.showAnimation) {
-            console.log("[PC] effect early return: no container or showAnimation=false");
-            return;
-        }
-        // Normalize status and avoid rAF loop unless actually running
-        const isRunningStatus = String(simulationStatus || "").toLowerCase() === "running";
-        // If simulation isn't running, draw a single static frame and avoid rAF loop
-        if (!isRunningStatus) {
-            console.log("[PC] paused/stopped: draw single frame; no rAF loop");
-            container.draw?.(false);
-            return;
-        }
-        let drawCount = 0;
-        let lastTime = performance.now();
-        const animate = () => {
-            const currentTime = performance.now();
-            const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
-            lastTime = currentTime;
-            drawCount++;
-            // Log once at start of animation loop
-            if ((animate as any)._logged !== true) {
-                console.log("ParticleCanvas: animation loop started", {
-                    showAnimation: gridLayoutParams.showAnimation,
-                    count: container.particles.count,
-                });
-                (animate as any)._logged = true;
-            }
-            // Step physics simulation forward if simulator is available
-            // Note: Physics stepping is now handled by useParticlesLoader hook
-            // This animation loop focuses on rendering/syncing visual particles
-            if (isRunningStatus) {
-                // GPU/CPU syncing is now handled exclusively by useParticlesLoader
-                container.draw?.(false);
-            }
-            else {
-                // When paused/stopped, just draw static frame without updates
-                container.draw?.(false);
-            }
-            if (drawCount % 120 === 0) {
-                const particlesContainer = container.particles;
-                const particlesArray = (particlesContainer?.array ?? particlesContainer?._array ?? []);
-                const xPositions = particlesArray.map((p) => p?.position?.x ?? 0);
-                const yPositions = particlesArray.map((p) => p?.position?.y ?? 0);
-                const xVelocities = particlesArray.map((p) => p?.velocity?.x ?? 0);
-                const yVelocities = particlesArray.map((p) => p?.velocity?.y ?? 0);
-                console.log("[PC] animate tick", {
-                    drawCount,
-                    deltaTime: deltaTime.toFixed(4) + 's',
-                    xMin: xPositions.length > 0 ? Math.min(...xPositions) : 0,
-                    xMax: xPositions.length > 0 ? Math.max(...xPositions) : 0,
-                    yMin: yPositions.length > 0 ? Math.min(...yPositions) : 0,
-                    yMax: yPositions.length > 0 ? Math.max(...yPositions) : 0,
-                    vxMin: xVelocities.length > 0 ? Math.min(...xVelocities) : 0,
-                    vxMax: xVelocities.length > 0 ? Math.max(...xVelocities) : 0,
-                    vyMin: yVelocities.length > 0 ? Math.min(...yVelocities) : 0,
-                    vyMax: yVelocities.length > 0 ? Math.max(...yVelocities) : 0,
-                    particleCount: container.particles?.count ?? particlesArray.length
-                });
-            }
-            animationFrameRef.current = requestAnimationFrame(animate) as any;
-        };
-        animationFrameRef.current = requestAnimationFrame(animate) as any;
-        return () => {
-            console.log("[PC] cleanup: cancelAnimationFrame", {
-                hadRaf: !!animationFrameRef.current,
-            });
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-        };
-    }, [container, gridLayoutParams.showAnimation, simulationStatus]);
+    // Rendering is now handled exclusively by useParticlesLoader
+    // This component only manages container lifecycle and particle count
     // Cleanup on unmount
     useEffect(() => {
         return () => {

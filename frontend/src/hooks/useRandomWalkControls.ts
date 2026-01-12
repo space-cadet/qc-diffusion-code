@@ -48,8 +48,20 @@ export function useRandomWalkControls({
     
     // Restart animation loop when simulation resumes
     const container = tsParticlesContainerRef.current;
-    if (container && (container as any)._restartAnimation) {
-      (container as any)._restartAnimation();
+    if (container) {
+      // Retry logic if restart not yet attached (race condition fix)
+      const attempts = 5;
+      const tryRestart = (attempt: number) => {
+        if ((container as any)._restartAnimation) {
+          (container as any)._restartAnimation();
+        } else if (attempt > 0) {
+          setTimeout(() => tryRestart(attempt - 1), 50);
+        } else {
+          console.error('_restartAnimation not available after retries');
+        }
+      };
+      
+      tryRestart(attempts);
     }
     
     // Update state when starting
@@ -186,9 +198,6 @@ export function useRandomWalkControls({
         distJitter: gridLayoutParams.distJitter,
       });
 
-      // Clear existing particles
-      container.particles.clear();
-      
       // Reset physics state and get fresh distribution
       simulatorRef.current.reset();
       
@@ -199,15 +208,17 @@ export function useRandomWalkControls({
       // Get particles from simulator's distribution
       const particles = pm.getAllParticles();
       
+      console.log("handleInitialize: adding particles", { count: particles.length });
+
       // Add to tsParticles in canvas coordinates
       for (const p of particles) {
         const canvasPos = pm.mapToCanvas(p.position);
         container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
       }
 
-      // Initialize GPU if in GPU mode
-      if (useGPU && particlesLoaded.initializeGPU) {
-        particlesLoaded.initializeGPU(particles);
+      // Initialize GPU if in GPU mode - must happen AFTER particles are added to container
+      if (useGPU && (particlesLoaded as any).initializeGPU) {
+        (particlesLoaded as any).initializeGPU(particles);
       }
 
       // Save the initialized particle state

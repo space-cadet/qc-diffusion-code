@@ -86,16 +86,67 @@ export class PhysicsRandomWalk {
   }
 
   calculateDensity(particles: Particle[]): DensityField {
-    // TODO: Interface with DensityCalculator
+    if (particles.length === 0) {
+      return {
+        error: 0,
+        effectiveDiffusion: 0,
+        effectiveVelocity: 0,
+        x: [],
+        rho: [],
+        u: [],
+        moments: { mean: 0, variance: 0, skewness: 0, kurtosis: 0 },
+        collisionRate: []
+      };
+    }
+
+    // Simple density calculation on graph nodes
+    const nodeDensity = new Map<string, number>();
+    const nodeVelocity = new Map<string, { vx: number, vy: number }>();
+    
+    particles.forEach(particle => {
+      // For graph simulation, we'd need to map particle position to nearest node
+      // For now, use position as key (this is a simplified implementation)
+      const key = `${Math.round(particle.position.x)},${Math.round(particle.position.y)}`;
+      nodeDensity.set(key, (nodeDensity.get(key) || 0) + 1);
+      
+      if (!nodeVelocity.has(key)) {
+        nodeVelocity.set(key, { vx: 0, vy: 0 });
+      }
+      const vel = nodeVelocity.get(key)!;
+      vel.vx += particle.velocity.vx;
+      vel.vy += particle.velocity.vy;
+    });
+
+    // Convert to arrays
+    const x: number[] = [];
+    const rho: number[] = [];
+    const u: number[] = [];
+    
+    nodeDensity.forEach((density, key) => {
+      const [xPos, yPos] = key.split(',').map(Number);
+      x.push(xPos);
+      rho.push(density);
+      
+      const vel = nodeVelocity.get(key)!;
+      const avgVel = Math.sqrt(vel.vx * vel.vx + vel.vy * vel.vy) / density;
+      u.push(avgVel);
+    });
+
+    // Calculate moments
+    const mean = rho.reduce((sum, val) => sum + val, 0) / rho.length;
+    const variance = rho.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / rho.length;
+    const skewness = rho.reduce((sum, val) => sum + Math.pow((val - mean) / Math.sqrt(variance), 3), 0) / rho.length;
+    const kurtosis = rho.reduce((sum, val) => sum + Math.pow((val - mean) / Math.sqrt(variance), 4), 0) / rho.length;
+
     return {
       error: 0,
-      effectiveDiffusion: 0,
-      effectiveVelocity: 0,
-      x: [],
-      rho: [],
-      u: [],
-      moments: { mean: 0, variance: 0, skewness: 0, kurtosis: 0 },
-      collisionRate: []
+      effectiveDiffusion: this.diffusionConstant,
+      effectiveVelocity: this.velocity,
+      x,
+      rho,
+      u,
+      moments: { mean, variance, skewness, kurtosis },
+      collisionRate: Array(rho.length).fill(this.collisionRate)
     };
   }
 
@@ -209,7 +260,16 @@ export class PhysicsRandomWalk {
   }
 
   getDensityField(): DensityField {
-    // Calculate and return density field
-    return {} as DensityField;
+    // For now, return empty field - would need access to current particles
+    return {
+      error: 0,
+      effectiveDiffusion: this.diffusionConstant,
+      effectiveVelocity: this.velocity,
+      x: [],
+      rho: [],
+      u: [],
+      moments: { mean: 0, variance: 0, skewness: 0, kurtosis: 0 },
+      collisionRate: []
+    };
   }
 }
