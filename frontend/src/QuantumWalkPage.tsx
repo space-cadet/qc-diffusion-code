@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Plot from 'react-plotly.js';
 import { useAppStore } from './stores/appStore';
 import * as math from 'mathjs';
-import { StateVector, MatrixOperator, SparseOperator, createSparseMatrix, setSparseEntry, } from '../../packages/ts-quantum/src';
+import { StateVector, MatrixOperator, SparseOperator, createSparseMatrix, setSparseEntry, } from 'ts-quantum';
 // --- Constants ---
 const INITIAL_LATTICE_SIZE = 51;
 const DEFAULT_PERSISTENCE = 0.9;
