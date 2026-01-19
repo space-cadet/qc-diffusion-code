@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-19 18:44:49 IST*
+*Last Updated: 2026-01-19 18:57:41 IST*
 
 ## Active Tasks
 
@@ -40,6 +40,7 @@
 | META-1 | Memory Bank Maintenance and Updates               | 🔄 ACTIVE      | MEDIUM   | 2025-08-24 | -               |
 | META-2 | Document Indexing System                          | 🔄 ACTIVE      | MEDIUM   | 2025-08-28 | -               |
 | C21 | Build and Dependency Vulnerability Resolution       | ✅ COMPLETED   | CRITICAL | 2025-09-09 | -            |   
+| C21a | Dependency Peer Resolution Maintenance           | 🔄 ACTIVE      | MEDIUM   | 2026-01-19 | C21          | [Details](tasks/C21a.md) |
 | C22 | Strategy System Implementation and Architecture    | 🔄 IN PROGRESS | HIGH     | 2025-09-09 | C5c, C12, C19   |
 | C23 | Comprehensive Testing Framework Enhancement   | 🔄 IN PROGRESS | HIGH     | 2025-09-10 | C15a, C21     |
 | C24 | Quantum Walk Explorer Implementation              | ✅ COMPLETED   | HIGH     | 2025-01-11 | C5b, C17       |
