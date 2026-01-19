@@ -1,5 +1,6 @@
 import { Parser } from 'expr-eval';
 import type { Particle } from '../types/Particle';
+import { TextObservableParser } from './TextObservableParser';
 
 export interface EvaluationContext {
   position: { x: number; y: number; magnitude: number };
@@ -63,21 +64,37 @@ export class ExpressionEvaluator {
   }
 
   static evaluateFilter(expression: string, context: EvaluationContext): boolean {
+    // Security validation
+    const validation = TextObservableParser.validateExpression(expression);
+    if (!validation.valid) {
+      console.warn(`[ExpressionEvaluator] Invalid filter expression: ${validation.error}`);
+      return false;
+    }
+    
     try {
       const expr = this.parser.parse(expression);
       // Cast to any to satisfy expr-eval's Value map type
       return Boolean(expr.evaluate(context as any));
-    } catch {
+    } catch (error) {
+      console.warn(`[ExpressionEvaluator] Filter evaluation failed:`, error);
       return false;
     }
   }
 
   static evaluateSelect(expression: string, context: EvaluationContext): number {
+    // Security validation
+    const validation = TextObservableParser.validateExpression(expression);
+    if (!validation.valid) {
+      console.warn(`[ExpressionEvaluator] Invalid select expression: ${validation.error}`);
+      return 0;
+    }
+    
     try {
       const expr = this.parser.parse(expression);
       const result = expr.evaluate(context as any);
       return typeof result === 'number' ? result : 0;
-    } catch {
+    } catch (error) {
+      console.warn(`[ExpressionEvaluator] Select evaluation failed:`, error);
       return 0;
     }
   }

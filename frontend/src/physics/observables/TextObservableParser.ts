@@ -194,6 +194,36 @@ export class TextObservableParser {
   }
 
   static validateExpression(expression: string): { valid: boolean; error?: string } {
+    // Security: Block dangerous patterns and limit length
+    if (expression.length > 1000) {
+      return { valid: false, error: 'Expression too long (max 1000 chars)' };
+    }
+    
+    // Block prototype pollution attempts
+    const dangerousPatterns = [
+      /__proto__/,
+      /constructor/,
+      /prototype/,
+      /\[\s*['"`][^'"`]*['"`]\s*\]/, // dynamic property access
+      /\[\s*[^[\]]+\s*\]/, // computed property access
+      /this\./,
+      /window\./,
+      /global\./,
+      /process\./,
+      /require\(/,
+      /import\s+/,
+      /eval\(/,
+      /Function\(/,
+      /setTimeout/,
+      /setInterval/
+    ];
+    
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(expression)) {
+        return { valid: false, error: 'Expression contains prohibited pattern' };
+      }
+    }
+    
     try {
       this.parser.parse(expression);
       // Semantic validation: ensure identifiers map to known context properties
