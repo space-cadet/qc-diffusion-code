@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-19 19:09:00 IST*
+*Last Updated: 2026-01-19 23:49:00 IST*
 
 ## Active Tasks
 
@@ -51,8 +51,16 @@
 | C25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | C25a |
 | C25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | C25c |
 | C26 | Build Performance Optimization and Bundle Size Reduction | ✅ COMPLETED | HIGH | 2026-01-19 | C21 | [Details](tasks/T26.md) |
+| C27 | Simulation Lab Framework | 🔄 IN PROGRESS | HIGH | 2026-01-19 | C7, C7a, C17, C18, C24 | [Details](tasks/C27.md) |
 
 ## Task Details
+
+### C27: Simulation Lab Framework
+
+**Description**: Design and implement shared simulation lab infrastructure for PDE, Classical Walk, and Quantum Walk pages
+**Status**: 🔄 IN PROGRESS **Last**: 2026-01-19 23:49:00 IST
+**Files**: `memory-bank/implementation-details/simulation-lab-framework.md`, `frontend/src/lab/` (planned)
+**Notes**: Architecture analysis complete. Core interfaces (SimulationController, TimeSeriesStore) and component extraction (MetricsGrid, TimelineSlider) designed.
 
 ### C26: Build Performance Optimization and Bundle Size Reduction
 
