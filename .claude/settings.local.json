@@ -5,7 +5,10 @@
       "Bash(pnpm build:*)",
       "Bash(git -C /Users/deepak/code/qc-diffusion-code log --oneline --all -- packages/ts-quantum/dist/esm/)",
       "Bash(pnpm --filter ts-quantum build:*)",
-      "Bash(node -e \"const q = require\\('/Users/deepak/code/qc-diffusion-code/packages/ts-quantum/dist/index.js'\\); console.log\\('MatrixOperator:', typeof q.MatrixOperator\\); console.log\\('StateVector:', typeof q.StateVector\\); console.log\\('SparseOperator:', typeof q.SparseOperator\\);\":*)"
+      "Bash(node -e \"const q = require\\('/Users/deepak/code/qc-diffusion-code/packages/ts-quantum/dist/index.js'\\); console.log\\('MatrixOperator:', typeof q.MatrixOperator\\); console.log\\('StateVector:', typeof q.StateVector\\); console.log\\('SparseOperator:', typeof q.SparseOperator\\);\":*)",
+      "Bash(node:*)",
+      "Bash(pnpm --filter graph-core build:*)",
+      "Bash(npx vite build:*)"
     ]
   }
 }

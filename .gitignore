@@ -61,3 +61,4 @@ packages/*/dist/
 packages/*/vite.config.d.ts
 packages/*/vite.config.d.ts.map
 packages/*/vite.config.js
+.vercel
