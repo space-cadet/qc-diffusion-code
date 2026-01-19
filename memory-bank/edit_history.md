@@ -1,7 +1,35 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-12 18:19:28 IST*
+*Last Updated: 2026-01-19 18:25:00 IST*
+
+### 2026-01-19
+
+#### 18:25:00 IST - C21: Workspace Protocol Migration and Vercel Build Resolution
+
+- Modified `frontend/package.json` - Changed @spin-network/graph-core and ts-quantum from file: to workspace:* protocol
+- Modified `pnpm-lock.yaml` - Removed esbuild@0.25.12 and platform-specific optional dependencies
+- Modified `.claude/settings.local.json` - Added git config, git rm, node, pnpm, and build command permissions
+- Removed `DynamicalBilliards.jl` - Converted from git submodule to local directory
+- Removed `visual-pde` - Converted from git submodule to local directory
+- Modified `.gitignore` - Added .vercel directory exclusion
+- Modified `packages/graph-core/package.json` - Changed CJS output extension from .js to .cjs in exports
+- Modified `packages/graph-core/vite.config.ts` - Updated CJS output configuration
+- Modified `packages/ts-quantum/package.json` - Updated exports to use .js extension for ESM, added ESM build script
+- Created `packages/ts-quantum/tsconfig.esm.json` - ESM build configuration with .js output
+- Created `packages/ts-quantum/` directory - Complete package from git submodule (89 files, 98,860 lines)
+- Created `packages/ts-quantum/.gitignore` - Package-specific git exclusions
+- Created `packages/ts-quantum/fix-imports.sh` - Import conversion utility script
+- Created `packages/ts-quantum/tsconfig.json` - TypeScript build configuration
+- Modified `frontend/src/RandomWalkSim.tsx` - Updated imports for type safety
+- Modified `packages/graph-core/package.json` - Fixed exports to prioritize types field
+- Modified `memory-bank/tasks/C21.md` - Added Phase 6 documentation of workspace protocol migration
+- Created `memory-bank/implementation-details/monorepo-workspace-protocol.md` - Comprehensive technical documentation
+- Modified `memory-bank/session_cache.md` - Updated current session and history
+- Modified `memory-bank/tasks.md` - Updated C21 completion with technical details
+- Modified `memory-bank/activeContext.md` - Updated context to reflect build success
+- Created `memory-bank/sessions/2026-01-19-evening.md` - Complete session documentation
+- Modified `memory-bank/edit_history.md` - Added this comprehensive technical record
 
 ### 2026-01-12
 
