@@ -25,7 +25,11 @@ import "react-resizable/css/styles.css";
 const ReactGridLayout = WidthProvider(RGL);
 export default function RandomWalkSim() {
     // Get parameters from Zustand store (persistent)
-    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU, setSelectedHistoryIndex, setIsRunning } = useAppStore();
+    const storeValues = useAppStore();
+    console.log('Full useAppStore return:', storeValues);
+    console.log('setIsRunning in store:', 'setIsRunning' in storeValues);
+    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU, setSelectedHistoryIndex, setIsRunning } = storeValues;
+    console.log('useAppStore destructured values:', { setIsRunning: typeof setIsRunning });
     const { selectedHistoryIndex } = randomWalkSimulationState;
     const selectedRun = randomWalkSimulationState.history?.[selectedHistoryIndex] || null;
 
@@ -47,6 +51,7 @@ export default function RandomWalkSim() {
     const renderEnabledRef = useRef(true);
 
     const setSimulationState = (state) => {
+        console.log('setSimulationState called, setIsRunning type:', typeof setIsRunning);
         if (typeof state === 'function') {
             const newState = state(randomWalkSimulationState);
             setIsRunning(newState.isRunning);
