@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanel } from "./components/RandomWalkParameterPanel";
-import { DensityComparison } from "./components/DensityComparison";
+const DensityComparison = lazy(() => import("./components/DensityComparison").then(module => ({ default: module.DensityComparison })));
 import { HistoryPanel } from "./components/HistoryPanel";
 import { ReplayControls } from "./components/ReplayControls";
 import { ExportPanel } from "./components/ExportPanel";
-import { ParticleCanvas } from "./components/ParticleCanvas";
+const ParticleCanvas = lazy(() => import("./components/ParticleCanvas").then(module => ({ default: module.ParticleCanvas })));
 import { StreamObservablesPanel } from "./components/stream-ObservablesPanel";
 import { ObservablesPanel } from "./components/ObservablesPanel";
 import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
@@ -203,12 +203,15 @@ export default function RandomWalkSim() {
 
           {/* Canvas Panel */}
           <div key="canvas">
-            <ParticleCanvas key={`canvas-${gridLayoutParams.dimension}`} gridLayoutParams={gridLayoutParams} simulationStatus={randomWalkSimulationState.status} tsParticlesContainerRef={tsParticlesContainerRef} particlesLoaded={particlesLoaded} graphPhysicsRef={graphPhysicsRef} dimension={gridLayoutParams.dimension}/>
+            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading canvas...</div>}>
+              <ParticleCanvas key={`canvas-${gridLayoutParams.dimension}`} gridLayoutParams={gridLayoutParams} simulationStatus={randomWalkSimulationState.status} tsParticlesContainerRef={tsParticlesContainerRef} particlesLoaded={particlesLoaded} graphPhysicsRef={graphPhysicsRef} dimension={gridLayoutParams.dimension}/>
+            </Suspense>
           </div>
 
           {/* Density Panel */}
           <div key="density">
-            <DensityComparison 
+            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading density...</div>}>
+              <DensityComparison 
               particles={[]} 
               particleCount={0} 
               simulatorRef={simulatorRef} 
@@ -218,6 +221,7 @@ export default function RandomWalkSim() {
               }} 
               particlesLoaded={particlesLoaded}
             />
+            </Suspense>
           </div>
 
           {/* History Panel */}

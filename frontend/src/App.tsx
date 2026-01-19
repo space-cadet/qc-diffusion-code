@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import PdeParameterPanel from "./PdeParameterPanel";
-import PlotComponent from "./PlotComponent";
-import RandomWalkSim from "./RandomWalkSim";
-import QuantumWalkPage from "./QuantumWalkPage";
-import AnalysisPage from "./components/AnalysisPage";
+const PlotComponent = lazy(() => import("./PlotComponent"));
+const RandomWalkSim = lazy(() => import("./RandomWalkSim"));
+const QuantumWalkPage = lazy(() => import("./QuantumWalkPage"));
+const AnalysisPage = lazy(() => import("./components/AnalysisPage"));
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
@@ -180,10 +180,12 @@ export default function App() {
               <PdeParameterPanel params={simulationParams} onChange={setSimulationParams}/>
             </div>
             <div className="flex-1 relative">
-              <PlotComponent frame={pdeState.lastFrame ?? currentFrame} isRunning={pdeState.isRunning} params={simulationParams} onChange={setSimulationParams} onStart={handleStart} onStop={handleStop} onPause={handlePause} onReset={handleReset}/>
+              <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
+                <PlotComponent frame={pdeState.lastFrame ?? currentFrame} isRunning={pdeState.isRunning} params={simulationParams} onChange={setSimulationParams} onStart={handleStart} onStop={handleStop} onPause={handlePause} onReset={handleReset}/>
+              </Suspense>
               {isWebGL && (<canvas ref={canvasRef} width={simulationParams.mesh_size} height={1} style={{ display: 'none' }}/>)}
             </div>
-          </div>) : activeTab === 'randomwalksim' ? (<RandomWalkSim />) : activeTab === 'quantumwalk' ? (<QuantumWalkPage />) : (<AnalysisPage />)}
+          </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>)}
       </div>
     </div>);
 }
