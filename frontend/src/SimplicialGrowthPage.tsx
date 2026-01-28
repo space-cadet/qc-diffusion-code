@@ -5,6 +5,8 @@ import { ControlButtons } from './lab/components/ControlButtons';
 import { ParameterPanel } from './lab/components/ParameterPanel';
 import { AnalysisTable } from './lab/components/AnalysisTable';
 import { MetricsTable } from './lab/components/MetricsTable';
+import { SimplicialVisualization } from './lab/components/SimplicialVisualization';
+import { PachnerMoveTester } from './lab/components/PachnerMoveTester';
 import { useSimplicialGrowth } from './lab/hooks/useSimplicialGrowth';
 import { ExportService } from './lab/services/ExportService';
 import { SimplicialGrowthController } from './lab/controllers/SimplicialGrowthController';
@@ -12,6 +14,7 @@ import { SimplicialGrowthParams, SimplicialGrowthState } from './lab/types/simpl
 
 export const SimplicialGrowthPage: React.FC = () => {
   const simulation = useSimplicialGrowth({
+    dimension: 3,
     initialVertices: 4,
     maxSteps: 100,
     moveProbabilities: {
@@ -19,6 +22,9 @@ export const SimplicialGrowthPage: React.FC = () => {
       '2-3': 0.3,
       '3-2': 0.2,
       '4-1': 0.1,
+      '1-3': 0.0,
+      '2-2': 0.0,
+      '3-1': 0.0,
     },
     growthRate: 1.0,
   });
@@ -27,6 +33,7 @@ export const SimplicialGrowthPage: React.FC = () => {
   const [metricsHistory, setMetricsHistory] = React.useState<any[]>([]);
 
   const [params, setParams] = React.useState<SimplicialGrowthParams>({
+    dimension: 3,
     initialVertices: 4,
     maxSteps: 100,
     moveProbabilities: {
@@ -34,6 +41,9 @@ export const SimplicialGrowthPage: React.FC = () => {
       '2-3': 0.3,
       '3-2': 0.2,
       '4-1': 0.1,
+      '1-3': 0.0,
+      '2-2': 0.0,
+      '3-1': 0.0,
     },
     growthRate: 1.0,
   });
@@ -88,6 +98,11 @@ export const SimplicialGrowthPage: React.FC = () => {
   const handleExportCSV = () => {
     const csv = simulation.exportCSV(['totalSimplices', 'vertexCount', 'volume', 'curvature']);
     ExportService.downloadCSV(csv, `simplicial-growth-${Date.now()}.csv`);
+  };
+
+  const handleApplyPachnerMove = (moveType: any) => {
+    console.debug('[SimplicialGrowthPage] Applying Pachner move:', moveType);
+    simulation.step(); // This will trigger the random move selection - we could enhance this to force specific moves
   };
 
   const handleCopyMetrics = async () => {
@@ -147,11 +162,22 @@ export const SimplicialGrowthPage: React.FC = () => {
       title: 'Simulation Parameters',
       fields: [
         {
+          label: 'Dimension',
+          type: 'select' as const,
+          value: params.dimension,
+          onChange: (val: 2 | 3) => handleParamChange('dimension', val),
+          options: [
+            { label: '2D (Triangles)', value: '2' },
+            { label: '3D (Tetrahedra)', value: '3' },
+          ],
+          hint: 'Choose between 2D triangulation or 3D triangulation',
+        },
+        {
           label: 'Initial Vertices',
           type: 'input' as const,
           value: params.initialVertices,
           onChange: (val: number) => handleParamChange('initialVertices', val),
-          min: 4,
+          min: params.dimension === 2 ? 3 : 4,
           max: 20,
           step: 1,
         },
@@ -177,8 +203,45 @@ export const SimplicialGrowthPage: React.FC = () => {
       ],
     },
     {
-      title: 'Pachner Move Probabilities',
-      fields: [
+      title: params.dimension === 2 ? '2D Pachner Move Probabilities' : '3D Pachner Move Probabilities',
+      fields: params.dimension === 2 ? [
+        {
+          label: '1-3 Move (Subdivision)',
+          type: 'range' as const,
+          value: params.moveProbabilities['1-3'],
+          onChange: (val: number) => {
+            handleParamChange('moveProbabilities', { ...params.moveProbabilities, '1-3': val });
+          },
+          min: 0,
+          max: 1,
+          step: 0.05,
+          hint: 'Replace 1 triangle with 3 triangles',
+        },
+        {
+          label: '2-2 Move (Edge Flip)',
+          type: 'range' as const,
+          value: params.moveProbabilities['2-2'],
+          onChange: (val: number) => {
+            handleParamChange('moveProbabilities', { ...params.moveProbabilities, '2-2': val });
+          },
+          min: 0,
+          max: 1,
+          step: 0.05,
+          hint: 'Replace 2 triangles with 2 triangles (flip edge)',
+        },
+        {
+          label: '3-1 Move (Coarsening)',
+          type: 'range' as const,
+          value: params.moveProbabilities['3-1'],
+          onChange: (val: number) => {
+            handleParamChange('moveProbabilities', { ...params.moveProbabilities, '3-1': val });
+          },
+          min: 0,
+          max: 1,
+          step: 0.05,
+          hint: 'Replace 3 triangles with 1 triangle',
+        },
+      ] : [
         {
           label: '1-4 Move (Subdivision)',
           type: 'range' as const,
@@ -189,7 +252,7 @@ export const SimplicialGrowthPage: React.FC = () => {
           min: 0,
           max: 1,
           step: 0.05,
-          hint: 'Replace 1 simplex with 4 simplices',
+          hint: 'Replace 1 tetrahedron with 4 tetrahedra',
         },
         {
           label: '2-3 Move',
@@ -201,7 +264,7 @@ export const SimplicialGrowthPage: React.FC = () => {
           min: 0,
           max: 1,
           step: 0.05,
-          hint: 'Replace 2 simplices with 3 simplices',
+          hint: 'Replace 2 tetrahedra with 3 tetrahedra',
         },
         {
           label: '3-2 Move',
@@ -213,7 +276,7 @@ export const SimplicialGrowthPage: React.FC = () => {
           min: 0,
           max: 1,
           step: 0.05,
-          hint: 'Replace 3 simplices with 2 simplices',
+          hint: 'Replace 3 tetrahedra with 2 tetrahedra',
         },
         {
           label: '4-1 Move (Coarsening)',
@@ -225,7 +288,7 @@ export const SimplicialGrowthPage: React.FC = () => {
           min: 0,
           max: 1,
           step: 0.05,
-          hint: 'Replace 4 simplices with 1 simplex',
+          hint: 'Replace 4 tetrahedra with 1 tetrahedron',
         },
       ],
     },
@@ -274,6 +337,37 @@ export const SimplicialGrowthPage: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-xl font-semibold mb-4">Simplicial Complex Metrics</h2>
                 <MetricsGrid metrics={metrics} columns={4} title="" />
+              </div>
+
+              {/* Visualization Section */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h2 className="text-xl font-semibold mb-4">Simplicial Complex Visualization</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Main Visualization */}
+                  <div>
+                    {simulation.currentState ? (
+                      <div className="flex justify-center">
+                        <SimplicialVisualization 
+                          complex={simulation.currentState.complex}
+                          width={600}
+                          height={400}
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No visualization data available
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Pachner Move Tester */}
+                  {simulation.currentState && (
+                    <PachnerMoveTester
+                      complex={simulation.currentState.complex}
+                      onApplyMove={handleApplyPachnerMove}
+                    />
+                  )}
+                </div>
               </div>
 
               {/* Parameters Section */}

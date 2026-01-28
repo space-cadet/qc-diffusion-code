@@ -3,7 +3,9 @@
  * For simplicial growth algorithm implementation
  */
 
-export type MoveType = '1-4' | '2-3' | '3-2' | '4-1';
+export type MoveType = '1-4' | '2-3' | '3-2' | '4-1' | '1-3' | '2-2' | '3-1';
+
+export type Dimension = 2 | 3;
 
 export interface Simplex {
   id: number;
@@ -15,6 +17,7 @@ export interface SimplicialComplex {
   simplices: Simplex[];
   vertexCount: number;
   dimension: number;
+  vertexPositions: Map<number, { x: number; y: number }>; // 2D positions for visualization
 }
 
 export interface SimplicialGrowthState {
@@ -26,6 +29,9 @@ export interface SimplicialGrowthState {
     '2-3': number;
     '3-2': number;
     '4-1': number;
+    '1-3': number;
+    '2-2': number;
+    '3-1': number;
   };
   metrics: {
     totalSimplices: number;
@@ -37,6 +43,7 @@ export interface SimplicialGrowthState {
 }
 
 export interface SimplicialGrowthParams {
+  dimension: Dimension;
   initialVertices: number;
   maxSteps: number;
   moveProbabilities: {
@@ -44,6 +51,9 @@ export interface SimplicialGrowthParams {
     '2-3': number;
     '3-2': number;
     '4-1': number;
+    '1-3': number;
+    '2-2': number;
+    '3-1': number;
   };
   growthRate: number;
 }

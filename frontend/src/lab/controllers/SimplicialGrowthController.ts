@@ -25,11 +25,12 @@ export class SimplicialGrowthController implements SimulationController<Simplici
     this.nextSimplexId = 0;
     this.nextVertexId = params.initialVertices;
 
-    // Initialize with a single tetrahedron (4 vertices, 4 faces)
+    // Initialize based on dimension
     const initialComplex: SimplicialComplex = {
-      simplices: this.createInitialTetrahedron(),
+      simplices: params.dimension === 2 ? this.createInitialTriangle() : this.createInitialTetrahedron(),
       vertexCount: params.initialVertices,
-      dimension: 3,
+      dimension: params.dimension,
+      vertexPositions: this.createInitialVertexPositions(params.dimension, params.initialVertices),
     };
 
     this.state = this.createState(initialComplex, null);
@@ -97,6 +98,51 @@ export class SimplicialGrowthController implements SimulationController<Simplici
     this.running = running;
   }
 
+  private createInitialTriangle(): Simplex[] {
+    const simplices: Simplex[] = [];
+    
+    // Create a single triangle (3 vertices, 1 face)
+    simplices.push({
+      id: this.nextSimplexId++,
+      vertices: [0, 1, 2],
+      dimension: 2, // In 2D, triangles are 2-simplices
+    });
+
+    return simplices;
+  }
+
+  private createInitialVertexPositions(dimension: number, vertexCount: number): Map<number, { x: number; y: number }> {
+    const positions = new Map<number, { x: number; y: number }>();
+    
+    if (dimension === 2) {
+      // For 2D, create an equilateral triangle for initial state
+      if (vertexCount === 3) {
+        const centerX = 300;
+        const centerY = 200;
+        const radius = 100;
+        
+        positions.set(0, { x: centerX, y: centerY - radius });
+        positions.set(1, { x: centerX - radius * 0.866, y: centerY + radius * 0.5 });
+        positions.set(2, { x: centerX + radius * 0.866, y: centerY + radius * 0.5 });
+      } else {
+        // For more vertices, use circular layout
+        const centerX = 300;
+        const centerY = 200;
+        const radius = 100;
+        
+        for (let i = 0; i < vertexCount; i++) {
+          const angle = (2 * Math.PI * i) / vertexCount;
+          positions.set(i, {
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle),
+          });
+        }
+      }
+    }
+    
+    return positions;
+  }
+
   private createInitialTetrahedron(): Simplex[] {
     const simplices: Simplex[] = [];
     
@@ -133,6 +179,26 @@ export class SimplicialGrowthController implements SimulationController<Simplici
   private applyPachnerMove(complex: SimplicialComplex, moveType: MoveType): SimplicialComplex {
     const newComplex = { ...complex, simplices: [...complex.simplices] };
 
+    // Handle 2D moves
+    if (complex.dimension === 2) {
+      switch (moveType) {
+        case '1-3':
+          // 1-3 move: Replace 1 triangle with 3 triangles
+          return this.apply1to3Move(newComplex);
+        case '2-2':
+          // 2-2 move: Replace 2 triangles with 2 triangles (flip edge)
+          return this.apply2to2Move(newComplex);
+        case '3-1':
+          // 3-1 move: Replace 3 triangles with 1 triangle
+          return this.apply3to1Move(newComplex);
+        default:
+          // Invalid move for 2D
+          console.warn(`[SimplicialGrowthController] Invalid 2D move: ${moveType}`);
+          return newComplex;
+      }
+    }
+
+    // Handle 3D moves
     switch (moveType) {
       case '1-4':
         // 1-4 move: Replace 1 tetrahedron with 4 tetrahedra
@@ -146,6 +212,10 @@ export class SimplicialGrowthController implements SimulationController<Simplici
       case '4-1':
         // 4-1 move: Replace 4 tetrahedra with 1 tetrahedron
         return this.apply4to1Move(newComplex);
+      default:
+        // Invalid move for 3D
+        console.warn(`[SimplicialGrowthController] Invalid 3D move: ${moveType}`);
+        return newComplex;
     }
   }
 
@@ -213,11 +283,150 @@ export class SimplicialGrowthController implements SimulationController<Simplici
   }
 
   private calculateSimplexVolume(simplex: Simplex): number {
-    // Simplified volume calculation for triangles
+    // Simplified volume calculation
     if (simplex.dimension === 2 && simplex.vertices.length === 3) {
-      return 1.0; // Unit area
+      return 1.0; // Unit area for triangles
     }
-    return 0.5;
+    return 0.5; // Default volume
+  }
+
+  // 2D Pachner moves for triangulations
+  private apply1to3Move(complex: SimplicialComplex): SimplicialComplex {
+    // 1-3 move: Subdivide one triangle into three triangles by adding a vertex at the center
+    if (complex.simplices.length === 0) return complex;
+    
+    const idx = Math.floor(Math.random() * complex.simplices.length);
+    const simplex = complex.simplices[idx];
+    
+    // Get positions of the triangle's vertices
+    const pos0 = complex.vertexPositions.get(simplex.vertices[0]);
+    const pos1 = complex.vertexPositions.get(simplex.vertices[1]);
+    const pos2 = complex.vertexPositions.get(simplex.vertices[2]);
+    
+    if (!pos0 || !pos1 || !pos2) return complex;
+    
+    // Calculate centroid position
+    const centroidX = (pos0.x + pos1.x + pos2.x) / 3;
+    const centroidY = (pos0.y + pos1.y + pos2.y) / 3;
+    
+    // Create new vertex at centroid
+    const centroidVertex = this.nextVertexId++;
+    const newPositions = new Map(complex.vertexPositions);
+    newPositions.set(centroidVertex, { x: centroidX, y: centroidY });
+    
+    const [v0, v1, v2] = simplex.vertices;
+    
+    // Create 3 new triangles from the original
+    const newSimplices: Simplex[] = [
+      { id: this.nextSimplexId++, vertices: [v0, v1, centroidVertex], dimension: 2 },
+      { id: this.nextSimplexId++, vertices: [v1, v2, centroidVertex], dimension: 2 },
+      { id: this.nextSimplexId++, vertices: [v2, v0, centroidVertex], dimension: 2 },
+    ];
+    
+    // Replace original with new simplices
+    const newComplex = { 
+      ...complex, 
+      simplices: [...complex.simplices],
+      vertexPositions: newPositions,
+    };
+    newComplex.simplices.splice(idx, 1, ...newSimplices);
+    newComplex.vertexCount++;
+    
+    return newComplex;
+  }
+
+  private apply2to2Move(complex: SimplicialComplex): SimplicialComplex {
+    const triangles = complex.simplices.filter(s => s.dimension === 2);
+    if (triangles.length < 2) return complex;
+
+    // Find two adjacent triangles sharing a common edge
+    for (let i = 0; i < triangles.length; i++) {
+      for (let j = i + 1; j < triangles.length; j++) {
+        const t1 = triangles[i];
+        const t2 = triangles[j];
+
+        const commonVertices = t1.vertices.filter(v => t2.vertices.includes(v));
+
+        if (commonVertices.length === 2) {
+          // Found two triangles sharing a common edge
+          const [vA, vB] = commonVertices;
+          const vC = t1.vertices.find(v => v !== vA && v !== vB)!;
+          const vD = t2.vertices.find(v => v !== vA && v !== vB)!;
+
+          // Ensure vC and vD are distinct (no self-loops or degenerate cases)
+          if (vC === vD) continue;
+
+          // Create two new triangles with the flipped edge (vC-vD becomes the new edge)
+          const newSimplex1: Simplex = { id: this.nextSimplexId++, vertices: [vA, vC, vD], dimension: 2 };
+          const newSimplex2: Simplex = { id: this.nextSimplexId++, vertices: [vB, vC, vD], dimension: 2 };
+
+          // Create a new complex to avoid modifying the original directly
+          const newComplex = {
+            ...complex,
+            simplices: complex.simplices.filter(s => s.id !== t1.id && s.id !== t2.id),
+            vertexPositions: new Map(complex.vertexPositions),
+          };
+
+          // Add the new flipped triangles
+          newComplex.simplices.push(newSimplex1, newSimplex2);
+
+          return newComplex;
+        }
+      }
+    }
+
+    // No adjacent triangles found, return original complex
+    return complex;
+  }
+
+  private apply3to1Move(complex: SimplicialComplex): SimplicialComplex {
+    const triangles = complex.simplices.filter(s => s.dimension === 2);
+    if (triangles.length < 3) return complex;
+
+    // Find a vertex that is shared by exactly three triangles
+    for (let vertexId = 0; vertexId < complex.vertexCount; vertexId++) {
+      const trianglesAroundVertex = triangles.filter(t => t.vertices.includes(vertexId));
+      
+      if (trianglesAroundVertex.length === 3) {
+        // Found three triangles around this vertex
+        const [t1, t2, t3] = trianglesAroundVertex;
+        
+        // Get the other vertices (not the central one)
+        const otherVertices = [
+          t1.vertices.find(v => v !== vertexId)!,
+          t2.vertices.find(v => v !== vertexId)!,
+          t3.vertices.find(v => v !== vertexId)!
+        ];
+        
+        // Ensure we have three distinct other vertices
+        const uniqueOthers = [...new Set(otherVertices)];
+        if (uniqueOthers.length === 3) {
+          // Create one larger triangle from the three outer vertices
+          const newSimplex: Simplex = {
+            id: this.nextSimplexId++,
+            vertices: uniqueOthers,
+            dimension: 2,
+          };
+          
+          // Create new complex without the three original triangles
+          const newComplex = {
+            ...complex,
+            simplices: complex.simplices.filter(s => 
+              s.id !== t1.id && s.id !== t2.id && s.id !== t3.id
+            ),
+            vertexPositions: new Map(complex.vertexPositions),
+          };
+          
+          // Add the new merged triangle
+          newComplex.simplices.push(newSimplex);
+          
+          return newComplex;
+        }
+      }
+    }
+
+    // No suitable vertex found, return original complex
+    return complex;
   }
 
   private createState(complex: SimplicialComplex, lastMove: MoveType | null): SimplicialGrowthState {
@@ -227,6 +436,7 @@ export class SimplicialGrowthController implements SimulationController<Simplici
         simplices: [...complex.simplices],
         vertexCount: complex.vertexCount,
         dimension: complex.dimension,
+        vertexPositions: new Map(complex.vertexPositions),
       },
       lastMove,
       moveCount: {
@@ -234,6 +444,9 @@ export class SimplicialGrowthController implements SimulationController<Simplici
         '2-3': 0,
         '3-2': 0,
         '4-1': 0,
+        '1-3': 0,
+        '2-2': 0,
+        '3-1': 0,
       },
       metrics: this.calculateMetrics(complex),
     };

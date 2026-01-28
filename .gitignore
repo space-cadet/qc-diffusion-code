@@ -20,6 +20,8 @@ logs/
 # Console logs
 memory-bank/console-logs/
 
+# Chat summaries
+memory-bank/tmp/
 
 # Dependency directories
 jspm_packages/

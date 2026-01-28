@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-28 22:53:56 IST*
+*Last Updated: 2026-01-29 00:06:02 IST*
 
 ## Active Tasks
 
@@ -53,6 +53,10 @@
 | C26 | Build Performance Optimization and Bundle Size Reduction | ✅ COMPLETED | HIGH | 2026-01-19 | C21 | [Details](tasks/T26.md) |
 | C27 | Simulation Lab Framework | 🔄 IN PROGRESS | HIGH | 2026-01-19 | C7, C7a, C17, C18, C24 | [Details](tasks/C27.md) |
 | C28 | Simplicial Growth Algorithm Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C27 | [Details](tasks/C28.md) |
+| C28a | Simplicial Foundational Core Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C28 | [Details](tasks/C28a.md) |
+| C28b | 2D Simplicial Pachner Moves Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C28a | [Details](tasks/C28b.md) |
+| C28c | 3D Simplicial Pachner Moves Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C28a | [Details](tasks/C28c.md) |
+| C28d | Simplicial Core Integration and Migration | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C28a, C28b, C28c | [Details](tasks/C28d.md) |
 
 ## Task Details
 
@@ -64,9 +68,9 @@
 
 ### C28: Simplicial Growth Algorithm Implementation
 **Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration
-**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:53:56 IST
-**Files**: `frontend/src/lab/types/simplicial.ts`, `frontend/src/lab/controllers/SimplicialGrowthController.ts`, `frontend/src/lab/hooks/useSimplicialGrowth.ts`, `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/lab/components/MetricsTable.tsx`, `frontend/src/App.tsx`, `frontend/src/stores/appStore.ts`
-**Notes**: Complete implementation finished with all features functional. Validates shared lab framework with 4th simulation domain. Auto-evolution, real-time metrics, and export capabilities working.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-01-29 00:06:02 IST
+**Files**: `frontend/src/lab/types/simplicial.ts`, `frontend/src/lab/controllers/SimplicialGrowthController.ts`, `frontend/src/lab/hooks/useSimplicialGrowth.ts`, `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/lab/components/MetricsTable.tsx`, `frontend/src/lab/components/PachnerMoveTester.tsx`, `frontend/src/lab/components/SimplicialVisualization.tsx`, `frontend/src/App.tsx`, `frontend/src/stores/appStore.ts`, `memory-bank/tasks/C28a.md`, `memory-bank/tasks/C28b.md`, `memory-bank/tasks/C28c.md`, `memory-bank/tasks/C28d.md`
+**Notes**: Complete implementation finished with all features functional. Code verified against summary claims. Extended types with Dimension (2|3), enhanced controller with dimension-aware initialization, fixed 2D visualization, created PachnerMoveTester, enhanced 3D moves. Task breakdown created for foundational core implementation (C28a-d). Validates shared lab framework with 4th simulation domain.
 
 ### C26: Build Performance Optimization and Bundle Size Reduction
 
