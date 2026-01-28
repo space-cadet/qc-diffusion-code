@@ -7,6 +7,9 @@ import { MetricsGrid } from './lab/components/MetricsGrid';
 import { TimelineSlider } from './lab/components/TimelineSlider';
 import { ControlButtons } from './lab/components/ControlButtons';
 import { ExportService } from './lab/services/ExportService';
+import { ParameterPanel } from './lab/components/ParameterPanel';
+import { AnalysisTable } from './lab/components/AnalysisTable';
+import { TabNavigation } from './lab/components/TabNavigation';
 
 const ANIMATION_DELAY = 100;
 
@@ -23,9 +26,12 @@ export const QuantumWalkPageRefactored: React.FC = () => {
   const [boundaryType, setBoundaryType] = useState<'periodic' | 'reflecting'>('reflecting');
   const [theta, setTheta] = useState(Math.PI / 4);
   const [compareClassical, setCompareClassical] = useState(true);
+  const [overlayClassical, setOverlayClassical] = useState(true);
   const [classicalModel, setClassicalModel] = useState<'simple' | 'persistent'>('simple');
   const [persistence, setPersistence] = useState(0.9);
   const [decoherence, setDecoherence] = useState(0);
+  const [ensembleSize, setEnsembleSize] = useState(50);
+  const [maxSteps, setMaxSteps] = useState(10);
 
   // Simulation Data State
   const [quantumPlotData, setQuantumPlotData] = useState<any>(null);
@@ -49,13 +55,13 @@ export const QuantumWalkPageRefactored: React.FC = () => {
       classicalModel,
       persistence,
       decoherence,
-      maxSteps: 100,
+      maxSteps,
     };
     const ctrl = new QuantumWalkController();
     ctrl.initialize(params);
     controllerRef.current = ctrl;
     updatePlots();
-  }, [latticeSize, coinType, theta, boundaryType, compareClassical, classicalModel, persistence, decoherence]);
+  }, [latticeSize, coinType, theta, boundaryType, compareClassical, classicalModel, persistence, decoherence, maxSteps]);
 
   const updatePlots = useCallback(() => {
     const ctrl = controllerRef.current;
@@ -184,7 +190,7 @@ export const QuantumWalkPageRefactored: React.FC = () => {
   useEffect(() => {
     console.debug('[QuantumWalkPageRefactored] Parameters changed, rebuilding');
     handleReset();
-  }, [latticeSize, coinType, boundaryType, theta, compareClassical, classicalModel, persistence, decoherence, handleReset]);
+  }, [latticeSize, coinType, boundaryType, theta, compareClassical, classicalModel, persistence, decoherence, maxSteps, handleReset]);
 
   const ctrl = controllerRef.current;
   if (!ctrl) return <div>Initializing...</div>;
@@ -192,12 +198,36 @@ export const QuantumWalkPageRefactored: React.FC = () => {
   const currentState = ctrl.getState();
   const maxStep = ctrl.getHistory().length - 1;
 
+  // Build variance analysis data for AnalysisTable
+  const varianceAnalysisData = varianceData.map((d) => ({
+    step: d.step,
+    quantumVariance: d.quantum,
+    classicalVariance: d.classical,
+    advantage: d.classical > 0 ? d.quantum / d.classical : 0,
+  }));
   // Build metrics for framework
   const metrics = [
     {
       label: 'Current Step',
       value: currentState.step,
       color: 'blue' as const,
+    },
+    {
+      label: 'Quantum σ² (∝ t²)',
+      value: currentState.quantumVariance.toFixed(4),
+      color: 'blue' as const,
+    },
+    {
+      label: 'Classical σ² (∝ t)',
+      value: currentState.classicalVariance.toFixed(4),
+      color: 'red' as const,
+    },
+    {
+      label: 'Quantum Advantage',
+      value: currentState.classicalVariance > 0 
+        ? (currentState.quantumVariance / currentState.classicalVariance).toFixed(2) + 'x' 
+        : 'N/A',
+      color: 'purple' as const,
     },
     {
       label: 'Quantum Spread',
@@ -212,14 +242,14 @@ export const QuantumWalkPageRefactored: React.FC = () => {
     {
       label: 'Regime',
       value: currentState.regime,
-      color: 'purple' as const,
+      color: 'gray' as const,
     },
   ];
 
-  if (activeTab !== 'quantumwalk') return null;
+  if (activeTab !== 'quantumwalk' && activeTab !== 'quantumwalk-refactored') return null;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-100 font-sans">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 p-4 shadow-sm flex-shrink-0 flex items-center justify-between">
         <div>
@@ -228,7 +258,7 @@ export const QuantumWalkPageRefactored: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1">
         {/* Sidebar */}
         <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col flex-shrink-0`}>
           <div className="p-4 border-b border-gray-100 flex items-center justify-between overflow-hidden">
@@ -287,6 +317,11 @@ export const QuantumWalkPageRefactored: React.FC = () => {
 
                   {compareClassical && (
                     <>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={overlayClassical} onChange={(e) => setOverlayClassical(e.target.checked)} className="w-4 h-4" />
+                        <span className="text-xs font-medium text-gray-700">Overlay Plots</span>
+                      </label>
+
                       <select value={classicalModel} onChange={(e) => setClassicalModel(e.target.value as any)} className="text-xs p-1.5 border border-gray-200 rounded bg-white w-full">
                         <option value="simple">Simple Walk</option>
                         <option value="persistent">Persistent Walk</option>
@@ -313,15 +348,19 @@ export const QuantumWalkPageRefactored: React.FC = () => {
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto flex flex-col">
+          {/* Tab Navigation */}
+          <TabNavigation
+            tabs={[
+              { id: 'visualization', label: 'Visualization' },
+              { id: 'analysis', label: 'Analysis' },
+            ]}
+            activeTab={currentView}
+            onTabChange={setCurrentView}
+          />
+
           {/* Metrics */}
           <div className="bg-white border-b border-gray-200 p-4">
-            <MetricsGrid metrics={metrics} columns={4} title="" />
-          </div>
-
-          {/* Timeline */}
-          <div className="bg-white border-b border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Timeline</h3>
-            <TimelineSlider currentStep={currentState.step} maxStep={maxStep} onSeek={handleSeek} label="Simulation Progress" />
+            <MetricsGrid metrics={metrics} columns={4} />
           </div>
 
           {/* Controls */}
@@ -349,55 +388,99 @@ export const QuantumWalkPageRefactored: React.FC = () => {
             </div>
           </div>
 
-          {/* Plots */}
-          <div className="flex-1 overflow-auto">
-            <div className="p-4 space-y-4">
-              {quantumPlotData && (
-                <div className="bg-white rounded-lg shadow">
-                  <Plot data={quantumPlotData.data} layout={quantumPlotData.layout} config={{ responsive: true }} />
+          {/* Content based on view */}
+          {currentView === 'visualization' ? (
+            <div className="flex-1 overflow-auto">
+              <div className="p-4 space-y-4">
+                {/* Mathematical Equation */}
+                <div className="bg-gray-50 text-gray-600 p-3 rounded font-serif text-center italic border border-gray-100 text-sm">
+                  |ψ(t+1)⟩ = S(C ⊗ I)|ψ(t)⟩
                 </div>
-              )}
 
-              {classicalPlotData && (
-                <div className="bg-white rounded-lg shadow">
-                  <Plot data={classicalPlotData.data} layout={classicalPlotData.layout} config={{ responsive: true }} />
-                </div>
-              )}
+                {/* Quantum Plot with Overlay */}
+                {quantumPlotData && (
+                  <div className="bg-white rounded-lg shadow">
+                    <Plot 
+                      data={[
+                        {
+                          x: quantumPlotData.data[0].x,
+                          y: quantumPlotData.data[0].y,
+                          type: 'bar' as const,
+                          name: 'Quantum Probabilities',
+                          marker: { 
+                            color: quantumPlotData.data[0].x.map((_: any, i: number) => `hsl(${210 + i * 5}, 70%, 50%)`) 
+                          }
+                        } as any,
+                        ...(compareClassical && overlayClassical && classicalPlotData ? [{
+                          x: classicalPlotData.data[0].x,
+                          y: classicalPlotData.data[0].y,
+                          type: 'scatter' as const,
+                          mode: 'lines' as const,
+                          name: 'Classical Probabilities',
+                          line: { color: '#ef4444', width: 3 }
+                        } as any] : [])
+                      ]}
+                      layout={{
+                        ...quantumPlotData.layout,
+                        showlegend: true,
+                        legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.1 }
+                      }}
+                      config={{ responsive: true }} 
+                    />
+                  </div>
+                )}
 
-              {varianceData.length > 0 && (
-                <div className="bg-white rounded-lg shadow">
-                  <Plot
-                    data={[
-                      {
-                        x: varianceData.map((d) => d.step),
-                        y: varianceData.map((d) => d.quantum),
-                        type: 'scatter',
-                        mode: 'lines',
-                        name: 'Quantum Variance',
-                        line: { color: 'rgba(99, 110, 250, 0.8)' },
-                      },
-                      {
-                        x: varianceData.map((d) => d.step),
-                        y: varianceData.map((d) => d.classical),
-                        type: 'scatter',
-                        mode: 'lines',
-                        name: 'Classical Variance',
-                        line: { color: 'rgba(239, 85, 59, 0.8)' },
-                      },
-                    ]}
-                    layout={{
-                      title: 'Variance Analysis',
-                      xaxis: { title: 'Step' },
-                      yaxis: { title: 'Variance' },
-                      hovermode: 'closest',
-                      height: 400,
-                    }}
-                    config={{ responsive: true }}
-                  />
-                </div>
-              )}
+                {/* Classical Plot (separate when overlay disabled) */}
+                {compareClassical && !overlayClassical && classicalPlotData && (
+                  <div className="bg-white rounded-lg shadow">
+                    <h4 className="text-sm font-bold text-gray-700 mb-4 uppercase p-4">Classical Walk Comparison</h4>
+                    <Plot 
+                      data={classicalPlotData.data} 
+                      layout={classicalPlotData.layout} 
+                      config={{ responsive: true }} 
+                    />
+                  </div>
+                )}
+
+                {varianceData.length > 0 && (
+                  <div className="bg-white rounded-lg shadow">
+                    <Plot
+                      data={[
+                        {
+                          x: varianceData.map((d) => d.step),
+                          y: varianceData.map((d) => d.quantum),
+                          type: 'scatter',
+                          mode: 'lines',
+                          name: 'Quantum Variance',
+                          line: { color: 'rgba(99, 110, 250, 0.8)' },
+                        },
+                        {
+                          x: varianceData.map((d) => d.step),
+                          y: varianceData.map((d) => d.classical),
+                          type: 'scatter',
+                          mode: 'lines',
+                          name: 'Classical Variance',
+                          line: { color: 'rgba(239, 85, 59, 0.8)' },
+                        },
+                      ]}
+                      layout={{
+                        title: 'Variance Analysis',
+                        xaxis: { title: 'Step' },
+                        yaxis: { title: 'Variance' },
+                        hovermode: 'closest',
+                        height: 400,
+                      }}
+                      config={{ responsive: true }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex-1 overflow-auto p-4">
+              <AnalysisTable data={varianceAnalysisData} />
+            </div>
+          )}
         </main>
       </div>
     </div>
