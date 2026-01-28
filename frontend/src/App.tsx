@@ -4,6 +4,7 @@ const PlotComponent = lazy(() => import("./PlotComponent"));
 const RandomWalkSim = lazy(() => import("./RandomWalkSim"));
 const QuantumWalkPage = lazy(() => import("./QuantumWalkPage"));
 const AnalysisPage = lazy(() => import("./components/AnalysisPage"));
+const LabDemoPage = lazy(() => import("./lab/LabDemoPage"));
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
@@ -170,6 +171,11 @@ export default function App() {
             : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             Analysis
           </button>
+          <button onClick={() => setActiveTab('labdemo')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'labdemo'
+            ? 'border-blue-500 text-blue-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+            Lab Demo
+          </button>
         </nav>
       </div>
 
@@ -185,7 +191,7 @@ export default function App() {
               </Suspense>
               {isWebGL && (<canvas ref={canvasRef} width={simulationParams.mesh_size} height={1} style={{ display: 'none' }}/>)}
             </div>
-          </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>)}
+          </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : activeTab === 'analysis' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><LabDemoPage /></Suspense>)}
       </div>
     </div>);
 }
