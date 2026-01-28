@@ -1,9 +1,20 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-28 04:21:56 IST*
+*Last Updated: 2026-01-28 17:51:18 IST*
 
 ### 2026-01-28
+
+#### 17:51:18 IST - C27: QuantumWalk Page Migration - Controller and Refactored Component
+
+- Created `frontend/src/lab/controllers/QuantumWalkController.ts` - SimulationController implementation wrapping quantum walk simulation with decoherence, boundary conditions, classical comparison support
+- Created `frontend/src/QuantumWalkPageRefactored.tsx` - Framework-based page using MetricsGrid, TimelineSlider, ControlButtons components with full original functionality
+- Updated `memory-bank/tasks/C27.md` - Added QuantumWalkController and QuantumWalkPageRefactored to related files, updated progress tracking and timestamps
+- Updated `memory-bank/sessions/2026-01-28-night.md` - Added QuantumWalk migration section with completed work, architecture, next steps
+- Updated `memory-bank/session_cache.md` - Updated focus task and timestamps
+- Updated `memory-bank/activeContext.md` - Updated current focus, working state, and completed work
+- Created `memory-bank/edits/2026-01-28/175118-c27-quantum-migration.md` - Edit chunk documenting work and metadata
+- Build verified successfully with no TypeScript errors
 
 #### 04:21:56 IST - C27: Simulation Lab Framework - Demo Page Implementation
 
