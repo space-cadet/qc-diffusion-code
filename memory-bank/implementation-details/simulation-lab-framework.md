@@ -1,20 +1,20 @@
 # Simulation Lab Framework Design
 
 *Created: 2026-01-19 23:49:00 IST*
-*Last Updated: 2026-01-19 23:49:00 IST*
+*Last Updated: 2026-01-28 22:53:56 IST*
 
 ## Overview
 
-Shared infrastructure for numerical simulation pages (PDE, Classical Walk, Quantum Walk) providing consistent patterns for simulation control, data management, and visualization.
+Shared infrastructure for numerical simulation pages (PDE, Classical Walk, Quantum Walk, Simplicial Growth) providing consistent patterns for simulation control, data management, and visualization.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Application Layer                            │
-├──────────────────┬──────────────────┬──────────────────────────────┤
-│   PDE Page       │  Classical Walk  │    Quantum Walk              │
-│   (PlotComponent)│  (RandomWalkSim) │    (QuantumWalkPage)         │
+├──────────────────┬──────────────────┬──────────────────┬─────────────┤
+│   PDE Page       │  Classical Walk  │   Quantum Walk   │ Simplicial   │
+│   (PlotComponent)│  (RandomWalkSim) │    (Page)        │   Growth    │
 └────────┬─────────┴────────┬─────────┴────────────┬─────────────────┘
          │                  │                      │
          ▼                  ▼                      ▼
@@ -140,9 +140,10 @@ interface TimelineSliderProps {
 
 ## Migration Priority
 
-1. **QuantumWalkPage** - cleanest, newest, best starting point
-2. **PlotComponent (PDE)** - well-structured, limited state
-3. **RandomWalkSim** - most complex, migrate last
+1. **QuantumWalkPage** - cleanest, newest, best starting point ✅
+2. **SimplicialGrowthPage** - framework validation ✅
+3. **PlotComponent (PDE)** - well-structured, limited state ✅
+4. **RandomWalkSim** - most complex, migrate last ⬜
 
 ## Integration with Existing Work
 
@@ -170,12 +171,13 @@ frontend/src/lab/
 
 ## Estimated Effort
 
-| Phase | Tasks | Days |
-|-------|-------|------|
-| 1 | Core interfaces + useSimulation hook | 1 |
-| 2 | TimeSeriesStore + MetricsGrid extraction | 1.5 |
-| 3 | TimelineSlider + ExportService | 1 |
-| 4 | Quantum Walk migration | 1 |
-| 5 | PDE page migration | 1.5 |
-| 6 | Classical Walk migration | 2 |
-| **Total** | | **8 days** |
+| Phase | Tasks | Days | Status |
+|-------|-------|------|---------|
+| 1 | Core interfaces + useSimulation hook | 1 | ✅ |
+| 2 | TimeSeriesStore + MetricsGrid extraction | 1.5 | ✅ |
+| 3 | TimelineSlider + ExportService | 1 | ✅ |
+| 4 | Quantum Walk migration | 1 | ✅ |
+| 5 | Simplicial Growth migration (validation) | 1 | ✅ |
+| 6 | PDE page migration | 1.5 | ✅ |
+| 7 | Classical Walk migration | 2 | ⬜ |
+| **Total** | | **8.5 days** | **6/7 complete** |

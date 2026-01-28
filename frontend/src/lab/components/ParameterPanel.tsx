@@ -57,15 +57,20 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ sections, classN
 
       case 'range':
         return (
-          <input
-            type="range"
-            value={field.value}
-            onChange={(e) => field.onChange(parseFloat(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-            min={field.min}
-            max={field.max}
-            step={field.step}
-          />
+          <div className="space-y-2">
+            <input
+              type="range"
+              value={field.value}
+              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              min={field.min}
+              max={field.max}
+              step={field.step}
+            />
+            <div className="text-xs text-gray-500 font-mono">
+              {typeof field.value === 'number' ? field.value.toFixed(2) : field.value}
+            </div>
+          </div>
         );
 
       case 'checkbox':

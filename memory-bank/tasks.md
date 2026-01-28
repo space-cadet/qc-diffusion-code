@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-28 22:11:28 IST*
+*Last Updated: 2026-01-28 22:53:56 IST*
 
 ## Active Tasks
 
@@ -52,14 +52,21 @@
 | C25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | C25c |
 | C26 | Build Performance Optimization and Bundle Size Reduction | ✅ COMPLETED | HIGH | 2026-01-19 | C21 | [Details](tasks/T26.md) |
 | C27 | Simulation Lab Framework | 🔄 IN PROGRESS | HIGH | 2026-01-19 | C7, C7a, C17, C18, C24 | [Details](tasks/C27.md) |
+| C28 | Simplicial Growth Algorithm Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-28 | C27 | [Details](tasks/C28.md) |
 
 ## Task Details
 
 ### C27: Simulation Lab Framework
-**Description**: Design and implement shared simulation lab infrastructure for PDE, Classical Walk, and Quantum Walk pages
-**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:11:28 IST
-**Files**: `memory-bank/implementation-details/simulation-lab-framework.md`, `memory-bank/implementation-details/shared-component-framework.md`, `frontend/src/lab/` (interfaces, components, hooks, services), `frontend/src/QuantumWalkPageRefactored.tsx`
-**Notes**: Core framework complete. QuantumWalk migration successful with new shared components (ParameterPanel, AnalysisTable, TabNavigation). Ready for PDE and Classical Walk migrations.
+**Description**: Design and implement shared simulation lab infrastructure for PDE, Classical Walk, Quantum Walk, and Simplicial Growth pages
+**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:53:56 IST
+**Files**: `memory-bank/implementation-details/simulation-lab-framework.md`, `memory-bank/implementation-details/shared-component-framework.md`, `frontend/src/lab/` (interfaces, components, hooks, services), `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/QuantumWalkPageRefactored.tsx`
+**Notes**: Framework validated by simplicial growth implementation. Core components working across all 4 simulation domains. Ready for PDE and Classical Walk migrations.
+
+### C28: Simplicial Growth Algorithm Implementation
+**Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration
+**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:53:56 IST
+**Files**: `frontend/src/lab/types/simplicial.ts`, `frontend/src/lab/controllers/SimplicialGrowthController.ts`, `frontend/src/lab/hooks/useSimplicialGrowth.ts`, `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/lab/components/MetricsTable.tsx`, `frontend/src/App.tsx`, `frontend/src/stores/appStore.ts`
+**Notes**: Complete implementation finished with all features functional. Validates shared lab framework with 4th simulation domain. Auto-evolution, real-time metrics, and export capabilities working.
 
 ### C26: Build Performance Optimization and Bundle Size Reduction
 

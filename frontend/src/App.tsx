@@ -6,6 +6,7 @@ const QuantumWalkPage = lazy(() => import("./QuantumWalkPage"));
 const QuantumWalkPageRefactored = lazy(() => import("./QuantumWalkPageRefactored"));
 const AnalysisPage = lazy(() => import("./components/AnalysisPage"));
 const LabDemoPage = lazy(() => import("./lab/LabDemoPage"));
+const SimplicialGrowthPage = lazy(() => import("./SimplicialGrowthPage"));
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
@@ -182,6 +183,11 @@ export default function App() {
             : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             Lab Demo
           </button>
+          <button onClick={() => setActiveTab('simplicialgrowth')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'simplicialgrowth'
+            ? 'border-blue-500 text-blue-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+            Simplicial Growth
+          </button>
         </nav>
       </div>
 
@@ -197,7 +203,7 @@ export default function App() {
               </Suspense>
               {isWebGL && (<canvas ref={canvasRef} width={simulationParams.mesh_size} height={1} style={{ display: 'none' }}/>)}
             </div>
-          </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : activeTab === 'quantumwalk-refactored' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPageRefactored /></Suspense>) : activeTab === 'analysis' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><LabDemoPage /></Suspense>)}
+          </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : activeTab === 'quantumwalk-refactored' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPageRefactored /></Suspense>) : activeTab === 'analysis' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>) : activeTab === 'labdemo' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><LabDemoPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><SimplicialGrowthPage /></Suspense>)}
       </div>
     </div>);
 }
