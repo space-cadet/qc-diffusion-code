@@ -117,8 +117,33 @@ export const SimplicialGrowthPage: React.FC = () => {
   };
 
   const handleParamChange = (key: string, value: any) => {
-    setParams((prev) => ({ ...prev, [key]: value }));
-    simulation.initialize({ ...params, [key]: value });
+    // Coerce dimension from string to number (HTML select returns strings)
+    const coerced = key === 'dimension' ? Number(value) : value;
+    console.debug(`[SimplicialGrowthPage] Param change: ${key} = ${coerced} (type: ${typeof coerced})`);
+
+    let updatedParams = { ...params, [key]: coerced };
+
+    // When dimension changes, swap to appropriate default probabilities
+    if (key === 'dimension') {
+      if (coerced === 2) {
+        updatedParams.moveProbabilities = {
+          '1-3': 0.5, '2-2': 0.3, '3-1': 0.2,
+          '1-4': 0.0, '2-3': 0.0, '3-2': 0.0, '4-1': 0.0,
+        };
+        updatedParams.initialVertices = 3;
+        console.debug('[SimplicialGrowthPage] Switched to 2D probabilities');
+      } else {
+        updatedParams.moveProbabilities = {
+          '1-3': 0.0, '2-2': 0.0, '3-1': 0.0,
+          '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1,
+        };
+        updatedParams.initialVertices = 4;
+        console.debug('[SimplicialGrowthPage] Switched to 3D probabilities');
+      }
+    }
+
+    setParams(updatedParams);
+    simulation.initialize(updatedParams);
   };
 
   const statusColor: 'red' | 'gray' = simulation.isRunning ? 'red' : 'gray';
@@ -146,8 +171,8 @@ export const SimplicialGrowthPage: React.FC = () => {
           color: 'blue' as const,
         },
         {
-          label: 'Curvature',
-          value: simulation.currentState.metrics.curvature.toFixed(3),
+          label: 'Euler Char',
+          value: simulation.currentState.metrics.curvature.toFixed(0),
           color: 'gray' as const,
         },
         {

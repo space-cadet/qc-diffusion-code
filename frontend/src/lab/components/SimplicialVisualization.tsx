@@ -15,12 +15,15 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
   complex,
   width = 600,
   height = 400,
-  showVertices = true,
-  showEdges = true,
-  showFaces = true,
+  showVertices: initialShowVertices = true,
+  showEdges: initialShowEdges = true,
+  showFaces: initialShowFaces = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredSimplex, setHoveredSimplex] = useState<{ id: number; dimension: number; vertices: number[] } | null>(null);
+  const [showVertices, setShowVertices] = useState(initialShowVertices);
+  const [showEdges, setShowEdges] = useState(initialShowEdges);
+  const [showFaces, setShowFaces] = useState(initialShowFaces);
 
   // Generate vertex positions for visualization
   const generateVertexPositions = (complex: SimplicialComplex): Map<number, VertexPosition> => {
@@ -322,7 +325,7 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
           <input
             type="checkbox"
             checked={showVertices}
-            onChange={(e) => {}}
+            onChange={(e) => setShowVertices(e.target.checked)}
             className="mr-1"
           />
           Vertices
@@ -331,7 +334,7 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
           <input
             type="checkbox"
             checked={showEdges}
-            onChange={(e) => {}}
+            onChange={(e) => setShowEdges(e.target.checked)}
             className="mr-1"
           />
           Edges
@@ -340,7 +343,7 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
           <input
             type="checkbox"
             checked={showFaces}
-            onChange={(e) => {}}
+            onChange={(e) => setShowFaces(e.target.checked)}
             className="mr-1"
           />
           Faces
