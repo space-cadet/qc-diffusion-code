@@ -11,8 +11,8 @@ import {
   addFace,
   edgeKey,
   faceKey,
-  validatePachnerMovePreconditions,
 } from '../core/types';
+import { validatePachnerMovePreconditions } from '../core/validators';
 import { SimplicialComplexGeometry } from '../geometry/types';
 import { validateConvexQuadrilateral } from '../geometry/quality';
 import { buildHalfEdgeStructure } from '../core/HalfEdgeStructure';
