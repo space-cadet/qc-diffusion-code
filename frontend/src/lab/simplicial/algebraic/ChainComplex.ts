@@ -99,6 +99,42 @@ export function computeBoundaryOfFace(
 }
 
 // ---------------------------------------------------------------------------
+// Connected components (union-find on vertex adjacency)
+// ---------------------------------------------------------------------------
+
+function countConnectedComponents(topology: SimplicialComplexTopology): number {
+  const parent = new Map<number, number>();
+  for (const id of topology.vertices.keys()) {
+    parent.set(id, id);
+  }
+  function find(x: number): number {
+    while (parent.get(x) !== x) {
+      const p = parent.get(parent.get(x)!)!;
+      parent.set(x, p);
+      x = p;
+    }
+    return x;
+  }
+  function union(a: number, b: number) {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra !== rb) parent.set(ra, rb);
+  }
+  for (const edge of topology.edges.values()) {
+    union(edge.vertices[0], edge.vertices[1]);
+  }
+  const roots = new Set<number>();
+  for (const id of topology.vertices.keys()) {
+    roots.add(find(id));
+  }
+  return topology.vertices.size === 0 ? 0 : roots.size;
+}
+
+function countConnectedComponents3D(topology: SimplicialComplexTopology): number {
+  return countConnectedComponents(topology);
+}
+
+// ---------------------------------------------------------------------------
 // Betti numbers (simplex-count heuristic for connected complexes)
 // ---------------------------------------------------------------------------
 
@@ -116,19 +152,28 @@ export function estimateBettiNumbers(
   const chi = computeEulerCharacteristic(topology);
 
   if (topology.dimension === 2) {
-    // For a connected 2-complex: b0 = number of connected components (assume 1)
+    // b0 = number of connected components
     // b2 depends on whether the complex is closed; assume 0 for open triangulations
-    const b0 = 1;
+    const b0 = countConnectedComponents(topology);
     const b2 = 0;
     const b1 = b0 + b2 - chi; // from chi = b0 - b1 + b2
     return [b0, Math.max(0, b1), b2];
   }
 
   // 3D: chi = b0 - b1 + b2 - b3
-  const b0 = 1;
-  const b3 = 0;
-  // Without full computation, return chi-derived estimate
-  return [b0, 0, 0, b3];
+  // Without Smith normal form we cannot separate b1 and b2 individually.
+  // Use connected-component count for b0, assume b3=0 for open complexes,
+  // and distribute the remaining deficit across b1 and b2 using the
+  // constraint: b1 - b2 = b0 + b3 - chi.
+  const b0 = countConnectedComponents3D(topology);
+  const b3 = 0; // 0 for open (boundary) complexes; 1 for closed manifolds
+  const deficit = b0 + b3 - chi; // = b1 - b2
+  // Heuristic: for simply-connected complexes b1=0, so b2 = -deficit.
+  // For non-simply-connected, assume b2=0 and b1=deficit.
+  // Pick the assignment that keeps both non-negative.
+  const b1 = Math.max(0, deficit);
+  const b2 = Math.max(0, -deficit);
+  return [b0, b1, b2, b3];
 }
 
 // ---------------------------------------------------------------------------

@@ -49,6 +49,11 @@ export function faceKey(a: number, b: number, c: number): string {
   return [a, b, c].sort((x, y) => x - y).join(',');
 }
 
+/** Produce the canonical key for an edge given two vertex ids. */
+export function edgeKey(a: number, b: number): string {
+  return a < b ? `${a},${b}` : `${b},${a}`;
+}
+
 // --- Top-level topology container ---
 
 export interface SimplicialComplexTopology {
@@ -58,6 +63,10 @@ export interface SimplicialComplexTopology {
   tetrahedra: Map<number, Tetrahedron>;
   halfEdges: Map<number, HalfEdge>;
   faceToTets: FaceToTetMap;
+  /** Maps edgeKey(v0,v1) -> edge id for O(1) duplicate detection. */
+  edgeIndex: Map<string, number>;
+  /** Maps faceKey(v0,v1,v2) -> face id for O(1) duplicate detection. */
+  faceIndex: Map<string, number>;
   dimension: 2 | 3;
   nextVertexId: number;
   nextEdgeId: number;
@@ -91,6 +100,8 @@ export function createEmptyTopology(dimension: 2 | 3): SimplicialComplexTopology
     tetrahedra: new Map(),
     halfEdges: new Map(),
     faceToTets: new Map(),
+    edgeIndex: new Map(),
+    faceIndex: new Map(),
     dimension,
     nextVertexId: 0,
     nextEdgeId: 0,
@@ -107,26 +118,34 @@ export function addVertex(topo: SimplicialComplexTopology): number {
   return id;
 }
 
-/** Add an edge between two existing vertices. */
+/** Add an edge between two existing vertices. Returns existing id if duplicate. */
 export function addEdge(
   topo: SimplicialComplexTopology,
   v0: number,
   v1: number,
 ): number {
+  const key = edgeKey(v0, v1);
+  const existing = topo.edgeIndex.get(key);
+  if (existing !== undefined) return existing;
   const id = topo.nextEdgeId++;
   topo.edges.set(id, { id, vertices: [v0, v1] });
+  topo.edgeIndex.set(key, id);
   return id;
 }
 
-/** Add a triangular face with three existing vertices. */
+/** Add a triangular face with three existing vertices. Returns existing id if duplicate. */
 export function addFace(
   topo: SimplicialComplexTopology,
   v0: number,
   v1: number,
   v2: number,
 ): number {
+  const key = faceKey(v0, v1, v2);
+  const existing = topo.faceIndex.get(key);
+  if (existing !== undefined) return existing;
   const id = topo.nextFaceId++;
   topo.faces.set(id, { id, vertices: [v0, v1, v2] });
+  topo.faceIndex.set(key, id);
   return id;
 }
 

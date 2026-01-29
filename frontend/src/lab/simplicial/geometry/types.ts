@@ -37,6 +37,10 @@ export function createTriangleGeometry(
 
 /**
  * Create initial 3D geometry for a regular tetrahedron (vertices 0,1,2,3).
+ *
+ * Uses the inscribed-in-cube construction: pick four alternating vertices of
+ * a cube with half-side = scale/sqrt(3), giving edge length = scale * sqrt(2).
+ * All six edges are equal.
  */
 export function createTetrahedronGeometry(
   centerX: number,
@@ -45,23 +49,12 @@ export function createTetrahedronGeometry(
   scale: number,
 ): SimplicialComplexGeometry {
   const positions = new Map<number, VertexPosition>();
-  // Regular tetrahedron centred at origin then shifted
-  const h = scale * Math.sqrt(2 / 3);
-  positions.set(0, { x: centerX, y: centerY - h, z: centerZ });
-  positions.set(1, {
-    x: centerX - scale * 0.866,
-    y: centerY + h * 0.5,
-    z: centerZ - scale * 0.5,
-  });
-  positions.set(2, {
-    x: centerX + scale * 0.866,
-    y: centerY + h * 0.5,
-    z: centerZ - scale * 0.5,
-  });
-  positions.set(3, {
-    x: centerX,
-    y: centerY + h * 0.5,
-    z: centerZ + scale,
-  });
+  // Regular tetrahedron: four alternating vertices of a cube centred at origin.
+  // s = scale / sqrt(3) so that the edge length equals scale * sqrt(2).
+  const s = scale / Math.sqrt(3);
+  positions.set(0, { x: centerX + s, y: centerY + s, z: centerZ + s });
+  positions.set(1, { x: centerX + s, y: centerY - s, z: centerZ - s });
+  positions.set(2, { x: centerX - s, y: centerY + s, z: centerZ - s });
+  positions.set(3, { x: centerX - s, y: centerY - s, z: centerZ + s });
   return { positions };
 }
