@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "node scripts/copy-memory-bank.js && vite",
+    "build": "node scripts/copy-memory-bank.js && tsc -b && vite build",
     "preview": "vite preview",
     "dev:full": "concurrently \"cd ../backend && source .venv/bin/activate && python main.py\" \"pnpm dev\"",
     "test": "pnpm exec vitest run",

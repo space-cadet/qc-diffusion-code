@@ -1,7 +1,7 @@
 # Memory Bank Viewer Page Implementation
 
 *Created: 2026-01-29 19:28:00 IST*
-*Last Updated: 2026-01-29 19:28:00 IST*
+*Last Updated: 2026-01-29 19:55:00 IST*
 
 ## Overview
 Implemented comprehensive memory bank documentation viewer page with three view modes (Tree, List, Grid), search functionality, and markdown rendering. Based on arxivite implementation patterns adapted for qc-diffusion-code project.
@@ -42,6 +42,33 @@ Implemented comprehensive memory bank documentation viewer page with three view 
 3. **Import Update**: Updated `App.tsx` line 10: `import("./features/memoryBank")` → `import("./memoryBank")`
 4. **Vite Configuration**: Added alias `/memory-bank` → `../memory-bank` in `frontend/vite.config.ts`
 5. **Path Import**: Added `import path from 'path'` to vite config
+
+### Session 3: Bug Fix - Memory Bank Viewer Not Showing Files
+**Date**: 2026-01-29
+**Status**: ✅ COMPLETED
+
+#### Issue
+Memory bank viewer displayed "No documents found" because Vite's `import.meta.glob('/memory-bank/**/*.md')` couldn't find files. Root cause: Vite runs with project root = `frontend/`, but `memory-bank/` directory is at repo root (`/Users/deepak/code/qc-diffusion-code/memory-bank`), outside the Vite project root.
+
+#### Solution
+Build-time copy of memory-bank folder to frontend directory:
+
+1. **Build Script Created**: `frontend/scripts/copy-memory-bank.js`
+   - Copies `memory-bank/` from repo root to `frontend/memory-bank/`
+   - Filters to only copy `.md` files
+   - Skips `node_modules`, `.git`, and `dist` directories
+   - Avoids ENOTSUP errors from symlinked files
+
+2. **Package.json Scripts Updated**:
+   - `dev`: `node scripts/copy-memory-bank.js && vite`
+   - `build`: `node scripts/copy-memory-bank.js && tsc -b && vite build`
+
+3. **Gitignore Updated**: Added `memory-bank/` to exclude copied folder
+
+#### Files Modified
+- `frontend/scripts/copy-memory-bank.js` - NEW
+- `frontend/package.json` - Updated scripts
+- `frontend/.gitignore` - Added memory-bank/ exclusion
 
 ## Technical Implementation
 

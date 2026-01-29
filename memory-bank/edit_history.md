@@ -1,9 +1,24 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-29 19:28:00 IST*
+*Last Updated: 2026-01-29 19:55:00 IST*
 
 ### 2026-01-29
+
+#### 19:55:00 IST - T29: Memory Bank Viewer Bug Fix
+- Created `memory-bank/sessions/2026-01-29-night.md` - Night session documenting bug fix work
+- Modified `memory-bank/implementation-details/memory-bank-viewer-page.md` - Added Session 3 bug fix section, updated timestamp to 2026-01-29 19:55:00 IST
+- Created `memory-bank/edits/2026-01-29/195500-memory-bank-viewer-fix.md` - Edit chunk for bug fix implementation
+- Modified `memory-bank/session_cache.md` - Added night session to history, updated timestamp to 2026-01-29 19:55:00 IST
+- Modified `memory-bank/tasks.md` - Updated timestamp to 2026-01-29 19:55:00 IST
+- Modified `memory-bank/tasks/T29.md` - Added Session 3 bug fix details, updated timestamp to 2026-01-29 19:55:00 IST
+- Modified `memory-bank/activeContext.md` - Updated timestamp to 2026-01-29 19:55:00 IST
+- Modified `memory-bank/edit_history.md` - Added bug fix entry, updated timestamp to 2026-01-29 19:55:00 IST
+- Created `frontend/scripts/copy-memory-bank.js` - Build script to copy memory-bank folder at build time
+- Modified `frontend/package.json` - Updated dev and build scripts to run copy script first
+- Modified `frontend/.gitignore` - Added memory-bank/ to exclude copied folder
+- Modified `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` - Reverted glob patterns to /memory-bank/**/*.md
+- Modified `frontend/vite.config.ts` - Removed interfering /memory-bank alias
 
 #### 19:28:00 IST - T29: Memory Bank Feature Implementation
 - Created `memory-bank/implementation-details/memory-bank-viewer-page.md` - Implementation documentation for memory bank viewer page with 12 files created across 2 sessions

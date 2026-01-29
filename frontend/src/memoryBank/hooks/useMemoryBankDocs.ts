@@ -201,7 +201,7 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
  */
 export function useMemoryBankDocs() {
   return useMemo(() => {
-    const modules = import.meta.glob('/memory-bank/**/*.md', { as: 'raw', eager: true });
+    const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
     const flatFiles: IndexFile[] = [];
 
     for (const [path, content] of Object.entries(modules)) {
@@ -263,8 +263,8 @@ export function useMemoryBankCategory(category: string) {
  * Fetch full parsed document using static imports
  */
 export function useMemoryBankDocument(category: string, file: string) {
-  const modules = import.meta.glob('/memory-bank/**/*.md', { as: 'raw', eager: true });
-  
+  const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
+
   return useMemo(() => {
     let filePath: string;
     if (category === "root") {
@@ -299,14 +299,14 @@ export function useMemoryBankDocument(category: string, file: string) {
  */
 export function useMemoryBankSearch(query: string) {
   const { categories } = useMemoryBankDocs();
-  
+
   return useMemo(() => {
     if (query.length < 2) return { query, resultCount: 0, results: [] };
-    
-    const modules = import.meta.glob('/memory-bank/**/*.md', { as: 'raw', eager: true });
+
+    const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
     const results: SearchResult[] = [];
     const lowerQuery = query.toLowerCase();
-    
+
     for (const [path, content] of Object.entries(modules)) {
       const relativePath = path.replace('/memory-bank/', '');
       const fileName = relativePath.split('/').pop() || '';
