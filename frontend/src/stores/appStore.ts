@@ -87,7 +87,7 @@ interface PdeState {
 }
 
 interface AppState {
-  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth'
+  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'memorybank'
   simulationParams: SimulationParams
   gridLayoutParams: RandomWalkParams
   randomWalkSimLayouts: Layout[]
@@ -119,7 +119,7 @@ interface AppState {
     initialConditionsOpen: boolean
     simulationSettingsOpen: boolean
   }
-  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth') => void
+  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'memorybank') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
