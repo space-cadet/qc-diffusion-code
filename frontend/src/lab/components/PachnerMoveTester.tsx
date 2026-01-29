@@ -16,6 +16,11 @@ import {
   apply2to3,
   apply3to2,
   apply4to1,
+  addVertex,
+  addEdge,
+  addFace,
+  addTetrahedron,
+  faceKey,
 } from '../simplicial';
 import { SimplicialVisualization } from './SimplicialVisualization';
 
@@ -30,24 +35,176 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
 }) => {
   const [selectedMove, setSelectedMove] = useState<MoveType | null>(null);
   const [previewComplex, setPreviewComplex] = useState<SimplicialComplex | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<Dimension>(dimension);
+  const [simplexCount, setSimplexCount] = useState<number>(1);
   
   // Create independent initial complex for testing
-  const createTestComplex = (): SimplicialComplex => {
+  const createTestComplex = (dim: Dimension, count: number): SimplicialComplex => {
     let topology: SimplicialComplexTopology;
     let geometry: SimplicialComplexGeometry;
     
-    if (dimension === 2) {
-      topology = createInitialTriangleTopology();
-      geometry = createTriangleGeometry(140, 100, 60);
+    if (dim === 2) {
+      if (count === 1) {
+        topology = createInitialTriangleTopology();
+        geometry = createTriangleGeometry(140, 100, 60);
+      } else if (count === 3) {
+        // Create 3 triangles sharing a center vertex (enables 3-1 move)
+        topology = createEmptyTopology(2);
+        geometry = createEmptyGeometry();
+        
+        const centerX = 140;
+        const centerY = 100;
+        const size = 80;
+        
+        // Center vertex (will have 3 incident faces)
+        const centerV = addVertex(topology);
+        geometry.positions.set(centerV, { x: centerX, y: centerY });
+        
+        // 3 outer vertices
+        const v0 = addVertex(topology);
+        const v1 = addVertex(topology);
+        const v2 = addVertex(topology);
+        
+        geometry.positions.set(v0, { x: centerX, y: centerY - size });
+        geometry.positions.set(v1, { x: centerX + size * 0.866, y: centerY + size * 0.5 });
+        geometry.positions.set(v2, { x: centerX - size * 0.866, y: centerY + size * 0.5 });
+        
+        // Create 3 triangles sharing the center
+        addFace(topology, v0, v1, centerV);
+        addFace(topology, v1, v2, centerV);
+        addFace(topology, v2, v0, centerV);
+        
+        // Create edges
+        addEdge(topology, v0, v1);
+        addEdge(topology, v1, v2);
+        addEdge(topology, v2, v0);
+        addEdge(topology, v0, centerV);
+        addEdge(topology, v1, centerV);
+        addEdge(topology, v2, centerV);
+      } else {
+        // Create a triangulated square with shared edges (enables 2-2 move)
+        topology = createEmptyTopology(2);
+        geometry = createEmptyGeometry();
+        
+        const centerX = 140;
+        const centerY = 100;
+        const size = 80;
+        
+        // Create 4 corner vertices
+        const v0 = addVertex(topology);
+        const v1 = addVertex(topology);
+        const v2 = addVertex(topology);
+        const v3 = addVertex(topology);
+        
+        geometry.positions.set(v0, { x: centerX - size, y: centerY - size });
+        geometry.positions.set(v1, { x: centerX + size, y: centerY - size });
+        geometry.positions.set(v2, { x: centerX + size, y: centerY + size });
+        geometry.positions.set(v3, { x: centerX - size, y: centerY + size });
+        
+        // Create 4 triangles sharing the center - each edge is shared by 2 faces
+        // Top-left triangle
+        addFace(topology, v0, v1, v2);
+        // Bottom-right triangle  
+        addFace(topology, v0, v2, v3);
+        
+        // Create edges
+        addEdge(topology, v0, v1);
+        addEdge(topology, v1, v2);
+        addEdge(topology, v2, v3);
+        addEdge(topology, v3, v0);
+        addEdge(topology, v0, v2);  // Shared diagonal edge
+      }
     } else {
-      topology = createInitialTetrahedronTopology();
-      geometry = createTetrahedronGeometry(140, 100, 0, 40);
+      if (count === 1) {
+        topology = createInitialTetrahedronTopology();
+        geometry = createTetrahedronGeometry(140, 100, 0, 40);
+      } else if (count === 2) {
+        // Create 2 tetrahedra sharing a face (enables 2-3 move)
+        topology = createEmptyTopology(3);
+        geometry = createEmptyGeometry();
+        
+        const centerX = 140;
+        const centerY = 100;
+        const centerZ = 0;
+        const size = 60;
+        
+        // Create 4 vertices for a shared face
+        const v0 = addVertex(topology);
+        const v1 = addVertex(topology);
+        const v2 = addVertex(topology);
+        const v3 = addVertex(topology);
+        
+        geometry.positions.set(v0, { x: centerX - size, y: centerY - size, z: centerZ - size });
+        geometry.positions.set(v1, { x: centerX + size, y: centerY - size, z: centerZ - size });
+        geometry.positions.set(v2, { x: centerX + size, y: centerY + size, z: centerZ - size });
+        geometry.positions.set(v3, { x: centerX - size, y: centerY + size, z: centerZ - size });
+        
+        // Create 2 tetrahedra sharing the face (v0, v1, v2)
+        addTetrahedron(topology, v0, v1, v2, v3);
+        addTetrahedron(topology, v0, v1, v2, v3 + 1); // Need to add v4
+        geometry.positions.set(v3 + 1, { x: centerX, y: centerY, z: centerZ + size });
+      } else {
+        // Create 8 tetrahedra sharing a center point (enables 3-2 and 4-1 moves)
+        topology = createEmptyTopology(3);
+        geometry = createEmptyGeometry();
+        
+        const centerX = 140;
+        const centerY = 100;
+        const centerZ = 0;
+        const size = 60;
+        
+        // Create 8 tetrahedra sharing a center point
+        const centerV = addVertex(topology);
+        geometry.positions.set(centerV, { x: centerX, y: centerY, z: centerZ });
+        
+        // Corner vertices of a cube
+        const corners = [
+          [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+          [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+        ].map(([dx, dy, dz]) => {
+          const v = addVertex(topology);
+          geometry.positions.set(v, { 
+            x: centerX + dx * size, 
+            y: centerY + dy * size, 
+            z: centerZ + dz * size 
+          });
+          return v;
+        });
+        
+        // Create tetrahedra from center to each face of the cube
+        // Bottom face tetrahedra
+        addTetrahedron(topology, corners[0], corners[1], corners[2], centerV);
+        addTetrahedron(topology, corners[0], corners[2], corners[3], centerV);
+        // Top face tetrahedra
+        addTetrahedron(topology, corners[4], corners[5], corners[6], centerV);
+        addTetrahedron(topology, corners[4], corners[6], corners[7], centerV);
+        // Side tetrahedra
+        addTetrahedron(topology, corners[0], corners[1], corners[5], centerV);
+        addTetrahedron(topology, corners[0], corners[4], corners[5], centerV);
+        addTetrahedron(topology, corners[2], corners[3], corners[7], centerV);
+        addTetrahedron(topology, corners[2], corners[6], corners[7], centerV);
+      }
     }
     
     return { topology, geometry };
   };
   
-  const [complex] = useState<SimplicialComplex>(createTestComplex());
+  const [complex, setComplex] = useState<SimplicialComplex>(createTestComplex(selectedDimension, simplexCount));
+
+  // Reset complex when dimension or simplex count changes
+  const handleDimensionChange = (newDimension: Dimension) => {
+    setSelectedDimension(newDimension);
+    setSelectedMove(null);
+    setPreviewComplex(null);
+    setComplex(createTestComplex(newDimension, simplexCount));
+  };
+
+  const handleSimplexCountChange = (newCount: number) => {
+    setSimplexCount(newCount);
+    setSelectedMove(null);
+    setPreviewComplex(null);
+    setComplex(createTestComplex(selectedDimension, newCount));
+  };
 
   const getAvailableMoves = (dimension: Dimension): MoveType[] => {
     if (dimension === 2) {
@@ -94,8 +251,20 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
         }
         case '2-2': {
           const edgeIds = Array.from(testTopology.edges.keys());
-          if (edgeIds.length > 0) {
-            apply2to2(testTopology, testGeometry, edgeIds[0]);
+          // Find an edge shared by exactly 2 faces
+          for (const edgeId of edgeIds) {
+            const edge = testTopology.edges.get(edgeId)!;
+            const [v0, v1] = edge.vertices;
+            let adjacentFaceCount = 0;
+            for (const [fId, f] of testTopology.faces) {
+              if (f.vertices.includes(v0) && f.vertices.includes(v1)) {
+                adjacentFaceCount++;
+              }
+            }
+            if (adjacentFaceCount === 2) {
+              apply2to2(testTopology, testGeometry, edgeId);
+              break;
+            }
           }
           break;
         }
@@ -126,25 +295,52 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
           break;
         }
         case '2-3': {
-          const edgeIds = Array.from(testTopology.edges.keys());
-          if (edgeIds.length > 0) {
-            apply2to3(testTopology, testGeometry, edgeIds[0]);
+          const faceIds = Array.from(testTopology.faces.keys());
+          // Find a face shared by exactly 2 tetrahedra
+          for (const faceId of faceIds) {
+            const face = testTopology.faces.get(faceId)!;
+            const key = faceKey(face.vertices[0], face.vertices[1], face.vertices[2]);
+            const tets = testTopology.faceToTets.get(key);
+            if (tets && tets.length === 2) {
+              apply2to3(testTopology, testGeometry, faceId);
+              break;
+            }
           }
           break;
         }
         case '3-2': {
-          // 3-2 move: operates on an edge
+          // 3-2 move: operates on an edge shared by exactly 3 tetrahedra
           const edgeIds = Array.from(testTopology.edges.keys());
-          if (edgeIds.length > 0) {
-            apply3to2(testTopology, testGeometry, edgeIds[0]);
+          for (const edgeId of edgeIds) {
+            const edge = testTopology.edges.get(edgeId)!;
+            const [v0, v1] = edge.vertices;
+            let incidentTets = 0;
+            for (const [tId, tet] of testTopology.tetrahedra) {
+              if (tet.vertices.includes(v0) && tet.vertices.includes(v1)) {
+                incidentTets++;
+              }
+            }
+            if (incidentTets === 3) {
+              apply3to2(testTopology, testGeometry, edgeId);
+              break;
+            }
           }
           break;
         }
         case '4-1': {
-          // 4-1 move: operates on a vertex
+          // 4-1 move: operates on a vertex with exactly 4 incident tetrahedra
           const vertexIds = Array.from(testTopology.vertices.keys());
-          if (vertexIds.length > 0) {
-            apply4to1(testTopology, testGeometry, vertexIds[0]);
+          for (const vertexId of vertexIds) {
+            let incidentTets = 0;
+            for (const [tId, tet] of testTopology.tetrahedra) {
+              if (tet.vertices.includes(vertexId)) {
+                incidentTets++;
+              }
+            }
+            if (incidentTets === 4) {
+              apply4to1(testTopology, testGeometry, vertexId);
+              break;
+            }
           }
           break;
         }
@@ -181,6 +377,96 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
       <h3 className="text-lg font-semibold mb-4">Pachner Move Tester</h3>
       
       <div className="grid grid-cols-1 gap-4">
+        {/* Dimension Selection */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Dimension:</h4>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dimension"
+                value="2"
+                checked={selectedDimension === 2}
+                onChange={() => handleDimensionChange(2)}
+                className="mr-2"
+              />
+              <span className="text-sm">2D (Triangles)</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dimension"
+                value="3"
+                checked={selectedDimension === 3}
+                onChange={() => handleDimensionChange(3)}
+                className="mr-2"
+              />
+              <span className="text-sm">3D (Tetrahedra)</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Simplex Count Selection */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Initial Simplices:</h4>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="simplexCount"
+                value="1"
+                checked={simplexCount === 1}
+                onChange={() => handleSimplexCountChange(1)}
+                className="mr-2"
+              />
+              <span className="text-sm">1 simplex</span>
+            </label>
+            {selectedDimension === 2 && (
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="simplexCount"
+                  value="3"
+                  checked={simplexCount === 3}
+                  onChange={() => handleSimplexCountChange(3)}
+                  className="mr-2"
+                />
+                <span className="text-sm">3 simplices (enables 3-1 move)</span>
+              </label>
+            )}
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="simplexCount"
+                value={selectedDimension === 2 ? "2" : "2"}
+                checked={simplexCount === 2}
+                onChange={() => handleSimplexCountChange(2)}
+                className="mr-2"
+              />
+              <span className="text-sm">
+                {selectedDimension === 2 ? "2 simplices (enables 2-2 move)" : "2 simplices (enables 2-3 move)"}
+              </span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="simplexCount"
+                value="8"
+                checked={simplexCount === 8}
+                onChange={() => handleSimplexCountChange(8)}
+                className="mr-2"
+              />
+              <span className="text-sm">8 simplices (enables 3-2 and 4-1 moves)</span>
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            {selectedDimension === 2 
+              ? "3 simplices create a vertex with exactly 3 incident faces for 3-1 move. 2 simplices create shared edge for 2-2 move."
+              : "2 simplices create shared face for 2-3 move. 8 simplices create center vertex with 4 incident tetrahedra for 4-1 move."
+            }
+          </p>
+        </div>
+
         {/* Move Selection */}
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Available Moves:</h4>
