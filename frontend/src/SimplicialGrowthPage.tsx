@@ -6,6 +6,7 @@ import { ParameterPanel } from './lab/components/ParameterPanel';
 import { AnalysisTable } from './lab/components/AnalysisTable';
 import { MetricsTable } from './lab/components/MetricsTable';
 import { SimplicialVisualization } from './lab/components/SimplicialVisualization';
+import { SimplicialVisualization3D } from './lab/components/SimplicialVisualization3D';
 import { PachnerMoveTester } from './lab/components/PachnerMoveTester';
 import { useSimplicialGrowth } from './lab/hooks/useSimplicialGrowth';
 import { ExportService } from './lab/services/ExportService';
@@ -374,15 +375,23 @@ export const SimplicialGrowthPage: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-xl font-semibold mb-4">Simplicial Complex Visualization</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Main Visualization */}
+                  {/* Main Visualization - 2D canvas or 3D Three.js */}
                   <div>
                     {simulation.currentState ? (
                       <div className="flex justify-center">
-                        <SimplicialVisualization 
-                          complex={simulation.currentState.complex}
-                          width={600}
-                          height={400}
-                        />
+                        {params.dimension === 3 ? (
+                          <SimplicialVisualization3D
+                            complex={simulation.currentState.complex}
+                            width={600}
+                            height={400}
+                          />
+                        ) : (
+                          <SimplicialVisualization
+                            complex={simulation.currentState.complex}
+                            width={600}
+                            height={400}
+                          />
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">
