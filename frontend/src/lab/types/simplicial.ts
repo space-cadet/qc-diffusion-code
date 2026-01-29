@@ -35,6 +35,34 @@ export interface SimplicialGrowthState {
   };
 }
 
+// --- Boundary Growth Types (T30) ---
+
+export type BoundaryMoveType = 'glue' | 'tent';
+
+export interface BoundaryGrowthState {
+  step: number;
+  complex: SimplicialComplex;
+  lastMove: BoundaryMoveType | null;
+  moveCount: { glue: number; tent: number };
+  boundarySize: number;
+  metrics: {
+    totalSimplices: number;
+    vertexCount: number;
+    dimension: number;
+    volume: number;
+    curvature: number;
+  };
+}
+
+export interface BoundaryGrowthParams {
+  dimension: Dimension;
+  maxSteps: number;
+  growthScale: number;
+  tentProbability: number; // 0-1, rest is glue probability
+}
+
+// --- Original Interior Growth Types ---
+
 export interface SimplicialGrowthParams {
   dimension: Dimension;
   initialVertices: number;
