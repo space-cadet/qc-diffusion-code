@@ -86,6 +86,21 @@ export {
   apply4to1,
 } from './operations/PachnerMoves3D';
 
+// Boundary growth operations (T30)
+export {
+  type GlueResult,
+  getBoundaryEdges2D,
+  getBoundaryFaces3D,
+  getBoundaryEdgesAtVertex2D,
+  getBoundaryFacesAtVertex3D,
+  computeOutwardNormal2D,
+  computeOutwardNormal3D,
+  glueTriangle2D,
+  glueTetrahedron3D,
+  tentMove2D,
+  tentMove3D,
+} from './operations/BoundaryGrowth';
+
 // Algebraic (optional)
 export {
   type Chain,
