@@ -103,17 +103,17 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ sections, classN
           <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
             {section.fields.map((field, fieldIdx) => (
               <div key={fieldIdx} className="space-y-4">
-                {field.type !== 'checkbox' && (
-                  <label className="text-xs font-bold text-gray-600 uppercase">
-                    {field.label}
-                  </label>
-                )}
+                <label className={`text-xs font-bold text-gray-600 uppercase ${
+                  field.type === 'checkbox' ? 'opacity-0 h-0' : ''
+                }`}>
+                  {field.label}
+                </label>
                 {renderField(field, fieldIdx)}
-                {field.hint && (
-                  <span className="text-[10px] text-gray-400 font-medium tracking-tight block">
-                    {field.hint}
-                  </span>
-                )}
+                <span className={`text-[10px] text-gray-400 font-medium tracking-tight block ${
+                  !field.hint ? 'opacity-0 h-0' : ''
+                }`}>
+                  {field.hint || 'No hint available'}
+                </span>
               </div>
             ))}
           </div>

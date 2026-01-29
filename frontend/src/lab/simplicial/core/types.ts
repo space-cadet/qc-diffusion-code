@@ -67,6 +67,10 @@ export interface SimplicialComplexTopology {
   edgeIndex: Map<string, number>;
   /** Maps faceKey(v0,v1,v2) -> face id for O(1) duplicate detection. */
   faceIndex: Map<string, number>;
+  /** Maps vertex id -> half-edge ids for O(1) adjacency queries. */
+  vertexToHalfEdges?: Map<number, number[]>;
+  /** Maps face id -> half-edge ids for O(1) adjacency queries. */
+  faceToHalfEdges?: Map<number, number[]>;
   dimension: 2 | 3;
   nextVertexId: number;
   nextEdgeId: number;

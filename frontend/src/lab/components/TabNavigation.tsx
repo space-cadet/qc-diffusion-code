@@ -32,7 +32,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            {tab.icon && <span className="mr-1">{tab.icon}</span>}
+            <span className={`mr-1 ${!tab.icon ? 'opacity-0 w-0' : ''}`}>{tab.icon || ''}</span>
             {tab.label}
           </button>
         ))}

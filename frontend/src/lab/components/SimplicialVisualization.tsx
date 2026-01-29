@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { SimplicialComplex, Simplex } from '../types/simplicial';
+import { SimplicialComplex } from '../types/simplicial';
+import { VertexPosition } from '../simplicial';
 
 interface SimplicialVisualizationProps {
   complex: SimplicialComplex;
@@ -19,36 +20,70 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
   showFaces = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hoveredSimplex, setHoveredSimplex] = useState<Simplex | null>(null);
+  const [hoveredSimplex, setHoveredSimplex] = useState<{ id: number; dimension: number; vertices: number[] } | null>(null);
 
   // Generate vertex positions for visualization
-  const generateVertexPositions = (complex: SimplicialComplex) => {
-    // Use stored positions if available (for 2D)
-    if (complex.vertexPositions && complex.vertexPositions.size > 0) {
-      return complex.vertexPositions;
+  const generateVertexPositions = (complex: SimplicialComplex): Map<number, VertexPosition> => {
+    // Use stored positions if available
+    if (complex.geometry.positions.size > 0) {
+      // Center the existing positions in the viewport
+      const positions = new Map<number, VertexPosition>();
+      const allPositions = Array.from(complex.geometry.positions.values());
+      
+      if (allPositions.length === 0) return positions;
+      
+      // Calculate bounds
+      const minX = Math.min(...allPositions.map(p => p.x));
+      const maxX = Math.max(...allPositions.map(p => p.x));
+      const minY = Math.min(...allPositions.map(p => p.y));
+      const maxY = Math.max(...allPositions.map(p => p.y));
+      
+      const currentWidth = maxX - minX;
+      const currentHeight = maxY - minY;
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+      
+      // Calculate scale to fit in viewport with padding
+      const padding = 50;
+      const targetWidth = width - 2 * padding;
+      const targetHeight = height - 2 * padding;
+      const scale = Math.min(targetWidth / currentWidth, targetHeight / currentHeight, 2); // Max scale 2x
+      
+      // Transform positions to be centered and scaled
+      const viewportCenterX = width / 2;
+      const viewportCenterY = height / 2;
+      
+      for (const [vertexId, pos] of complex.geometry.positions) {
+        const newX = viewportCenterX + (pos.x - centerX) * scale;
+        const newY = viewportCenterY + (pos.y - centerY) * scale;
+        positions.set(vertexId, { x: newX, y: newY, z: pos.z });
+      }
+      
+      return positions;
     }
     
-    // Fallback to generated positions for 3D or when positions not available
-    const positions: Map<number, { x: number; y: number; z?: number }> = new Map();
+    // Fallback to generated positions for when geometry not available
+    const positions: Map<number, VertexPosition> = new Map();
     
-    if (complex.dimension === 2) {
+    if (complex.topology.dimension === 2) {
       // 2D layout - arrange vertices in a triangular or circular pattern
-      const vertexCount = complex.vertexCount;
+      const vertexCount = complex.topology.vertices.size;
       const centerX = width / 2;
       const centerY = height / 2;
       const radius = Math.min(width, height) * 0.3;
       
-      // For 2D, create a more interesting layout
+      const vertexIds = Array.from(complex.topology.vertices.keys());
+      
       if (vertexCount === 3) {
         // Single triangle
-        positions.set(0, { x: centerX, y: centerY - radius });
-        positions.set(1, { x: centerX - radius * 0.866, y: centerY + radius * 0.5 });
-        positions.set(2, { x: centerX + radius * 0.866, y: centerY + radius * 0.5 });
+        positions.set(vertexIds[0], { x: centerX, y: centerY - radius });
+        positions.set(vertexIds[1], { x: centerX - radius * 0.866, y: centerY + radius * 0.5 });
+        positions.set(vertexIds[2], { x: centerX + radius * 0.866, y: centerY + radius * 0.5 });
       } else {
         // Circular layout for more vertices
-        for (let i = 0; i < vertexCount; i++) {
-          const angle = (2 * Math.PI * i) / vertexCount;
-          positions.set(i, {
+        for (let i = 0; i < vertexIds.length; i++) {
+          const angle = (2 * Math.PI * i) / vertexIds.length;
+          positions.set(vertexIds[i], {
             x: centerX + radius * Math.cos(angle),
             y: centerY + radius * Math.sin(angle),
           });
@@ -56,21 +91,23 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
       }
     } else {
       // 3D layout - create tetrahedral arrangement and project onto 2D
-      const vertexCount = complex.vertexCount;
+      const vertexCount = complex.topology.vertices.size;
       const centerX = width / 2;
       const centerY = height / 2;
       const scale = Math.min(width, height) * 0.15;
       
+      const vertexIds = Array.from(complex.topology.vertices.keys());
+      
       if (vertexCount === 4) {
         // Single tetrahedron vertices
         const h = scale * Math.sqrt(2/3); // Height of tetrahedron
-        positions.set(0, { x: centerX, y: centerY - h/2 }); // Top vertex
-        positions.set(1, { x: centerX - scale, y: centerY + h/2 }); // Base vertex 1
-        positions.set(2, { x: centerX + scale, y: centerY + h/2 }); // Base vertex 2
-        positions.set(3, { x: centerX, y: centerY + h/2 - scale * 0.5 }); // Base vertex 3
+        positions.set(vertexIds[0], { x: centerX, y: centerY - h }); // Top vertex
+        positions.set(vertexIds[1], { x: centerX - scale, y: centerY + h/2 }); // Base vertex 1
+        positions.set(vertexIds[2], { x: centerX + scale, y: centerY + h/2 }); // Base vertex 2
+        positions.set(vertexIds[3], { x: centerX, y: centerY + h/2 - scale * 0.5 }); // Base vertex 3
       } else {
         // For more vertices, create multiple tetrahedra or extended structure
-        for (let i = 0; i < vertexCount; i++) {
+        for (let i = 0; i < vertexIds.length; i++) {
           const theta = (2 * Math.PI * i) / Math.min(vertexCount, 6);
           const phi = Math.PI / 3 + (i % 2) * Math.PI / 6; // Alternating elevation
           
@@ -78,7 +115,7 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
           const y = centerY + scale * 2 * Math.cos(phi);
           const z = scale * 2 * Math.sin(phi) * Math.sin(theta);
           
-          positions.set(i, { x, y, z });
+          positions.set(vertexIds[i], { x, y, z });
         }
       }
     }
@@ -102,9 +139,10 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
     
     // Draw faces (2D triangles or 3D tetrahedron faces)
     if (showFaces) {
-      complex.simplices.forEach(simplex => {
-        if (simplex.dimension === 2) {
-          const vertices = simplex.vertices.map(v => positions.get(v)!);
+      if (complex.topology.dimension === 2) {
+        // 2D: draw triangles
+        for (const [faceId, face] of complex.topology.faces) {
+          const vertices = face.vertices.map(v => positions.get(v)!);
           if (vertices.length === 3) {
             ctx.beginPath();
             ctx.moveTo(vertices[0].x, vertices[0].y);
@@ -112,13 +150,30 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
             ctx.closePath();
             
             // Fill with semi-transparent color
-            ctx.fillStyle = hoveredSimplex?.id === simplex.id 
+            ctx.fillStyle = hoveredSimplex?.id === faceId 
               ? 'rgba(59, 130, 246, 0.4)' 
               : 'rgba(156, 163, 175, 0.2)';
             ctx.fill();
           }
         }
-      });
+      } else {
+        // 3D: draw tetrahedron faces
+        for (const [faceId, face] of complex.topology.faces) {
+          const vertices = face.vertices.map(v => positions.get(v)!);
+          if (vertices.length === 3) {
+            ctx.beginPath();
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+            vertices.forEach(v => ctx.lineTo(v.x, v.y));
+            ctx.closePath();
+            
+            // Fill with semi-transparent color
+            ctx.fillStyle = hoveredSimplex?.id === faceId 
+              ? 'rgba(59, 130, 246, 0.4)' 
+              : 'rgba(156, 163, 175, 0.2)';
+            ctx.fill();
+          }
+        }
+      }
     }
     
     // Draw edges
@@ -129,23 +184,14 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
       // Collect all unique edges from simplices
       const edges = new Set<string>();
       
-      complex.simplices.forEach(simplex => {
-        const vertices = simplex.vertices;
-        
-        // For triangles (2D) and tetrahedron faces (3D), draw all edges
-        if (simplex.dimension === 2 && vertices.length >= 3) {
-          for (let i = 0; i < vertices.length; i++) {
-            for (let j = i + 1; j < vertices.length; j++) {
-              const edge = [vertices[i], vertices[j]].sort().join('-');
-              edges.add(edge);
-            }
-          }
-        }
-      });
+      for (const [edgeId, edge] of complex.topology.edges) {
+        const edgeKey = `${edge.vertices[0]},${edge.vertices[1]}`;
+        edges.add(edgeKey);
+      }
       
       // Draw each unique edge
       edges.forEach(edge => {
-        const [v1, v2] = edge.split('-').map(Number);
+        const [v1, v2] = edge.split(',').map(Number);
         const pos1 = positions.get(v1);
         const pos2 = positions.get(v2);
         
@@ -191,15 +237,27 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
     const positions = generateVertexPositions(complex);
     
     // Check if mouse is over any simplex
-    let foundSimplex: Simplex | null = null;
+    let foundSimplex: { id: number; dimension: number; vertices: number[] } | null = null;
     
-    for (const simplex of complex.simplices) {
-      if (simplex.dimension === 2) {
-        const vertices = simplex.vertices.map(v => positions.get(v)!);
+    if (complex.topology.dimension === 2) {
+      for (const [faceId, face] of complex.topology.faces) {
+        const vertices = face.vertices.map(v => positions.get(v)!);
         if (vertices.length === 3) {
           // Simple point-in-triangle test
           if (isPointInTriangle(x, y, vertices[0], vertices[1], vertices[2])) {
-            foundSimplex = simplex;
+            foundSimplex = { id: faceId, dimension: 2, vertices: face.vertices };
+            break;
+          }
+        }
+      }
+    } else {
+      // 3D: check tetrahedron faces
+      for (const [faceId, face] of complex.topology.faces) {
+        const vertices = face.vertices.map(v => positions.get(v)!);
+        if (vertices.length === 3) {
+          // Simple point-in-triangle test
+          if (isPointInTriangle(x, y, vertices[0], vertices[1], vertices[2])) {
+            foundSimplex = { id: faceId, dimension: 2, vertices: face.vertices };
             break;
           }
         }
@@ -248,16 +306,14 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
       {/* Info panel */}
       <div className="absolute top-2 right-2 bg-white bg-opacity-90 p-2 rounded border border-gray-200 text-xs">
         <div className="font-semibold">Simplicial Complex</div>
-        <div>Dimension: {complex.dimension}D</div>
-        <div>Vertices: {complex.vertexCount}</div>
-        <div>Simplices: {complex.simplices.length}</div>
-        {hoveredSimplex && (
-          <div className="mt-1 pt-1 border-t border-gray-200">
-            <div>Simplex #{hoveredSimplex.id}</div>
-            <div>Type: {hoveredSimplex.dimension}D</div>
-            <div>Vertices: {hoveredSimplex.vertices.join(', ')}</div>
-          </div>
-        )}
+        <div>Dimension: {complex.topology.dimension}D</div>
+        <div>Vertices: {complex.topology.vertices.size}</div>
+        <div>Simplices: {complex.topology.dimension === 2 ? complex.topology.faces.size : complex.topology.tetrahedra.size}</div>
+        <div className="mt-1 pt-1 border-t border-gray-200">
+          <div>Simplex #{hoveredSimplex?.id || 'None'}</div>
+          <div>Type: {hoveredSimplex?.dimension || 'N/A'}D</div>
+          <div>Vertices: {hoveredSimplex?.vertices.join(', ') || 'Hover over simplex'}</div>
+        </div>
       </div>
       
       {/* Controls */}

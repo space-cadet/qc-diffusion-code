@@ -32,7 +32,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ metrics, columns = 4, 
 
   return (
     <div className="w-full">
-      {title && <h3 className="text-lg font-semibold mb-3">{title}</h3>}
+      <h3 className="text-lg font-semibold mb-3">{title || 'Metrics'}</h3>
       <div className={`grid ${colsClass} gap-4`}>
         {metrics.map((metric, idx) => (
           <div

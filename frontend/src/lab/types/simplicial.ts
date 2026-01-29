@@ -1,23 +1,16 @@
-/**
- * Simplicial Complex Types
- * For simplicial growth algorithm implementation
- */
+import {
+  SimplicialComplexTopology,
+  SimplicialComplexGeometry,
+  PachnerMove,
+} from '../simplicial';
 
-export type MoveType = '1-4' | '2-3' | '3-2' | '4-1' | '1-3' | '2-2' | '3-1';
+export type MoveType = PachnerMove;
 
 export type Dimension = 2 | 3;
 
-export interface Simplex {
-  id: number;
-  vertices: number[];
-  dimension: number;
-}
-
 export interface SimplicialComplex {
-  simplices: Simplex[];
-  vertexCount: number;
-  dimension: number;
-  vertexPositions: Map<number, { x: number; y: number }>; // 2D positions for visualization
+  topology: SimplicialComplexTopology;
+  geometry: SimplicialComplexGeometry;
 }
 
 export interface SimplicialGrowthState {

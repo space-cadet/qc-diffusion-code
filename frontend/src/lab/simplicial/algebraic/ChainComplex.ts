@@ -77,7 +77,7 @@ export function computeBoundaryOfFace(
   const coefficients = new Map<number, number>();
 
   // Boundary of [v0,v1,v2] = [v1,v2] - [v0,v2] + [v0,v1]
-  // Find edge ids by matching vertex pairs
+  // Use edgeIndex for O(1) lookup instead of O(n) scan
   const pairs: [number, number, number][] = [
     [v1, v2, 1],
     [v0, v2, -1],
@@ -85,13 +85,10 @@ export function computeBoundaryOfFace(
   ];
 
   for (const [a, b, sign] of pairs) {
-    for (const [edgeId, edge] of topology.edges) {
-      const sorted = [...edge.vertices].sort((x, y) => x - y);
-      const target = [a, b].sort((x, y) => x - y);
-      if (sorted[0] === target[0] && sorted[1] === target[1]) {
-        coefficients.set(edgeId, sign);
-        break;
-      }
+    const key = a < b ? `${a},${b}` : `${b},${a}`;
+    const edgeId = topology.edgeIndex.get(key);
+    if (edgeId !== undefined) {
+      coefficients.set(edgeId, sign);
     }
   }
 
@@ -141,10 +138,34 @@ function countConnectedComponents3D(topology: SimplicialComplexTopology): number
 /**
  * Estimate Betti numbers from the Euler characteristic and simplex counts.
  *
- * For a closed orientable 2-manifold: b0=1, b2=1, b1 = 2 - chi.
- * For a general 2-complex with boundary or a simplicial disc this is
- * only an approximation. Full computation would require Smith normal form
- * on the boundary matrices, which is left for a future extension.
+ * ⚠️ IMPORTANT: This is a HEURISTIC ESTIMATION, not exact computation.
+ *
+ * For exact Betti numbers, Smith normal form computation on boundary matrices is required,
+ * which is computationally expensive (O(n^3) for large complexes) and beyond current scope.
+ *
+ * 2D Case:
+ * - b0 = number of connected components (exact, computed via union-find)
+ * - b2 = 0 for open complexes with boundary, 1 for closed manifolds (assumed 0 here)
+ * - b1 = b0 + b2 - chi (derived from Euler characteristic)
+ * - This is exact for closed orientable 2-manifolds, approximate for general 2-complexes
+ *
+ * 3D Case:
+ * - b0 = number of connected components (exact, computed via union-find)
+ * - b3 = 0 for open complexes with boundary, 1 for closed 3-manifolds (assumed 0 here)
+ * - Without Smith normal form, cannot separate b1 and b2 individually
+ * - Uses constraint: b1 - b2 = b0 + b3 - chi
+ * - Heuristic: assumes simply-connected (b1=0) or non-simply-connected (b2=0) based on deficit sign
+ * - This is only approximate and may be incorrect for non-simply-connected complexes
+ *
+ * Use this for:
+ * - Quick topological sanity checks
+ * - Detecting obvious topological changes after Pachner moves
+ * - Educational purposes and visualization
+ *
+ * Do NOT use for:
+ * - Rigorous mathematical proofs
+ * - Critical physics calculations requiring exact homology
+ * - Detecting subtle topological features
  */
 export function estimateBettiNumbers(
   topology: SimplicialComplexTopology,

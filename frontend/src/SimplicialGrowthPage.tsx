@@ -101,8 +101,9 @@ export const SimplicialGrowthPage: React.FC = () => {
   };
 
   const handleApplyPachnerMove = (moveType: any) => {
-    console.debug('[SimplicialGrowthPage] Applying Pachner move:', moveType);
-    simulation.step(); // This will trigger the random move selection - we could enhance this to force specific moves
+    console.debug('[SimplicialGrowthPage] Pachner move tested:', moveType);
+    // This is now just for notification/testing - doesn't affect main simulation
+    // The PachnerMoveTester is completely independent
   };
 
   const handleCopyMetrics = async () => {
@@ -361,12 +362,10 @@ export const SimplicialGrowthPage: React.FC = () => {
                   </div>
                   
                   {/* Pachner Move Tester */}
-                  {simulation.currentState && (
-                    <PachnerMoveTester
-                      complex={simulation.currentState.complex}
-                      onApplyMove={handleApplyPachnerMove}
-                    />
-                  )}
+                  <PachnerMoveTester
+                    dimension={params.dimension}
+                    onApplyMove={handleApplyPachnerMove}
+                  />
                 </div>
               </div>
 

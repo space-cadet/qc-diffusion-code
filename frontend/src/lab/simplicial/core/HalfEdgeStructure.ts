@@ -10,6 +10,8 @@ import { SimplicialComplexTopology, HalfEdge, edgeKey } from './types';
  * Populate topo.halfEdges from existing faces.
  * For each triangular face, creates 3 half-edges forming a cycle.
  * Twin pairing connects half-edges sharing the same edge in opposite directions.
+ *
+ * Also builds vertex-to-halfedge index for O(1) adjacency queries.
  */
 export function buildHalfEdgeStructure(topo: SimplicialComplexTopology): void {
   topo.halfEdges.clear();
@@ -18,6 +20,9 @@ export function buildHalfEdgeStructure(topo: SimplicialComplexTopology): void {
   // Map from edgeKey+direction -> half-edge id for twin pairing
   // Key: "origin,dest" (NOT sorted) to distinguish direction
   const directedEdgeMap = new Map<string, number>();
+
+  // Map from vertex id -> half-edge ids for O(1) adjacency queries
+  const vertexToHalfEdges = new Map<number, number[]>();
 
   for (const [faceId, face] of topo.faces) {
     const [v0, v1, v2] = face.vertices;
@@ -42,6 +47,12 @@ export function buildHalfEdgeStructure(topo: SimplicialComplexTopology): void {
       };
       topo.halfEdges.set(he.id, he);
       directedEdgeMap.set(`${origin},${dest}`, he.id);
+
+      // Build vertex-to-halfedge index
+      if (!vertexToHalfEdges.has(origin)) {
+        vertexToHalfEdges.set(origin, []);
+      }
+      vertexToHalfEdges.get(origin)!.push(he.id);
     }
   }
 
@@ -65,32 +76,62 @@ export function buildHalfEdgeStructure(topo: SimplicialComplexTopology): void {
 
 /**
  * Get all half-edges originating from a vertex.
+ * Uses vertex-to-halfedge index for O(1) lookup.
  */
 export function getVertexHalfEdges(
   topo: SimplicialComplexTopology,
   vertexId: number,
 ): HalfEdge[] {
-  const result: HalfEdge[] = [];
-  for (const [, he] of topo.halfEdges) {
-    if (he.origin === vertexId) {
-      result.push(he);
+  // Build vertex-to-halfedge index on-demand if not present
+  if (!topo.vertexToHalfEdges) {
+    topo.vertexToHalfEdges = new Map<number, number[]>();
+    for (const [, he] of topo.halfEdges) {
+      if (!topo.vertexToHalfEdges.has(he.origin)) {
+        topo.vertexToHalfEdges.set(he.origin, []);
+      }
+      topo.vertexToHalfEdges.get(he.origin)!.push(he.id);
     }
+  }
+
+  const heIds = topo.vertexToHalfEdges.get(vertexId);
+  if (!heIds) return [];
+
+  const result: HalfEdge[] = [];
+  for (const id of heIds) {
+    const he = topo.halfEdges.get(id);
+    if (he) result.push(he);
   }
   return result;
 }
 
 /**
  * Get the 3 half-edges of a face.
+ * Uses face-to-halfedge index for O(1) lookup.
  */
 export function getFaceHalfEdges(
   topo: SimplicialComplexTopology,
   faceId: number,
 ): HalfEdge[] {
-  const result: HalfEdge[] = [];
-  for (const [, he] of topo.halfEdges) {
-    if (he.face === faceId) {
-      result.push(he);
+  // Build face-to-halfedge index on-demand if not present
+  if (!topo.faceToHalfEdges) {
+    topo.faceToHalfEdges = new Map<number, number[]>();
+    for (const [, he] of topo.halfEdges) {
+      if (he.face !== null) {
+        if (!topo.faceToHalfEdges.has(he.face)) {
+          topo.faceToHalfEdges.set(he.face, []);
+        }
+        topo.faceToHalfEdges.get(he.face)!.push(he.id);
+      }
     }
+  }
+
+  const heIds = topo.faceToHalfEdges.get(faceId);
+  if (!heIds) return [];
+
+  const result: HalfEdge[] = [];
+  for (const id of heIds) {
+    const he = topo.halfEdges.get(id);
+    if (he) result.push(he);
   }
   return result;
 }

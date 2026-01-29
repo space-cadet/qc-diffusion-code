@@ -159,15 +159,25 @@ export function apply3to1(
     }
   }
 
-  // Collect outer vertices (not the target vertex)
-  const outerVertexSet = new Set<number>();
-  for (const fId of incidentFaces) {
-    const f = topo.faces.get(fId)!;
+  // Collect outer vertices (not the target vertex) while preserving orientation
+  // Use the first incident face to determine orientation
+  const firstFace = topo.faces.get(incidentFaces[0])!;
+  const outerVertices: number[] = [];
+
+  // Add vertices from first face (excluding target vertex) in order
+  for (const v of firstFace.vertices) {
+    if (v !== vertexId) outerVertices.push(v);
+  }
+
+  // Add remaining outer vertices from other faces
+  for (let i = 1; i < incidentFaces.length; i++) {
+    const f = topo.faces.get(incidentFaces[i])!;
     for (const v of f.vertices) {
-      if (v !== vertexId) outerVertexSet.add(v);
+      if (v !== vertexId && !outerVertices.includes(v)) {
+        outerVertices.push(v);
+      }
     }
   }
-  const outerVertices = Array.from(outerVertexSet);
 
   // Remove the 3 faces
   for (const fId of incidentFaces) {
@@ -199,7 +209,7 @@ export function apply3to1(
   addEdge(topo, outerVertices[1], outerVertices[2]);
   addEdge(topo, outerVertices[2], outerVertices[0]);
 
-  // Add 1 new face
+  // Add 1 new face with preserved orientation
   addFace(topo, outerVertices[0], outerVertices[1], outerVertices[2]);
 
   // Rebuild half-edges
