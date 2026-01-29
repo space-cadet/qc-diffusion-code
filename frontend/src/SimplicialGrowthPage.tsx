@@ -166,12 +166,17 @@ export const SimplicialGrowthPage: React.FC = () => {
           color: 'purple' as const,
         },
         {
-          label: 'Volume',
-          value: simulation.currentState.metrics.volume.toFixed(3),
+          label: 'Edges',
+          value: simulation.currentState.complex.topology.edges.size,
           color: 'blue' as const,
         },
         {
-          label: 'Euler Char',
+          label: 'Faces',
+          value: simulation.currentState.complex.topology.faces.size,
+          color: 'blue' as const,
+        },
+        {
+          label: 'Euler Char (X)',
           value: simulation.currentState.metrics.curvature.toFixed(0),
           color: 'gray' as const,
         },
