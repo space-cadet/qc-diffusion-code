@@ -3,10 +3,10 @@ description: Memory Bank Update Workflow
 auto_execution_mode: 1
 ---
 
-## Memory Bank Update Workflow (Enhanced v6.11 Compliance)
+## Memory Bank Update Workflow (Enhanced v6.12 Compliance)
 
 ### Step 1: Read Memory Bank Update Protocol
-- **First Action:** Read the memory bank update protocol from `memory-bank/integrated-rules-v6.11.md` (Sections 1.5, 1.6, and 6.5)
+- **First Action:** Read the memory bank update protocol from `memory-bank/integrated-rules-v6.12.md` (Sections 1.5, 1.6, and 6.5)
 - **Purpose:** Understand strict compliance requirements, file operation standards, and approval protocols
 - **Critical:** Must read this before making any file modifications
 
@@ -30,7 +30,7 @@ auto_execution_mode: 1
 
 ### Step 4: Initialize Context (Time & Timezone)
 - **Get Current Time:** Determine current system time and timezone (IST format: `YYYY-MM-DD HH:MM:SS TZ`)
-- **Verify Timestamp Standards:** Ensure compliance with v6.11 timestamp requirements
+- **Verify Timestamp Standards:** Ensure compliance with v6.12 timestamp requirements
 - **Prepare for Updates:** Have accurate timestamps ready for all file updates
 
 ### Step 5: Update Specific Files (Task/Implementation)
@@ -44,7 +44,7 @@ auto_execution_mode: 1
   - And other specialized templates as needed
 - **Targeted Updates:** Update only the specific task files and implementation docs identified in Step 2-3
 - **Strict Rule:** Use `edit_block` (or equivalent) for updates. **Never** overwrite whole files unless creating new ones
-- **Schema Compliance:** Follow v6.11 requirements AND template formats exactly
+- **Schema Compliance:** Follow v6.12 requirements AND template formats exactly
 
 ### Step 6: Update Registries (Strict Schema Enforced)
 - **`tasks.md`:** Update status/timestamps
@@ -56,7 +56,7 @@ auto_execution_mode: 1
 ### Step 7: Update Session Log
 - **Check for `sessions/YYYY-MM-DD-PERIOD.md`**
 - **If exists:** Update while **PRESERVING EXISTING CONTENT**. Append new work items
-- **If new:** Create with standard header following v6.11 template
+- **If new:** Create with standard header following v6.12 template
 
 ### Step 8: Update History (Strict Regex Compliance)
 - **`edit_history.md`:** Prepend new entry
@@ -65,6 +65,6 @@ auto_execution_mode: 1
   - *Action:* `Created`, `Modified`, `Updated`, `Deleted`
 
 ### Step 9: Finalize
-- **Generate Commit Message:** Create commit message per v6.11 format
-- **Verify Compliance:** Ensure all updates follow strict v6.11 requirements
+- **Generate Commit Message:** Create commit message per v6.12 format
+- **Verify Compliance:** Ensure all updates follow strict v6.12 requirements
 - **Document Completion:** Note workflow completion in appropriate logs

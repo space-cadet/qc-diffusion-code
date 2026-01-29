@@ -23,7 +23,7 @@ Shared infrastructure for numerical simulation pages (PDE, Classical Walk, Quant
 ├─────────────────────────────────────────────────────────────────────┤
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐     │
 │  │ SimulationCtrl  │  │ TimeSeriesStore │  │ ObservableEngine│     │
-│  │ Interface       │  │                 │  │ (existing C7a)  │     │
+│  │ Interface       │  │                 │  │ (existing T7a)  │     │
 │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘     │
 │           │                    │                    │               │
 │  ┌────────▼────────────────────▼────────────────────▼────────┐     │
@@ -147,10 +147,10 @@ interface TimelineSliderProps {
 
 ## Integration with Existing Work
 
-- **C7/C7a**: Observable system provides metrics calculation
-- **C17**: AnalysisPage shares PlotlyChart, grid layout patterns
-- **C18**: Streaming framework provides real-time data flow
-- **C7b**: Future composable observables build on this foundation
+- **T7/T7a**: Observable system provides metrics calculation
+- **T17**: AnalysisPage shares PlotlyChart, grid layout patterns
+- **T18**: Streaming framework provides real-time data flow
+- **T7b**: Future composable observables build on this foundation
 
 ## File Structure (Planned)
 

@@ -2,12 +2,12 @@
 *Created: 2025-09-15 14:23:30 IST*
 
 ## Focus Task
-C16b: GPU CTRW Strategy Implementation and Testing
+T16b: GPU CTRW Strategy Implementation and Testing
 **Status**: 🔄 IN PROGRESS - Physics Implementation Complete
 **Time Spent**: 2.5 hours
 
 ## Tasks Worked On
-### C16b: GPU CTRW Strategy Implementation and Testing
+### T16b: GPU CTRW Strategy Implementation and Testing
 **Priority**: HIGH
 **Progress Made**:
 - Created `ctrw.glsl` shader with proper velocity-jump CTRW physics model
@@ -20,7 +20,7 @@ C16b: GPU CTRW Strategy Implementation and Testing
 - Applied UI safety fixes with null checks for simulationTime across all components
 **Status Change**: 📝 PLANNED → 🔄 IN PROGRESS
 
-### C16: GPU.IO Framework Implementation (Parent Task)
+### T16: GPU.IO Framework Implementation (Parent Task)
 **Priority**: HIGH
 **Progress Made**:
 - Advanced to Phase 2.5 with complete CTRW GPU implementation
@@ -56,4 +56,4 @@ CTRW GPU implementation complete with corrected physics. All parameter flows wor
 2. Implement energy conservation verification
 3. Test telegraph equation convergence in diffusion limits
 4. Performance benchmarking vs CPU implementation
-5. Begin work on C16c interparticle collision testing
+5. Begin work on T16c interparticle collision testing

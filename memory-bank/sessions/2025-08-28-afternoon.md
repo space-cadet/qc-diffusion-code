@@ -2,12 +2,12 @@
 *Created: 2025-08-28 13:36:51 IST*
 
 ## Focus Task
-C12 & C14: Collision System Bug Fixes and Production Refinement
+T12 & T14: Collision System Bug Fixes and Production Refinement
 **Status**: ✅ COMPLETED
 **Time Spent**: ~2 hours
 
 ## Tasks Worked On
-### C12: Interparticle Collisions and Obstacles Implementation
+### T12: Interparticle Collisions and Obstacles Implementation
 **Priority**: HIGH
 **Progress Made**:
 - Fixed unintended CTRW scattering at startup by clearing default strategies in appStore
@@ -16,7 +16,7 @@ C12 & C14: Collision System Bug Fixes and Production Refinement
 - Added type safety for particle ID parsing (handles both string and numeric IDs)
 **Status Change**: 🔄 IN PROGRESS → 🔄 IN PROGRESS (critical bugs fixed)
 
-### C14: Composite Strategy Framework Implementation  
+### T14: Composite Strategy Framework Implementation  
 **Priority**: HIGH
 **Progress Made**:
 - Fixed 1D collision double-counting by processing each particle pair once per frame
@@ -77,7 +77,7 @@ Session completed comprehensive bug fixes for the collision system implemented i
 ### System Capabilities
 ```bash
 pnpm run index tag boundary-conditions  # Query by tag
-pnpm run index task C14                 # Query by task
+pnpm run index task T14                 # Query by task
 pnpm run index recent "2025-08-26"      # Recent updates
 pnpm run index export                   # All entries as JSON
 pnpm run index validate                 # Structure validation

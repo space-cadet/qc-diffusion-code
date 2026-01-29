@@ -274,7 +274,7 @@ This document defines the user interface design for the Random Walk simulation p
 
 ### Existing Components
 - **Navigation**: Add "RandomWalk" tab to existing header
-- **Telegraph Solver**: Import from C1 task for comparison
+- **Telegraph Solver**: Import from T1 task for comparison
 - **WebGL Infrastructure**: Leverage existing GPU acceleration
 - **Parameter Controls**: Reuse styling from telegraph page
 

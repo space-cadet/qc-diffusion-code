@@ -215,7 +215,7 @@ By implementing these changes, you would decouple the `WebGLSolver` from the spe
 
 Successfully implemented solver-agnostic Dirichlet boundary condition enforcement through a post-processing pass. Fixed the Forward Euler solver to properly render its updates before BC enforcement. Enhanced the plot visualization with solver and parameter information in the legend. This implementation provides a clean foundation for adding UI controls for boundary condition selection in the future.## Related Work
 
-### C13: 1D Random Walk Implementation
+### T13: 1D Random Walk Implementation
 *Completed: 2025-08-27 14:08:14 IST by Gemini 2.5 (Pro + Flash)*
 
 Parallel development of dimensional physics simulation with boundary condition considerations:

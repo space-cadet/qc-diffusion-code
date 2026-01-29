@@ -400,7 +400,7 @@ When migrating a page to the shared framework:
 
 - `simulation-lab-framework.md` - Core framework architecture
 - `quantum-walk-implementation.md` - Original Quantum Walk implementation
-- `tasks/C27.md` - Simulation Lab Framework task
+- `tasks/T27.md` - Simulation Lab Framework task
 
 ## Notes
 

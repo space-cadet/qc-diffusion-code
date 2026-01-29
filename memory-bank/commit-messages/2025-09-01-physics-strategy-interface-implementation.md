@@ -29,4 +29,4 @@ Refactor InterparticleCollisionStrategy and InterparticleCollisionStrategy1D to 
 - Improves performance by removing unnecessary console output
 - Ensures consistent trajectory timestamps across simulation
 
-This change advances the physics engine migration (C15) by implementing the PhysicsStrategy interface in collision strategies while preserving existing functionality.
+This change advances the physics engine migration (T15) by implementing the PhysicsStrategy interface in collision strategies while preserving existing functionality.

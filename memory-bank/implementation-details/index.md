@@ -24,9 +24,9 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "quantum": ["quantum-walk-implementation"]
   },
   "task_index": {
-    "C12": ["interparticle-collision-plan"],
-    "C14": ["interparticle-collision-plan"],
-    "C24": ["quantum-walk-implementation"]
+    "T12": ["interparticle-collision-plan"],
+    "T14": ["interparticle-collision-plan"],
+    "T24": ["quantum-walk-implementation"]
   }
 }
 ```
@@ -36,9 +36,9 @@ One JSON object per line. Fields: id, title, path, summary, tags, tasks?, update
 
 ```jsonl
 { "id":"1d-random-walk-sim-plan", "title":"1D Random Walk Simulation Implementation Plan", "path":"memory-bank/implementation-details/1d-random-walk-sim-plan.md", "summary":"Adds a dedicated 1D CTRW strategy, 1D visualization, and UI toggles for dimension and interparticle collisions; strategy selection wired in RandomWalkSimulator.", "tags":["random-walk","strategy","ui"], "updated":"2025-08-27 15:03:12 IST" }
-{ "id":"quantum-walk-implementation", "title":"Quantum Walk Explorer Implementation", "path":"memory-bank/implementation-details/quantum-walk-implementation.md", "summary":"Comprehensive React implementation of quantum random walk with parameter panel, classical comparison, decoherence logic, and unified styling matching existing application components.", "tags":["quantum","random-walk","ui","implementation"], "tasks":["C24"], "updated":"2026-01-11 14:50:46 IST" }
+{ "id":"quantum-walk-implementation", "title":"Quantum Walk Explorer Implementation", "path":"memory-bank/implementation-details/quantum-walk-implementation.md", "summary":"Comprehensive React implementation of quantum random walk with parameter panel, classical comparison, decoherence logic, and unified styling matching existing application components.", "tags":["quantum","random-walk","ui","implementation"], "tasks":["T24"], "updated":"2026-01-11 14:50:46 IST" }
 { "id":"gpu-amr-integration", "title":"GPU AMR Integration Analysis", "path":"memory-bank/implementation-details/gpu-amr-integration.md", "summary":"Surveys tessellation, screen-space LOD, and displacement mapping to bring adaptive mesh refinement into GPU PDE workflows; proposes phased tessellation-based AMR.", "tags":["gpu","amr","pde","performance"], "updated":"2025-08-20 14:33:33 IST" }
-{ "id":"interparticle-collision-plan", "title":"Inter-Particle Collision Implementation Plan", "path":"memory-bank/implementation-details/interparticle-collision-plan.md", "summary":"Composite framework: ballistic base + elastic interparticle collisions; Phase 1.1 bug fixes separating scattering vs collisions and correcting 1D pair handling.", "tags":["random-walk","collisions","strategy"], "tasks":["C12","C14"], "updated":"2025-08-28 13:36:51 IST" }
+{ "id":"interparticle-collision-plan", "title":"Inter-Particle Collision Implementation Plan", "path":"memory-bank/implementation-details/interparticle-collision-plan.md", "summary":"Composite framework: ballistic base + elastic interparticle collisions; Phase 1.1 bug fixes separating scattering vs collisions and correcting 1D pair handling.", "tags":["random-walk","collisions","strategy"], "tasks":["T12","T14"], "updated":"2025-08-28 13:36:51 IST" }
 { "id":"observer-design-plan", "title":"Observer Design and Implementation Plan", "path":"memory-bank/implementation-details/observer-design-plan.md", "summary":"Observer pattern for numerical observables with zero-cost when inactive, snapshot consistency, lazy evaluation, and ObservableManager orchestration.", "tags":["observables","ui","architecture"], "updated":"2025-08-24 22:21:48 IST" }
 { "id":"pde-bcs-equations-stability", "title":"PDE Solvers — Boundary Conditions, Equation Types, and Stability", "path":"memory-bank/implementation-details/pde-bcs-equations-stability.md", "summary":"Unifies Neumann BCs via CLAMP_TO_EDGE across solvers; adds dt guards and diagnostics; frames future Dirichlet/Periodic/Absorbing extensions.", "tags":["pde","boundary-conditions","stability"], "updated":"2025-08-25 00:00:00 IST" }
 { "id":"pde-bcs-final-plan", "title":"Final Boundary Conditions Implementation Plan", "path":"memory-bank/implementation-details/pde-bcs-final-plan.md", "summary":"Chooses corrected shader-only domain-level BC architecture (KIRSS); details config, UI hooks, and shader integration for Neumann/Dirichlet/Periodic/Absorbing.", "tags":["pde","boundary-conditions","architecture","solvers"], "updated":"2025-08-26 20:40:41 IST" }

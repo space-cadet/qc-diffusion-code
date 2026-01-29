@@ -59,7 +59,7 @@ Updated physics strategy implementations to implement PhysicsStrategy interface,
 - Ensures trajectory data is synchronized with simulation time management
 
 ## Memory Bank Updates
-- Updated task files C2a.md and C5b.md with latest implementation details
+- Updated task files T2a.md and T5b.md with latest implementation details
 - Updated master tasks.md registry with current status
 - Updated coordinate-system-design.md implementation documentation
 - Updated physics-engine-rewrite-migration-plan.md with progress details

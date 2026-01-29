@@ -23,7 +23,7 @@ Complete UI implementation for simplicial growth algorithm using the shared simu
 ├─────────────────────────────────────────────────────────────────────┤
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐     │
 │  │ SimulationCtrl  │  │ TimeSeriesStore │  │ ObservableEngine│     │
-│  │ Interface       │  │                 │  │ (existing C7a)  │     │
+│  │ Interface       │  │                 │  │ (existing T7a)  │     │
 │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘     │
 │           │                    │                    │               │
 │  ┌────────▼────────────────────▼────────────────────▼────────┐     │

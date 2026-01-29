@@ -71,7 +71,7 @@ graph TD
     C --> F[Density Field ρ-x-t]
     C --> G[Velocity Field u-x-t]
 
-    D --> H[Telegraph Solver from C1]
+    D --> H[Telegraph Solver from T1]
     D --> I[Convergence Metrics]
 
     style A fill:#e8f5e8
@@ -140,7 +140,7 @@ graph TD
 
     Z --> E
     AA --> E
-    E --> BB[Telegraph Solver from C1]
+    E --> BB[Telegraph Solver from T1]
     E --> CC[Convergence Metrics]
 
     style B fill:#e8f5e8
@@ -310,7 +310,7 @@ classDiagram
 1. **Custom Physics** generates collision events with exponential timing
 2. **tsParticles** manages particle states and renders visually
 3. **Density Calculator** bins particle data → continuous density/velocity fields
-4. **Telegraph Comparison** compares fields against C1 analytical solver
+4. **Telegraph Comparison** compares fields against T1 analytical solver
 
 ## Random Walk Class Structure
 
@@ -510,7 +510,7 @@ As τ → 0, a → 0, with constraints:
 
 ### Framework Choice
 
-- **React component**: Integrate with existing C1 architecture
+- **React component**: Integrate with existing T1 architecture
 - **WebGL acceleration**: Use for large particle simulations (N > 1000)
 - **Canvas rendering**: Real-time particle visualization
 - **Plotly integration**: Density plots and comparison charts
@@ -564,7 +564,7 @@ interface DensityField {
 
 ### Dependencies
 
-- **C1 task**: Use existing telegraph equation solver for comparison
+- **T1 task**: Use existing telegraph equation solver for comparison
 - **WebGL solver**: Leverage existing GPU acceleration infrastructure
 - **UI components**: Reuse parameter controls and visualization components
 
@@ -591,7 +591,7 @@ frontend/src/
 3. **Interactive exploration**: Users can explore different scaling regimes
 4. **Educational value**: Clear demonstration of stochastic → deterministic connection
 5. **Performance**: Smooth real-time simulation for N ≤ 10,000 particles
-6. **Integration**: Seamless integration with existing C1 telegraph equation solver
+6. **Integration**: Seamless integration with existing T1 telegraph equation solver
 
 ## Existing Random Walk Implementations Analysis
 

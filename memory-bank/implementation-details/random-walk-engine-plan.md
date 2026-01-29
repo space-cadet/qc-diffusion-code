@@ -147,9 +147,9 @@ getDensityProfile2D(binSize: number = 10): {
 
 ### Phase 4: Telegraph Equation Comparison (Priority 4)
 
-**Integration with existing C1 solver:**
+**Integration with existing T1 solver:**
 
-- Use existing telegraph equation solver from C1 task
+- Use existing telegraph equation solver from T1 task
 - Compare CTRW density evolution with analytical solution
 - Display convergence metrics in DensityComparison panel
 
@@ -392,7 +392,7 @@ function createStrategiesInternal(/* ... */, forPhysicsEngine: boolean) {
 
 ## Integration with Existing Architecture
 
-### C1 Telegraph Solver Integration
+### T1 Telegraph Solver Integration
 
 - Reuse existing WebGL telegraph equation solver
 - Extract density comparison functionality

@@ -5,13 +5,13 @@ _Last Updated: 2025-08-21 11:37:53 IST_
 
 ## Focus Task
 
-C5c: Random Walk Physics Implementation
+T5c: Random Walk Physics Implementation
 **Status**: 🔄 IN PROGRESS
 **Time Spent**: 0 minutes
 
 ## Tasks Worked On
 
-### C5c: Random Walk Physics Implementation
+### T5c: Random Walk Physics Implementation
 
 **Priority**: HIGH
 **Progress Made**:

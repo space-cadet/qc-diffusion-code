@@ -104,7 +104,7 @@ class WebGLSolver {
 - `RK4Solver.ts` - Multi-stage explicit strategy (80 lines)
 - Additional texture management for intermediate stages (60 lines)
 
-### Phase 6: Boundary Conditions System (NEW - Task C2a)
+### Phase 6: Boundary Conditions System (NEW - Task T2a)
 **Files to Create/Modify**: 4 files (~120 lines)
 - Boundary condition parameter in SimulationParams and UI
 - WebGL texture wrap mode switching based on BC type

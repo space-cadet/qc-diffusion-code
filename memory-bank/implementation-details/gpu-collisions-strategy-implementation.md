@@ -2,7 +2,7 @@
 *Created: 2025-09-11, 12:58:51 IST*
 *Last updated: 2025-09-15 14:09:32 IST*
 
-## Task C16c Integration
+## Task T16c Integration
 
 **Current Status**: GPU collision system partially implemented with spatial partitioning and bilateral momentum conservation. Requires comprehensive testing and validation.
 

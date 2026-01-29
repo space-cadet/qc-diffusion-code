@@ -227,7 +227,7 @@ Boundary Condition System
 ### Complex Geometries
 - Custom domain shapes beyond rectangular
 - Boundary conditions on irregular geometries
-- Integration with adaptive mesh refinement (C3)
+- Integration with adaptive mesh refinement (T3)
 
 ### Advanced Boundary Types
 - Robin boundary conditions (linear combination of Dirichlet/Neumann)

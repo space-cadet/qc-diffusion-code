@@ -5,7 +5,7 @@ Fix density visualization pipeline with enhanced diagnostics and error handling 
 
 ## Details
 
-### Density Visualization Debugging (C8)
+### Density Visualization Debugging (T8)
 - Fixed React hook dependencies in useDensityVisualization for proper reactivity
 - Added comprehensive console diagnostics throughout density calculation pipeline
 - Implemented simulation status gating (only updates when status === 'Running')
@@ -14,7 +14,7 @@ Fix density visualization pipeline with enhanced diagnostics and error handling 
 - Removed stale particlesRef pattern for direct particle array usage
 - Added detailed logging for 2D density calculation with input validation
 
-### Observable System Groundwork (C7a)
+### Observable System Groundwork (T7a)
 - Extended RandomWalkSimulationState with interparticleCollisions field
 - Integrated collision metrics tracking with periodic syncing every 1 second
 - Enhanced type safety for collision metrics in simulation types
@@ -31,8 +31,8 @@ Fix density visualization pipeline with enhanced diagnostics and error handling 
 - frontend/src/physics/utils/density.ts
 - frontend/src/stores/appStore.ts
 - frontend/src/types/simulation.ts
-- memory-bank/tasks/C8.md
-- memory-bank/tasks/C7a.md
+- memory-bank/tasks/T8.md
+- memory-bank/tasks/T7a.md
 - memory-bank/tasks.md
 - memory-bank/sessions/2025-09-01-afternoon.md
 - memory-bank/session_cache.md

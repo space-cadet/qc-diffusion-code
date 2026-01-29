@@ -17,7 +17,7 @@ Each entry is a single line JSON object with the following fields:
   "path": "memory-bank/implementation-details/.../file.md",
   "summary": "≤220-char compressed summary focused on decisions/implementation.",
   "tags": ["tag1","tag2"],
-  "tasks": ["C12","C14"],        // optional
+  "tasks": ["T12","T14"],        // optional
   "updated": "YYYY-MM-DD HH:MM:SS IST",
   "related": ["other-doc-id"]     // optional
 }
@@ -46,7 +46,7 @@ Conventions:
 - Normalize synonyms (e.g., `bc` → `boundary-conditions`, `solver` → `solvers`).
 
 5) Infer tasks (optional)
-- Detect explicit task IDs (`C12`, `C14`, etc.).
+- Detect explicit task IDs (`T12`, `T14`, etc.).
 
 6) Write JSONL entries
 - Append one line per doc in the Entries section.

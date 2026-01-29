@@ -47,7 +47,7 @@ memory-bank/implementation-details/
   "path": "memory-bank/implementation-details/file.md",
   "summary": "≤220-char compressed summary",
   "tags": ["tag1","tag2"],
-  "tasks": ["C12","C14"],
+  "tasks": ["T12","T14"],
   "updated": "YYYY-MM-DD HH:MM:SS IST",
   "related": ["other-doc-id"]
 }
@@ -75,7 +75,7 @@ memory-bank/implementation-details/
 pnpm run index tag boundary-conditions
 
 # By task
-pnpm run index task C14
+pnpm run index task T14
 
 # Recent updates
 pnpm run index recent "2025-08-26 00:00:00 IST"

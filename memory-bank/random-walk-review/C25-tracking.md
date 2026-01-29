@@ -1,12 +1,12 @@
-# C25: Random Walk Review - Implementation Tracking
+# T25: Random Walk Review - Implementation Tracking
 
 *Created: 2026-01-12 17:01:21 IST*
 *Last Updated: 2026-01-12 17:01:21 IST*
 
-**Task**: C25 - Random Walk Page Architecture Review and Fix
+**Task**: T25 - Random Walk Page Architecture Review and Fix
 **Status**: 🔄 IN PROGRESS - Template compliance complete
 
-## Critical Bugs (C25a)
+## Critical Bugs (T25a)
 
 | Issue | Status | Hours | Notes |
 |-------|--------|-------|-------|
@@ -14,14 +14,14 @@
 | P1-011: ReplayControls Data | ⏳ TODO | 4-6h | RandomWalkSim.tsx:222 |
 | P1-007: Animation Race | ⏳ TODO | 2-3h | useParticlesLoader.ts:324 |
 
-## Type Safety (C25b)
+## Type Safety (T25b)
 
 | Issue | Status | Hours | Notes |
 |-------|--------|-------|-------|
 | P6-001: ParticlesLoader Interface | ⏳ TODO | 2-3h | useParticlesLoader.ts |
 | P6-002: Remove `any` casts | ⏳ TODO | 2-3h | 7 locations |
 
-## Dependencies (C25c)
+## Dependencies (T25c)
 
 | Issue | Status | Hours | Notes |
 |-------|--------|-------|-------|
@@ -29,7 +29,7 @@
 | P5-002: GPU mode switch | ⏳ TODO | 0.5h | Related to P1-001 |
 | P1-008: State consolidation | ⏳ TODO | 4-6h | RandomWalkSim.tsx |
 
-## Architecture (C25d)
+## Architecture (T25d)
 
 | Task | Status | Hours | Phase |
 |------|--------|-------|-------|
@@ -38,11 +38,11 @@
 
 ## Quick Links
 
-**Review Documents**: `implementation-docs/random-walk-review/`
-- [REVIEW-INDEX.md](../../implementation-docs/random-walk-review/REVIEW-INDEX.md)
-- [review-summary.md](../../implementation-docs/random-walk-review/review-summary.md)
-- [review-findings.md](../../implementation-docs/random-walk-review/review-findings.md)
-- [review-action-items.md](../../implementation-docs/random-walk-review/review-action-items.md)
+**Review Documents**: `implementation-details/random-walk-review/`
+- [REVIEW-INDEX.md](../../implementation-details/random-walk-review/REVIEW-INDEX.md)
+- [review-summary.md](../../implementation-details/random-walk-review/review-summary.md)
+- [review-findings.md](../../implementation-details/random-walk-review/review-findings.md)
+- [review-action-items.md](../../implementation-details/random-walk-review/review-action-items.md)
 
 **Start**: review-action-items.md → Critical Fixes section
 

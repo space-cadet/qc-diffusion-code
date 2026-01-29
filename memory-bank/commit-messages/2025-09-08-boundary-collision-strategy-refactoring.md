@@ -2,7 +2,7 @@
 
 **Date**: 2025-09-08 22:53:16 IST  
 **Contributor**: GPT5  
-**Tasks**: C19 (Boundary Conditions), C12 (Interparticle Collisions)
+**Tasks**: T19 (Boundary Conditions), T12 (Interparticle Collisions)
 
 ## Commit Message
 
