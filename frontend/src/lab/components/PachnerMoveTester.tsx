@@ -128,21 +128,36 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
         const centerZ = 0;
         const size = 60;
         
-        // Create 4 vertices for a shared face
+        // Create 5 vertices: 3 shared + 2 opposite
         const v0 = addVertex(topology);
         const v1 = addVertex(topology);
         const v2 = addVertex(topology);
         const v3 = addVertex(topology);
-        
-        geometry.positions.set(v0, { x: centerX - size, y: centerY - size, z: centerZ - size });
-        geometry.positions.set(v1, { x: centerX + size, y: centerY - size, z: centerZ - size });
-        geometry.positions.set(v2, { x: centerX + size, y: centerY + size, z: centerZ - size });
-        geometry.positions.set(v3, { x: centerX - size, y: centerY + size, z: centerZ - size });
-        
-        // Create 2 tetrahedra sharing the face (v0, v1, v2)
+        const v4 = addVertex(topology);
+
+        geometry.positions.set(v0, { x: centerX - size, y: centerY - size, z: centerZ });
+        geometry.positions.set(v1, { x: centerX + size, y: centerY - size, z: centerZ });
+        geometry.positions.set(v2, { x: centerX, y: centerY + size, z: centerZ });
+        geometry.positions.set(v3, { x: centerX, y: centerY, z: centerZ - size });
+        geometry.positions.set(v4, { x: centerX, y: centerY, z: centerZ + size });
+
+        // All edges
+        for (const [a, b] of [[v0,v1],[v0,v2],[v0,v3],[v0,v4],[v1,v2],[v1,v3],[v1,v4],[v2,v3],[v2,v4]] as [number,number][]) {
+          addEdge(topology, a, b);
+        }
+
+        // All faces
+        addFace(topology, v0, v1, v2); // shared face
+        addFace(topology, v0, v1, v3);
+        addFace(topology, v0, v2, v3);
+        addFace(topology, v1, v2, v3);
+        addFace(topology, v0, v1, v4);
+        addFace(topology, v0, v2, v4);
+        addFace(topology, v1, v2, v4);
+
+        // 2 tetrahedra sharing face (v0, v1, v2)
         addTetrahedron(topology, v0, v1, v2, v3);
-        addTetrahedron(topology, v0, v1, v2, v3 + 1); // Need to add v4
-        geometry.positions.set(v3 + 1, { x: centerX, y: centerY, z: centerZ + size });
+        addTetrahedron(topology, v0, v1, v2, v4);
       } else {
         // Create 8 tetrahedra sharing a center point (enables 3-2 and 4-1 moves)
         topology = createEmptyTopology(3);
@@ -359,7 +374,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
 
   const handleApplyMove = () => {
     if (selectedMove) {
-      onApplyMove(selectedMove);
+      onApplyMove?.(selectedMove);
       setSelectedMove(null);
       setPreviewComplex(null);
     }

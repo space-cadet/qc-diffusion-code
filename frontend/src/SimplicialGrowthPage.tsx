@@ -6,6 +6,7 @@ import { ParameterPanel } from './lab/components/ParameterPanel';
 import { AnalysisTable } from './lab/components/AnalysisTable';
 import { MetricsTable } from './lab/components/MetricsTable';
 import { SimplicialVisualization } from './lab/components/SimplicialVisualization';
+import { SimplicialVisualization3D } from './lab/components/SimplicialVisualization3D';
 import { PachnerMoveTester } from './lab/components/PachnerMoveTester';
 import { useSimplicialGrowth } from './lab/hooks/useSimplicialGrowth';
 import { ExportService } from './lab/services/ExportService';
@@ -117,8 +118,33 @@ export const SimplicialGrowthPage: React.FC = () => {
   };
 
   const handleParamChange = (key: string, value: any) => {
-    setParams((prev) => ({ ...prev, [key]: value }));
-    simulation.initialize({ ...params, [key]: value });
+    // Coerce dimension from string to number (HTML select returns strings)
+    const coerced = key === 'dimension' ? Number(value) : value;
+    console.debug(`[SimplicialGrowthPage] Param change: ${key} = ${coerced} (type: ${typeof coerced})`);
+
+    let updatedParams = { ...params, [key]: coerced };
+
+    // When dimension changes, swap to appropriate default probabilities
+    if (key === 'dimension') {
+      if (coerced === 2) {
+        updatedParams.moveProbabilities = {
+          '1-3': 0.5, '2-2': 0.3, '3-1': 0.2,
+          '1-4': 0.0, '2-3': 0.0, '3-2': 0.0, '4-1': 0.0,
+        };
+        updatedParams.initialVertices = 3;
+        console.debug('[SimplicialGrowthPage] Switched to 2D probabilities');
+      } else {
+        updatedParams.moveProbabilities = {
+          '1-3': 0.0, '2-2': 0.0, '3-1': 0.0,
+          '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1,
+        };
+        updatedParams.initialVertices = 4;
+        console.debug('[SimplicialGrowthPage] Switched to 3D probabilities');
+      }
+    }
+
+    setParams(updatedParams);
+    simulation.initialize(updatedParams);
   };
 
   const statusColor: 'red' | 'gray' = simulation.isRunning ? 'red' : 'gray';
@@ -141,13 +167,18 @@ export const SimplicialGrowthPage: React.FC = () => {
           color: 'purple' as const,
         },
         {
-          label: 'Volume',
-          value: simulation.currentState.metrics.volume.toFixed(3),
+          label: 'Edges',
+          value: simulation.currentState.complex.topology.edges.size,
           color: 'blue' as const,
         },
         {
-          label: 'Curvature',
-          value: simulation.currentState.metrics.curvature.toFixed(3),
+          label: 'Faces',
+          value: simulation.currentState.complex.topology.faces.size,
+          color: 'blue' as const,
+        },
+        {
+          label: 'Euler Char (X)',
+          value: simulation.currentState.metrics.curvature.toFixed(0),
           color: 'gray' as const,
         },
         {
@@ -344,15 +375,23 @@ export const SimplicialGrowthPage: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-xl font-semibold mb-4">Simplicial Complex Visualization</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Main Visualization */}
+                  {/* Main Visualization - 2D canvas or 3D Three.js */}
                   <div>
                     {simulation.currentState ? (
                       <div className="flex justify-center">
-                        <SimplicialVisualization 
-                          complex={simulation.currentState.complex}
-                          width={600}
-                          height={400}
-                        />
+                        {params.dimension === 3 ? (
+                          <SimplicialVisualization3D
+                            complex={simulation.currentState.complex}
+                            width={600}
+                            height={400}
+                          />
+                        ) : (
+                          <SimplicialVisualization
+                            complex={simulation.currentState.complex}
+                            width={600}
+                            height={400}
+                          />
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">

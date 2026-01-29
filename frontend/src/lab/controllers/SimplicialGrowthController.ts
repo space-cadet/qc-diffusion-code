@@ -21,6 +21,7 @@ import {
   apply2to3,
   apply3to2,
   apply4to1,
+  computeEulerCharacteristic,
 } from '../simplicial';
 
 export class SimplicialGrowthController implements SimulationController<SimplicialGrowthState, SimplicialGrowthParams> {
@@ -53,7 +54,14 @@ export class SimplicialGrowthController implements SimulationController<Simplici
     this.state = this.createState(null);
     this.history = [this.state];
 
-    console.debug('[SimplicialGrowthController] Initialized');
+    console.debug('[SimplicialGrowthController] Initialized:', {
+      dimension: params.dimension,
+      dimType: typeof params.dimension,
+      vertices: this.topology.vertices.size,
+      edges: this.topology.edges.size,
+      faces: this.topology.faces.size,
+      tets: this.topology.tetrahedra.size,
+    });
   }
 
   step(): SimplicialGrowthState {
@@ -78,7 +86,12 @@ export class SimplicialGrowthController implements SimulationController<Simplici
     this.state.moveCount[moveType]++;
     this.history.push(this.state);
 
-    console.debug('[SimplicialGrowthController] Step', this.currentStep, 'move:', moveType);
+    console.debug('[SimplicialGrowthController] Step', this.currentStep, 'move:', moveType, {
+      vertices: this.topology.vertices.size,
+      edges: this.topology.edges.size,
+      faces: this.topology.faces.size,
+      tets: this.topology.tetrahedra.size,
+    });
     return this.state;
   }
 
@@ -190,22 +203,57 @@ export class SimplicialGrowthController implements SimulationController<Simplici
           return apply1to4(this.topology, this.geometry, tetId);
         }
         case '2-3': {
-          const edgeIds = Array.from(this.topology.edges.keys());
-          if (edgeIds.length === 0) return { success: false, error: 'No edges available' };
-          const edgeId = edgeIds[Math.floor(Math.random() * edgeIds.length)];
-          return apply2to3(this.topology, this.geometry, edgeId);
+          // 2-3 move needs a face shared by exactly 2 tetrahedra
+          const faceIds = Array.from(this.topology.faces.keys());
+          if (faceIds.length === 0) return { success: false, error: 'No faces available' };
+          // Shuffle and find a suitable face
+          const shuffledFaces = faceIds.sort(() => Math.random() - 0.5);
+          for (const faceId of shuffledFaces) {
+            const face = this.topology.faces.get(faceId)!;
+            const key = `${[...face.vertices].sort((a,b) => a-b).join(',')}`;
+            const tets = this.topology.faceToTets.get(key);
+            if (tets && tets.length === 2) {
+              console.debug(`[SimplicialGrowthController] 2-3 move: face ${faceId} shared by 2 tets`);
+              return apply2to3(this.topology, this.geometry, faceId);
+            }
+          }
+          return { success: false, error: 'No face shared by exactly 2 tetrahedra' };
         }
         case '3-2': {
-          const vertexIds = Array.from(this.topology.vertices.keys());
-          if (vertexIds.length === 0) return { success: false, error: 'No vertices available' };
-          const vertexId = vertexIds[Math.floor(Math.random() * vertexIds.length)];
-          return apply3to2(this.topology, this.geometry, vertexId);
+          // 3-2 move needs an edge shared by exactly 3 tetrahedra
+          const edgeIds = Array.from(this.topology.edges.keys());
+          if (edgeIds.length === 0) return { success: false, error: 'No edges available' };
+          const shuffledEdges = edgeIds.sort(() => Math.random() - 0.5);
+          for (const edgeId of shuffledEdges) {
+            const edge = this.topology.edges.get(edgeId)!;
+            const [v0, v1] = edge.vertices;
+            let count = 0;
+            for (const tet of this.topology.tetrahedra.values()) {
+              if (tet.vertices.includes(v0) && tet.vertices.includes(v1)) count++;
+            }
+            if (count === 3) {
+              console.debug(`[SimplicialGrowthController] 3-2 move: edge ${edgeId} shared by 3 tets`);
+              return apply3to2(this.topology, this.geometry, edgeId);
+            }
+          }
+          return { success: false, error: 'No edge shared by exactly 3 tetrahedra' };
         }
         case '4-1': {
-          const tetIds = Array.from(this.topology.tetrahedra.keys());
-          if (tetIds.length === 0) return { success: false, error: 'No tetrahedra available' };
-          const tetId = tetIds[Math.floor(Math.random() * tetIds.length)];
-          return apply4to1(this.topology, this.geometry, tetId);
+          // 4-1 move needs a vertex incident to exactly 4 tetrahedra
+          const vertexIds = Array.from(this.topology.vertices.keys());
+          if (vertexIds.length === 0) return { success: false, error: 'No vertices available' };
+          const shuffledVerts = vertexIds.sort(() => Math.random() - 0.5);
+          for (const vertexId of shuffledVerts) {
+            let count = 0;
+            for (const tet of this.topology.tetrahedra.values()) {
+              if (tet.vertices.includes(vertexId)) count++;
+            }
+            if (count === 4) {
+              console.debug(`[SimplicialGrowthController] 4-1 move: vertex ${vertexId} incident to 4 tets`);
+              return apply4to1(this.topology, this.geometry, vertexId);
+            }
+          }
+          return { success: false, error: 'No vertex incident to exactly 4 tetrahedra' };
         }
         default:
           return { success: false, error: `Invalid 3D move: ${moveType}` };
@@ -231,8 +279,8 @@ export class SimplicialGrowthController implements SimulationController<Simplici
       totalSimplices = this.topology.tetrahedra.size;
     }
     
-    // Calculate curvature (simplified)
-    const curvature = totalSimplices > 0 ? (vertexCount - totalSimplices) / vertexCount : 0;
+    // Euler characteristic (topological invariant - should be preserved by Pachner moves)
+    const curvature = computeEulerCharacteristic(this.topology);
     
     return {
       totalSimplices,
