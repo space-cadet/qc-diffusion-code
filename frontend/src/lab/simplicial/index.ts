@@ -18,6 +18,7 @@ export {
   type PachnerMove,
   type ValidationResult,
   faceKey,
+  edgeKey,
   createEmptyTopology,
   addVertex,
   addEdge,
