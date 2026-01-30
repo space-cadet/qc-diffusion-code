@@ -388,7 +388,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
   const availableMoves = getAvailableMoves(complex.topology.dimension);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
       <h3 className="text-lg font-semibold mb-4">Pachner Move Tester</h3>
       
       <div className="grid grid-cols-1 gap-4">
@@ -424,7 +424,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
         {/* Simplex Count Selection */}
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Initial Simplices:</h4>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <label className="flex items-center">
               <input
                 type="radio"
@@ -503,7 +503,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
         </div>
 
         {/* Side-by-side comparison */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Current State */}
           <div>
             <h4 className="text-sm font-medium text-gray-700 mb-2">Current State:</h4>
@@ -512,6 +512,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
                 complex={complex}
                 width={280}
                 height={200}
+                responsive
                 showVertices={true}
                 showEdges={true}
                 showFaces={true}
@@ -529,6 +530,7 @@ export const PachnerMoveTester: React.FC<PachnerMoveTesterProps> = ({
                 complex={previewComplex || complex}
                 width={280}
                 height={200}
+                responsive
                 showVertices={true}
                 showEdges={true}
                 showFaces={true}

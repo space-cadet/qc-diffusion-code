@@ -195,28 +195,28 @@ const InteriorMovesTab: React.FC = () => {
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 md:pb-6">
       {!isInitialized ? (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <p className="text-blue-800">Initializing simulation...</p>
         </div>
       ) : (
         <>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Simplicial Complex Metrics</h2>
             <MetricsGrid metrics={metrics} columns={4} title="" />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Simplicial Complex Visualization</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 {simulation.currentState ? (
-                  <div className="flex justify-center">
+                  <div>
                     {params.dimension === 3 ? (
-                      <SimplicialVisualization3D complex={simulation.currentState.complex} width={600} height={400} />
+                      <SimplicialVisualization3D complex={simulation.currentState.complex} width={600} height={400} responsive />
                     ) : (
-                      <SimplicialVisualization complex={simulation.currentState.complex} width={600} height={400} />
+                      <SimplicialVisualization complex={simulation.currentState.complex} width={600} height={400} responsive />
                     )}
                   </div>
                 ) : (
@@ -231,12 +231,13 @@ const InteriorMovesTab: React.FC = () => {
             <ParameterPanel sections={parameterSections} />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Timeline Control</h2>
             <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Evolution Progress" />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          {/* Desktop-only full controls section */}
+          <div className="hidden md:block bg-white border border-gray-200 rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Simulation Controls</h2>
             <div className="space-y-4">
               <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
@@ -247,13 +248,21 @@ const InteriorMovesTab: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          {/* Mobile sticky bottom control bar */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
+              <button onClick={handleExportCSV} className="px-3 py-2 rounded font-medium bg-indigo-500 hover:bg-indigo-600 text-white transition-colors text-sm">CSV</button>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Evolution History</h2>
             <MetricsTable data={metricsHistory} maxHeight="400px" />
           </div>
 
           {analysisData.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
               <h2 className="text-xl font-semibold mb-4">Move Analysis</h2>
               {analysisData.map((section, idx) => (
                 <AnalysisTable key={idx} title={section.label} data={section.data} />
@@ -394,26 +403,26 @@ const BoundaryGrowthTab: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 md:pb-6">
       {!isInitialized ? (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <p className="text-blue-800">Initializing boundary growth...</p>
         </div>
       ) : (
         <>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Boundary Growth Metrics</h2>
             <MetricsGrid metrics={metrics} columns={4} title="" />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Complex Visualization</h2>
             {simulation.currentState ? (
-              <div className="flex justify-center">
+              <div>
                 {params.dimension === 3 ? (
-                  <SimplicialVisualization3D complex={simulation.currentState.complex} width={700} height={500} />
+                  <SimplicialVisualization3D complex={simulation.currentState.complex} width={700} height={500} responsive />
                 ) : (
-                  <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} />
+                  <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} responsive />
                 )}
               </div>
             ) : (
@@ -425,22 +434,28 @@ const BoundaryGrowthTab: React.FC = () => {
             <ParameterPanel sections={parameterSections} />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Timeline Control</h2>
             <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Growth Progress" />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          {/* Desktop-only full controls section */}
+          <div className="hidden md:block bg-white border border-gray-200 rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Simulation Controls</h2>
             <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          {/* Mobile sticky bottom control bar */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-lg px-4 py-3">
+            <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <h2 className="text-xl font-semibold mb-4">Growth History</h2>
             <MetricsTable data={metricsHistory} maxHeight="400px" />
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-green-900 mb-2">Boundary Growth Algorithm</h3>
             <ul className="text-sm text-green-800 space-y-1">
               <li>- <strong>Glue Move:</strong> Attach a new simplex to a random boundary face, displacing a new vertex outward along the face normal</li>

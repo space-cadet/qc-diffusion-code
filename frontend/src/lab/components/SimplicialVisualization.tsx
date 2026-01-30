@@ -6,6 +6,7 @@ interface SimplicialVisualizationProps {
   complex: SimplicialComplex;
   width?: number;
   height?: number;
+  responsive?: boolean;
   showVertices?: boolean;
   showEdges?: boolean;
   showFaces?: boolean;
@@ -13,13 +14,30 @@ interface SimplicialVisualizationProps {
 
 export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = ({
   complex,
-  width = 600,
-  height = 400,
+  width: propWidth = 600,
+  height: propHeight = 400,
+  responsive = false,
   showVertices: initialShowVertices = true,
   showEdges: initialShowEdges = true,
   showFaces: initialShowFaces = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(propWidth);
+
+  // Responsive sizing
+  useEffect(() => {
+    if (!responsive || !containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w && w > 0) setContainerWidth(w);
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [responsive]);
+
+  const width = responsive ? containerWidth : propWidth;
+  const height = responsive ? Math.round(containerWidth * (propHeight / propWidth)) : propHeight;
   const [hoveredSimplex, setHoveredSimplex] = useState<{ id: number; dimension: number; vertices: number[] } | null>(null);
   const [showVertices, setShowVertices] = useState(initialShowVertices);
   const [showEdges, setShowEdges] = useState(initialShowEdges);
@@ -296,12 +314,13 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
   }, [complex, showVertices, showEdges, showFaces, hoveredSimplex]);
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative w-full">
       <canvas
         ref={canvasRef}
         width={width}
         height={height}
-        className="border border-gray-300 rounded-lg bg-white"
+        className="border border-gray-300 rounded-lg bg-white max-w-full"
+        style={responsive ? { width: '100%', height: 'auto' } : undefined}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredSimplex(null)}
       />

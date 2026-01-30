@@ -172,22 +172,24 @@ export function Viewer({ category, file }: ViewerProps) {
     const title = typeof children === 'string' ? children : children?.toString?.() || '';
     const id = sectionIdMap.get(title);
     const Tag = level === 1 ? 'h2' : level === 2 ? 'h3' : 'h4';
-    const className = level === 1 ? "text-2xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-20" : 
-                     level === 2 ? "text-xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-20" : 
-                                  "text-lg font-bold mt-5 mb-2 text-gray-900 scroll-mt-20";
+    const className = level === 1 ? "text-2xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-4" : 
+                     level === 2 ? "text-xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-4" : 
+                                  "text-lg font-bold mt-5 mb-2 text-gray-900 scroll-mt-4";
     
     return <Tag id={id} className={className} {...props}>{children}</Tag>;
   };
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Sticky Sections Toolbar */}
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto">
+      {/* Sections Toolbar */}
       {doc.sections.length > 0 && (
-        <div className="sticky top-0 z-20 border-b border-gray-200 bg-white p-3 shadow-sm">
+        <div className="border-b border-gray-200 bg-white p-3">
           <div className="text-xs font-semibold text-gray-700 mb-2">
             Sections
           </div>
-          <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
+          <div className="flex flex-wrap gap-2">
             {doc.sections
               .filter((s: any) => s.level <= 2)
               .map((section: any) => (
@@ -209,12 +211,12 @@ export function Viewer({ category, file }: ViewerProps) {
       )}
 
       {/* Header */}
-      <div className="border-b border-gray-200 bg-gray-50 p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm text-gray-600">
+      <div className="border-b border-gray-200 bg-gray-50 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600">
           <code className="bg-gray-100 px-2 py-1 rounded text-sm">
             {doc.filePath}
           </code>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
+          <div className="flex flex-col sm:flex-row gap-1 sm:gap-6">
             <div>
               <span className="font-semibold">Created:</span> {createdDate} IST
             </div>
@@ -225,8 +227,8 @@ export function Viewer({ category, file }: ViewerProps) {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      {/* Markdown Content */}
+      <div className="p-4 sm:p-6">
         <div className="max-w-4xl prose prose-sm">
           <ReactMarkdown
             components={{
@@ -300,6 +302,7 @@ export function Viewer({ category, file }: ViewerProps) {
           </ReactMarkdown>
         </div>
       </div>
+      </div>{/* end scrollable wrapper */}
     </div>
   );
 }

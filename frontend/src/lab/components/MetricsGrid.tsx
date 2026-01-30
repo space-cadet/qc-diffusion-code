@@ -21,7 +21,7 @@ const colorMap: Record<string, string> = {
 };
 
 export const MetricsGrid: React.FC<MetricsGridProps> = ({ metrics, columns = 4, title }) => {
-  const colsClass = columns === 2 ? 'grid-cols-2' : 'grid-cols-4';
+  const colsClass = columns === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4';
 
   if (metrics.length === 0) {
     console.debug('[MetricsGrid] No metrics to display');
@@ -33,14 +33,14 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ metrics, columns = 4, 
   return (
     <div className="w-full">
       <h3 className="text-lg font-semibold mb-3">{title || 'Metrics'}</h3>
-      <div className={`grid ${colsClass} gap-4`}>
+      <div className={`grid ${colsClass} gap-2 sm:gap-4`}>
         {metrics.map((metric, idx) => (
           <div
             key={`${metric.label}-${idx}`}
-            className={`p-4 border rounded-lg ${colorMap[metric.color] || colorMap.gray}`}
+            className={`p-2 sm:p-4 border rounded-lg ${colorMap[metric.color] || colorMap.gray}`}
           >
-            <div className="text-sm opacity-75">{metric.label}</div>
-            <div className="text-2xl font-bold mt-2">
+            <div className="text-xs sm:text-sm opacity-75">{metric.label}</div>
+            <div className="text-lg sm:text-2xl font-bold mt-1 sm:mt-2 truncate">
               {typeof metric.value === 'number' ? metric.value.toFixed(3) : metric.value}
             </div>
           </div>
