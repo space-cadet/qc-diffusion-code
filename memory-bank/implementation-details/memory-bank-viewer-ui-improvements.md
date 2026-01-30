@@ -1,7 +1,7 @@
 # Memory Bank Viewer UI Improvements
 
 *Created: 2026-01-30 02:07:00 IST*
-*Last Updated: 2026-01-30 02:07:00 IST*
+*Last Updated: 2026-01-30 07:44:00 IST*
 
 ## Overview
 Task T29a — improve browsing efficiency of the Memory Bank viewer page built in T29. Addresses layout waste, oversized grid cards, missing file preview in grid/list modes, and search UX gaps.
@@ -42,6 +42,19 @@ Display the category/folder path below the title in search result items.
 
 ### 7. Diagnostic Logging
 Add minimal `console.log` statements with `[MemoryBank]` prefix at key interaction points.
+
+## Status
+✅ COMPLETED — 2026-01-30 07:44:00 IST
+
+All 7 changes implemented across 6 files. TypeScript compiles clean. Net reduction of ~174 lines through simplification.
+
+## Files Modified
+- `frontend/src/memoryBank/pages/MemoryBankPage.tsx` — removed header row, added slide-over panel, mobile auto-collapse, exported ViewModeToggle
+- `frontend/src/memoryBank/components/FileGridView.tsx` — breadcrumb+toggle bar, max-w-5xl, denser grid, inline search
+- `frontend/src/memoryBank/components/FileListView.tsx` — breadcrumb+toggle bar, max-w-5xl, inline search
+- `frontend/src/memoryBank/components/FileGridItem.tsx` — compact card (w-8 icon, no h-24 container)
+- `frontend/src/memoryBank/components/FileListItem.tsx` — removed fake file size, added logging
+- `frontend/src/memoryBank/components/SearchBar.tsx` — folder path in results, compact prop
 
 ## References
 - Parent task: `memory-bank/tasks/T29.md`
