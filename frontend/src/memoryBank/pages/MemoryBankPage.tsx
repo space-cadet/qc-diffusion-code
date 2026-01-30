@@ -179,8 +179,8 @@ export function MemoryBankPage() {
 
   /* ── Render ──────────────────────────────────────────── */
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-white">
-      {/* Main Content — no separate header row for view toggles */}
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* ── Sidebar (tree view only) ─────────────────── */}
         {viewMode === "tree" && (

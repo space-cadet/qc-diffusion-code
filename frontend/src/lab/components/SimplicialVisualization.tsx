@@ -325,17 +325,14 @@ export const SimplicialVisualization: React.FC<SimplicialVisualizationProps> = (
         onMouseLeave={() => setHoveredSimplex(null)}
       />
       
-      {/* Info panel */}
-      <div className="absolute top-2 right-2 bg-white bg-opacity-90 p-2 rounded border border-gray-200 text-xs">
-        <div className="font-semibold">Simplicial Complex</div>
-        <div>Dimension: {complex.topology.dimension}D</div>
-        <div>Vertices: {complex.topology.vertices.size}</div>
-        <div>Simplices: {complex.topology.dimension === 2 ? complex.topology.faces.size : complex.topology.tetrahedra.size}</div>
-        <div className="mt-1 pt-1 border-t border-gray-200">
-          <div>Simplex #{hoveredSimplex?.id || 'None'}</div>
-          <div>Type: {hoveredSimplex?.dimension || 'N/A'}D</div>
-          <div>Vertices: {hoveredSimplex?.vertices.join(', ') || 'Hover over simplex'}</div>
-        </div>
+      {/* Info panel - compact on mobile */}
+      <div className="absolute top-1 right-1 bg-white bg-opacity-90 px-1.5 py-1 rounded border border-gray-200 text-[10px] leading-tight max-w-[45%] sm:max-w-none sm:text-xs sm:p-2 sm:top-2 sm:right-2">
+        <div className="font-semibold">{complex.topology.dimension}D &middot; V:{complex.topology.vertices.size} &middot; S:{complex.topology.dimension === 2 ? complex.topology.faces.size : complex.topology.tetrahedra.size}</div>
+        {hoveredSimplex && (
+          <div className="mt-0.5 pt-0.5 border-t border-gray-200">
+            #{hoveredSimplex.id} ({hoveredSimplex.dimension}D) [{hoveredSimplex.vertices.join(',')}]
+          </div>
+        )}
       </div>
       
       {/* Controls */}
