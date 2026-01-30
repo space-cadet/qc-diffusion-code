@@ -102,9 +102,9 @@ export function createTetrahedronGeometry(
 
 /**
  * Create geometry for a 3D tet strip with n tetrahedra.
- * Generates 2*(n+1) vertices in two parallel layers forming non-degenerate tets.
- * Bottom layer (z=0): vertices 0, 1, ..., n
- * Top layer (z=height): vertices n+1, n+2, ..., 2n+1
+ * Generates 2*(n+1) vertices in two layers forming non-degenerate tets.
+ * Bottom layer: vertices 0, 1, ..., n
+ * Top layer: vertices n+1, n+2, ..., 2n+1
  */
 export function createTetStripGeometry(
   n: number,
@@ -116,7 +116,7 @@ export function createTetStripGeometry(
   const positions = new Map<number, VertexPosition>();
   if (n < 1) n = 1;
 
-  // Height between bottom and top layers for equilateral triangles
+  // Height between layers for non-degenerate tetrahedra
   const height = scale * 0.866; // sqrt(3)/2 * scale
   const spacing = scale * 0.5; // x-spacing between consecutive vertices
 
@@ -128,10 +128,15 @@ export function createTetStripGeometry(
     positions.set(i, { x, y: centerY, z: centerZ });
   }
 
-  // Top layer (z = centerZ + height)
+  // Top layer (offset in x, y, and z to create non-degenerate 3D tetrahedra)
+  // Stagger x by half spacing so vertices aren't coplanar with bottom layer
   for (let i = 0; i <= n; i++) {
-    const x = centerX - halfLen + i * spacing;
-    positions.set(n + 1 + i, { x, y: centerY, z: centerZ + height });
+    const x = centerX - halfLen + i * spacing + spacing * 0.5;
+    positions.set(n + 1 + i, { 
+      x, 
+      y: centerY + (i % 2 === 0 ? 1 : -1) * height * 0.5,  // Offset in y
+      z: centerZ + height * 0.866   // Offset in z (sqrt(3)/2 * height)
+    });
   }
 
   return { positions };

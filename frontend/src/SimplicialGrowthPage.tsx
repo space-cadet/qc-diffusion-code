@@ -13,6 +13,7 @@ import { useSimplicialGrowth } from './lab/hooks/useSimplicialGrowth';
 import { useBoundaryGrowth } from './lab/hooks/useBoundaryGrowth';
 import { ExportService } from './lab/services/ExportService';
 import { SimplicialGrowthParams, BoundaryGrowthParams, InitialStateType } from './lab/types/simplicial';
+import { getBoundaryEdges2D, getBoundaryFaces3D } from './lab/simplicial/operations/BoundaryGrowth';
 
 // ---- Parameter Drawer (mobile slide-in from right) ----
 
@@ -252,9 +253,14 @@ const BoundaryGrowthTab: React.FC = () => {
   const [isInitialized, setIsInitialized] = React.useState(false);
   const [metricsHistory, setMetricsHistory] = React.useState<any[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [params, setParams] = React.useState<BoundaryGrowthParams>({
     dimension: 2, maxSteps: 200, growthScale: 80, tentProbability: 0.3,
     preventOverlap: false, initialState: 'single-simplex', stripLength: 8,
+    boundaryConstraints: {
+      mode: 'none',
+      customFrozenElementIds: new Set<number>(),
+    },
   });
 
   useEffect(() => {
@@ -292,11 +298,44 @@ const BoundaryGrowthTab: React.FC = () => {
   const handleParamChange = (key: string, value: any) => {
     const coerced = key === 'dimension' ? Number(value) : value;
     console.debug(`[BoundaryGrowthTab] Param change: ${key} = ${coerced}`);
-    const updatedParams = { ...params, [key]: coerced };
-    setParams(updatedParams);
-    simulation.initialize(updatedParams);
+
+    // Handle nested boundaryConstraints properties
+    if (key.startsWith('boundaryConstraints.')) {
+      const subKey = key.replace('boundaryConstraints.', '');
+      const updatedParams = {
+        ...params,
+        boundaryConstraints: {
+          ...params.boundaryConstraints,
+          [subKey]: coerced,
+        },
+      };
+      setParams(updatedParams);
+      simulation.initialize(updatedParams);
+    } else {
+      const updatedParams = { ...params, [key]: coerced };
+      setParams(updatedParams);
+      simulation.initialize(updatedParams);
+    }
     setIsInitialized(true);
     setMetricsHistory([]);
+  };
+
+  const toggleFrozenBoundary = (elementId: number) => {
+    const currentSet = new Set(params.boundaryConstraints?.customFrozenElementIds || []);
+    if (currentSet.has(elementId)) {
+      currentSet.delete(elementId);
+    } else {
+      currentSet.add(elementId);
+    }
+    const updatedParams = {
+      ...params,
+      boundaryConstraints: {
+        ...params.boundaryConstraints,
+        customFrozenElementIds: currentSet,
+      },
+    };
+    setParams(updatedParams);
+    simulation.initialize(updatedParams);
   };
 
   const metrics = simulation.currentState && isInitialized
@@ -347,6 +386,19 @@ const BoundaryGrowthTab: React.FC = () => {
           hint: 'Reject overlapping simplices' },
       ],
     },
+    {
+      title: 'Boundary Conditions',
+      fields: [
+        { label: 'Mode', type: 'select' as const, value: params.boundaryConstraints?.mode ?? 'none',
+          onChange: (val: any) => handleParamChange('boundaryConstraints.mode', val),
+          options: [
+            { label: 'None', value: 'none' },
+            { label: 'Bottom and Sides', value: 'bottom-and-sides' },
+            { label: 'Custom', value: 'custom' },
+          ],
+          hint: 'Which boundaries are frozen from evolution' },
+      ],
+    },
   ];
 
   return (
@@ -367,10 +419,20 @@ const BoundaryGrowthTab: React.FC = () => {
               ) : (
                 <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} responsive />
               )}
+              {simulation.currentState.frozenBoundaryElements.size > 0 && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Frozen boundaries: {simulation.currentState.frozenBoundaryElements.size}
+                </div>
+              )}
             </div>
           ) : (<div className="text-center py-8 text-gray-500">No visualization data</div>)}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
+            {params.boundaryConstraints?.mode === 'custom' && (
+              <button onClick={() => setPickerOpen(true)} className="px-3 py-2 rounded font-medium bg-blue-500 hover:bg-blue-600 text-white text-sm">
+                Select Frozen Boundaries
+              </button>
+            )}
             <button onClick={() => setDrawerOpen(true)} className="md:hidden px-3 py-2 rounded font-medium bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm">
               Params
             </button>
@@ -383,6 +445,64 @@ const BoundaryGrowthTab: React.FC = () => {
         <ParameterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <ParameterPanel sections={parameterSections} />
         </ParameterDrawer>
+
+        {pickerOpen && simulation.currentState && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                <span className="text-sm font-semibold text-gray-700">Select Frozen Boundaries</span>
+                <button onClick={() => setPickerOpen(false)} className="p-1 rounded hover:bg-gray-200 text-gray-500">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <p className="text-sm text-gray-600 mb-3">Click on boundary elements to freeze/unfreeze them</p>
+                <div className="space-y-1">
+                  {params.dimension === 2 ? (
+                    (() => {
+                      const boundaryEdges = getBoundaryEdges2D(simulation.currentState.complex.topology);
+                      if (boundaryEdges.length === 0) {
+                        return <div className="text-sm text-gray-500">No boundary elements found</div>;
+                      }
+                      return boundaryEdges.map((edgeId, idx) => {
+                        const isFrozen = params.boundaryConstraints?.customFrozenElementIds?.has(edgeId) || false;
+                        return (
+                          <div key={edgeId} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer" onClick={() => toggleFrozenBoundary(edgeId)}>
+                            <input type="checkbox" checked={isFrozen} onChange={() => {}} className="w-4 h-4" />
+                            <span className="text-sm">Boundary Edge {edgeId}</span>
+                          </div>
+                        );
+                      });
+                    })()
+                  ) : (
+                    (() => {
+                      const boundaryFaces = getBoundaryFaces3D(simulation.currentState.complex.topology);
+                      if (boundaryFaces.length === 0) {
+                        return <div className="text-sm text-gray-500">No boundary elements found</div>;
+                      }
+                      return boundaryFaces.map((faceId, idx) => {
+                        const isFrozen = params.boundaryConstraints?.customFrozenElementIds?.has(faceId) || false;
+                        return (
+                          <div key={faceId} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer" onClick={() => toggleFrozenBoundary(faceId)}>
+                            <input type="checkbox" checked={isFrozen} onChange={() => {}} className="w-4 h-4" />
+                            <span className="text-sm">Boundary Face {faceId}</span>
+                          </div>
+                        );
+                      });
+                    })()
+                  )}
+                </div>
+              </div>
+              <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+                <div className="text-sm text-gray-600">
+                  Frozen: {params.boundaryConstraints?.customFrozenElementIds?.size || 0} boundaries
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
           <h2 className="text-lg sm:text-xl font-semibold mb-3">Timeline</h2>
