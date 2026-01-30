@@ -59,6 +59,8 @@
 | T28d | Simplicial Core Integration and Migration | 🔄 70% COMPLETE | HIGH | 2026-01-28 | T28a, T28b, T28c | [Details](tasks/T28d.md) |
 | T29 | Memory Bank Feature Implementation | ✅ COMPLETED | HIGH | 2026-01-29 | - | [Details](tasks/T29.md) |
 | T30 | Boundary Growth Algorithm Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-29 | T28, T27 | [Details](tasks/T30.md) |
+| T30a | Overlap Prevention & Initial State Selection | ✅ COMPLETED | HIGH | 2026-01-30 | T30 | [Details](tasks/T30a.md) |
+| T30b | Simplicial Boundary Conditions & 3D Tet Strip Fix | 🔄 IN PROGRESS | HIGH | 2026-01-30 | T30, T30a | [Details](tasks/T30b.md) |
 | T31 | Mobile UI Responsiveness and Design | ✅ COMPLETED | HIGH | 2026-01-30 | T27, T29a, T30a | [Details](tasks/T31.md) |
 
 ## Task Details

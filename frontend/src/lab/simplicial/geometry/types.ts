@@ -102,7 +102,9 @@ export function createTetrahedronGeometry(
 
 /**
  * Create geometry for a 3D tet strip with n tetrahedra.
- * Each tet extends along the x-axis, alternating displacement direction.
+ * Generates 2*(n+1) vertices in two parallel layers forming non-degenerate tets.
+ * Bottom layer (z=0): vertices 0, 1, ..., n
+ * Top layer (z=height): vertices n+1, n+2, ..., 2n+1
  */
 export function createTetStripGeometry(
   n: number,
@@ -114,22 +116,22 @@ export function createTetStripGeometry(
   const positions = new Map<number, VertexPosition>();
   if (n < 1) n = 1;
 
-  const s = scale / Math.sqrt(3);
-  const halfLen = (n * s) / 2;
+  // Height between bottom and top layers for equilateral triangles
+  const height = scale * 0.866; // sqrt(3)/2 * scale
+  const spacing = scale * 0.5; // x-spacing between consecutive vertices
 
-  // First tet: 4 vertices
-  positions.set(0, { x: centerX - halfLen, y: centerY + s, z: centerZ + s });
-  positions.set(1, { x: centerX - halfLen, y: centerY - s, z: centerZ - s });
-  positions.set(2, { x: centerX - halfLen + s, y: centerY, z: centerZ });
-  positions.set(3, { x: centerX - halfLen, y: centerY - s, z: centerZ + s });
+  const halfLen = ((n + 1) * spacing) / 2;
 
-  let nextId = 4;
-  for (let i = 1; i < n; i++) {
-    const xOff = centerX - halfLen + (i + 1) * s;
-    // Alternate y/z displacement for visual separation
-    const yOff = (i % 2 === 0) ? s : -s;
-    positions.set(nextId, { x: xOff, y: centerY + yOff, z: centerZ + (i % 2 === 0 ? s : -s) });
-    nextId++;
+  // Bottom layer (z = centerZ)
+  for (let i = 0; i <= n; i++) {
+    const x = centerX - halfLen + i * spacing;
+    positions.set(i, { x, y: centerY, z: centerZ });
+  }
+
+  // Top layer (z = centerZ + height)
+  for (let i = 0; i <= n; i++) {
+    const x = centerX - halfLen + i * spacing;
+    positions.set(n + 1 + i, { x, y: centerY, z: centerZ + height });
   }
 
   return { positions };

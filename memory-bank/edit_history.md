@@ -8,8 +8,8 @@
 **17:22:00 IST - T31: Mobile UI Responsiveness and Design - Task Renumber and Memory Bank Updates**
 
 - Created `memory-bank/tasks/T31.md` - New task file for Mobile UI Responsiveness and Design
-- Deleted `memory-bank/tasks/T30b.md` - Removed misplaced task file 
-- Modified `memory-bank/tasks.md` - Changed T30b entry to T31 with correct title and dependencies
+- Deleted [memory-bank/tasks/T30b.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/tasks/T30b.md:0:0-0:0) - Removed misplaced task file 
+- Modified [memory-bank/tasks.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/tasks.md:0:0-0:0) - Changed T30b entry to T31 with correct title and dependencies
 - Modified `memory-bank/activeContext.md` - Updated current focus from T30b to T31, updated completed tasks list
 - Modified `memory-bank/session_cache.md` - Added T31 to task registry
 - Renamed `memory-bank/edits/2026-01-30/150332-T30b.md` to `150332-T31.md` - Updated edit chunk file
@@ -26,6 +26,19 @@
 - Modified `frontend/src/memoryBank/components/FileListItem.tsx` - Updated to display file metadata in table cells with conditional column visibility
 - Modified `frontend/src/memoryBank/components/Viewer.tsx` - Extended to handle images, text files, and downloads with conditional rendering
 - Modified `frontend/scripts/copy-memory-bank.js` - Enhanced to copy all files and generate metadata.json with file stats
+
+**08:18:39 IST - T30b: Boundary Conditions & 3D Tet Strip Fix (Haiku 4.5)**
+
+- Created [memory-bank/tasks/T30b.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/tasks/T30b.md:0:0-0:0) - Task definition for boundary constraints and tet strip geometry fix
+- Created [memory-bank/implementation-details/simplicial-boundary-conditions.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/implementation-details/simplicial-boundary-conditions.md:0:0-0:0) - Implementation plan and design doc
+- Modified `frontend/src/lab/types/simplicial.ts` - Added BoundaryConstraintMode type and extended BoundaryGrowthParams with boundary constraints, extended BoundaryGrowthState with frozenBoundaryElements
+- Modified `frontend/src/lab/simplicial/operations/BoundaryGrowth.ts` - Added getBottomAndSideBoundaries2D(), getBottomAndSideBoundaries3D(), isBoundaryFrozen() helper functions for T30b frozen boundary detection
+- Modified `frontend/src/lab/controllers/BoundaryGrowthController.ts` - Added frozenBoundaryElements tracking, initialized in initialize() based on constraint mode, added filtering in applyMove() for 2D/3D glue operations, updated createState() to snapshot frozen boundaries
+- Modified `frontend/src/lab/simplicial/geometry/types.ts` - Rewrote createTetStripGeometry() to generate 2*(n+1) vertices in two parallel layers for non-degenerate tetrahedra
+- Modified `frontend/src/lab/simplicial/core/types.ts` - Rewrote createTetStripTopology() to match new geometry layout
+- Modified `frontend/src/lab/simplicial/index.ts` - Added exports for getBottomAndSideBoundaries2D, getBottomAndSideBoundaries3D, isBoundaryFrozen
+- Modified [memory-bank/tasks.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/tasks.md:0:0-0:0) - Added T30a and T30b to active task registry, updated Last Updated timestamp
+- Modified [memory-bank/tasks/T30b.md](cci:7://file:///Users/deepak/code/qc-diffusion-code/memory-bank/tasks/T30b.md:0:0-0:0) - Marked acceptance criteria as complete/deferred, added progress tracking entry
 
 **23:30 IST - T30a: Overlap Prevention & Initial State Selection (Opus 4.5)**
 

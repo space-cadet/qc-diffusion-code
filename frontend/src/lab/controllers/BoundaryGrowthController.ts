@@ -33,6 +33,9 @@ import {
   tetrahedronOverlaps3D,
   computeOutwardNormal2D,
   computeOutwardNormal3D,
+  getBottomAndSideBoundaries2D,
+  getBottomAndSideBoundaries3D,
+  isBoundaryFrozen,
   type VertexPosition,
 } from '../simplicial';
 
@@ -46,6 +49,7 @@ export class BoundaryGrowthController
   private params: BoundaryGrowthParams | null = null;
   private topology: SimplicialComplexTopology | null = null;
   private geometry: SimplicialComplexGeometry | null = null;
+  private frozenBoundaryElements: Set<number> = new Set(); // T30b: Frozen boundary constraints
 
   initialize(params: BoundaryGrowthParams): void {
     console.debug('[BoundaryGrowthController] Initialize with params:', params);
@@ -74,12 +78,28 @@ export class BoundaryGrowthController
       }
     }
 
+    // T30b: Initialize frozen boundary constraints
+    this.frozenBoundaryElements.clear();
+    const constraintMode = params.boundaryConstraints?.mode ?? 'none';
+    if (constraintMode === 'bottom-and-sides') {
+      if (params.dimension === 2) {
+        const frozenIds = getBottomAndSideBoundaries2D(this.topology, this.geometry);
+        this.frozenBoundaryElements = new Set(frozenIds);
+      } else {
+        const frozenIds = getBottomAndSideBoundaries3D(this.topology, this.geometry);
+        this.frozenBoundaryElements = new Set(frozenIds);
+      }
+    } else if (constraintMode === 'custom' && params.boundaryConstraints?.customFrozenElementIds) {
+      this.frozenBoundaryElements = new Set(params.boundaryConstraints.customFrozenElementIds);
+    }
+
     this.state = this.createState(null);
     this.history = [this.state];
     console.debug('[BoundaryGrowthController] Initialized:', {
       dimension: params.dimension,
       vertices: this.topology.vertices.size,
       boundarySize: this.state.boundarySize,
+      frozenBoundaries: this.frozenBoundaryElements.size,
     });
   }
 
@@ -226,6 +246,12 @@ export class BoundaryGrowthController
         for (let attempt = 0; attempt < maxTries; attempt++) {
           const edgeId = shuffled[attempt % shuffled.length];
 
+          // T30b: Skip frozen boundaries
+          if (isBoundaryFrozen(edgeId, this.frozenBoundaryElements)) {
+            console.debug(`[BoundaryGrowthController] Skipped frozen edge (attempt ${attempt + 1})`);
+            continue;
+          }
+
           if (checkOverlap) {
             const candidate = this.computeCandidatePosition2D(edgeId, scale);
             if (candidate) {
@@ -262,6 +288,12 @@ export class BoundaryGrowthController
 
         for (let attempt = 0; attempt < maxTries; attempt++) {
           const faceId = shuffled[attempt % shuffled.length];
+
+          // T30b: Skip frozen boundaries
+          if (isBoundaryFrozen(faceId, this.frozenBoundaryElements)) {
+            console.debug(`[BoundaryGrowthController] Skipped frozen face (attempt ${attempt + 1})`);
+            continue;
+          }
 
           if (checkOverlap) {
             const candidate = this.computeCandidatePosition3D(faceId, scale);
@@ -318,6 +350,7 @@ export class BoundaryGrowthController
       lastMove,
       moveCount: { ...prevMoveCount },
       boundarySize: this.getBoundarySize(),
+      frozenBoundaryElements: new Set(this.frozenBoundaryElements), // T30b: snapshot frozen set
       metrics: {
         totalSimplices,
         vertexCount: this.topology.vertices.size,

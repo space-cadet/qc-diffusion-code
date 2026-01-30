@@ -90,7 +90,7 @@ export {
   apply4to1,
 } from './operations/PachnerMoves3D';
 
-// Boundary growth operations (T30)
+// Boundary growth operations (T30, T30b)
 export {
   type GlueResult,
   getBoundaryEdges2D,
@@ -105,6 +105,9 @@ export {
   tentMove3D,
   trianglesOverlap2D,
   tetrahedronOverlaps3D,
+  getBottomAndSideBoundaries2D,
+  getBottomAndSideBoundaries3D,
+  isBoundaryFrozen,
 } from './operations/BoundaryGrowth';
 
 // Algebraic (optional)

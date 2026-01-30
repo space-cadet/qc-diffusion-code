@@ -280,31 +280,42 @@ export function createTetStripTopology(n: number): SimplicialComplexTopology {
   const topo = createEmptyTopology(3);
   if (n < 1) n = 1;
 
-  // First tet: vertices 0,1,2,3
-  const v0 = addVertex(topo);
-  const v1 = addVertex(topo);
-  const v2 = addVertex(topo);
-  const v3 = addVertex(topo);
+  // T30b: Create 2*(n+1) vertices in two layers
+  // Bottom layer: 0, 1, 2, ..., n
+  // Top layer: n+1, n+2, ..., 2n+1
+  // Each tet i (i in [0, n-1]): (i, i+1, n+1+i, n+2+i)
+  // shares face (i, i+1, n+1+i) with next tet
 
-  addEdge(topo, v0, v1); addEdge(topo, v0, v2); addEdge(topo, v0, v3);
-  addEdge(topo, v1, v2); addEdge(topo, v1, v3); addEdge(topo, v2, v3);
-  addFace(topo, v0, v1, v2); addFace(topo, v0, v1, v3);
-  addFace(topo, v0, v2, v3); addFace(topo, v1, v2, v3);
-  addTetrahedron(topo, v0, v1, v2, v3);
-
-  // Track the "front face" — the face we'll glue the next tet onto
-  let frontFace: [number, number, number] = [v1, v2, v3];
-
-  for (let i = 1; i < n; i++) {
-    const newV = addVertex(topo);
-    const [a, b, c] = frontFace;
-    addEdge(topo, a, newV); addEdge(topo, b, newV); addEdge(topo, c, newV);
-    addFace(topo, a, b, newV); addFace(topo, a, c, newV); addFace(topo, b, c, newV);
-    addTetrahedron(topo, a, b, c, newV);
-    // Rotate front face: replace the oldest vertex with newV
-    frontFace = [b, c, newV];
+  // Create all vertices
+  for (let i = 0; i < 2 * (n + 1); i++) {
+    addVertex(topo);
   }
 
-  console.debug(`[createTetStripTopology] Created strip with ${n} tets, ${topo.vertices.size} vertices`);
+  // Create edges and faces, then tets
+  for (let i = 0; i < n; i++) {
+    const v0 = i;
+    const v1 = i + 1;
+    const v2 = n + 1 + i;
+    const v3 = n + 2 + i;
+
+    // Edges
+    addEdge(topo, v0, v1);
+    addEdge(topo, v0, v2);
+    addEdge(topo, v0, v3);
+    addEdge(topo, v1, v2);
+    addEdge(topo, v1, v3);
+    addEdge(topo, v2, v3);
+
+    // Faces
+    addFace(topo, v0, v1, v2);
+    addFace(topo, v0, v1, v3);
+    addFace(topo, v0, v2, v3);
+    addFace(topo, v1, v2, v3);
+
+    // Tetrahedron
+    addTetrahedron(topo, v0, v1, v2, v3);
+  }
+
+  console.debug(`[createTetStripTopology] Created strip with ${n} tets, ${topo.vertices.size} vertices (T30b)`);
   return topo;
 }
