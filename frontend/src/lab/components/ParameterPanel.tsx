@@ -100,7 +100,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ sections, classN
               {section.title}
             </h3>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             {section.fields.map((field, fieldIdx) => (
               <div key={fieldIdx} className="space-y-4">
                 <label className={`text-xs font-bold text-gray-600 uppercase ${

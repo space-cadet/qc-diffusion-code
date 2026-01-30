@@ -35,16 +35,16 @@ export const AnalysisTable: React.FC<AnalysisTableProps> = ({
         <table className="w-full text-left bg-white border-collapse">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
+              <th className="px-3 sm:px-6 py-2 sm:py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
                 Step
               </th>
-              <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
+              <th className="px-3 sm:px-6 py-2 sm:py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
                 Quantum σ² (∝ t²)
               </th>
-              <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
+              <th className="px-3 sm:px-6 py-2 sm:py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-r border-gray-100">
                 Classical σ² (∝ t)
               </th>
-              <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              <th className="px-3 sm:px-6 py-2 sm:py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                 Advantage Factor
               </th>
             </tr>
@@ -53,16 +53,16 @@ export const AnalysisTable: React.FC<AnalysisTableProps> = ({
             {displayData.length > 0 ? (
               displayData.map((row, i) => (
                 <tr key={i} className="hover:bg-blue-50/30 transition-colors">
-                  <td className="px-6 py-4 font-mono font-bold text-gray-700 text-sm border-r border-gray-50">
+                  <td className="px-3 sm:px-6 py-2 sm:py-4 font-mono font-bold text-gray-700 text-sm border-r border-gray-50">
                     {row.step}
                   </td>
-                  <td className="px-6 py-4 font-mono text-blue-600 text-sm border-r border-gray-50">
+                  <td className="px-3 sm:px-6 py-2 sm:py-4 font-mono text-blue-600 text-sm border-r border-gray-50">
                     {formatNumber(row.quantumVariance)}
                   </td>
-                  <td className="px-6 py-4 font-mono text-red-600 text-sm border-r border-gray-50">
+                  <td className="px-3 sm:px-6 py-2 sm:py-4 font-mono text-red-600 text-sm border-r border-gray-50">
                     {formatNumber(row.classicalVariance)}
                   </td>
-                  <td className="px-6 py-4 font-mono font-bold text-green-600 text-sm">
+                  <td className="px-3 sm:px-6 py-2 sm:py-4 font-mono font-bold text-green-600 text-sm">
                     {formatNumber(row.advantage, 3)}x
                   </td>
                 </tr>

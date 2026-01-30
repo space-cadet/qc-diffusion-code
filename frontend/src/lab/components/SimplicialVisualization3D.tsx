@@ -15,6 +15,7 @@ interface SimplicialVisualization3DProps {
   complex: SimplicialComplex;
   width?: number;
   height?: number;
+  responsive?: boolean;
   showVertices?: boolean;
   showEdges?: boolean;
   showFaces?: boolean;
@@ -22,13 +23,29 @@ interface SimplicialVisualization3DProps {
 
 export const SimplicialVisualization3D: React.FC<SimplicialVisualization3DProps> = ({
   complex,
-  width = 600,
-  height = 400,
+  width: propWidth = 600,
+  height: propHeight = 400,
+  responsive = false,
   showVertices: initialShowVertices = true,
   showEdges: initialShowEdges = true,
   showFaces: initialShowFaces = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [measuredWidth, setMeasuredWidth] = useState(propWidth);
+
+  useEffect(() => {
+    if (!responsive || !wrapperRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w && w > 0) setMeasuredWidth(w);
+    });
+    observer.observe(wrapperRef.current);
+    return () => observer.disconnect();
+  }, [responsive]);
+
+  const width = responsive ? measuredWidth : propWidth;
+  const height = responsive ? Math.round(measuredWidth * (propHeight / propWidth)) : propHeight;
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -241,11 +258,11 @@ export const SimplicialVisualization3D: React.FC<SimplicialVisualization3DProps>
   }, [complex, showVertices, showEdges, showFaces]);
 
   return (
-    <div className="relative">
+    <div ref={wrapperRef} className="relative w-full">
       <div
         ref={containerRef}
         style={{ width, height }}
-        className="border border-gray-300 rounded-lg bg-white overflow-hidden"
+        className="border border-gray-300 rounded-lg bg-white overflow-hidden max-w-full"
       />
 
       {/* Info panel */}
