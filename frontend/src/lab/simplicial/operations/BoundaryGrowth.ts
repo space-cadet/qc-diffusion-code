@@ -574,3 +574,129 @@ export function tentMove3D(
   console.debug(`[BoundaryGrowth] Tent move 3D: v=${vertexId} -> v'=${newVId}, ${incidentBoundary.length} tets`);
   return { success: true, newVertexId: newVId };
 }
+
+// --- Frozen Boundary Helpers (T30b) ---
+
+/**
+ * Get bottom and side boundary elements for 2D complexes.
+ * Bottom = boundary edges with lowest y coordinate
+ * Sides = boundary edges at x extremes
+ */
+export function getBottomAndSideBoundaries2D(
+  topo: SimplicialComplexTopology,
+  geometry: SimplicialComplexGeometry,
+): number[] {
+  const boundaryEdges = getBoundaryEdges2D(topo);
+  if (boundaryEdges.length === 0) return [];
+
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let minX = Infinity;
+
+  for (const eId of boundaryEdges) {
+    const edge = topo.edges.get(eId);
+    if (!edge) continue;
+    const [v0, v1] = edge.vertices;
+    const p0 = geometry.positions.get(v0);
+    const p1 = geometry.positions.get(v1);
+    if (!p0 || !p1) continue;
+
+    minY = Math.min(minY, p0.y, p1.y);
+    maxX = Math.max(maxX, p0.x, p1.x);
+    minX = Math.min(minX, p0.x, p1.x);
+  }
+
+  const frozen: number[] = [];
+  const threshold = 0.1; // tolerance for edge proximity
+
+  for (const eId of boundaryEdges) {
+    const edge = topo.edges.get(eId);
+    if (!edge) continue;
+    const [v0, v1] = edge.vertices;
+    const p0 = geometry.positions.get(v0);
+    const p1 = geometry.positions.get(v1);
+    if (!p0 || !p1) continue;
+
+    // Check if bottom (lowest y) or side (x extremes)
+    const isBottom = Math.abs(p0.y - minY) < threshold || Math.abs(p1.y - minY) < threshold;
+    const isSide = Math.abs(p0.x - maxX) < threshold || Math.abs(p1.x - maxX) < threshold ||
+                   Math.abs(p0.x - minX) < threshold || Math.abs(p1.x - minX) < threshold;
+
+    if (isBottom || isSide) {
+      frozen.push(eId);
+    }
+  }
+
+  console.debug(`[BoundaryGrowth] Frozen 2D boundaries: ${frozen.length}/${boundaryEdges.length}`);
+  return frozen;
+}
+
+/**
+ * Get bottom and side boundary elements for 3D complexes.
+ * Bottom = boundary faces with lowest z coordinate
+ * Sides = boundary faces at x/y extremes
+ */
+export function getBottomAndSideBoundaries3D(
+  topo: SimplicialComplexTopology,
+  geometry: SimplicialComplexGeometry,
+): number[] {
+  const boundaryFaces = getBoundaryFaces3D(topo);
+  if (boundaryFaces.length === 0) return [];
+
+  let minZ = Infinity;
+  let maxX = -Infinity;
+  let minX = Infinity;
+  let maxY = -Infinity;
+  let minY = Infinity;
+
+  for (const fId of boundaryFaces) {
+    const face = topo.faces.get(fId);
+    if (!face) continue;
+    for (const v of face.vertices) {
+      const p = geometry.positions.get(v);
+      if (!p) continue;
+      minZ = Math.min(minZ, p.z ?? 0);
+      maxX = Math.max(maxX, p.x);
+      minX = Math.min(minX, p.x);
+      maxY = Math.max(maxY, p.y);
+      minY = Math.min(minY, p.y);
+    }
+  }
+
+  const frozen: number[] = [];
+  const threshold = 0.1;
+
+  for (const fId of boundaryFaces) {
+    const face = topo.faces.get(fId);
+    if (!face) continue;
+
+    let isBottom = false;
+    let isSide = false;
+
+    for (const v of face.vertices) {
+      const p = geometry.positions.get(v);
+      if (!p) continue;
+
+      if (Math.abs((p.z ?? 0) - minZ) < threshold) isBottom = true;
+      if (Math.abs(p.x - maxX) < threshold || Math.abs(p.x - minX) < threshold) isSide = true;
+      if (Math.abs(p.y - maxY) < threshold || Math.abs(p.y - minY) < threshold) isSide = true;
+    }
+
+    if (isBottom || isSide) {
+      frozen.push(fId);
+    }
+  }
+
+  console.debug(`[BoundaryGrowth] Frozen 3D boundaries: ${frozen.length}/${boundaryFaces.length}`);
+  return frozen;
+}
+
+/**
+ * Check if a boundary element is frozen (constrained from evolution).
+ */
+export function isBoundaryFrozen(
+  elementId: number,
+  frozenSet: Set<number>,
+): boolean {
+  return frozenSet.has(elementId);
+}

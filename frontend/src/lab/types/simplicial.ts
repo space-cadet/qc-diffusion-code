@@ -45,6 +45,7 @@ export interface BoundaryGrowthState {
   lastMove: BoundaryMoveType | null;
   moveCount: { glue: number; tent: number };
   boundarySize: number;
+  frozenBoundaryElements: Set<number>; // Elements that don't evolve (T30b)
   metrics: {
     totalSimplices: number;
     vertexCount: number;
@@ -56,6 +57,8 @@ export interface BoundaryGrowthState {
 
 export type InitialStateType = 'single-simplex' | 'triangle-strip';
 
+export type BoundaryConstraintMode = 'none' | 'bottom-and-sides' | 'custom';
+
 export interface BoundaryGrowthParams {
   dimension: Dimension;
   maxSteps: number;
@@ -64,6 +67,10 @@ export interface BoundaryGrowthParams {
   preventOverlap: boolean;
   initialState: InitialStateType;
   stripLength: number; // number of triangles/tets in strip (3-20)
+  boundaryConstraints?: {
+    mode: BoundaryConstraintMode;
+    customFrozenElementIds?: Set<number>; // Face/edge IDs to freeze
+  };
 }
 
 // --- Original Interior Growth Types ---
