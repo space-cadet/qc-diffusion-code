@@ -1,7 +1,24 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-29 22:51:00 IST*
+*Last Updated: 2026-01-31 00:00:00 IST*
+
+### 2026-01-30
+
+**23:30 IST - T30a: Overlap Prevention & Initial State Selection (Opus 4.5)**
+
+- Created `memory-bank/tasks/T30a.md` - Task file for overlap prevention and initial state selection
+- Created `memory-bank/implementation-details/overlap-and-initial-state.md` - Implementation doc
+- Modified `frontend/src/lab/types/simplicial.ts` - Added InitialStateType, preventOverlap, initialState, stripLength to BoundaryGrowthParams
+- Modified `frontend/src/lab/simplicial/core/types.ts` - Added createTriangleStripTopology() and createTetStripTopology()
+- Modified `frontend/src/lab/simplicial/geometry/types.ts` - Added createTriangleStripGeometry() and createTetStripGeometry()
+- Modified `frontend/src/lab/simplicial/operations/BoundaryGrowth.ts` - Added trianglesOverlap2D(), tetrahedronOverlaps3D(), segmentsIntersect(), pointInTriangle()
+- Modified `frontend/src/lab/simplicial/index.ts` - Added new exports for strip factories and overlap functions
+- Modified `frontend/src/lab/controllers/BoundaryGrowthController.ts` - Added overlap retry logic, initial state routing, computeCandidatePosition2D/3D
+- Modified `frontend/src/SimplicialGrowthPage.tsx` - Added Initial State & Overlap parameter section with select, slider, checkbox
+- Modified `memory-bank/activeContext.md` - Updated focus to T30a completed
+- Modified `memory-bank/session_cache.md` - Updated current session
+- Modified `memory-bank/tasks/T30a.md` - Marked completed with all acceptance criteria
 
 ### 2026-01-29
 
