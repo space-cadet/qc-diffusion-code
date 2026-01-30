@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MetricsGrid } from './lab/components/MetricsGrid';
 import { TimelineSlider } from './lab/components/TimelineSlider';
 import { ControlButtons } from './lab/components/ControlButtons';
@@ -14,30 +14,48 @@ import { useBoundaryGrowth } from './lab/hooks/useBoundaryGrowth';
 import { ExportService } from './lab/services/ExportService';
 import { SimplicialGrowthParams, BoundaryGrowthParams, InitialStateType } from './lab/types/simplicial';
 
-// ---- Interior Moves Tab (existing T28 functionality) ----
+// ---- Parameter Drawer (mobile slide-in from right) ----
+
+const ParameterDrawer: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}> = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+  console.debug('[ParameterDrawer] Rendering, isOpen:', isOpen);
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-30 z-40" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 w-[85%] max-w-md bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <span className="text-sm font-semibold text-gray-700">Parameters</span>
+          <button onClick={onClose} className="p-1 rounded hover:bg-gray-200 text-gray-500">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
+      </div>
+    </>
+  );
+};
+
+// ---- Interior Moves Tab ----
 
 const InteriorMovesTab: React.FC = () => {
   const simulation = useSimplicialGrowth({
-    dimension: 3,
-    initialVertices: 4,
-    maxSteps: 100,
-    moveProbabilities: {
-      '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1,
-      '1-3': 0.0, '2-2': 0.0, '3-1': 0.0,
-    },
+    dimension: 3, initialVertices: 4, maxSteps: 100,
+    moveProbabilities: { '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1, '1-3': 0.0, '2-2': 0.0, '3-1': 0.0 },
     growthRate: 1.0,
   });
 
   const [isInitialized, setIsInitialized] = React.useState(false);
   const [metricsHistory, setMetricsHistory] = React.useState<any[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [params, setParams] = React.useState<SimplicialGrowthParams>({
-    dimension: 3,
-    initialVertices: 4,
-    maxSteps: 100,
-    moveProbabilities: {
-      '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1,
-      '1-3': 0.0, '2-2': 0.0, '3-1': 0.0,
-    },
+    dimension: 3, initialVertices: 4, maxSteps: 100,
+    moveProbabilities: { '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1, '1-3': 0.0, '2-2': 0.0, '3-1': 0.0 },
     growthRate: 1.0,
   });
 
@@ -61,11 +79,7 @@ const InteriorMovesTab: React.FC = () => {
       };
       setMetricsHistory(prev => {
         const existingIndex = prev.findIndex(row => row.step === metricsRow.step);
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          updated[existingIndex] = metricsRow;
-          return updated;
-        }
+        if (existingIndex >= 0) { const updated = [...prev]; updated[existingIndex] = metricsRow; return updated; }
         return [...prev, metricsRow];
       });
     }
@@ -83,9 +97,7 @@ const InteriorMovesTab: React.FC = () => {
   };
 
   const handleCopyMetrics = async () => {
-    const metricsText = `Step: ${simulation.currentStep}\nSimplices: ${
-      simulation.currentState?.metrics.totalSimplices || 0
-    }\nVertices: ${simulation.currentState?.metrics.vertexCount || 0}`;
+    const metricsText = `Step: ${simulation.currentStep}\nSimplices: ${simulation.currentState?.metrics.totalSimplices || 0}\nVertices: ${simulation.currentState?.metrics.vertexCount || 0}`;
     await ExportService.copyToClipboard(metricsText);
   };
 
@@ -95,16 +107,10 @@ const InteriorMovesTab: React.FC = () => {
     let updatedParams = { ...params, [key]: coerced };
     if (key === 'dimension') {
       if (coerced === 2) {
-        updatedParams.moveProbabilities = {
-          '1-3': 0.5, '2-2': 0.3, '3-1': 0.2,
-          '1-4': 0.0, '2-3': 0.0, '3-2': 0.0, '4-1': 0.0,
-        };
+        updatedParams.moveProbabilities = { '1-3': 0.5, '2-2': 0.3, '3-1': 0.2, '1-4': 0.0, '2-3': 0.0, '3-2': 0.0, '4-1': 0.0 };
         updatedParams.initialVertices = 3;
       } else {
-        updatedParams.moveProbabilities = {
-          '1-3': 0.0, '2-2': 0.0, '3-1': 0.0,
-          '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1,
-        };
+        updatedParams.moveProbabilities = { '1-3': 0.0, '2-2': 0.0, '3-1': 0.0, '1-4': 0.4, '2-3': 0.3, '3-2': 0.2, '4-1': 0.1 };
         updatedParams.initialVertices = 4;
       }
     }
@@ -113,15 +119,14 @@ const InteriorMovesTab: React.FC = () => {
   };
 
   const statusColor: 'red' | 'gray' = simulation.isRunning ? 'red' : 'gray';
-
   const metrics = simulation.currentState && isInitialized
     ? [
-        { label: 'Current Step', value: simulation.currentStep, color: 'blue' as const },
-        { label: 'Total Simplices', value: simulation.currentState.metrics.totalSimplices, color: 'emerald' as const },
-        { label: 'Vertex Count', value: simulation.currentState.metrics.vertexCount, color: 'purple' as const },
+        { label: 'Step', value: simulation.currentStep, color: 'blue' as const },
+        { label: 'Simplices', value: simulation.currentState.metrics.totalSimplices, color: 'emerald' as const },
+        { label: 'Vertices', value: simulation.currentState.metrics.vertexCount, color: 'purple' as const },
         { label: 'Edges', value: simulation.currentState.complex.topology.edges.size, color: 'blue' as const },
         { label: 'Faces', value: simulation.currentState.complex.topology.faces.size, color: 'blue' as const },
-        { label: 'Euler Char (X)', value: simulation.currentState.metrics.curvature.toFixed(0), color: 'gray' as const },
+        { label: 'Euler X', value: simulation.currentState.metrics.curvature.toFixed(0), color: 'gray' as const },
         { label: 'Last Move', value: simulation.currentState.lastMove || 'None', color: statusColor },
       ]
     : [];
@@ -130,156 +135,126 @@ const InteriorMovesTab: React.FC = () => {
     {
       title: 'Simulation Parameters',
       fields: [
-        {
-          label: 'Dimension', type: 'select' as const, value: params.dimension,
+        { label: 'Dimension', type: 'select' as const, value: params.dimension,
           onChange: (val: 2 | 3) => handleParamChange('dimension', val),
           options: [{ label: '2D (Triangles)', value: '2' }, { label: '3D (Tetrahedra)', value: '3' }],
-          hint: 'Choose between 2D triangulation or 3D triangulation',
-        },
-        {
-          label: 'Initial Vertices', type: 'input' as const, value: params.initialVertices,
+          hint: 'Choose between 2D or 3D triangulation' },
+        { label: 'Initial Vertices', type: 'input' as const, value: params.initialVertices,
           onChange: (val: number) => handleParamChange('initialVertices', val),
-          min: params.dimension === 2 ? 3 : 4, max: 20, step: 1,
-        },
-        {
-          label: 'Max Steps', type: 'input' as const, value: params.maxSteps,
-          onChange: (val: number) => handleParamChange('maxSteps', val),
-          min: 10, max: 1000, step: 10,
-        },
-        {
-          label: 'Growth Rate', type: 'range' as const, value: params.growthRate,
+          min: params.dimension === 2 ? 3 : 4, max: 20, step: 1 },
+        { label: 'Max Steps', type: 'input' as const, value: params.maxSteps,
+          onChange: (val: number) => handleParamChange('maxSteps', val), min: 10, max: 1000, step: 10 },
+        { label: 'Growth Rate', type: 'range' as const, value: params.growthRate,
           onChange: (val: number) => handleParamChange('growthRate', val),
-          min: 0.1, max: 2.0, step: 0.1, hint: 'Controls how fast simplices are added',
-        },
+          min: 0.1, max: 2.0, step: 0.1, hint: 'Controls how fast simplices are added' },
       ],
     },
     {
-      title: params.dimension === 2 ? '2D Pachner Move Probabilities' : '3D Pachner Move Probabilities',
+      title: params.dimension === 2 ? '2D Pachner Probabilities' : '3D Pachner Probabilities',
       fields: params.dimension === 2 ? [
-        { label: '1-3 Move (Subdivision)', type: 'range' as const, value: params.moveProbabilities['1-3'],
+        { label: '1-3 (Subdivide)', type: 'range' as const, value: params.moveProbabilities['1-3'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '1-3': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 1 triangle with 3 triangles' },
-        { label: '2-2 Move (Edge Flip)', type: 'range' as const, value: params.moveProbabilities['2-2'],
+          min: 0, max: 1, step: 0.05 },
+        { label: '2-2 (Flip)', type: 'range' as const, value: params.moveProbabilities['2-2'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '2-2': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 2 triangles with 2 triangles (flip edge)' },
-        { label: '3-1 Move (Coarsening)', type: 'range' as const, value: params.moveProbabilities['3-1'],
+          min: 0, max: 1, step: 0.05 },
+        { label: '3-1 (Coarsen)', type: 'range' as const, value: params.moveProbabilities['3-1'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '3-1': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 3 triangles with 1 triangle' },
+          min: 0, max: 1, step: 0.05 },
       ] : [
-        { label: '1-4 Move (Subdivision)', type: 'range' as const, value: params.moveProbabilities['1-4'],
+        { label: '1-4 (Subdivide)', type: 'range' as const, value: params.moveProbabilities['1-4'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '1-4': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 1 tetrahedron with 4 tetrahedra' },
+          min: 0, max: 1, step: 0.05 },
         { label: '2-3 Move', type: 'range' as const, value: params.moveProbabilities['2-3'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '2-3': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 2 tetrahedra with 3 tetrahedra' },
+          min: 0, max: 1, step: 0.05 },
         { label: '3-2 Move', type: 'range' as const, value: params.moveProbabilities['3-2'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '3-2': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 3 tetrahedra with 2 tetrahedra' },
-        { label: '4-1 Move (Coarsening)', type: 'range' as const, value: params.moveProbabilities['4-1'],
+          min: 0, max: 1, step: 0.05 },
+        { label: '4-1 (Coarsen)', type: 'range' as const, value: params.moveProbabilities['4-1'],
           onChange: (val: number) => handleParamChange('moveProbabilities', { ...params.moveProbabilities, '4-1': val }),
-          min: 0, max: 1, step: 0.05, hint: 'Replace 4 tetrahedra with 1 tetrahedron' },
+          min: 0, max: 1, step: 0.05 },
       ],
     },
   ];
 
   const analysisData = simulation.currentState && isInitialized
-    ? [{
-        label: 'Move Statistics',
-        data: [
-          { step: simulation.currentStep, quantumVariance: simulation.currentState.moveCount['1-4'],
-            classicalVariance: simulation.currentState.moveCount['2-3'], advantage: simulation.currentState.moveCount['3-2'] },
-          { step: simulation.currentStep + 1, quantumVariance: simulation.currentState.moveCount['4-1'],
-            classicalVariance: 0, advantage: 0 },
-        ],
-      }]
-    : [];
+    ? [{ label: 'Move Statistics', data: [
+        { step: simulation.currentStep, quantumVariance: simulation.currentState.moveCount['1-4'],
+          classicalVariance: simulation.currentState.moveCount['2-3'], advantage: simulation.currentState.moveCount['3-2'] },
+        { step: simulation.currentStep + 1, quantumVariance: simulation.currentState.moveCount['4-1'],
+          classicalVariance: 0, advantage: 0 },
+      ]}] : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {!isInitialized ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <p className="text-blue-800">Initializing simulation...</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4"><p className="text-blue-800">Initializing simulation...</p></div>
+      ) : (<>
+        <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-4">
+          <MetricsGrid metrics={metrics} columns={4} />
         </div>
-      ) : (
-        <>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Simplicial Complex Metrics</h2>
-            <MetricsGrid metrics={metrics} columns={4} title="" />
-          </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Simplicial Complex Visualization</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                {simulation.currentState ? (
-                  <div className="flex justify-center">
-                    {params.dimension === 3 ? (
-                      <SimplicialVisualization3D complex={simulation.currentState.complex} width={600} height={400} />
-                    ) : (
-                      <SimplicialVisualization complex={simulation.currentState.complex} width={600} height={400} />
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">No visualization data available</div>
-                )}
-              </div>
-              <PachnerMoveTester dimension={params.dimension} onApplyMove={() => {}} />
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <ParameterPanel sections={parameterSections} />
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Timeline Control</h2>
-            <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Evolution Progress" />
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Simulation Controls</h2>
-            <div className="space-y-4">
-              <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
-              <div className="flex gap-2 pt-4 border-t border-gray-200">
-                <button onClick={handleExportCSV} className="px-4 py-2 rounded font-medium bg-indigo-500 hover:bg-indigo-600 text-white transition-colors">Export CSV</button>
-                <button onClick={handleCopyMetrics} className="px-4 py-2 rounded font-medium bg-cyan-500 hover:bg-cyan-600 text-white transition-colors">Copy Metrics</button>
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3">Visualization</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              {simulation.currentState ? (
+                <div>
+                  {params.dimension === 3 ? (
+                    <SimplicialVisualization3D complex={simulation.currentState.complex} width={600} height={400} responsive />
+                  ) : (
+                    <SimplicialVisualization complex={simulation.currentState.complex} width={600} height={400} responsive />
+                  )}
+                </div>
+              ) : (<div className="text-center py-8 text-gray-500">No visualization data</div>)}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
+                <button onClick={handleExportCSV} className="px-3 py-2 rounded font-medium bg-indigo-500 hover:bg-indigo-600 text-white text-sm">CSV</button>
+                <button onClick={handleCopyMetrics} className="px-3 py-2 rounded font-medium bg-cyan-500 hover:bg-cyan-600 text-white text-sm">Copy</button>
+                <button onClick={() => setDrawerOpen(true)} className="md:hidden px-3 py-2 rounded font-medium bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm">
+                  Params
+                </button>
               </div>
             </div>
+            <PachnerMoveTester dimension={params.dimension} onApplyMove={() => {}} />
           </div>
+        </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Evolution History</h2>
-            <MetricsTable data={metricsHistory} maxHeight="400px" />
+        <div className="hidden md:block bg-white border border-gray-200 rounded-lg">
+          <ParameterPanel sections={parameterSections} />
+        </div>
+        <ParameterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <ParameterPanel sections={parameterSections} />
+        </ParameterDrawer>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3">Timeline</h2>
+          <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Evolution Progress" />
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <MetricsTable data={metricsHistory} maxHeight="400px" />
+        </div>
+        {analysisData.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+            {analysisData.map((section, idx) => (<AnalysisTable key={idx} title={section.label} data={section.data} />))}
           </div>
-
-          {analysisData.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Move Analysis</h2>
-              {analysisData.map((section, idx) => (
-                <AnalysisTable key={idx} title={section.label} data={section.data} />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+        )}
+      </>)}
     </div>
   );
 };
 
-// ---- Boundary Growth Tab (T30) ----
+// ---- Boundary Growth Tab ----
 
 const BoundaryGrowthTab: React.FC = () => {
   const simulation = useBoundaryGrowth();
   const [isInitialized, setIsInitialized] = React.useState(false);
   const [metricsHistory, setMetricsHistory] = React.useState<any[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [params, setParams] = React.useState<BoundaryGrowthParams>({
-    dimension: 2,
-    maxSteps: 200,
-    growthScale: 80,
-    tentProbability: 0.3,
-    preventOverlap: false,
-    initialState: 'single-simplex',
-    stripLength: 8,
+    dimension: 2, maxSteps: 200, growthScale: 80, tentProbability: 0.3,
+    preventOverlap: false, initialState: 'single-simplex', stripLength: 8,
   });
 
   useEffect(() => {
@@ -329,10 +304,10 @@ const BoundaryGrowthTab: React.FC = () => {
         { label: 'Step', value: simulation.currentStep, color: 'blue' as const },
         { label: 'Simplices', value: simulation.currentState.metrics.totalSimplices, color: 'emerald' as const },
         { label: 'Vertices', value: simulation.currentState.metrics.vertexCount, color: 'purple' as const },
-        { label: 'Boundary Size', value: simulation.currentState.boundarySize, color: 'blue' as const },
-        { label: 'Glue Moves', value: simulation.currentState.moveCount.glue, color: 'emerald' as const },
-        { label: 'Tent Moves', value: simulation.currentState.moveCount.tent, color: 'purple' as const },
-        { label: 'Euler Char', value: simulation.currentState.metrics.curvature.toFixed(0), color: 'gray' as const },
+        { label: 'Boundary', value: simulation.currentState.boundarySize, color: 'blue' as const },
+        { label: 'Glue', value: simulation.currentState.moveCount.glue, color: 'emerald' as const },
+        { label: 'Tent', value: simulation.currentState.moveCount.tent, color: 'purple' as const },
+        { label: 'Euler X', value: simulation.currentState.metrics.curvature.toFixed(0), color: 'gray' as const },
         { label: 'Last Move', value: simulation.currentState.lastMove || 'None', color: (simulation.isRunning ? 'red' : 'gray') as 'red' | 'gray' },
       ]
     : [];
@@ -341,116 +316,90 @@ const BoundaryGrowthTab: React.FC = () => {
     {
       title: 'Boundary Growth Parameters',
       fields: [
-        {
-          label: 'Dimension', type: 'select' as const, value: params.dimension,
+        { label: 'Dimension', type: 'select' as const, value: params.dimension,
           onChange: (val: any) => handleParamChange('dimension', val),
           options: [{ label: '2D (Triangles)', value: '2' }, { label: '3D (Tetrahedra)', value: '3' }],
-          hint: 'Dimension of the growing complex',
-        },
-        {
-          label: 'Growth Scale', type: 'range' as const, value: params.growthScale,
+          hint: 'Dimension of the growing complex' },
+        { label: 'Growth Scale', type: 'range' as const, value: params.growthScale,
           onChange: (val: number) => handleParamChange('growthScale', val),
-          min: 20, max: 200, step: 10,
-          hint: 'Distance of new vertex from boundary face',
-        },
-        {
-          label: 'Tent Move Probability', type: 'range' as const, value: params.tentProbability,
+          min: 20, max: 200, step: 10, hint: 'Distance of new vertex from boundary face' },
+        { label: 'Tent Move Probability', type: 'range' as const, value: params.tentProbability,
           onChange: (val: number) => handleParamChange('tentProbability', val),
-          min: 0, max: 1, step: 0.05,
-          hint: 'Probability of tent move vs single glue (rest is glue probability)',
-        },
-        {
-          label: 'Max Steps', type: 'input' as const, value: params.maxSteps,
-          onChange: (val: number) => handleParamChange('maxSteps', val),
-          min: 10, max: 2000, step: 10,
-        },
+          min: 0, max: 1, step: 0.05, hint: 'Probability of tent move vs glue' },
+        { label: 'Max Steps', type: 'input' as const, value: params.maxSteps,
+          onChange: (val: number) => handleParamChange('maxSteps', val), min: 10, max: 2000, step: 10 },
       ],
     },
     {
       title: 'Initial State & Overlap',
       fields: [
-        {
-          label: 'Initial Topology', type: 'select' as const, value: params.initialState,
+        { label: 'Initial Topology', type: 'select' as const, value: params.initialState,
           onChange: (val: any) => handleParamChange('initialState', val as InitialStateType),
           options: [
             { label: 'Single Simplex', value: 'single-simplex' },
-            { label: params.dimension === 2 ? 'Triangle Strip (Cauchy surface)' : 'Tet Strip (Cauchy surface)', value: 'triangle-strip' },
-          ],
-          hint: 'Starting topology for the simulation',
-        },
-        {
-          label: 'Strip Length', type: 'range' as const, value: params.stripLength,
+            { label: params.dimension === 2 ? 'Triangle Strip' : 'Tet Strip', value: 'triangle-strip' },
+          ], hint: 'Starting topology' },
+        { label: 'Strip Length', type: 'range' as const, value: params.stripLength,
           onChange: (val: number) => handleParamChange('stripLength', val),
-          min: 3, max: 20, step: 1,
-          hint: 'Number of simplices in the initial strip',
-        },
-        {
-          label: 'Prevent Overlapping Simplices', type: 'checkbox' as const, value: params.preventOverlap,
+          min: 3, max: 20, step: 1, hint: 'Simplices in initial strip' },
+        { label: 'Prevent Overlap', type: 'checkbox' as const, value: params.preventOverlap,
           onChange: (val: boolean) => handleParamChange('preventOverlap', val),
-          hint: 'Reject new simplices that geometrically overlap existing ones',
-        },
+          hint: 'Reject overlapping simplices' },
       ],
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {!isInitialized ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <p className="text-blue-800">Initializing boundary growth...</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4"><p className="text-blue-800">Initializing boundary growth...</p></div>
+      ) : (<>
+        <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-4">
+          <MetricsGrid metrics={metrics} columns={4} />
         </div>
-      ) : (
-        <>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Boundary Growth Metrics</h2>
-            <MetricsGrid metrics={metrics} columns={4} title="" />
-          </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Complex Visualization</h2>
-            {simulation.currentState ? (
-              <div className="flex justify-center">
-                {params.dimension === 3 ? (
-                  <SimplicialVisualization3D complex={simulation.currentState.complex} width={700} height={500} />
-                ) : (
-                  <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} />
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">No visualization data</div>
-            )}
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <ParameterPanel sections={parameterSections} />
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Timeline Control</h2>
-            <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Growth Progress" />
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Simulation Controls</h2>
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3">Visualization</h2>
+          {simulation.currentState ? (
+            <div>
+              {params.dimension === 3 ? (
+                <SimplicialVisualization3D complex={simulation.currentState.complex} width={700} height={500} responsive />
+              ) : (
+                <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} responsive />
+              )}
+            </div>
+          ) : (<div className="text-center py-8 text-gray-500">No visualization data</div>)}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <ControlButtons onPlay={simulation.play} onPause={simulation.pause} onStep={simulation.step} onReset={simulation.reset} isRunning={simulation.isRunning} />
+            <button onClick={() => setDrawerOpen(true)} className="md:hidden px-3 py-2 rounded font-medium bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm">
+              Params
+            </button>
           </div>
+        </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Growth History</h2>
-            <MetricsTable data={metricsHistory} maxHeight="400px" />
-          </div>
+        <div className="hidden md:block bg-white border border-gray-200 rounded-lg">
+          <ParameterPanel sections={parameterSections} />
+        </div>
+        <ParameterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <ParameterPanel sections={parameterSections} />
+        </ParameterDrawer>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-green-900 mb-2">Boundary Growth Algorithm</h3>
-            <ul className="text-sm text-green-800 space-y-1">
-              <li>- <strong>Glue Move:</strong> Attach a new simplex to a random boundary face, displacing a new vertex outward along the face normal</li>
-              <li>- <strong>Tent Move:</strong> Select a boundary vertex, create a future copy displaced outward, glue simplices around its boundary star</li>
-              <li>- Growth proceeds outward from the boundary, modeling spacetime foliation evolution</li>
-              <li>- <strong>Reference:</strong> Dittrich & Hoehn, arXiv:1108.1974v2</li>
-            </ul>
-          </div>
-        </>
-      )}
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3">Timeline</h2>
+          <TimelineSlider currentStep={simulation.currentStep} maxStep={Math.max(simulation.maxSteps - 1, 0)} onSeek={simulation.seek} label="Growth Progress" />
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+          <MetricsTable data={metricsHistory} maxHeight="400px" />
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+          <h3 className="text-sm font-semibold text-green-900 mb-1">Boundary Growth Algorithm</h3>
+          <ul className="text-xs text-green-800 space-y-0.5">
+            <li>- <strong>Glue:</strong> Attach simplex to boundary face</li>
+            <li>- <strong>Tent:</strong> Displace boundary vertex outward</li>
+            <li>- Ref: Dittrich & Hoehn, arXiv:1108.1974v2</li>
+          </ul>
+        </div>
+      </>)}
     </div>
   );
 };
@@ -464,19 +413,16 @@ const TABS = [
 
 export const SimplicialGrowthPage: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('boundary');
+  console.debug('[SimplicialGrowthPage] Render, activeTab:', activeTab);
 
   return (
     <div className="w-full h-full flex flex-col bg-white">
-      <div className="p-6 border-b border-gray-200 bg-gray-50">
-        <h1 className="text-3xl font-bold mb-2">Simplicial Growth Algorithm</h1>
-        <p className="text-gray-600">
-          Discrete evolution of triangulations via Pachner moves and boundary gluing - arXiv:1108.1974v2
-        </p>
+      <div className="p-3 sm:p-6 border-b border-gray-200 bg-gray-50">
+        <h1 className="text-xl sm:text-3xl font-bold mb-1">Simplicial Growth</h1>
+        <p className="text-xs sm:text-sm text-gray-600">Discrete evolution via Pachner moves and boundary gluing</p>
       </div>
-
       <TabNavigation tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
-
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-3 sm:p-6">
         <div className="max-w-7xl mx-auto">
           {activeTab === 'boundary' && <BoundaryGrowthTab />}
           {activeTab === 'interior' && <InteriorMovesTab />}

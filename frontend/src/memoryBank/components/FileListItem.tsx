@@ -1,13 +1,15 @@
 /**
  * FileListItem Component
- * T29a: Cleaned up — removed fake file size, added diagnostic logging.
+ * T29a: Table layout with columns (Name, Date Modified, Size, Kind)
  */
 
 import type { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
+import { formatFileSize, getFileKind } from "../utils/fileTypeUtils";
 
 interface FileListItemProps {
   item: IndexCategory | IndexFile;
   isFolder: boolean;
+  showDetails?: boolean;
   onFolderClick?: (folderName: string) => void;
   onFileClick?: (filePath: string) => void;
 }
@@ -28,19 +30,11 @@ function FileTextIcon({ className }: { className?: string }) {
   );
 }
 
-function ChevronRight({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
-
 function isCategory(item: any): item is IndexCategory {
   return "subcategories" in item && "displayName" in item;
 }
 
-export function FileListItem({ item, isFolder, onFolderClick, onFileClick }: FileListItemProps) {
+export function FileListItem({ item, isFolder, showDetails = true, onFolderClick, onFileClick }: FileListItemProps) {
   const category = isCategory(item) ? item : null;
   const file = !isFolder ? (item as IndexFile) : null;
 
@@ -48,14 +42,18 @@ export function FileListItem({ item, isFolder, onFolderClick, onFileClick }: Fil
     ? (category.subcategories?.length || 0) + (category.files?.length || 0)
     : null;
 
-  const createdDate = file
-    ? new Date(file.created).toLocaleDateString("en-IN", {
-        timeZone: "Asia/Kolkata",
+  const modifiedDate = file?.modified
+    ? new Date(file.modified).toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
-        year: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : null;
+
+  const fileSize = file?.size ? formatFileSize(file.size) : null;
+  const fileKind = file?.mimeType ? getFileKind(file.fileName || file.title) : null;
 
   const handleClick = () => {
     if (isFolder && category) {
@@ -72,38 +70,55 @@ export function FileListItem({ item, isFolder, onFolderClick, onFileClick }: Fil
       onClick={handleClick}
       className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
     >
-      <div className="flex items-center gap-3 px-4 py-3">
-        {/* Icon */}
-        <div
-          className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-            isFolder ? "bg-blue-100" : "bg-blue-50"
-          }`}
-        >
-          {isFolder ? (
-            <FolderIcon className="w-5 h-5 text-blue-600" />
-          ) : (
-            <FileTextIcon className="w-5 h-5 text-blue-600" />
-          )}
-        </div>
-
-        {/* Name + meta */}
-        <div className="flex-1 min-w-0">
+      <div className={`grid gap-2 px-4 py-3 items-center ${showDetails ? 'grid-cols-12' : 'grid-cols-1'}`}>
+        {/* Name column */}
+        <div className={`flex items-center gap-3 min-w-0 ${showDetails ? 'col-span-4' : ''}`}>
+          {/* Icon */}
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+              isFolder ? "bg-blue-100" : "bg-blue-50"
+            }`}
+          >
+            {isFolder ? (
+              <FolderIcon className="w-4 h-4 text-blue-600" />
+            ) : (
+              <FileTextIcon className="w-4 h-4 text-blue-600" />
+            )}
+          </div>
+          {/* Name */}
           <h3 className="text-sm font-medium text-gray-900 truncate">
             {category?.displayName || file?.title || "Untitled"}
           </h3>
-          <div className="flex items-center gap-4 mt-0.5">
-            {isFolder && itemCount !== null && (
-              <p className="text-xs text-gray-500">
-                {itemCount} item{itemCount !== 1 ? "s" : ""}
-              </p>
-            )}
-            {!isFolder && file && (
-              <p className="text-xs text-gray-500">{createdDate}</p>
-            )}
-          </div>
         </div>
 
-        <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
+        {/* Details columns - only shown when showDetails is true */}
+        {showDetails && (
+          <>
+            {/* Date Modified column */}
+            <div className="col-span-3 text-xs text-gray-500">
+              {isFolder && itemCount !== null && (
+                <span>{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
+              )}
+              {!isFolder && file && modifiedDate && (
+                <span>{modifiedDate}</span>
+              )}
+            </div>
+
+            {/* Size column */}
+            <div className="col-span-2 text-xs text-gray-500">
+              {!isFolder && file && fileSize && (
+                <span>{fileSize}</span>
+              )}
+            </div>
+
+            {/* Kind column */}
+            <div className="col-span-3 text-xs text-gray-500">
+              {!isFolder && file && fileKind && (
+                <span>{fileKind}</span>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,9 @@ export interface ParsedDoc {
   sections: Section[];
   content: string;
   searchIndex: string;
+  size?: number;
+  mimeType?: string;
+  modified?: Date;
 }
 
 export interface Section {

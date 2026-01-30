@@ -5,6 +5,7 @@
 
 import { useMemo } from "react";
 import { ParsedDoc, DocCategory, MemoryBankIndex, SearchEntry } from "../types";
+import { detectFileType, getFileExtension, formatFileSize } from "../utils/fileTypeUtils";
 
 export interface IndexCategory {
   name: string;
@@ -19,6 +20,9 @@ export interface IndexFile {
   title: string;
   created: string;
   updated: string;
+  size?: number;
+  mimeType?: string;
+  modified?: string;
 }
 
 export interface ParsedDocument {
@@ -138,23 +142,17 @@ function getContext(content: string, query: string, sectionTitle?: string): stri
 function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
   const categoryMap = new Map<string, IndexCategory>();
   const rootCategories: IndexCategory[] = [];
+  const rootFiles: IndexFile[] = [];
 
   for (const file of files) {
     const parts = file.filePath.split('/');
     
     if (parts.length === 1) {
-      // Root level file - add to root category
-      if (!categoryMap.has('root')) {
-        categoryMap.set('root', {
-          name: 'root',
-          displayName: 'Root Files',
-          files: [],
-          subcategories: []
-        });
-      }
-      categoryMap.get('root')!.files.push(file);
+      // Root level file - add to root files list
+      rootFiles.push(file);
     } else {
       // File in subdirectory - build hierarchy
+      const categoryName = parts[0];
       let currentCategory: IndexCategory | undefined;
       
       for (let i = 0; i < parts.length - 1; i++) {
@@ -188,9 +186,14 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
     }
   }
 
-  // Add root category if it has files
-  if (categoryMap.has('root') && categoryMap.get('root')!.files.length > 0) {
-    rootCategories.unshift(categoryMap.get('root')!);
+  // Add root files to a root category if any exist
+  if (rootFiles.length > 0) {
+    rootCategories.unshift({
+      name: 'root',
+      displayName: 'Files',
+      files: rootFiles,
+      subcategories: []
+    });
   }
 
   return rootCategories;
@@ -201,41 +204,104 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
  */
 export function useMemoryBankDocs() {
   return useMemo(() => {
-    const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
-    const flatFiles: IndexFile[] = [];
+    const modules = import.meta.glob('/memory-bank/**/*', { query: '?url', import: 'default', eager: true });
+    const rootFiles: IndexFile[] = [];
+    const subdirectoryFiles: IndexFile[] = [];
+    const folderSet = new Set<string>();
 
-    for (const [path, content] of Object.entries(modules)) {
+    // Load metadata file
+    let fileMetadata: Record<string, { size: number; modified: string }> = {};
+    try {
+      const metadataModule = import.meta.glob('/memory-bank/metadata.json', { query: '?raw', import: 'default', eager: true });
+      const metadataPath = '/memory-bank/metadata.json';
+      const metadataContent = metadataModule[metadataPath] as string;
+      if (metadataContent) {
+        fileMetadata = JSON.parse(metadataContent);
+      }
+    } catch (e) {
+      console.warn('[MemoryBank] Could not load metadata.json:', e);
+    }
+
+    for (const [path, url] of Object.entries(modules)) {
       const relativePath = path.replace('/memory-bank/', '');
       const parts = relativePath.split('/');
+      const fileName = parts[parts.length - 1];
+      
+      // Skip directories and hidden files
+      if (!fileName || fileName.startsWith('.')) continue;
+      
+      // Skip metadata.json itself
+      if (fileName === 'metadata.json') continue;
+      
+      // Track folders
+      if (parts.length > 1) {
+        folderSet.add(parts[0]);
+      }
       
       let categoryName: string;
-      let fileName: string;
+      let filePath: string;
+      
+      // Get file metadata
+      const metadata = fileMetadata[relativePath];
+      const fileSize = metadata?.size || 0;
+      const fileModified = metadata?.modified || new Date().toISOString();
       
       if (parts.length === 1) {
-        // Root level file like "activeContext.md"
+        // Root level file
         categoryName = 'root';
-        fileName = parts[0];
+        filePath = relativePath;
+        rootFiles.push({
+          fileName,
+          filePath: relativePath,
+          title: fileName,
+          created: fileModified,
+          updated: fileModified,
+          size: fileSize,
+          mimeType: detectFileType(fileName).mimeType,
+          modified: fileModified
+        });
       } else {
-        // File in subdirectory (could be nested like "implementation-details/subfolder/file.md")
+        // File in subdirectory
         categoryName = parts[0];
-        fileName = parts.slice(1).join('/'); // Keep the full subfolder path
+        filePath = parts.slice(1).join('/');
+        subdirectoryFiles.push({
+          fileName,
+          filePath: relativePath,
+          title: fileName,
+          created: fileModified,
+          updated: fileModified,
+          size: fileSize,
+          mimeType: detectFileType(fileName).mimeType,
+          modified: fileModified
+        });
       }
+    }
 
-      const title = extractTitle(content as string) || fileName.replace('.md', '');
-      const created = extractDate(content as string) || new Date();
-      const updated = extractDate(content as string) || new Date();
+    // Build hierarchical structure from subdirectory files
+    const categories = buildCategoryStructure(subdirectoryFiles);
 
-      flatFiles.push({
-        fileName,
-        filePath: relativePath,
-        title,
-        created: created.toISOString(),
-        updated: updated.toISOString()
+    // Add root files as a separate category at the beginning
+    if (rootFiles.length > 0) {
+      categories.unshift({
+        name: 'root',
+        displayName: 'Files',
+        files: rootFiles,
+        subcategories: []
       });
     }
 
-    // Build hierarchical structure
-    const categories = buildCategoryStructure(flatFiles);
+    // Add empty folders (folders with no files)
+    for (const folderName of folderSet) {
+      const exists = categories.some(cat => cat.name === folderName);
+      if (!exists) {
+        categories.push({
+          name: folderName,
+          displayName: folderName.charAt(0).toUpperCase() + folderName.slice(1).replace(/-/g, ' '),
+          files: [],
+          subcategories: []
+        });
+      }
+    }
 
     return {
       categories,
@@ -259,38 +325,68 @@ export function useMemoryBankCategory(category: string) {
   }, [categories, category]);
 }
 
-/**
- * Fetch full parsed document using static imports
- */
 export function useMemoryBankDocument(category: string, file: string) {
-  const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
+  const modules = import.meta.glob('/memory-bank/**/*', { query: '?url', import: 'default', eager: true });
+  const rawModules = import.meta.glob('/memory-bank/**/*', { query: '?raw', import: 'default', eager: true });
 
   return useMemo(() => {
     let filePath: string;
     if (category === "root") {
-      // Root level file
       filePath = `/memory-bank/${file}`;
     } else {
-      // File in subdirectory (could be nested)
-      const fileName = file.endsWith('.md') ? file : `${file}.md`;
+      const fileName = file.endsWith('.md') ? file : `${file}`;
       filePath = `/memory-bank/${category}/${fileName}`;
     }
     
-    const content = modules[filePath] as string;
+    const url = modules[filePath] as string;
+    const rawContent = rawModules[filePath] as string;
     
-    if (!content) {
+    if (!url) {
       return undefined;
     }
 
+    const fileType = detectFileType(file);
+    
+    if (fileType.displayMode === 'markdown') {
+      const content = rawContent as any;
+      return {
+        fileName: file,
+        filePath: `${category}/${file}`,
+        title: extractTitle(content) || file.replace('.md', ''),
+        created: extractDate(content)?.toISOString() || new Date().toISOString(),
+        updated: extractDate(content)?.toISOString() || new Date().toISOString(),
+        sections: parseSections(content),
+        content,
+        mimeType: fileType.mimeType,
+        displayMode: fileType.displayMode
+      } as any;
+    }
+
+    if (fileType.displayMode === 'text') {
+      const content = rawContent as string;
+      return {
+        fileName: file,
+        filePath: `${category}/${file}`,
+        title: file,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        content: content || "Unable to read file content",
+        mimeType: fileType.mimeType,
+        displayMode: fileType.displayMode
+      } as any;
+    }
+
+    // For images and download mode, use the URL
     return {
       fileName: file,
       filePath: `${category}/${file}`,
-      title: extractTitle(content) || file.replace('.md', ''),
-      created: extractDate(content)?.toISOString() || new Date().toISOString(),
-      updated: extractDate(content)?.toISOString() || new Date().toISOString(),
-      sections: parseSections(content),
-      content
-    } as ParsedDocument;
+      title: file,
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+      content: url,
+      mimeType: fileType.mimeType,
+      displayMode: fileType.displayMode
+    } as any;
   }, [category, file]);
 }
 
@@ -303,53 +399,70 @@ export function useMemoryBankSearch(query: string) {
   return useMemo(() => {
     if (query.length < 2) return { query, resultCount: 0, results: [] };
 
-    const modules = import.meta.glob('/memory-bank/**/*.md', { query: '?raw', import: 'default', eager: true });
+    const modules = import.meta.glob('/memory-bank/**/*', { query: '?url', import: 'default', eager: true });
     const results: SearchResult[] = [];
     const lowerQuery = query.toLowerCase();
 
-    for (const [path, content] of Object.entries(modules)) {
+    for (const [path, url] of Object.entries(modules)) {
       const relativePath = path.replace('/memory-bank/', '');
       const fileName = relativePath.split('/').pop() || '';
-      const title = extractTitle(content as string) || fileName.replace('.md', '');
-      const contentStr = content as string;
+      const fileType = detectFileType(fileName);
       
-      // Title match
-      if (title.toLowerCase().includes(lowerQuery)) {
-        results.push({
-          fileName,
-          filePath: relativePath,
-          title,
-          context: getContext(contentStr, query),
-          matchType: "title"
-        });
-        continue;
-      }
-      
-      // Section match
-      const sections = parseSections(contentStr);
-      for (const section of sections) {
-        if (section.title.toLowerCase().includes(lowerQuery)) {
+      // Only search markdown files for content
+      if (fileType.displayMode === 'markdown') {
+        const content = url as any;
+        const title = extractTitle(content) || fileName.replace('.md', '');
+        const contentStr = content as string;
+        
+        // Title match
+        if (title.toLowerCase().includes(lowerQuery)) {
           results.push({
             fileName,
             filePath: relativePath,
             title,
-            section: section.title,
-            context: getContext(contentStr, query, section.title),
-            matchType: "section"
+            context: getContext(contentStr, query),
+            matchType: "title"
           });
-          break;
+          continue;
         }
-      }
-      
-      // Content match
-      if (contentStr.toLowerCase().includes(lowerQuery)) {
-        results.push({
-          fileName,
-          filePath: relativePath,
-          title,
-          context: getContext(contentStr, query),
-          matchType: "content"
-        });
+        
+        // Section match
+        const sections = parseSections(contentStr);
+        for (const section of sections) {
+          if (section.title.toLowerCase().includes(lowerQuery)) {
+            results.push({
+              fileName,
+              filePath: relativePath,
+              title,
+              section: section.title,
+              context: getContext(contentStr, query, section.title),
+              matchType: "section"
+            });
+            break;
+          }
+        }
+        
+        // Content match
+        if (contentStr.toLowerCase().includes(lowerQuery)) {
+          results.push({
+            fileName,
+            filePath: relativePath,
+            title,
+            context: getContext(contentStr, query),
+            matchType: "content"
+          });
+        }
+      } else {
+        // Non-markdown files - match by filename
+        if (fileName.toLowerCase().includes(lowerQuery)) {
+          results.push({
+            fileName,
+            filePath: relativePath,
+            title: fileName,
+            context: `File: ${fileName}`,
+            matchType: "title"
+          });
+        }
       }
     }
     

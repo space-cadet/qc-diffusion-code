@@ -50,8 +50,17 @@ export function useFolderNavigation(initialPath: string = "root") {
     const files: IndexFile[] = [];
 
     if (currentPath === "root") {
-      // Root level: show all top-level categories
-      folders.push(...categories);
+      // Root level: show all top-level categories and root-level files
+      for (const category of categories) {
+        // Skip the root files category - we'll handle its files directly
+        if (category.name === 'root') {
+          // Add root-level files directly
+          files.push(...(category.files || []));
+        } else {
+          // Add other categories as folders
+          folders.push(category);
+        }
+      }
     } else {
       // Navigate to specific folder
       const parts = currentPath.split("/");

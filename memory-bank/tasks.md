@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-30 08:18:39 IST*
+*Last Updated: 2026-01-30 17:22:00 IST*
 
 ## Active Tasks
 
@@ -61,6 +61,7 @@
 | T30 | Boundary Growth Algorithm Implementation | 🔄 IN PROGRESS | HIGH | 2026-01-29 | T28, T27 | [Details](tasks/T30.md) |
 | T30a | Overlap Prevention & Initial State Selection | ✅ COMPLETED | HIGH | 2026-01-30 | T30 | [Details](tasks/T30a.md) |
 | T30b | Simplicial Boundary Conditions & 3D Tet Strip Fix | 🔄 IN PROGRESS | HIGH | 2026-01-30 | T30, T30a | [Details](tasks/T30b.md) |
+| T31 | Mobile UI Responsiveness and Design | ✅ COMPLETED | HIGH | 2026-01-30 | T27, T29a, T30a | [Details](tasks/T31.md) |
 
 ## Task Details
 
