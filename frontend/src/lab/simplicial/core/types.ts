@@ -200,6 +200,49 @@ export function createInitialTriangleTopology(): SimplicialComplexTopology {
 }
 
 /**
+ * Build a 2D triangle strip topology: N triangles in a zigzag row.
+ * Forms a 1D Cauchy surface boundary suitable for tent-move evolution.
+ *
+ *   V2------V4------V6
+ *   /\      /\      /\
+ *  /  \    /  \    /  \
+ * V1----V3------V5----V7
+ */
+export function createTriangleStripTopology(n: number): SimplicialComplexTopology {
+  const topo = createEmptyTopology(2);
+  if (n < 1) n = 1;
+
+  // Create first two vertices (bottom-left edge)
+  const v0 = addVertex(topo); // bottom-left
+  const v1 = addVertex(topo); // top-left
+  addEdge(topo, v0, v1);
+
+  let bottomLeft = v0;
+  let topLeft = v1;
+
+  for (let i = 0; i < n; i++) {
+    if (i % 2 === 0) {
+      // Triangle pointing right-bottom: bottomLeft, topLeft -> new bottom-right
+      const newV = addVertex(topo);
+      addEdge(topo, topLeft, newV);
+      addEdge(topo, bottomLeft, newV);
+      addFace(topo, bottomLeft, topLeft, newV);
+      bottomLeft = newV;
+    } else {
+      // Triangle pointing right-top: bottomLeft, topLeft -> new top-right
+      const newV = addVertex(topo);
+      addEdge(topo, bottomLeft, newV);
+      addEdge(topo, topLeft, newV);
+      addFace(topo, bottomLeft, topLeft, newV);
+      topLeft = newV;
+    }
+  }
+
+  console.debug(`[createTriangleStripTopology] Created strip with ${n} triangles, ${topo.vertices.size} vertices`);
+  return topo;
+}
+
+/**
  * Build a minimal 3D topology: a single tetrahedron with vertices 0,1,2,3.
  */
 export function createInitialTetrahedronTopology(): SimplicialComplexTopology {
@@ -226,5 +269,42 @@ export function createInitialTetrahedronTopology(): SimplicialComplexTopology {
   // 1 tetrahedron
   addTetrahedron(topo, v0, v1, v2, v3);
 
+  return topo;
+}
+
+/**
+ * Build a 3D tet strip topology: N tetrahedra sharing triangular faces in a row.
+ * Each successive tet shares one face with the previous and adds one new vertex.
+ */
+export function createTetStripTopology(n: number): SimplicialComplexTopology {
+  const topo = createEmptyTopology(3);
+  if (n < 1) n = 1;
+
+  // First tet: vertices 0,1,2,3
+  const v0 = addVertex(topo);
+  const v1 = addVertex(topo);
+  const v2 = addVertex(topo);
+  const v3 = addVertex(topo);
+
+  addEdge(topo, v0, v1); addEdge(topo, v0, v2); addEdge(topo, v0, v3);
+  addEdge(topo, v1, v2); addEdge(topo, v1, v3); addEdge(topo, v2, v3);
+  addFace(topo, v0, v1, v2); addFace(topo, v0, v1, v3);
+  addFace(topo, v0, v2, v3); addFace(topo, v1, v2, v3);
+  addTetrahedron(topo, v0, v1, v2, v3);
+
+  // Track the "front face" — the face we'll glue the next tet onto
+  let frontFace: [number, number, number] = [v1, v2, v3];
+
+  for (let i = 1; i < n; i++) {
+    const newV = addVertex(topo);
+    const [a, b, c] = frontFace;
+    addEdge(topo, a, newV); addEdge(topo, b, newV); addEdge(topo, c, newV);
+    addFace(topo, a, b, newV); addFace(topo, a, c, newV); addFace(topo, b, c, newV);
+    addTetrahedron(topo, a, b, c, newV);
+    // Rotate front face: replace the oldest vertex with newV
+    frontFace = [b, c, newV];
+  }
+
+  console.debug(`[createTetStripTopology] Created strip with ${n} tets, ${topo.vertices.size} vertices`);
   return topo;
 }

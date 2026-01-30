@@ -26,6 +26,8 @@ export {
   addTetrahedron,
   createInitialTriangleTopology,
   createInitialTetrahedronTopology,
+  createTriangleStripTopology,
+  createTetStripTopology,
 } from './core/types';
 
 // Validation
@@ -41,6 +43,8 @@ export {
   createEmptyGeometry,
   createTriangleGeometry,
   createTetrahedronGeometry,
+  createTriangleStripGeometry,
+  createTetStripGeometry,
 } from './geometry/types';
 
 export {
@@ -99,6 +103,8 @@ export {
   glueTetrahedron3D,
   tentMove2D,
   tentMove3D,
+  trianglesOverlap2D,
+  tetrahedronOverlaps3D,
 } from './operations/BoundaryGrowth';
 
 // Algebraic (optional)

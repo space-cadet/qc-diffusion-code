@@ -54,11 +54,16 @@ export interface BoundaryGrowthState {
   };
 }
 
+export type InitialStateType = 'single-simplex' | 'triangle-strip';
+
 export interface BoundaryGrowthParams {
   dimension: Dimension;
   maxSteps: number;
   growthScale: number;
   tentProbability: number; // 0-1, rest is glue probability
+  preventOverlap: boolean;
+  initialState: InitialStateType;
+  stripLength: number; // number of triangles/tets in strip (3-20)
 }
 
 // --- Original Interior Growth Types ---

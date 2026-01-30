@@ -12,7 +12,7 @@ import { PachnerMoveTester } from './lab/components/PachnerMoveTester';
 import { useSimplicialGrowth } from './lab/hooks/useSimplicialGrowth';
 import { useBoundaryGrowth } from './lab/hooks/useBoundaryGrowth';
 import { ExportService } from './lab/services/ExportService';
-import { SimplicialGrowthParams, BoundaryGrowthParams } from './lab/types/simplicial';
+import { SimplicialGrowthParams, BoundaryGrowthParams, InitialStateType } from './lab/types/simplicial';
 
 // ---- Interior Moves Tab (existing T28 functionality) ----
 
@@ -277,6 +277,9 @@ const BoundaryGrowthTab: React.FC = () => {
     maxSteps: 200,
     growthScale: 80,
     tentProbability: 0.3,
+    preventOverlap: false,
+    initialState: 'single-simplex',
+    stripLength: 8,
   });
 
   useEffect(() => {
@@ -360,6 +363,31 @@ const BoundaryGrowthTab: React.FC = () => {
           label: 'Max Steps', type: 'input' as const, value: params.maxSteps,
           onChange: (val: number) => handleParamChange('maxSteps', val),
           min: 10, max: 2000, step: 10,
+        },
+      ],
+    },
+    {
+      title: 'Initial State & Overlap',
+      fields: [
+        {
+          label: 'Initial Topology', type: 'select' as const, value: params.initialState,
+          onChange: (val: any) => handleParamChange('initialState', val as InitialStateType),
+          options: [
+            { label: 'Single Simplex', value: 'single-simplex' },
+            { label: params.dimension === 2 ? 'Triangle Strip (Cauchy surface)' : 'Tet Strip (Cauchy surface)', value: 'triangle-strip' },
+          ],
+          hint: 'Starting topology for the simulation',
+        },
+        {
+          label: 'Strip Length', type: 'range' as const, value: params.stripLength,
+          onChange: (val: number) => handleParamChange('stripLength', val),
+          min: 3, max: 20, step: 1,
+          hint: 'Number of simplices in the initial strip',
+        },
+        {
+          label: 'Prevent Overlapping Simplices', type: 'checkbox' as const, value: params.preventOverlap,
+          onChange: (val: boolean) => handleParamChange('preventOverlap', val),
+          hint: 'Reject new simplices that geometrically overlap existing ones',
         },
       ],
     },

@@ -16,8 +16,12 @@ import {
   SimplicialComplexGeometry,
   createInitialTriangleTopology,
   createInitialTetrahedronTopology,
+  createTriangleStripTopology,
+  createTetStripTopology,
   createTriangleGeometry,
   createTetrahedronGeometry,
+  createTriangleStripGeometry,
+  createTetStripGeometry,
   computeEulerCharacteristic,
   getBoundaryEdges2D,
   getBoundaryFaces3D,
@@ -25,6 +29,11 @@ import {
   glueTetrahedron3D,
   tentMove2D,
   tentMove3D,
+  trianglesOverlap2D,
+  tetrahedronOverlaps3D,
+  computeOutwardNormal2D,
+  computeOutwardNormal3D,
+  type VertexPosition,
 } from '../simplicial';
 
 export class BoundaryGrowthController
@@ -46,11 +55,23 @@ export class BoundaryGrowthController
     this.history = [];
 
     if (params.dimension === 2) {
-      this.topology = createInitialTriangleTopology();
-      this.geometry = createTriangleGeometry(400, 300, 120);
+      if (params.initialState === 'triangle-strip') {
+        this.topology = createTriangleStripTopology(params.stripLength);
+        this.geometry = createTriangleStripGeometry(params.stripLength, 400, 300, 120);
+        console.debug(`[BoundaryGrowthController] Using triangle strip, length=${params.stripLength}`);
+      } else {
+        this.topology = createInitialTriangleTopology();
+        this.geometry = createTriangleGeometry(400, 300, 120);
+      }
     } else {
-      this.topology = createInitialTetrahedronTopology();
-      this.geometry = createTetrahedronGeometry(400, 300, 0, 80);
+      if (params.initialState === 'triangle-strip') {
+        this.topology = createTetStripTopology(params.stripLength);
+        this.geometry = createTetStripGeometry(params.stripLength, 400, 300, 0, 80);
+        console.debug(`[BoundaryGrowthController] Using tet strip, length=${params.stripLength}`);
+      } else {
+        this.topology = createInitialTetrahedronTopology();
+        this.geometry = createTetrahedronGeometry(400, 300, 0, 80);
+      }
     }
 
     this.state = this.createState(null);
@@ -137,29 +158,94 @@ export class BoundaryGrowthController
     this.running = running;
   }
 
+  private readonly MAX_OVERLAP_RETRIES = 10;
+
+  /**
+   * Compute candidate new vertex position for a 2D glue without mutating topology.
+   * Returns null if position cannot be computed.
+   */
+  private computeCandidatePosition2D(edgeId: number, scale: number): { p0: VertexPosition; p1: VertexPosition; newP: VertexPosition } | null {
+    if (!this.topology || !this.geometry) return null;
+    const edge = this.topology.edges.get(edgeId);
+    if (!edge) return null;
+    const [v0, v1] = edge.vertices;
+    const p0 = this.geometry.positions.get(v0);
+    const p1 = this.geometry.positions.get(v1);
+    if (!p0 || !p1) return null;
+
+    const normal = computeOutwardNormal2D(this.topology, this.geometry, edgeId);
+    if (!normal) return null;
+
+    const midX = (p0.x + p1.x) / 2;
+    const midY = (p0.y + p1.y) / 2;
+    return { p0, p1, newP: { x: midX + normal.x * scale, y: midY + normal.y * scale } };
+  }
+
+  /**
+   * Compute candidate new vertex position for a 3D glue without mutating topology.
+   */
+  private computeCandidatePosition3D(faceId: number, scale: number): { faceVerts: VertexPosition[]; newP: VertexPosition } | null {
+    if (!this.topology || !this.geometry) return null;
+    const face = this.topology.faces.get(faceId);
+    if (!face) return null;
+    const [v0, v1, v2] = face.vertices;
+    const p0 = this.geometry.positions.get(v0);
+    const p1 = this.geometry.positions.get(v1);
+    const p2 = this.geometry.positions.get(v2);
+    if (!p0 || !p1 || !p2) return null;
+
+    const normal = computeOutwardNormal3D(this.topology, this.geometry, faceId);
+    if (!normal) return null;
+
+    const cx = (p0.x + p1.x + p2.x) / 3;
+    const cy = (p0.y + p1.y + p2.y) / 3;
+    const cz = ((p0.z ?? 0) + (p1.z ?? 0) + (p2.z ?? 0)) / 3;
+    return {
+      faceVerts: [p0, p1, p2],
+      newP: { x: cx + normal.x * scale, y: cy + normal.y * scale, z: cz + (normal.z ?? 0) * scale },
+    };
+  }
+
   private applyMove(moveType: BoundaryMoveType): { success: boolean; error?: string } {
     if (!this.topology || !this.geometry || !this.params) {
       return { success: false, error: 'Not initialized' };
     }
 
     const scale = this.params.growthScale;
+    const checkOverlap = this.params.preventOverlap;
 
     if (this.params.dimension === 2) {
       if (moveType === 'glue') {
         const boundaryEdges = getBoundaryEdges2D(this.topology);
         if (boundaryEdges.length === 0) return { success: false, error: 'No boundary edges' };
-        const edgeId = boundaryEdges[Math.floor(Math.random() * boundaryEdges.length)];
-        return glueTriangle2D(this.topology, this.geometry, edgeId, scale);
+
+        // Shuffle for retry
+        const shuffled = [...boundaryEdges].sort(() => Math.random() - 0.5);
+        const maxTries = checkOverlap ? Math.min(this.MAX_OVERLAP_RETRIES, shuffled.length) : 1;
+
+        for (let attempt = 0; attempt < maxTries; attempt++) {
+          const edgeId = shuffled[attempt % shuffled.length];
+
+          if (checkOverlap) {
+            const candidate = this.computeCandidatePosition2D(edgeId, scale);
+            if (candidate) {
+              const overlaps = trianglesOverlap2D(candidate.p0, candidate.p1, candidate.newP, this.topology, this.geometry);
+              if (overlaps) {
+                console.debug(`[BoundaryGrowthController] Overlap rejected (attempt ${attempt + 1})`);
+                continue;
+              }
+            }
+          }
+
+          return glueTriangle2D(this.topology, this.geometry, edgeId, scale);
+        }
+        return { success: false, error: 'All glue attempts overlapped' };
       } else {
-        // Tent move: pick a random boundary vertex
         const boundaryEdges = getBoundaryEdges2D(this.topology);
         const boundaryVertices = new Set<number>();
         for (const eId of boundaryEdges) {
           const edge = this.topology.edges.get(eId);
-          if (edge) {
-            boundaryVertices.add(edge.vertices[0]);
-            boundaryVertices.add(edge.vertices[1]);
-          }
+          if (edge) { boundaryVertices.add(edge.vertices[0]); boundaryVertices.add(edge.vertices[1]); }
         }
         const verts = Array.from(boundaryVertices);
         if (verts.length === 0) return { success: false, error: 'No boundary vertices' };
@@ -170,16 +256,34 @@ export class BoundaryGrowthController
       if (moveType === 'glue') {
         const boundaryFaces = getBoundaryFaces3D(this.topology);
         if (boundaryFaces.length === 0) return { success: false, error: 'No boundary faces' };
-        const faceId = boundaryFaces[Math.floor(Math.random() * boundaryFaces.length)];
-        return glueTetrahedron3D(this.topology, this.geometry, faceId, scale);
+
+        const shuffled = [...boundaryFaces].sort(() => Math.random() - 0.5);
+        const maxTries = checkOverlap ? Math.min(this.MAX_OVERLAP_RETRIES, shuffled.length) : 1;
+
+        for (let attempt = 0; attempt < maxTries; attempt++) {
+          const faceId = shuffled[attempt % shuffled.length];
+
+          if (checkOverlap) {
+            const candidate = this.computeCandidatePosition3D(faceId, scale);
+            if (candidate) {
+              const allPos = [...candidate.faceVerts, candidate.newP];
+              const minDist = scale * 0.3;
+              if (tetrahedronOverlaps3D(allPos, this.topology, this.geometry, minDist)) {
+                console.debug(`[BoundaryGrowthController] 3D overlap rejected (attempt ${attempt + 1})`);
+                continue;
+              }
+            }
+          }
+
+          return glueTetrahedron3D(this.topology, this.geometry, faceId, scale);
+        }
+        return { success: false, error: 'All glue attempts overlapped' };
       } else {
         const boundaryFaces = getBoundaryFaces3D(this.topology);
         const boundaryVertices = new Set<number>();
         for (const fId of boundaryFaces) {
           const face = this.topology.faces.get(fId);
-          if (face) {
-            for (const v of face.vertices) boundaryVertices.add(v);
-          }
+          if (face) { for (const v of face.vertices) boundaryVertices.add(v); }
         }
         const verts = Array.from(boundaryVertices);
         if (verts.length === 0) return { success: false, error: 'No boundary vertices' };
