@@ -1,9 +1,20 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-31 00:00:00 IST*
+*Last Updated: 2026-01-30 13:24:07 IST*
 
 ### 2026-01-30
+
+**13:24:07 IST - T29a: Memory Bank Viewer Enhancements - Non-Markdown File Support and Sortable Columns**
+
+- Created `frontend/src/memoryBank/utils/fileTypeUtils.ts` - File type detection utility with MIME types, icons, display modes, and formatting functions
+- Modified `frontend/src/memoryBank/types.ts` - Added optional metadata fields (size, mimeType, modified) to ParsedDoc interface
+- Modified `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` - Extended to handle all files with metadata extraction, metadata.json loading, and proper content fetching
+- Modified `frontend/src/memoryBank/hooks/useFolderNavigation.ts` - Fixed root files listing by skipping "root" category and adding files directly
+- Modified `frontend/src/memoryBank/components/FileListView.tsx` - Converted to sortable table layout with columns and added showDetails toggle
+- Modified `frontend/src/memoryBank/components/FileListItem.tsx` - Updated to display file metadata in table cells with conditional column visibility
+- Modified `frontend/src/memoryBank/components/Viewer.tsx` - Extended to handle images, text files, and downloads with conditional rendering
+- Modified `frontend/scripts/copy-memory-bank.js` - Enhanced to copy all files and generate metadata.json with file stats
 
 **23:30 IST - T30a: Overlap Prevention & Initial State Selection (Opus 4.5)**
 
