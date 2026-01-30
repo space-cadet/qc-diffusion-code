@@ -215,6 +215,118 @@ export function computeOutwardNormal3D(
   return { x: nx / len, y: ny / len, z: nz / len };
 }
 
+// --- Overlap Detection ---
+
+/** Check if two 2D line segments (a1-a2) and (b1-b2) intersect (proper crossing). */
+function segmentsIntersect(
+  a1x: number, a1y: number, a2x: number, a2y: number,
+  b1x: number, b1y: number, b2x: number, b2y: number,
+): boolean {
+  const d1x = a2x - a1x, d1y = a2y - a1y;
+  const d2x = b2x - b1x, d2y = b2y - b1y;
+  const cross = d1x * d2y - d1y * d2x;
+  if (Math.abs(cross) < 1e-10) return false; // parallel
+  const dx = b1x - a1x, dy = b1y - a1y;
+  const t = (dx * d2y - dy * d2x) / cross;
+  const u = (dx * d1y - dy * d1x) / cross;
+  // Strict interior intersection (exclude endpoints to allow shared edges)
+  return t > 0.01 && t < 0.99 && u > 0.01 && u < 0.99;
+}
+
+/** Check if point (px,py) is inside triangle (ax,ay)-(bx,by)-(cx,cy). */
+function pointInTriangle(
+  px: number, py: number,
+  ax: number, ay: number, bx: number, by: number, cx: number, cy: number,
+): boolean {
+  const d1 = (px - bx) * (ay - by) - (ax - bx) * (py - by);
+  const d2 = (px - cx) * (by - cy) - (bx - cx) * (py - cy);
+  const d3 = (px - ax) * (cy - ay) - (cx - ax) * (py - ay);
+  const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+  const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+  return !(hasNeg && hasPos);
+}
+
+/**
+ * Check if a candidate triangle overlaps any existing face in the 2D complex.
+ * Tests edge-edge intersection and vertex containment.
+ */
+export function trianglesOverlap2D(
+  newP0: VertexPosition,
+  newP1: VertexPosition,
+  newP2: VertexPosition,
+  topo: SimplicialComplexTopology,
+  geometry: SimplicialComplexGeometry,
+): boolean {
+  const newVerts: [number, number][] = [
+    [newP0.x, newP0.y], [newP1.x, newP1.y], [newP2.x, newP2.y],
+  ];
+  const newEdges: [number, number, number, number][] = [
+    [newVerts[0][0], newVerts[0][1], newVerts[1][0], newVerts[1][1]],
+    [newVerts[1][0], newVerts[1][1], newVerts[2][0], newVerts[2][1]],
+    [newVerts[2][0], newVerts[2][1], newVerts[0][0], newVerts[0][1]],
+  ];
+
+  for (const face of topo.faces.values()) {
+    const [fv0, fv1, fv2] = face.vertices;
+    const fp0 = geometry.positions.get(fv0);
+    const fp1 = geometry.positions.get(fv1);
+    const fp2 = geometry.positions.get(fv2);
+    if (!fp0 || !fp1 || !fp2) continue;
+
+    const existEdges: [number, number, number, number][] = [
+      [fp0.x, fp0.y, fp1.x, fp1.y],
+      [fp1.x, fp1.y, fp2.x, fp2.y],
+      [fp2.x, fp2.y, fp0.x, fp0.y],
+    ];
+
+    // Edge-edge intersection
+    for (const ne of newEdges) {
+      for (const ee of existEdges) {
+        if (segmentsIntersect(ne[0], ne[1], ne[2], ne[3], ee[0], ee[1], ee[2], ee[3])) {
+          return true;
+        }
+      }
+    }
+
+    // Check if new triangle centroid is inside existing face
+    const cx = (newP0.x + newP1.x + newP2.x) / 3;
+    const cy = (newP0.y + newP1.y + newP2.y) / 3;
+    if (pointInTriangle(cx, cy, fp0.x, fp0.y, fp1.x, fp1.y, fp2.x, fp2.y)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if a candidate tetrahedron overlaps existing tetrahedra using bounding-sphere proximity.
+ */
+export function tetrahedronOverlaps3D(
+  newPositions: VertexPosition[],
+  topo: SimplicialComplexTopology,
+  geometry: SimplicialComplexGeometry,
+  minDistance: number,
+): boolean {
+  // Compute centroid of candidate tet
+  const cx = newPositions.reduce((s, p) => s + p.x, 0) / newPositions.length;
+  const cy = newPositions.reduce((s, p) => s + p.y, 0) / newPositions.length;
+  const cz = newPositions.reduce((s, p) => s + (p.z ?? 0), 0) / newPositions.length;
+
+  for (const tet of topo.tetrahedra.values()) {
+    const verts = tet.vertices.map(v => geometry.positions.get(v)).filter(Boolean) as VertexPosition[];
+    if (verts.length < 4) continue;
+    const tx = verts.reduce((s, p) => s + p.x, 0) / 4;
+    const ty = verts.reduce((s, p) => s + p.y, 0) / 4;
+    const tz = verts.reduce((s, p) => s + (p.z ?? 0), 0) / 4;
+    const dist = Math.sqrt((cx - tx) ** 2 + (cy - ty) ** 2 + (cz - tz) ** 2);
+    if (dist < minDistance) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // --- Gluing Operations ---
 
 export interface GlueResult {

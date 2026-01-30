@@ -42,6 +42,47 @@ export function createTriangleGeometry(
  * a cube with half-side = scale/sqrt(3), giving edge length = scale * sqrt(2).
  * All six edges are equal.
  */
+/**
+ * Create geometry for a 2D triangle strip with n triangles.
+ * Zigzag pattern: bottom vertices on one row, top vertices on another.
+ */
+export function createTriangleStripGeometry(
+  n: number,
+  centerX: number,
+  centerY: number,
+  scale: number,
+): SimplicialComplexGeometry {
+  const positions = new Map<number, VertexPosition>();
+  if (n < 1) n = 1;
+
+  const halfWidth = (n * scale * 0.5) / 2;
+  const halfHeight = scale * 0.433; // equilateral triangle height / 2
+
+  // V0 = bottom-left, V1 = top-left
+  positions.set(0, { x: centerX - halfWidth, y: centerY + halfHeight });
+  positions.set(1, { x: centerX - halfWidth, y: centerY - halfHeight });
+
+  let bottomX = centerX - halfWidth;
+  let topX = centerX - halfWidth;
+  let nextId = 2;
+  const dx = scale * 0.5;
+
+  for (let i = 0; i < n; i++) {
+    if (i % 2 === 0) {
+      // New bottom-right vertex
+      bottomX += dx;
+      positions.set(nextId, { x: bottomX, y: centerY + halfHeight });
+    } else {
+      // New top-right vertex
+      topX += dx;
+      positions.set(nextId, { x: topX, y: centerY - halfHeight });
+    }
+    nextId++;
+  }
+
+  return { positions };
+}
+
 export function createTetrahedronGeometry(
   centerX: number,
   centerY: number,
@@ -56,5 +97,40 @@ export function createTetrahedronGeometry(
   positions.set(1, { x: centerX + s, y: centerY - s, z: centerZ - s });
   positions.set(2, { x: centerX - s, y: centerY + s, z: centerZ - s });
   positions.set(3, { x: centerX - s, y: centerY - s, z: centerZ + s });
+  return { positions };
+}
+
+/**
+ * Create geometry for a 3D tet strip with n tetrahedra.
+ * Each tet extends along the x-axis, alternating displacement direction.
+ */
+export function createTetStripGeometry(
+  n: number,
+  centerX: number,
+  centerY: number,
+  centerZ: number,
+  scale: number,
+): SimplicialComplexGeometry {
+  const positions = new Map<number, VertexPosition>();
+  if (n < 1) n = 1;
+
+  const s = scale / Math.sqrt(3);
+  const halfLen = (n * s) / 2;
+
+  // First tet: 4 vertices
+  positions.set(0, { x: centerX - halfLen, y: centerY + s, z: centerZ + s });
+  positions.set(1, { x: centerX - halfLen, y: centerY - s, z: centerZ - s });
+  positions.set(2, { x: centerX - halfLen + s, y: centerY, z: centerZ });
+  positions.set(3, { x: centerX - halfLen, y: centerY - s, z: centerZ + s });
+
+  let nextId = 4;
+  for (let i = 1; i < n; i++) {
+    const xOff = centerX - halfLen + (i + 1) * s;
+    // Alternate y/z displacement for visual separation
+    const yOff = (i % 2 === 0) ? s : -s;
+    positions.set(nextId, { x: xOff, y: centerY + yOff, z: centerZ + (i % 2 === 0 ? s : -s) });
+    nextId++;
+  }
+
   return { positions };
 }
