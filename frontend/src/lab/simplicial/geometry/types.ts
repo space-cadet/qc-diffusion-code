@@ -103,12 +103,12 @@ export function createTetrahedronGeometry(
 /**
  * Create geometry for a 3D tet strip with n tetrahedra.
  * Generates 2*(n+1) vertices in two layers forming non-degenerate tets.
- * Bottom layer: vertices 0, 1, ..., n  (shared edge of strip)
- * Top layer: vertices n+1, n+2, ..., 2n+1  (alternating above/below)
- *
+ * Bottom layer: vertices 0..n, Top layer: vertices n+1..2n+1
  * Each tet i uses vertices (i, i+1, n+1+i, n+2+i).
- * The cube-inscribed approach ensures proper 3D volume visible from default
- * camera at (0,0,300) by spreading vertices in all three axes.
+ *
+ * Non-coplanarity proof for each tet:
+ *   Bottom[i] zigzags in y at z=0; Top[i] at constant z=1.5s with opposite y.
+ *   Triple product of edge vectors = 3 s^2 dx ≠ 0, so volume > 0.
  */
 export function createTetStripGeometry(
   n: number,
@@ -120,31 +120,30 @@ export function createTetStripGeometry(
   const positions = new Map<number, VertexPosition>();
   if (n < 1) n = 1;
 
-  // s controls the tet size; matches createTetrahedronGeometry convention
   const s = scale / Math.sqrt(3);
-  const edgeSpacing = s * 2; // spacing along x for the strip
+  const dx = s * 2;
+  const halfLen = (n * dx) / 2;
 
-  const halfLen = (n * edgeSpacing) / 2;
-
-  // Bottom layer (vertices 0..n): zigzag in y, flat in z
-  // Alternating y gives the shared edge between successive tets a non-trivial shape
+  // Bottom layer (vertices 0..n): zigzag y, flat z=centerZ
+  // Even i → y = centerY, Odd i → y = centerY + s
   for (let i = 0; i <= n; i++) {
-    const x = centerX - halfLen + i * edgeSpacing;
-    const y = centerY + (i % 2 === 0 ? -s : s);
+    const x = centerX - halfLen + i * dx;
+    const y = centerY + (i % 2) * s;
     positions.set(i, { x, y, z: centerZ });
   }
 
-  // Top layer (vertices n+1..2n+1): offset in both y and z for 3D depth
-  // Each top vertex is displaced perpendicular to the bottom strip plane
+  // Top layer (vertices n+1..2n+1): opposite y zigzag, constant z offset
+  // Even i → y = centerY + s, Odd i → y = centerY; all at z = centerZ + 1.5s
+  // This ensures each tet (i, i+1, n+1+i, n+2+i) has non-zero volume
+  const zTop = centerZ + s * 1.5;
   for (let i = 0; i <= n; i++) {
-    const x = centerX - halfLen + i * edgeSpacing;
-    const y = centerY + (i % 2 === 0 ? s : -s);
-    const z = centerZ + (i % 2 === 0 ? s * 1.5 : -s * 1.5);
-    positions.set(n + 1 + i, { x, y, z });
+    const x = centerX - halfLen + i * dx;
+    const y = centerY + ((i + 1) % 2) * s;
+    positions.set(n + 1 + i, { x, y, z: zTop });
   }
 
   console.debug(
-    `[createTetStripGeometry] Created ${n} tets, ${2 * (n + 1)} vertices, scale=${scale}, s=${s.toFixed(2)}`
+    `[createTetStripGeometry] ${n} tets, ${2 * (n + 1)} verts, s=${s.toFixed(1)}, vol_per_tet=${(s * s * dx / 2).toFixed(1)}`
   );
   return { positions };
 }
