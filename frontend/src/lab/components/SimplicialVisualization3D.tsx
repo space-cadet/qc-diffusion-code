@@ -265,30 +265,30 @@ export const SimplicialVisualization3D: React.FC<SimplicialVisualization3DProps>
         className="border border-gray-300 rounded-lg bg-white overflow-hidden max-w-full"
       />
 
-      {/* Info panel */}
-      <div className="absolute top-2 right-2 bg-white bg-opacity-90 p-2 rounded border border-gray-200 text-xs">
+      {/* Info panel - compact on mobile */}
+      <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white bg-opacity-90 p-1 sm:p-2 rounded border border-gray-200 text-[10px] sm:text-xs leading-tight">
         <div className="font-semibold">Simplicial Complex</div>
         <div>Dimension: {complex.topology.dimension}D</div>
         <div>Vertices: {complex.topology.vertices.size}</div>
         <div>Edges: {complex.topology.edges.size}</div>
         <div>Faces: {complex.topology.faces.size}</div>
         <div>Tetrahedra: {complex.topology.tetrahedra.size}</div>
-        <div className="mt-1 pt-1 border-t border-gray-200 text-[10px] text-gray-400">
+        <div className="mt-1 pt-1 border-t border-gray-200 text-[8px] sm:text-[10px] text-gray-400">
           Drag to rotate, scroll to zoom
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="absolute bottom-2 left-2 flex gap-2">
-        <label className="flex items-center text-xs bg-white bg-opacity-90 px-2 py-1 rounded border border-gray-200">
+      {/* Controls - compact on mobile */}
+      <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 flex gap-1 sm:gap-2">
+        <label className="flex items-center text-[10px] sm:text-xs bg-white bg-opacity-90 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-200">
           <input type="checkbox" checked={showVertices} onChange={(e) => setShowVertices(e.target.checked)} className="mr-1" />
           Vertices
         </label>
-        <label className="flex items-center text-xs bg-white bg-opacity-90 px-2 py-1 rounded border border-gray-200">
+        <label className="flex items-center text-[10px] sm:text-xs bg-white bg-opacity-90 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-200">
           <input type="checkbox" checked={showEdges} onChange={(e) => setShowEdges(e.target.checked)} className="mr-1" />
           Edges
         </label>
-        <label className="flex items-center text-xs bg-white bg-opacity-90 px-2 py-1 rounded border border-gray-200">
+        <label className="flex items-center text-[10px] sm:text-xs bg-white bg-opacity-90 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-200">
           <input type="checkbox" checked={showFaces} onChange={(e) => setShowFaces(e.target.checked)} className="mr-1" />
           Faces
         </label>

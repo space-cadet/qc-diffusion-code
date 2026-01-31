@@ -1,7 +1,7 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-30 17:22:00 IST*
+*Last Updated: 2026-01-30 19:45:00 IST*
 
 ## Current Focus
 **Task**: T30b Simplicial Boundary Conditions & 3D Tet Strip Fix
@@ -36,7 +36,7 @@ T31 completed: Comprehensive mobile UI overhaul including bottom icon navigation
 - Added BoundaryConstraintMode type and extended BoundaryGrowthParams with boundary constraints
 - Implemented getBottomAndSideBoundaries2D/3D() for automatic boundary identification
 - Added frozen boundary filtering in BoundaryGrowthController.step() for both 2D and 3D
-- Fixed createTetStripGeometry() to generate non-degenerate tets in two parallel layers
+- Rewrote createTetStripGeometry() from scratch with cube-inscribed approach for proper 3D rendering from default camera angle
 - Updated createTetStripTopology() to match new geometry (2*(n+1) vertices)
 - Added isBoundaryFrozen() helper for efficient constraint checking
 - All acceptance criteria met (7/9), UI/visualization deferred to T30c
