@@ -1,7 +1,7 @@
 # Vercel Deployment Plan for QC-Diffusion Code Subproject
 
 *Created: 2025-08-23 17:46:03 IST*
-*Last Updated: 2026-01-11 16:15:00 IST*
+*Last Updated: 2026-02-09 20:51:40 IST*
 
 ## Overview
 
@@ -229,3 +229,46 @@ These changes resolved the TypeScript compilation errors in `packages/graph-core
 2. **CI/CD Pipeline**: Automate testing and deployment
 3. **Performance Monitoring**: Add analytics and error tracking
 4. **Progressive Enhancement**: Offline functionality and service workers
+
+## Python Backend Environment Setup
+
+### Environment Configuration
+
+The Python backend requires proper environment setup for local development and deployment. See `python-backend-environment-setup.md` for comprehensive setup guide.
+
+### Key Setup Points
+
+**Recommended Environment**: Conda
+```bash
+conda create -n qc-diffusion python=3.10 -y
+conda activate qc-diffusion
+cd backend && pip install -r requirements.txt
+```
+
+**Common Issues**:
+- `pde` module import: Use `conda run -n qc-diffusion python` instead of `conda activate` in scripts
+- Dependency conflicts: Conda handles scientific packages better than venv
+- Version pinning: Use exact versions in requirements.txt for reproducibility
+
+### Development Scripts
+
+For local development, frontend package.json includes:
+```json
+{
+  "scripts": {
+    "dev:full": "concurrently \"cd ../backend && conda run -n qc-diffusion python main.py\" \"pnpm dev\""
+  }
+}
+```
+
+**Important**: Never use conda commands in deployment scripts - Vercel doesn't support Python.
+
+### Backend Deployment Options
+
+Since Vercel cannot host Python servers, deploy backend to:
+- **Railway** (recommended for FastAPI)
+- **Render**  
+- **AWS EC2/ECS**
+- **DigitalOcean**
+
+Configure frontend to connect to backend via environment variables in production.

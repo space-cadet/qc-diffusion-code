@@ -7,7 +7,7 @@
     "dev": "node scripts/copy-memory-bank.js && vite",
     "build": "node scripts/copy-memory-bank.js && tsc -b && vite build",
     "preview": "vite preview",
-    "dev:full": "concurrently \"cd ../backend && source .venv/bin/activate && python main.py\" \"pnpm dev\"",
+    "dev:full": "concurrently \"cd ../backend && conda run -n qc-diff python main.py\" \"pnpm dev\"",
     "test": "pnpm exec vitest run",
     "test:watch": "vitest --watch",
     "clean": "rm -rf node_modules dist"
