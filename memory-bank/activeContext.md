@@ -1,16 +1,19 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-30 19:45:00 IST*
+*Last Updated: 2026-02-16 05:27:33 IST*
 
 ## Current Focus
-**Task**: T32 Python Backend Environment Setup and Documentation
-**Status**: 🔄 IN PROGRESS - Documentation created, task file and registry updated
+**Task**: T33 - Boundary Growth: Panel Size, Symmetric Simplices, Boundary Conditions Fix
+**Status**: ✅ COMPLETED - All three issues fixed, built and pushed to claude/boundary-growth-simplicial-egRHn
 
-**Recent Completion**: T30b - Simplicial Boundary Conditions & 3D Tet Strip Fix ✅ COMPLETED
+**Recent Completion**: T33 - Boundary Growth Visualization Fixes ✅ COMPLETED
 
 ## Immediate Context
-T32 documentation completed - Created comprehensive Python backend environment setup guide, updated Vercel deployment plan with Python environment section, added task to registry with proper schema compliance. All memory bank files updated following v6.12 protocol.
+T33 completed: Fixed three issues in Simplicial Growth -> Boundary Growth tab:
+1. Panel size: max-w-2xl wrapper + canvas reduced to 600x400
+2. Symmetric simplices (default on): equilateral placement via edgeLen*sqrt(3)/2 for 2D; regular tet via avgEdgeLen*sqrt(2/3) for 3D; UI toggle checkbox added
+3. Boundary conditions: minY→maxY axis inversion fix for screen y-down; relative 2% threshold; dynamic frozen set recomputed per step() for bottom-and-sides mode
 
 T31 completed: Comprehensive mobile UI overhaul including bottom icon navigation bar with hamburger overflow menu, compact MetricsGrid (3-col mobile), slide-in parameter drawer, simulation controls repositioned below visualization, responsive canvas sizing via ResizeObserver, compact visualization info panel, and memory bank viewer scroll fixes.
 

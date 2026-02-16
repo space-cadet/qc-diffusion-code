@@ -65,6 +65,7 @@ export interface BoundaryGrowthParams {
   growthScale: number;
   tentProbability: number; // 0-1, rest is glue probability
   preventOverlap: boolean;
+  symmetricSimplices: boolean; // T33: enforce equilateral/regular simplex shape on glue
   initialState: InitialStateType;
   stripLength: number; // number of triangles/tets in strip (3-20)
   boundaryConstraints?: {
