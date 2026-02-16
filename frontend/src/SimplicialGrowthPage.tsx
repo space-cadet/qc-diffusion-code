@@ -256,7 +256,7 @@ const BoundaryGrowthTab: React.FC = () => {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [params, setParams] = React.useState<BoundaryGrowthParams>({
     dimension: 2, maxSteps: 200, growthScale: 80, tentProbability: 0.3,
-    preventOverlap: false, initialState: 'single-simplex', stripLength: 8,
+    preventOverlap: false, symmetricSimplices: true, initialState: 'single-simplex', stripLength: 8,
     boundaryConstraints: {
       mode: 'none',
       customFrozenElementIds: new Set<number>(),
@@ -384,6 +384,9 @@ const BoundaryGrowthTab: React.FC = () => {
         { label: 'Prevent Overlap', type: 'checkbox' as const, value: params.preventOverlap,
           onChange: (val: boolean) => handleParamChange('preventOverlap', val),
           hint: 'Reject overlapping simplices' },
+        { label: 'Symmetric Simplices', type: 'checkbox' as const, value: params.symmetricSimplices,
+          onChange: (val: boolean) => handleParamChange('symmetricSimplices', val),
+          hint: 'Enforce equilateral/regular shape on all new simplices' },
       ],
     },
     {
@@ -413,11 +416,11 @@ const BoundaryGrowthTab: React.FC = () => {
         <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
           <h2 className="text-lg sm:text-xl font-semibold mb-3">Visualization</h2>
           {simulation.currentState ? (
-            <div>
+            <div className="max-w-2xl">
               {params.dimension === 3 ? (
-                <SimplicialVisualization3D complex={simulation.currentState.complex} width={700} height={500} responsive />
+                <SimplicialVisualization3D complex={simulation.currentState.complex} width={600} height={400} responsive />
               ) : (
-                <SimplicialVisualization complex={simulation.currentState.complex} width={700} height={500} responsive />
+                <SimplicialVisualization complex={simulation.currentState.complex} width={600} height={400} responsive />
               )}
               {simulation.currentState.frozenBoundaryElements.size > 0 && (
                 <div className="mt-2 text-sm text-gray-600">

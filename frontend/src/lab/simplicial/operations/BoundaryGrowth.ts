@@ -338,12 +338,14 @@ export interface GlueResult {
 /**
  * Glue a new triangle onto a 2D boundary edge.
  * Creates a new vertex displaced outward from the boundary edge.
+ * When symmetric=true, uses edge length to form an equilateral triangle (T33).
  */
 export function glueTriangle2D(
   topo: SimplicialComplexTopology,
   geometry: SimplicialComplexGeometry,
   edgeId: number,
   scale: number,
+  symmetric = false,
 ): GlueResult {
   const edge = topo.edges.get(edgeId);
   if (!edge) return { success: false, error: 'Edge not found' };
@@ -359,11 +361,21 @@ export function glueTriangle2D(
   const midX = (p0.x + p1.x) / 2;
   const midY = (p0.y + p1.y) / 2;
 
-  // Place new vertex at midpoint + normal * scale
+  // T33: symmetric mode uses edge length to form equilateral triangle
+  let displacement: number;
+  if (symmetric) {
+    const edgeLen = Math.sqrt((p1.x - p0.x) ** 2 + (p1.y - p0.y) ** 2);
+    displacement = edgeLen * Math.sqrt(3) / 2;
+    console.debug(`[BoundaryGrowth] glueTriangle2D symmetric: edgeLen=${edgeLen.toFixed(1)}, h=${displacement.toFixed(1)}`);
+  } else {
+    displacement = scale;
+  }
+
+  // Place new vertex at midpoint + normal * displacement
   const newVId = addVertex(topo);
   geometry.positions.set(newVId, {
-    x: midX + normal.x * scale,
-    y: midY + normal.y * scale,
+    x: midX + normal.x * displacement,
+    y: midY + normal.y * displacement,
   });
 
   // Add edges
@@ -380,12 +392,14 @@ export function glueTriangle2D(
 /**
  * Glue a new tetrahedron onto a 3D boundary face.
  * Creates a new vertex displaced outward from the boundary face.
+ * When symmetric=true, uses avg face edge length to form a regular tet (T33).
  */
 export function glueTetrahedron3D(
   topo: SimplicialComplexTopology,
   geometry: SimplicialComplexGeometry,
   faceId: number,
   scale: number,
+  symmetric = false,
 ): GlueResult {
   const face = topo.faces.get(faceId);
   if (!face) return { success: false, error: 'Face not found' };
@@ -403,12 +417,25 @@ export function glueTetrahedron3D(
   const centY = (p0.y + p1.y + p2.y) / 3;
   const centZ = ((p0.z ?? 0) + (p1.z ?? 0) + (p2.z ?? 0)) / 3;
 
-  // Place new vertex at centroid + normal * scale
+  // T33: symmetric mode uses avg edge length for regular tetrahedron height
+  let displacement: number;
+  if (symmetric) {
+    const edgeLen01 = Math.sqrt((p1.x-p0.x)**2 + (p1.y-p0.y)**2 + ((p1.z??0)-(p0.z??0))**2);
+    const edgeLen12 = Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2 + ((p2.z??0)-(p1.z??0))**2);
+    const edgeLen20 = Math.sqrt((p0.x-p2.x)**2 + (p0.y-p2.y)**2 + ((p0.z??0)-(p2.z??0))**2);
+    const avgEdgeLen = (edgeLen01 + edgeLen12 + edgeLen20) / 3;
+    displacement = avgEdgeLen * Math.sqrt(2 / 3);
+    console.debug(`[BoundaryGrowth] glueTetrahedron3D symmetric: avgEdge=${avgEdgeLen.toFixed(1)}, h=${displacement.toFixed(1)}`);
+  } else {
+    displacement = scale;
+  }
+
+  // Place new vertex at centroid + normal * displacement
   const newVId = addVertex(topo);
   geometry.positions.set(newVId, {
-    x: centX + (normal.x) * scale,
-    y: centY + (normal.y) * scale,
-    z: centZ + (normal.z ?? 0) * scale,
+    x: centX + (normal.x) * displacement,
+    y: centY + (normal.y) * displacement,
+    z: centZ + (normal.z ?? 0) * displacement,
   });
 
   // Add edges from face vertices to new vertex
@@ -589,7 +616,7 @@ export function getBottomAndSideBoundaries2D(
   const boundaryEdges = getBoundaryEdges2D(topo);
   if (boundaryEdges.length === 0) return [];
 
-  let minY = Infinity;
+  let maxY = -Infinity; // T33 fix: bottom = highest y in screen coords (y-down)
   let maxX = -Infinity;
   let minX = Infinity;
 
@@ -601,13 +628,16 @@ export function getBottomAndSideBoundaries2D(
     const p1 = geometry.positions.get(v1);
     if (!p0 || !p1) continue;
 
-    minY = Math.min(minY, p0.y, p1.y);
+    maxY = Math.max(maxY, p0.y, p1.y);
     maxX = Math.max(maxX, p0.x, p1.x);
     minX = Math.min(minX, p0.x, p1.x);
   }
 
+  // Use relative threshold (1% of x-span) to handle varied coordinate scales
+  const xSpan = maxX - minX;
+  const threshold = Math.max(0.5, xSpan * 0.02);
+
   const frozen: number[] = [];
-  const threshold = 0.1; // tolerance for edge proximity
 
   for (const eId of boundaryEdges) {
     const edge = topo.edges.get(eId);
@@ -617,8 +647,8 @@ export function getBottomAndSideBoundaries2D(
     const p1 = geometry.positions.get(v1);
     if (!p0 || !p1) continue;
 
-    // Check if bottom (lowest y) or side (x extremes)
-    const isBottom = Math.abs(p0.y - minY) < threshold || Math.abs(p1.y - minY) < threshold;
+    // Bottom = highest y in screen coords; sides = x extremes
+    const isBottom = Math.abs(p0.y - maxY) < threshold || Math.abs(p1.y - maxY) < threshold;
     const isSide = Math.abs(p0.x - maxX) < threshold || Math.abs(p1.x - maxX) < threshold ||
                    Math.abs(p0.x - minX) < threshold || Math.abs(p1.x - minX) < threshold;
 

@@ -108,6 +108,15 @@ export class BoundaryGrowthController
       throw new Error('Controller not initialized');
     }
 
+    // T33: Recompute frozen boundaries dynamically each step for bottom-and-sides mode
+    const constraintMode = this.params.boundaryConstraints?.mode ?? 'none';
+    if (constraintMode === 'bottom-and-sides') {
+      const frozenIds = this.params.dimension === 2
+        ? getBottomAndSideBoundaries2D(this.topology, this.geometry)
+        : getBottomAndSideBoundaries3D(this.topology, this.geometry);
+      this.frozenBoundaryElements = new Set(frozenIds);
+    }
+
     const moveType: BoundaryMoveType =
       Math.random() < this.params.tentProbability ? 'tent' : 'glue';
 
@@ -182,9 +191,9 @@ export class BoundaryGrowthController
 
   /**
    * Compute candidate new vertex position for a 2D glue without mutating topology.
-   * Returns null if position cannot be computed.
+   * T33: respects symmetric flag for equilateral placement.
    */
-  private computeCandidatePosition2D(edgeId: number, scale: number): { p0: VertexPosition; p1: VertexPosition; newP: VertexPosition } | null {
+  private computeCandidatePosition2D(edgeId: number, scale: number, symmetric: boolean): { p0: VertexPosition; p1: VertexPosition; newP: VertexPosition } | null {
     if (!this.topology || !this.geometry) return null;
     const edge = this.topology.edges.get(edgeId);
     if (!edge) return null;
@@ -198,13 +207,17 @@ export class BoundaryGrowthController
 
     const midX = (p0.x + p1.x) / 2;
     const midY = (p0.y + p1.y) / 2;
-    return { p0, p1, newP: { x: midX + normal.x * scale, y: midY + normal.y * scale } };
+    const displacement = symmetric
+      ? Math.sqrt((p1.x - p0.x) ** 2 + (p1.y - p0.y) ** 2) * Math.sqrt(3) / 2
+      : scale;
+    return { p0, p1, newP: { x: midX + normal.x * displacement, y: midY + normal.y * displacement } };
   }
 
   /**
    * Compute candidate new vertex position for a 3D glue without mutating topology.
+   * T33: respects symmetric flag for regular tetrahedron placement.
    */
-  private computeCandidatePosition3D(faceId: number, scale: number): { faceVerts: VertexPosition[]; newP: VertexPosition } | null {
+  private computeCandidatePosition3D(faceId: number, scale: number, symmetric: boolean): { faceVerts: VertexPosition[]; newP: VertexPosition } | null {
     if (!this.topology || !this.geometry) return null;
     const face = this.topology.faces.get(faceId);
     if (!face) return null;
@@ -220,9 +233,16 @@ export class BoundaryGrowthController
     const cx = (p0.x + p1.x + p2.x) / 3;
     const cy = (p0.y + p1.y + p2.y) / 3;
     const cz = ((p0.z ?? 0) + (p1.z ?? 0) + (p2.z ?? 0)) / 3;
+    let displacement = scale;
+    if (symmetric) {
+      const e01 = Math.sqrt((p1.x-p0.x)**2 + (p1.y-p0.y)**2 + ((p1.z??0)-(p0.z??0))**2);
+      const e12 = Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2 + ((p2.z??0)-(p1.z??0))**2);
+      const e20 = Math.sqrt((p0.x-p2.x)**2 + (p0.y-p2.y)**2 + ((p0.z??0)-(p2.z??0))**2);
+      displacement = ((e01 + e12 + e20) / 3) * Math.sqrt(2 / 3);
+    }
     return {
       faceVerts: [p0, p1, p2],
-      newP: { x: cx + normal.x * scale, y: cy + normal.y * scale, z: cz + (normal.z ?? 0) * scale },
+      newP: { x: cx + normal.x * displacement, y: cy + normal.y * displacement, z: cz + (normal.z ?? 0) * displacement },
     };
   }
 
@@ -233,6 +253,7 @@ export class BoundaryGrowthController
 
     const scale = this.params.growthScale;
     const checkOverlap = this.params.preventOverlap;
+    const symmetric = this.params.symmetricSimplices ?? true; // T33: default on
 
     if (this.params.dimension === 2) {
       if (moveType === 'glue') {
@@ -253,7 +274,7 @@ export class BoundaryGrowthController
           }
 
           if (checkOverlap) {
-            const candidate = this.computeCandidatePosition2D(edgeId, scale);
+            const candidate = this.computeCandidatePosition2D(edgeId, scale, symmetric);
             if (candidate) {
               const overlaps = trianglesOverlap2D(candidate.p0, candidate.p1, candidate.newP, this.topology, this.geometry);
               if (overlaps) {
@@ -263,7 +284,7 @@ export class BoundaryGrowthController
             }
           }
 
-          return glueTriangle2D(this.topology, this.geometry, edgeId, scale);
+          return glueTriangle2D(this.topology, this.geometry, edgeId, scale, symmetric);
         }
         return { success: false, error: 'All glue attempts overlapped' };
       } else {
@@ -296,7 +317,7 @@ export class BoundaryGrowthController
           }
 
           if (checkOverlap) {
-            const candidate = this.computeCandidatePosition3D(faceId, scale);
+            const candidate = this.computeCandidatePosition3D(faceId, scale, symmetric);
             if (candidate) {
               const allPos = [...candidate.faceVerts, candidate.newP];
               const minDist = scale * 0.3;
@@ -307,7 +328,7 @@ export class BoundaryGrowthController
             }
           }
 
-          return glueTetrahedron3D(this.topology, this.geometry, faceId, scale);
+          return glueTetrahedron3D(this.topology, this.geometry, faceId, scale, symmetric);
         }
         return { success: false, error: 'All glue attempts overlapped' };
       } else {
