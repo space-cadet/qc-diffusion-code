@@ -1,7 +1,25 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-02-09 20:51:40 IST*
+*Last Updated: 2026-05-09 04:46:47 IST*
+
+**04:46:47 IST - T25: Screenshot Verification and Critical Bug Fixes**
+
+- Created `memory-bank/edits/2026-05-09/044647-T25-memory-bank-async.md` - Memory Bank async loading fix
+- Created `memory-bank/edits/2026-05-09/044647-T25-backend-requirements.md` - Backend requirements fix
+- Created `memory-bank/edits/2026-05-09/044647-T25-websocket-verify.md` - WebSocket route verification
+- Created `memory-bank/sessions/2026-05-09-early.md` - Session documentation
+- Modified `backend/requirements.txt` - Fixed `python-multipart` → `python3-multipart`
+- Modified `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` - Async rewrite with loading states
+- Modified `frontend/src/memoryBank/components/Sidebar.tsx` - Added loading/error UI
+- Modified `frontend/src/memoryBank/components/FileListView.tsx` - Added loading state
+- Modified `frontend/src/memoryBank/components/FileGridView.tsx` - Added loading state
+- Modified `memory-bank/activeContext.md` - Updated with T25 completion
+- Modified `memory-bank/progress.md` - Added recent completions
+- Modified `memory-bank/session_cache.md` - Updated session to 2026-05-09-early
+- Created `scripts/test-websocket.ts` - WebSocket connection verification script
+- Created `scripts/capture-tabs.ts` - Playwright screenshot capture script
+- Captured screenshots: 01-pde-simulation.png, 02-random-walk.png, 03-quantum-walk.png, 04-simplicial-growth.png, 05-memory-bank.png, 06-analysis.png
 
 ### 2026-02-09
 

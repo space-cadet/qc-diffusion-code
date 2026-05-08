@@ -8,6 +8,7 @@ import { useFolderNavigation } from "../hooks/useFolderNavigation";
 import { FileGridItem } from "./FileGridItem";
 import { ViewModeToggle } from "../pages/MemoryBankPage";
 import { SearchBar } from "./SearchBar";
+import { useMemoryBankDocs } from "../hooks/useMemoryBankDocs";
 
 interface FileGridViewProps {
   onSelectDoc: (filePath: string) => void;
@@ -24,6 +25,7 @@ function ChevronRight({ className }: { className?: string }) {
 }
 
 export function FileGridView({ onSelectDoc, viewMode, setViewMode }: FileGridViewProps) {
+  const memoryBankData = useMemoryBankDocs();
   const {
     currentPath,
     breadcrumbs,
@@ -31,6 +33,14 @@ export function FileGridView({ onSelectDoc, viewMode, setViewMode }: FileGridVie
     navigateToFolder,
     navigateToBreadcrumb,
   } = useFolderNavigation("root");
+
+  if (memoryBankData.isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading documents...</div>
+      </div>
+    );
+  }
 
   console.log("[MemoryBank:GridView] path:", currentPath);
 

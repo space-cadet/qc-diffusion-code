@@ -1,54 +1,17 @@
 /**
  * useMemoryBankDocs Hook
- * Static imports for memory bank data fetching and caching
+ * Async imports for memory bank data fetching with loading state
  */
 
-import { useMemo } from "react";
-import { ParsedDoc, DocCategory, MemoryBankIndex, SearchEntry } from "../types";
-import { detectFileType, getFileExtension, formatFileSize } from "../utils/fileTypeUtils";
+import { useState, useEffect, useMemo } from "react";
+import { detectFileType } from "../utils/fileTypeUtils";
+import type { IndexCategory, IndexFile } from "../types";
 
-export interface IndexCategory {
-  name: string;
-  displayName: string;
-  files: IndexFile[];
-  subcategories?: IndexCategory[];
-}
-
-export interface IndexFile {
-  fileName: string;
-  filePath: string;
-  title: string;
-  created: string;
-  updated: string;
-  size?: number;
-  mimeType?: string;
-  modified?: string;
-}
-
-export interface ParsedDocument {
-  fileName: string;
-  filePath: string;
-  title: string;
-  created: string;
-  updated: string;
-  sections: DocSection[];
-  content: string;
-}
-
-export interface DocSection {
-  id: string;
-  level: number;
-  title: string;
-  content: string;
-}
-
-export interface SearchResult {
-  fileName: string;
-  filePath: string;
-  title: string;
-  section?: string;
-  context: string;
-  matchType: "title" | "section" | "content";
+export interface MemoryBankData {
+  categories: IndexCategory[];
+  lastUpdated: string;
+  isLoading: boolean;
+  error: string | null;
 }
 
 // Helper functions
@@ -57,21 +20,10 @@ function extractTitle(content: string): string | null {
   return match ? match[1] : null;
 }
 
-function extractDate(content: string): Date | null {
-  // Look for date patterns in frontmatter or content
-  const dateMatch = content.match(/(?:^|\n)[*#]\s*[*]Updated[*]:?\s*(.+?)(?:\n|$)/im) ||
-                    content.match(/(?:^|\n)date:\s*(.+?)(?:\n|$)/im);
-  if (dateMatch) {
-    const date = new Date(dateMatch[1].trim());
-    return isNaN(date.getTime()) ? null : date;
-  }
-  return null;
-}
-
-function parseSections(content: string): DocSection[] {
-  const sections: DocSection[] = [];
+function parseSections(content: string) {
+  const sections = [];
   const lines = content.split('\n');
-  let currentSection: DocSection | null = null;
+  let currentSection = null;
   let sectionContent = '';
   
   for (let i = 0; i < lines.length; i++) {
@@ -79,13 +31,10 @@ function parseSections(content: string): DocSection[] {
     const headerMatch = line.match(/^(#{2,6})\s+(.+)$/);
     
     if (headerMatch) {
-      // Save previous section
       if (currentSection) {
         currentSection.content = sectionContent.trim();
         sections.push(currentSection);
       }
-      
-      // Start new section
       currentSection = {
         id: `section-${sections.length}`,
         level: headerMatch[1].length,
@@ -98,7 +47,6 @@ function parseSections(content: string): DocSection[] {
     }
   }
   
-  // Save last section
   if (currentSection) {
     currentSection.content = sectionContent.trim();
     sections.push(currentSection);
@@ -107,38 +55,6 @@ function parseSections(content: string): DocSection[] {
   return sections;
 }
 
-function getContext(content: string, query: string, sectionTitle?: string): string {
-  const lines = content.split('\n');
-  const queryLower = query.toLowerCase();
-  
-  if (sectionTitle) {
-    // Find section and get content around it
-    const sectionStart = lines.findIndex(line => 
-      line.toLowerCase().includes(sectionTitle.toLowerCase())
-    );
-    
-    if (sectionStart !== -1) {
-      const start = Math.max(0, sectionStart - 1);
-      const end = Math.min(lines.length, sectionStart + 4);
-      return lines.slice(start, end).join('\n').trim();
-    }
-  }
-  
-  // Find first occurrence of query and get context
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].toLowerCase().includes(queryLower)) {
-      const start = Math.max(0, i - 1);
-      const end = Math.min(lines.length, i + 3);
-      return lines.slice(start, end).join('\n').trim();
-    }
-  }
-  
-  return content.substring(0, 200) + '...';
-}
-
-/**
- * Helper function to build hierarchical category structure
- */
 function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
   const categoryMap = new Map<string, IndexCategory>();
   const rootCategories: IndexCategory[] = [];
@@ -148,18 +64,16 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
     const parts = file.filePath.split('/');
     
     if (parts.length === 1) {
-      // Root level file - add to root files list
       rootFiles.push(file);
     } else {
-      // File in subdirectory - build hierarchy
       const categoryName = parts[0];
-      let currentCategory: IndexCategory | undefined;
+      let currentCategory;
       
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
         
         if (!categoryMap.has(part)) {
-          const newCategory: IndexCategory = {
+          const newCategory = {
             name: part,
             displayName: part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, ' '),
             files: [],
@@ -167,7 +81,6 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
           };
           categoryMap.set(part, newCategory);
           
-          // Add to parent's subcategories or root
           if (i === 0) {
             rootCategories.push(newCategory);
           } else if (currentCategory) {
@@ -179,14 +92,12 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
         currentCategory = categoryMap.get(part);
       }
       
-      // Add file to the deepest category
       if (currentCategory) {
         currentCategory.files.push(file);
       }
     }
   }
 
-  // Add root files to a root category if any exist
   if (rootFiles.length > 0) {
     rootCategories.unshift({
       name: 'root',
@@ -200,114 +111,116 @@ function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
 }
 
 /**
- * Fetch all memory bank categories and files using static imports
+ * Async hook to fetch all memory bank categories and files
  */
-export function useMemoryBankDocs() {
-  return useMemo(() => {
-    const modules = import.meta.glob('/memory-bank/**/*', { query: '?url', import: 'default', eager: true });
-    const rootFiles: IndexFile[] = [];
-    const subdirectoryFiles: IndexFile[] = [];
-    const folderSet = new Set<string>();
+export function useMemoryBankDocs(): MemoryBankData {
+  const [data, setData] = useState<MemoryBankData>({
+    categories: [],
+    lastUpdated: '',
+    isLoading: true,
+    error: null
+  });
 
-    // Load metadata file
-    let fileMetadata: Record<string, { size: number; modified: string }> = {};
-    try {
-      const metadataModule = import.meta.glob('/memory-bank/metadata.json', { query: '?raw', import: 'default', eager: true });
-      const metadataPath = '/memory-bank/metadata.json';
-      const metadataContent = metadataModule[metadataPath] as string;
-      if (metadataContent) {
-        fileMetadata = JSON.parse(metadataContent);
-      }
-    } catch (e) {
-      console.warn('[MemoryBank] Could not load metadata.json:', e);
-    }
-
-    for (const [path, url] of Object.entries(modules)) {
-      const relativePath = path.replace('/memory-bank/', '');
-      const parts = relativePath.split('/');
-      const fileName = parts[parts.length - 1];
-      
-      // Skip directories and hidden files
-      if (!fileName || fileName.startsWith('.')) continue;
-      
-      // Skip metadata.json itself
-      if (fileName === 'metadata.json') continue;
-      
-      // Track folders
-      if (parts.length > 1) {
-        folderSet.add(parts[0]);
-      }
-      
-      let categoryName: string;
-      let filePath: string;
-      
-      // Get file metadata
-      const metadata = fileMetadata[relativePath];
-      const fileSize = metadata?.size || 0;
-      const fileModified = metadata?.modified || new Date().toISOString();
-      
-      if (parts.length === 1) {
-        // Root level file
-        categoryName = 'root';
-        filePath = relativePath;
-        rootFiles.push({
-          fileName,
-          filePath: relativePath,
-          title: fileName,
-          created: fileModified,
-          updated: fileModified,
-          size: fileSize,
-          mimeType: detectFileType(fileName).mimeType,
-          modified: fileModified
+  useEffect(() => {
+    let cancelled = false;
+    
+    async function loadDocs() {
+      try {
+        // Use dynamic import instead of eager glob
+        const modules = import.meta.glob('/memory-bank/**/*', { 
+          query: '?url', 
+          import: 'default'
         });
-      } else {
-        // File in subdirectory
-        categoryName = parts[0];
-        filePath = parts.slice(1).join('/');
-        subdirectoryFiles.push({
-          fileName,
-          filePath: relativePath,
-          title: fileName,
-          created: fileModified,
-          updated: fileModified,
-          size: fileSize,
-          mimeType: detectFileType(fileName).mimeType,
-          modified: fileModified
+        
+        const rawModules = import.meta.glob('/memory-bank/**/*', { 
+          query: '?raw', 
+          import: 'default'
         });
+        
+        const rootFiles: IndexFile[] = [];
+        const subdirectoryFiles: IndexFile[] = [];
+        const folderSet = new Set<string>();
+
+        // Load all modules asynchronously
+        const entries = await Promise.all(
+          Object.entries(modules).map(async ([path, loader]) => {
+            try {
+              const url = await loader();
+              return { path, url: url as string };
+            } catch (e) {
+              console.warn(`[MemoryBank] Failed to load ${path}:`, e);
+              return null;
+            }
+          })
+        );
+
+        for (const entry of entries) {
+          if (!entry) continue;
+          
+          const { path, url } = entry;
+          const relativePath = path.replace('/memory-bank/', '');
+          const parts = relativePath.split('/');
+          const fileName = parts[parts.length - 1];
+          
+          if (!fileName || fileName.startsWith('.')) continue;
+          if (fileName === 'metadata.json') continue;
+          
+          if (parts.length > 1) {
+            folderSet.add(parts[0]);
+          }
+          
+          const fileData: IndexFile = {
+            fileName,
+            filePath: relativePath,
+            title: fileName,
+            created: new Date().toISOString(),
+            updated: new Date().toISOString(),
+            mimeType: detectFileType(fileName).mimeType
+          };
+          
+          if (parts.length === 1) {
+            rootFiles.push(fileData);
+          } else {
+            subdirectoryFiles.push(fileData);
+          }
+        }
+
+        const categories = buildCategoryStructure(subdirectoryFiles);
+        
+        if (rootFiles.length > 0) {
+          categories.unshift({
+            name: 'root',
+            displayName: 'Files',
+            files: rootFiles,
+            subcategories: []
+          });
+        }
+
+        if (!cancelled) {
+          setData({
+            categories,
+            lastUpdated: new Date().toISOString(),
+            isLoading: false,
+            error: null
+          });
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setData(prev => ({
+            ...prev,
+            isLoading: false,
+            error: e instanceof Error ? e.message : 'Failed to load memory bank'
+          }));
+        }
       }
     }
-
-    // Build hierarchical structure from subdirectory files
-    const categories = buildCategoryStructure(subdirectoryFiles);
-
-    // Add root files as a separate category at the beginning
-    if (rootFiles.length > 0) {
-      categories.unshift({
-        name: 'root',
-        displayName: 'Files',
-        files: rootFiles,
-        subcategories: []
-      });
-    }
-
-    // Add empty folders (folders with no files)
-    for (const folderName of folderSet) {
-      const exists = categories.some(cat => cat.name === folderName);
-      if (!exists) {
-        categories.push({
-          name: folderName,
-          displayName: folderName.charAt(0).toUpperCase() + folderName.slice(1).replace(/-/g, ' '),
-          files: [],
-          subcategories: []
-        });
-      }
-    }
-
-    return {
-      categories,
-      lastUpdated: new Date().toISOString()
-    };
+    
+    loadDocs();
+    
+    return () => { cancelled = true; };
   }, []);
+
+  return data;
 }
 
 /**
