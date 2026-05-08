@@ -7,6 +7,12 @@
 **Task**: T33 - Boundary Growth: Panel Size, Symmetric Simplices, Boundary Conditions Fix
 **Status**: ✅ COMPLETED - All three issues fixed, built and pushed to claude/boundary-growth-simplicial-egRHn
 
+**Recent Finding**: T25 Critical Bugs Verified Fixed (2026-05-09)
+- P3-006 (Graph physics frozen on GPU): ✅ Fixed in commit 7d9ef07
+- P1-011 (ReplayControls hardcoded data): ✅ Fixed in commit 7d9ef07  
+- P1-007 (Animation startup race condition): ✅ Fixed in commit 7d9ef07
+- T25 task status updated to COMPLETED, remaining subtasks (T25b-d) still pending
+
 **Recent Completion**: T33 - Boundary Growth Visualization Fixes ✅ COMPLETED
 
 ## Immediate Context
