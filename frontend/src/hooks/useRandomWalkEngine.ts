@@ -121,6 +121,7 @@ export function useRandomWalkEngine({
     gridLayoutParams.graphSize,
     useNewEngine,
     useStreamingObservables,
+    useGPU,
   ]);
 
   // Update physics parameters when store changes
