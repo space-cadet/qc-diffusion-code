@@ -103,7 +103,7 @@ export class WebGLRendererPlugin implements IContainerPlugin {
   /**
    * Called when container starts.
    */
-  start(): void {
+  async start(): Promise<void> {
     // WebGL renderer is ready
   }
 

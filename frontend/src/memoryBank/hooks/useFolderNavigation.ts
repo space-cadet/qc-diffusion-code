@@ -6,7 +6,7 @@
 
 import { useState, useMemo } from "react";
 import { useMemoryBankDocs } from "./useMemoryBankDocs";
-import type { IndexCategory, IndexFile } from "./useMemoryBankDocs";
+import { IndexCategory, IndexFile } from "./useMemoryBankDocs";
 
 export interface BreadcrumbItem {
   name: string;

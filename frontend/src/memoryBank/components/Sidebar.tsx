@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useMemoryBankDocs } from "../hooks/useMemoryBankDocs";
-import type { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
+import { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
 
 interface SidebarProps {
   selectedDoc: string | null;

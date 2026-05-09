@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useMemoryBankSearch } from "../hooks/useMemoryBankDocs";
-import type { SearchResult } from "../hooks/useMemoryBankDocs";
+import { SearchResult } from "../hooks/useMemoryBankDocs";
 
 interface SearchBarProps {
   onSelectResult: (filePath: string) => void;

@@ -5,7 +5,43 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { detectFileType } from "../utils/fileTypeUtils";
-import type { IndexCategory, IndexFile } from "../types";
+// Local types (not exported from ../types)
+export interface IndexCategory {
+  name: string;
+  displayName: string;
+  files: IndexFile[];
+  subcategories?: IndexCategory[];
+}
+
+export interface IndexFile {
+  name: string;
+  path: string;
+  title: string;
+  type: string;
+  size: number;
+  modified: string;
+  category: string;
+}
+
+export interface SearchResult {
+  fileName: string;
+  filePath: string;
+  title: string;
+  context: string;
+  matchType: 'title' | 'section' | 'content';
+}
+
+export interface ParsedDocument {
+  fileName: string;
+  filePath: string;
+  title: string;
+  created: string;
+  updated: string;
+  sections: { id: string; level: number; title: string; content: string }[];
+  content: string;
+  mimeType: string;
+  displayMode: string;
+}
 
 export interface MemoryBankData {
   categories: IndexCategory[];
@@ -47,6 +83,25 @@ export interface MemoryBankData {
 }
 
 // Helper functions
+function extractTitle(content: string): string | null {
+  const match = content.match(/^#\s+(.+)$/m);
+  return match ? match[1] : null;
+}
+
+function extractDate(content: string): Date | null {
+  const match = content.match(/(?:created|updated|date):\s*(.+)/i);
+  return match ? new Date(match[1]) : null;
+}
+
+function getContext(content: string, query: string, sectionTitle?: string): string {
+  const lowerQuery = query.toLowerCase();
+  const lowerContent = content.toLowerCase();
+  const idx = lowerContent.indexOf(lowerQuery);
+  if (idx === -1) return '';
+  const start = Math.max(0, idx - 50);
+  const end = Math.min(content.length, idx + query.length + 50);
+  return content.slice(start, end).trim();
+}
 function extractTitle(content: string): string | null {
   const match = content.match(/^#\s+(.+)$/m);
   return match ? match[1] : null;
