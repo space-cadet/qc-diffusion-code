@@ -1,28 +1,29 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 13:15:00 IST*
+*Last Updated: 2026-05-09 14:37:00 IST*
 
 ## Current Focus
-**Task**: T27 - Clean Rewrite — Pure WebGL + New Physics Engine
-**Status**: 🔄 IN PROGRESS — Core architecture working, Vercel build fixes ongoing
+**Task**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
+**Status**: 🔄 IN PROGRESS — Build succeeds, particles frozen, strategies missing
 **Priority**: HIGH
 
-**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. Built clean V2 architecture with PhysicsEngineV2 + WebGLRendererV2. TypeScript compiles clean locally. Multiple rounds of Vercel build fixes applied (6 rounds so far). Some TypeScript errors remain to be fixed in next session.
+**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. Built clean V2 architecture with WebGLRendererV2 + original PhysicsEngine. TypeScript compiles clean. Build and deploy succeed. Two remaining issues identified for next session:
 
-**New Architecture**:
-- `PhysicsEngineV2`: owns particles (created once, updated in place)
-- `WebGLRendererV2`: draws particles directly with GPU (no tsParticles)
-- `usePhysicsEngine` / `useWebGLRenderer`: React hooks
-- `ParticleCanvasV2`: canvas component
-- `RandomWalkSimV2`: main component (wired into App.tsx)
-- `RandomWalkParameterPanelV2`: decoupled parameter panel (no simulatorRef)
+1. **Particles frozen** — animation loop may have closure issue or engine step not advancing time
+2. **Missing walk strategies** — parameter panel doesn't show CTRW, Ballistic, etc. strategy selection
+
+**Architecture Evolution**:
+- Started with: `PhysicsEngineV2` (hardcoded ballistic) + `WebGLRendererV2`
+- **Current**: Original `PhysicsEngine` (full strategy system) + `WebGLRendererV2`
+- New adapter: `useOriginalPhysicsEngine.ts` bridges original engine to V2 renderer
 
 **Files Created**:
-- `frontend/src/physics/PhysicsEngineV2.ts`
+- `frontend/src/physics/PhysicsEngineV2.ts` (kept as fallback)
 - `frontend/src/webgl/WebGLRendererV2.ts`
-- `frontend/src/hooks/usePhysicsEngine.ts`
+- `frontend/src/hooks/usePhysicsEngine.ts` (V2 wrapper)
 - `frontend/src/hooks/useWebGLRenderer.ts`
+- `frontend/src/hooks/useOriginalPhysicsEngine.ts` (NEW — wraps original engine)
 - `frontend/src/components/ParticleCanvasV2.tsx`
 - `frontend/src/RandomWalkSimV2.tsx`
 - `frontend/src/components/RandomWalkParameterPanelV2.tsx`
@@ -31,31 +32,34 @@
 - `frontend/src/App.tsx` — imports RandomWalkSimV2
 - `frontend/src/stores/appStore.ts` — exported RandomWalkSimulationState
 - `frontend/src/physics/types/BoundaryConfig.ts` — kept 'reflective' type
-- `frontend/src/hooks/useParticlesLoader.ts` — type fixes
+- `frontend/src/hooks/useParticlesLoader.ts` — type fixes (as unknown as ParticlesLoader)
 - `frontend/src/hooks/useRandomWalkControls.ts` — type fixes
 - `frontend/src/components/WebGLCanvas.tsx` — canvas.id fix
 - `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` — complete rewrite with types
 - `frontend/src/memoryBank/components/*` — import fixes
 
-**Current State**: Particles render and move locally. Vercel deployment has remaining TypeScript errors to fix.
+**Current State**: 
+- Build: ✅ Compiles clean locally and on Vercel
+- Deploy: ✅ Successful
+- Motion: ❌ Particles frozen, time indicator not advancing
+- Strategies: ❌ Parameter panel missing strategy selection (CTRW, Ballistic, etc.)
 
-**Branch**: `cloud-claw/screenshot-poc` (merged from t27-webgl-rewrite)
+**Branch**: `cloud-claw/screenshot-poc`
 
-**Immediate Next Step**: Fix remaining Vercel build errors in new session
+**Immediate Next Step**: Fix frozen particles and add strategy selection to parameter panel in new session
 
 ## Recent Completed Work
 
-### T27: Clean Architecture Implementation + Vercel Build Fixes (6 rounds)
+### T27: Clean Architecture + Original Engine Integration (7 rounds of fixes)
 - PhysicsEngineV2 with particle creation, step, boundaries, collisions
 - WebGLRendererV2 with shaders, buffers, draw call
 - React hooks for orchestration
 - Component integration with App.tsx
 - RandomWalkParameterPanelV2 (decoupled from simulatorRef)
-- TypeScript compiles clean locally
-- Initial render shows particles correctly
-- Start/Pause/Reset buttons work
-- Particles move when simulation runs
-- **Build fixes applied**: RandomWalkSimulationState export, BoundaryType consistency, useParticlesLoader types, memory bank type exports, various cast fixes
+- **useOriginalPhysicsEngine.ts**: New hook wrapping original PhysicsEngine with full strategy system
+- **adaptParticles()**: Converts original Particle[] to SimpleParticle[] for WebGL renderer
+- TypeScript compiles clean locally and on Vercel
+- Build fixes applied: RandomWalkSimulationState export, BoundaryType consistency, useParticlesLoader types, memory bank type exports, various cast fixes, double cast (unknown → ParticlesLoader)
 
 ### T31: Mobile UI Responsiveness and Design
 - Mobile bottom icon navigation bar (4 primary + hamburger overflow)
