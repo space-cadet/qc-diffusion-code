@@ -388,7 +388,7 @@ export const useParticlesLoader = ({
       getGPUManager: () => gpuManagerRef.current as GPUParticleManager | null,
       setGraphPhysicsRef,
     }
-  ) as ParticlesLoader;
+  ) as unknown as ParticlesLoader;
 
   return particlesLoader;
 };
