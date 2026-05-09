@@ -117,7 +117,7 @@ export function useRandomWalkControls({
     if (simulatorRef.current) {
       simulatorRef.current.reset();
       // Reset all registered observables
-      const observableManager = (simulatorRef.current as { observableManager?: { reset: () => void } }).observableManager;
+      const observableManager = (simulatorRef.current as unknown as { observableManager?: { reset: () => void } }).observableManager;
       if (observableManager) {
         observableManager.reset();
       }

@@ -51,21 +51,21 @@ export default function RandomWalkSimV2() {
   }), [gridLayoutParams]);
 
   const handleStart = () => {
-    setRandomWalkSimulationState({ isRunning: true });
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: true, status: 'Running' });
   };
 
   const handlePause = () => {
-    setRandomWalkSimulationState({ isRunning: false });
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, status: 'Paused' });
   };
 
   const handleReset = () => {
-    setRandomWalkSimulationState({ isRunning: false, time: 0 });
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, status: 'Stopped' });
     // The ParticleCanvasV2 will handle reset internally via key change
   };
 
   const handleInitialize = () => {
     // Force remount of ParticleCanvasV2 to reinitialize particles
-    setRandomWalkSimulationState({ status: "initialized" });
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, status: 'Initialized' });
   };
 
   const onLayoutChange = (layout: any) => {

@@ -14,6 +14,38 @@ export interface MemoryBankData {
   error: string | null;
 }
 
+export interface IndexCategory {
+  name: string;
+  displayName: string;
+  files: IndexFile[];
+  subcategories?: IndexCategory[];
+}
+
+export interface IndexFile {
+  name: string;
+  path: string;
+  title: string;
+  type: string;
+  size: number;
+  modified: string;
+  category: string;
+}
+
+export interface SearchResult {
+  fileName: string;
+  filePath: string;
+  title: string;
+  context: string;
+  matchType: 'title' | 'section' | 'content';
+}
+
+export interface MemoryBankData {
+  categories: IndexCategory[];
+  lastUpdated: string;
+  isLoading: boolean;
+  error: string | null;
+}
+
 // Helper functions
 function extractTitle(content: string): string | null {
   const match = content.match(/^#\s+(.+)$/m);

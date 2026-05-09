@@ -110,7 +110,7 @@ export const WebGLCanvas: React.FC<WebGLCanvasProps> = ({
 
     try {
       const container = await tsParticles.load({
-        id: canvas,
+        id: canvas.id,
         options,
       });
 

@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import type { Container } from '@tsparticles/engine';
-import type { GPUParticleManager } from '../gpu/GPUParticleManager';
+import { GPUParticleManager } from '../gpu/GPUParticleManager';
 import type { RandomWalkSimulator } from '../physics/RandomWalkSimulator';
 import type { RandomWalkParams } from '../types/simulationTypes';
 import { updateParticlesFromStrategies } from '../config/tsParticlesConfig';
@@ -262,7 +262,7 @@ export const useParticlesLoader = ({
             (container as { _frameCounter?: number })._frameCounter!++;
             (window as { _gpuFrameCount?: number })._gpuFrameCount = (container as { _frameCounter?: number })._frameCounter!; // Fallback for GPUSync
             
-            const hasMapper = !!gpuManagerRef.current.canvasMapper;
+            const hasMapper = !!gpuManagerRef.current?.canvasMapper;
             if ((container as { _frameCounter?: number })._frameCounter! % 100 === 0) {
               console.log('[useParticlesLoader Log] GPU Sync loop:', {
                 frameCount: (container as { _frameCounter?: number })._frameCounter,
@@ -278,9 +278,9 @@ export const useParticlesLoader = ({
           }
         } else {
           // CPU mode - update particles from strategies
-          // Defensive: if particleManager not set yet, retry next frame
-          if (!particleManager) {
-            console.warn('[CPU] particleManager not set yet, skipping sync');
+          // Defensive: if simulator not set yet, retry next frame
+          if (!simulatorRef.current) {
+            console.warn('[CPU] Simulator not set yet, skipping sync');
           } else {
             updateParticlesFromStrategies(container, true, isRunning || false);
           }
@@ -339,7 +339,7 @@ export const useParticlesLoader = ({
             gpuManagerRef.current.updateParameters(initialParams);
             console.log('[GPU] Initial boundary parameters applied:', bounds);
 
-            const particles = simulatorRef.current.getParticleManager().getAllParticles();
+            const particles = simulatorRef.current?.getParticleManager?.()?.getAllParticles?.() || [];
             gpuManagerRef.current.initializeParticles(particles);
             console.log('[GPU] GPU manager initialized with', particles.length, 'particles');
 

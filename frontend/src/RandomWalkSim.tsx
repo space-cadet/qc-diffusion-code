@@ -49,7 +49,7 @@ export default function RandomWalkSim() {
     const collisionsRef = useRef(0);
     const renderEnabledRef = useRef(true);
 
-    const setSimulationState = (state: SimulationState | ((prev: SimulationState) => SimulationState)) => {
+    const setSimulationState = (state: RandomWalkSimulationState | ((prev: RandomWalkSimulationState) => RandomWalkSimulationState)) => {
         if (typeof state === 'function') {
             const newState = state(randomWalkSimulationState);
             setRandomWalkSimulationState({
