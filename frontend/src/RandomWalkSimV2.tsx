@@ -125,8 +125,9 @@ export default function RandomWalkSimV2() {
           <div key="export">
             <ExportPanel
               simulationState={randomWalkSimulationState}
-              timeRef={timeRef}
-              collisionsRef={collisionsRef}
+              onExport={() => console.log('Export')}
+              onCopy={() => console.log('Copy')}
+              onShare={() => console.log('Share')}
             />
           </div>
         </ReactGridLayout>

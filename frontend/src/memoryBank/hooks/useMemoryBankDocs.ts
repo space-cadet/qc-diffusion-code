@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { detectFileType } from "../utils/fileTypeUtils";
+
 // Local types (not exported from ../types)
 export interface IndexCategory {
   name: string;
@@ -21,6 +22,11 @@ export interface IndexFile {
   size: number;
   modified: string;
   category: string;
+  filePath?: string;
+  fileName?: string;
+  mimeType?: string;
+  created?: string;
+  updated?: string;
 }
 
 export interface SearchResult {
@@ -29,6 +35,7 @@ export interface SearchResult {
   title: string;
   context: string;
   matchType: 'title' | 'section' | 'content';
+  section?: string;
 }
 
 export interface ParsedDocument {
@@ -41,38 +48,6 @@ export interface ParsedDocument {
   content: string;
   mimeType: string;
   displayMode: string;
-}
-
-export interface MemoryBankData {
-  categories: IndexCategory[];
-  lastUpdated: string;
-  isLoading: boolean;
-  error: string | null;
-}
-
-export interface IndexCategory {
-  name: string;
-  displayName: string;
-  files: IndexFile[];
-  subcategories?: IndexCategory[];
-}
-
-export interface IndexFile {
-  name: string;
-  path: string;
-  title: string;
-  type: string;
-  size: number;
-  modified: string;
-  category: string;
-}
-
-export interface SearchResult {
-  fileName: string;
-  filePath: string;
-  title: string;
-  context: string;
-  matchType: 'title' | 'section' | 'content';
 }
 
 export interface MemoryBankData {
@@ -102,104 +77,7 @@ function getContext(content: string, query: string, sectionTitle?: string): stri
   const end = Math.min(content.length, idx + query.length + 50);
   return content.slice(start, end).trim();
 }
-function extractTitle(content: string): string | null {
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1] : null;
-}
 
-function parseSections(content: string) {
-  const sections = [];
-  const lines = content.split('\n');
-  let currentSection = null;
-  let sectionContent = '';
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const headerMatch = line.match(/^(#{2,6})\s+(.+)$/);
-    
-    if (headerMatch) {
-      if (currentSection) {
-        currentSection.content = sectionContent.trim();
-        sections.push(currentSection);
-      }
-      currentSection = {
-        id: `section-${sections.length}`,
-        level: headerMatch[1].length,
-        title: headerMatch[2].trim(),
-        content: ''
-      };
-      sectionContent = '';
-    } else if (currentSection) {
-      sectionContent += line + '\n';
-    }
-  }
-  
-  if (currentSection) {
-    currentSection.content = sectionContent.trim();
-    sections.push(currentSection);
-  }
-  
-  return sections;
-}
-
-function buildCategoryStructure(files: IndexFile[]): IndexCategory[] {
-  const categoryMap = new Map<string, IndexCategory>();
-  const rootCategories: IndexCategory[] = [];
-  const rootFiles: IndexFile[] = [];
-
-  for (const file of files) {
-    const parts = file.filePath.split('/');
-    
-    if (parts.length === 1) {
-      rootFiles.push(file);
-    } else {
-      const categoryName = parts[0];
-      let currentCategory;
-      
-      for (let i = 0; i < parts.length - 1; i++) {
-        const part = parts[i];
-        
-        if (!categoryMap.has(part)) {
-          const newCategory = {
-            name: part,
-            displayName: part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, ' '),
-            files: [],
-            subcategories: []
-          };
-          categoryMap.set(part, newCategory);
-          
-          if (i === 0) {
-            rootCategories.push(newCategory);
-          } else if (currentCategory) {
-            currentCategory.subcategories = currentCategory.subcategories || [];
-            currentCategory.subcategories.push(newCategory);
-          }
-        }
-        
-        currentCategory = categoryMap.get(part);
-      }
-      
-      if (currentCategory) {
-        currentCategory.files.push(file);
-      }
-    }
-  }
-
-  if (rootFiles.length > 0) {
-    rootCategories.unshift({
-      name: 'root',
-      displayName: 'Files',
-      files: rootFiles,
-      subcategories: []
-    });
-  }
-
-  return rootCategories;
-}
-
-/**
- * Async hook to fetch all memory bank categories and files
- */
 export function useMemoryBankDocs(): MemoryBankData {
   const [data, setData] = useState<MemoryBankData>({
     categories: [],
@@ -210,82 +88,58 @@ export function useMemoryBankDocs(): MemoryBankData {
 
   useEffect(() => {
     let cancelled = false;
-    
+
     async function loadDocs() {
       try {
-        // Use dynamic import instead of eager glob
-        const modules = import.meta.glob('/memory-bank/**/*', { 
-          query: '?url', 
-          import: 'default'
-        });
-        
-        const rawModules = import.meta.glob('/memory-bank/**/*', { 
-          query: '?raw', 
-          import: 'default'
-        });
-        
+        setData(prev => ({ ...prev, isLoading: true, error: null }));
+
+        // Use Vite's import.meta.glob to discover files
+        const modules = import.meta.glob('/memory-bank/**/*', { query: '?url', import: 'default', eager: true });
+        const rawModules = import.meta.glob('/memory-bank/**/*', { query: '?raw', import: 'default', eager: true });
+
+        const files: IndexFile[] = [];
+        const categoryMap = new Map<string, IndexCategory>();
+        const rootCategories: IndexCategory[] = [];
         const rootFiles: IndexFile[] = [];
-        const subdirectoryFiles: IndexFile[] = [];
-        const folderSet = new Set<string>();
 
-        // Load all modules asynchronously
-        const entries = await Promise.all(
-          Object.entries(modules).map(async ([path, loader]) => {
-            try {
-              const url = await loader();
-              return { path, url: url as string };
-            } catch (e) {
-              console.warn(`[MemoryBank] Failed to load ${path}:`, e);
-              return null;
-            }
-          })
-        );
-
-        for (const entry of entries) {
-          if (!entry) continue;
-          
-          const { path, url } = entry;
+        for (const [path, url] of Object.entries(modules)) {
           const relativePath = path.replace('/memory-bank/', '');
           const parts = relativePath.split('/');
-          const fileName = parts[parts.length - 1];
-          
-          if (!fileName || fileName.startsWith('.')) continue;
-          if (fileName === 'metadata.json') continue;
-          
-          if (parts.length > 1) {
-            folderSet.add(parts[0]);
-          }
-          
+          const fileName = parts.pop() || '';
+          const category = parts.length > 0 ? parts[0] : 'root';
+
           const fileData: IndexFile = {
-            fileName,
-            filePath: relativePath,
-            title: fileName,
-            created: new Date().toISOString(),
-            updated: new Date().toISOString(),
-            mimeType: detectFileType(fileName).mimeType
+            name: fileName,
+            path: relativePath,
+            title: fileName.replace('.md', ''),
+            type: detectFileType(fileName).displayMode,
+            size: (rawModules[path] as string)?.length || 0,
+            modified: new Date().toISOString(),
+            category
           };
-          
-          if (parts.length === 1) {
+
+          files.push(fileData);
+
+          if (category === 'root') {
             rootFiles.push(fileData);
           } else {
-            subdirectoryFiles.push(fileData);
+            if (!categoryMap.has(category)) {
+              const newCategory: IndexCategory = {
+                name: category,
+                displayName: category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                files: [],
+                subcategories: []
+              };
+              categoryMap.set(category, newCategory);
+              rootCategories.push(newCategory);
+            }
+            categoryMap.get(category)?.files.push(fileData);
           }
-        }
-
-        const categories = buildCategoryStructure(subdirectoryFiles);
-        
-        if (rootFiles.length > 0) {
-          categories.unshift({
-            name: 'root',
-            displayName: 'Files',
-            files: rootFiles,
-            subcategories: []
-          });
         }
 
         if (!cancelled) {
           setData({
-            categories,
+            categories: rootCategories,
             lastUpdated: new Date().toISOString(),
             isLoading: false,
             error: null
@@ -301,9 +155,9 @@ export function useMemoryBankDocs(): MemoryBankData {
         }
       }
     }
-    
+
     loadDocs();
-    
+
     return () => { cancelled = true; };
   }, []);
 
@@ -315,7 +169,7 @@ export function useMemoryBankDocs(): MemoryBankData {
  */
 export function useMemoryBankCategory(category: string) {
   const { categories } = useMemoryBankDocs();
-  
+
   return useMemo(() => {
     const foundCategory = categories.find(cat => cat.name === category);
     return {
@@ -337,16 +191,16 @@ export function useMemoryBankDocument(category: string, file: string) {
       const fileName = file.endsWith('.md') ? file : `${file}`;
       filePath = `/memory-bank/${category}/${fileName}`;
     }
-    
+
     const url = modules[filePath] as string;
     const rawContent = rawModules[filePath] as string;
-    
+
     if (!url) {
       return undefined;
     }
 
     const fileType = detectFileType(file);
-    
+
     if (fileType.displayMode === 'markdown') {
       const content = rawContent as any;
       return {
@@ -407,13 +261,13 @@ export function useMemoryBankSearch(query: string) {
       const relativePath = path.replace('/memory-bank/', '');
       const fileName = relativePath.split('/').pop() || '';
       const fileType = detectFileType(fileName);
-      
+
       // Only search markdown files for content
       if (fileType.displayMode === 'markdown') {
         const content = url as any;
         const title = extractTitle(content) || fileName.replace('.md', '');
         const contentStr = content as string;
-        
+
         // Title match
         if (title.toLowerCase().includes(lowerQuery)) {
           results.push({
@@ -425,7 +279,7 @@ export function useMemoryBankSearch(query: string) {
           });
           continue;
         }
-        
+
         // Section match
         const sections = parseSections(contentStr);
         for (const section of sections) {
@@ -441,7 +295,7 @@ export function useMemoryBankSearch(query: string) {
             break;
           }
         }
-        
+
         // Content match
         if (contentStr.toLowerCase().includes(lowerQuery)) {
           results.push({
@@ -465,11 +319,50 @@ export function useMemoryBankSearch(query: string) {
         }
       }
     }
-    
+
     return {
       query,
       resultCount: results.length,
       results
     };
-  }, [categories, query]);
+  }, [query, categories]);
+}
+
+function parseSections(content: string) {
+  const sections = [];
+  const lines = content.split('\n');
+  let currentSection = null;
+  let sectionContent = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.startsWith('#')) {
+      if (currentSection) {
+        sections.push({
+          ...currentSection,
+          content: sectionContent.trim()
+        });
+      }
+      const level = line.match(/^#+/)?.[0].length || 1;
+      currentSection = {
+        id: `section-${i}`,
+        level,
+        title: line.replace(/^#+\s*/, ''),
+        content: ''
+      };
+      sectionContent = '';
+    } else if (currentSection) {
+      sectionContent += line + '\n';
+    }
+  }
+
+  if (currentSection) {
+    sections.push({
+      ...currentSection,
+      content: sectionContent.trim()
+    });
+  }
+
+  return sections;
 }

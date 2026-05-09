@@ -9,7 +9,7 @@ import { useAppStore } from '../stores/appStore';
 export interface ParticlesLoader {
   (container: Container): void;
   resetGPU: () => void;
-  initializeGPU: (particles: unknown[]) => void;
+  initializeGPU: (particles: { position: { x: number; y: number }; velocity: { vx: number; vy: number } }[]) => void;
   updateGPUParameters: (params: Record<string, unknown>) => void;
   getGPUManager: () => GPUParticleManager | null;
   setGraphPhysicsRef: (ref: GraphPhysicsRef | null) => void;
@@ -65,7 +65,7 @@ export const useParticlesLoader = ({
     graphPhysicsRef.current = ref;
   }, []);
 
-  const initializeGPU = useCallback((particles: unknown[]) => {
+  const initializeGPU = useCallback((particles: { position: { x: number; y: number }; velocity: { vx: number; vy: number } }[]) => {
     if (gpuManagerRef.current && particles.length > 0) {
       gpuManagerRef.current.initializeParticles(particles);
     }
@@ -262,7 +262,7 @@ export const useParticlesLoader = ({
             (container as { _frameCounter?: number })._frameCounter!++;
             (window as { _gpuFrameCount?: number })._gpuFrameCount = (container as { _frameCounter?: number })._frameCounter!; // Fallback for GPUSync
             
-            const hasMapper = !!gpuManagerRef.current?.canvasMapper;
+            const hasMapper = !!(gpuManagerRef.current as any).canvasMapper;
             if ((container as { _frameCounter?: number })._frameCounter! % 100 === 0) {
               console.log('[useParticlesLoader Log] GPU Sync loop:', {
                 frameCount: (container as { _frameCounter?: number })._frameCounter,

@@ -18,6 +18,7 @@ import { useTemperatureHandler } from './hooks/useTemperatureHandler';
 import { useRandomWalkEngine } from './hooks/useRandomWalkEngine';
 import { useRandomWalkControls } from './hooks/useRandomWalkControls';
 import { useRandomWalkPanels } from './hooks/useRandomWalkPanels';
+import type { RandomWalkSimulationState } from './stores/appStore';
 import { useRandomWalkStateSync } from './lib/useRandomWalkStateSync';
 // CSS imports
 import "react-grid-layout/css/styles.css";
