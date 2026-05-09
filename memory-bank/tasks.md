@@ -69,9 +69,9 @@
 
 ### T27: Clean Architecture Rewrite (Physics + WebGL)
 **Description**: Complete rewrite of Random Walk simulation with clean architecture: PhysicsEngineV2 (pure physics), WebGLRendererV2 (pure WebGL), React hooks for orchestration. Ditches tsParticles entirely.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 11:45:00 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 13:15:00 IST
 **Files**: `frontend/src/physics/PhysicsEngineV2.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `frontend/src/hooks/usePhysicsEngine.ts`, `frontend/src/hooks/useWebGLRenderer.ts`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`
-**Notes**: Core architecture built, parameter panel V2 created, compiles clean, particles render and move. Need to verify physics correctness (collision algorithms, random walk behavior).
+**Notes**: Core architecture built, parameter panel V2 created, compiles clean locally, particles render and move. Vercel deployment has remaining TypeScript errors (6 rounds of fixes applied, more needed). Branch merged into cloud-claw/screenshot-poc.
 
 ### T28: Simplicial Growth Algorithm Implementation
 **Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration
