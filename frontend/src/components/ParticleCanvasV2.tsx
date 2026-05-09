@@ -1,10 +1,10 @@
-import React, { useRef, useEffect, useCallback } from "react";
-import { usePhysicsEngine } from "../hooks/usePhysicsEngine";
+import React, { useRef, useEffect } from "react";
+import { useOriginalPhysicsEngine, adaptParticles } from "../hooks/useOriginalPhysicsEngine";
 import { useWebGLRenderer } from "../hooks/useWebGLRenderer";
-import type { EngineParamsV2 } from "../physics/PhysicsEngineV2";
+import type { EngineParams } from "../hooks/useOriginalPhysicsEngine";
 
 interface ParticleCanvasV2Props {
-  params: EngineParamsV2;
+  params: EngineParams;
   isRunning: boolean;
   onStatsUpdate?: (stats: { time: number; collisionCount: number; particleCount: number }) => void;
 }
@@ -18,7 +18,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   const animationFrameId = useRef<number | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
 
-  const { engineRef, step, reset, updateParams, getStats } = usePhysicsEngine({
+  const { engineRef, particlesRef, step, reset, updateParams, getStats } = useOriginalPhysicsEngine({
     params,
     isRunning,
   });
@@ -35,24 +35,25 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
 
   // Animation loop - runs continuously, physics steps only when running
   useEffect(() => {
-    let animationFrameId: number;
+    let animFrameId: number;
     let lastTime = performance.now();
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animFrameId = requestAnimationFrame(animate);
 
       const now = performance.now();
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
 
       // Step physics only if running
-      if (isRunning && engineRef.current) {
-        engineRef.current.step(dt);
+      if (isRunning) {
+        step(dt);
       }
 
       // Always render
-      if (engineRef.current) {
-        render(engineRef.current.particles);
+      const particles = particlesRef.current;
+      if (particles.length > 0) {
+        render(adaptParticles(particles));
       }
 
       // Report stats
@@ -62,12 +63,12 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
       }
     };
 
-    animationFrameId = requestAnimationFrame(animate);
+    animFrameId = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animFrameId);
     };
-  }, [isRunning, render, engineRef, getStats, onStatsUpdate]);
+  }, [isRunning, render, step, engineRef, getStats, onStatsUpdate]);
 
   // Handle resize
   useEffect(() => {

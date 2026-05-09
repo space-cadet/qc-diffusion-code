@@ -6,7 +6,7 @@ import { HistoryPanel } from "./components/HistoryPanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvasV2 } from "./components/ParticleCanvasV2";
 import { RandomWalkHeader } from "./components/RandomWalkHeader";
-import type { EngineParamsV2 } from "./physics/PhysicsEngineV2";
+import type { EngineParams } from "./hooks/useOriginalPhysicsEngine";
 // CSS imports
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -27,8 +27,8 @@ export default function RandomWalkSimV2() {
   const timeRef = useRef(0);
   const collisionsRef = useRef(0);
 
-  // Convert gridLayoutParams to EngineParamsV2
-  const engineParams: EngineParamsV2 = useMemo(() => ({
+  // Convert gridLayoutParams to EngineParams
+  const engineParams: EngineParams = useMemo(() => ({
     particleCount: gridLayoutParams.particles,
     dimension: gridLayoutParams.dimension,
     canvasWidth: 800,
@@ -38,8 +38,10 @@ export default function RandomWalkSimV2() {
     temperature: gridLayoutParams.temperature,
     boundaryCondition: gridLayoutParams.boundaryCondition as "reflective" | "absorbing" | "periodic",
     interparticleCollisions: gridLayoutParams.interparticleCollisions,
-    collisionRadius: gridLayoutParams.collisionRate,
+    collisionRate: gridLayoutParams.collisionRate,
+    collisionRadius: gridLayoutParams.collisionRate || 5,
     initialDistType: gridLayoutParams.initialDistType || "uniform",
+    strategyType: (gridLayoutParams as any).strategyType,
     distSigmaX: gridLayoutParams.distSigmaX,
     distSigmaY: gridLayoutParams.distSigmaY,
     distR0: gridLayoutParams.distR0,
