@@ -34,43 +34,6 @@ interface WindowRect {
   zIndex: number
 }
 
-interface RandomWalkSimulationState {
-  isRunning: boolean
-  time: number
-  collisions: number
-  interparticleCollisions: number
-  status: 'Running' | 'Paused' | 'Stopped' | 'Initialized'
-  particleData: Array<{
-    id: string
-    position: { x: number; y: number }
-    velocity: { vx: number; vy: number }
-    collisionCount: number
-    lastCollisionTime: number
-    waitingTime: number
-  }> | null
-  densityHistory: Array<{
-    time: number
-    density: number[][]
-    bounds: { xMin: number; xMax: number; yMin: number; yMax: number }
-  }>
-  observableData: Record<string, any>
-  selectedHistoryIndex: number
-  history: Array<{
-    startTime: number
-    endTime: number
-    parameters: RandomWalkParams
-    particleData: RandomWalkSimulationState['particleData']
-    densityHistory: RandomWalkSimulationState['densityHistory']
-    observableData: RandomWalkSimulationState['observableData']
-  }>
-  gpuState?: {
-    positions: Float32Array
-    velocities: Float32Array
-    collisionCount: number
-    simulationTime: number
-  }
-}
-
 export interface RandomWalkSimulationState {
   isRunning: boolean
   time: number

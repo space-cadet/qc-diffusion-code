@@ -67,7 +67,7 @@ export const useParticlesLoader = ({
 
   const initializeGPU = useCallback((particles: { position: { x: number; y: number }; velocity: { vx: number; vy: number } }[]) => {
     if (gpuManagerRef.current && particles.length > 0) {
-      gpuManagerRef.current.initializeParticles(particles);
+      gpuManagerRef.current.initializeParticles(particles as any);
     }
   }, []);
 
@@ -385,7 +385,7 @@ export const useParticlesLoader = ({
       resetGPU,
       initializeGPU,
       updateGPUParameters,
-      getGPUManager: () => gpuManagerRef.current,
+      getGPUManager: () => gpuManagerRef.current as GPUParticleManager | null,
       setGraphPhysicsRef,
     }
   );
