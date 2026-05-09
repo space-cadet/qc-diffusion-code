@@ -44,9 +44,10 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
     const diffusionCoefficient = gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate);
     // Calculate effective values from density data
     const densityData = gridLayoutParams.dimension === '1D' ? densityData1D : densityData2D;
-    const maxDensity = densityData ? Math.max(...densityData.density.flat()) : 0;
+    const flatDensity = densityData?.density?.flat?.() ?? [];
+    const maxDensity = flatDensity.length > 0 ? Math.max(...flatDensity) : 0;
     const totalBins = densityData ? (gridLayoutParams.dimension === '1D' ? (densityData.density as any[]).length : (densityData.density as any[]).length * ((densityData.density as any[])[0]?.length || 0)) : 0;
-    const occupiedBins = densityData ? densityData.density.flat().filter((d) => d > 0).length : 0;
+    const occupiedBins = flatDensity.filter((d: number) => d > 0).length;
     const spreadRatio = totalBins > 0 ? occupiedBins / totalBins : 0;
     // Auto-update density when simulation is running
     useEffect(() => {

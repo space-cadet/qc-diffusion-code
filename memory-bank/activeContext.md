@@ -1,51 +1,53 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 07:27:00 IST*
+*Last Updated: 2026-05-09 11:45:00 IST*
 
 ## Current Focus
-**Task**: T33 - Boundary Growth: Panel Size, Symmetric Simplices, Boundary Conditions Fix
-**Status**: ✅ COMPLETED - All three issues fixed, built and pushed to claude/boundary-growth-simplicial-egRHn
+**Task**: T27 - Clean Rewrite — Pure WebGL + New Physics Engine
+**Status**: 🔄 IN PROGRESS — Core architecture working, needs physics verification
+**Priority**: HIGH
 
-**Recent Finding**: T25 Critical Bugs Verified Fixed (2026-05-09)
-- P3-006 (Graph physics frozen on GPU): ✅ Fixed in commit 7d9ef07
-- P1-011 (ReplayControls hardcoded data): ✅ Fixed in commit 7d9ef07  
-- P1-007 (Animation startup race condition): ✅ Fixed in commit 7d9ef07
-- T25 task status updated to COMPLETED, remaining subtasks (T25b-d) still pending
+**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. Built clean V2 architecture with PhysicsEngineV2 + WebGLRendererV2. TypeScript compiles clean. Initial render shows particles. Start/Pause works. Parameter panel V2 created and integrated.
 
-**Recent Completion**: T25 Screenshot Verification (2026-05-09)
-- Memory Bank async loading fix: `useMemoryBankDocs.ts` rewritten with async `import()`
-- Backend requirements fixed: `python3-multipart` package name corrected
-- WebSocket route verified working: `/ws/simulate` connects successfully
-- All 6 tabs captured in screenshots confirming UI functionality
-- Edit history chunks created following integrated rules v6.12
-- Changes committed to `cloud-claw/screenshot-poc` branch
+**New Architecture**:
+- `PhysicsEngineV2`: owns particles (created once, updated in place)
+- `WebGLRendererV2`: draws particles directly with GPU (no tsParticles)
+- `usePhysicsEngine` / `useWebGLRenderer`: React hooks
+- `ParticleCanvasV2`: canvas component
+- `RandomWalkSimV2`: main component (wired into App.tsx)
+- `RandomWalkParameterPanelV2`: decoupled parameter panel (no simulatorRef)
 
-**Recent Completion**: T25 Screenshot Verification (2026-05-09)
-- Memory Bank async loading fix: `useMemoryBankDocs.ts` rewritten with async `import()`
-- Backend requirements fixed: `python3-multipart` package name corrected
-- WebSocket route verified working: `/ws/simulate` connects successfully
-- All 6 tabs captured in screenshots confirming UI functionality
-- Edit history chunks created following integrated rules v6.12
-- Changes committed to `cloud-claw/screenshot-poc` branch
+**Files Created**:
+- `frontend/src/physics/PhysicsEngineV2.ts`
+- `frontend/src/webgl/WebGLRendererV2.ts`
+- `frontend/src/hooks/usePhysicsEngine.ts`
+- `frontend/src/hooks/useWebGLRenderer.ts`
+- `frontend/src/components/ParticleCanvasV2.tsx`
+- `frontend/src/RandomWalkSimV2.tsx`
+- `frontend/src/components/RandomWalkParameterPanelV2.tsx`
 
-**Recent Completion**: T33 - Boundary Growth Visualization Fixes ✅ COMPLETED
+**Files Modified**:
+- `frontend/src/App.tsx` — imports RandomWalkSimV2
 
-## Immediate Context
-T33 completed: Fixed three issues in Simplicial Growth -> Boundary Growth tab:
-1. Panel size: max-w-2xl wrapper + canvas reduced to 600x400
-2. Symmetric simplices (default on): equilateral placement via edgeLen*sqrt(3)/2 for 2D; regular tet via avgEdgeLen*sqrt(2/3) for 3D; UI toggle checkbox added
-3. Boundary conditions: minY→maxY axis inversion fix for screen y-down; relative 2% threshold; dynamic frozen set recomputed per step() for bottom-and-sides mode
+**Current State**: Particles render and move. Need to verify physics correctness (collision algorithms, random walk behavior, boundary conditions).
 
-T31 completed: Comprehensive mobile UI overhaul including bottom icon navigation bar with hamburger overflow menu, compact MetricsGrid (3-col mobile), slide-in parameter drawer, simulation controls repositioned below visualization, responsive canvas sizing via ResizeObserver, compact visualization info panel, and memory bank viewer scroll fixes.
+**Branch**: `cloud-claw/t27-webgl-rewrite`
 
-## Current Working State
-- Active Tasks: 18 (T1, T2a, T2b, T3, T7, T7a, T8, T12, T15, T15a, T16, T17, T25, T27, T30, T30b, T32, META-1, META-2)
-- Completed Tasks: 23 (T0, T4, T5b, T6, T6a, T9, T10, T13, T14, T21, T21b, T24, T26, T28, T28a, T28b, T28c, T29, T29a, T30a, T30b, T31)
-- Current Focus: T32 - Python Backend Environment Setup and Documentation (documentation complete)
-- Branch: claude/boundary-growth-feature-GLCrk
+**Immediate Next Step**: Verify physics algorithms or commit current progress
 
 ## Recent Completed Work
+
+### T27: Clean Architecture Implementation
+- PhysicsEngineV2 with particle creation, step, boundaries, collisions
+- WebGLRendererV2 with shaders, buffers, draw call
+- React hooks for orchestration
+- Component integration with App.tsx
+- RandomWalkParameterPanelV2 (decoupled from simulatorRef)
+- TypeScript compiles clean
+- Initial render shows particles correctly
+- Start/Pause/Reset buttons work
+- Particles move when simulation runs
 
 ### T31: Mobile UI Responsiveness and Design
 - Mobile bottom icon navigation bar (4 primary + hamburger overflow)

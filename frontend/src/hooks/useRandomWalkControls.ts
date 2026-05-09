@@ -215,11 +215,22 @@ export function useRandomWalkControls({
       
       console.log("handleInitialize: adding particles", { count: particles.length });
 
+      // Clear existing particles before adding new ones
+      container.particles.clear();
+
       // Add to tsParticles in canvas coordinates
       for (const p of particles) {
         const canvasPos = pm.mapToCanvas(p.position);
         container.particles.addParticle({ x: canvasPos.x, y: canvasPos.y }, { color: { value: "#3b82f6" } });
       }
+
+      // Force a redraw to ensure particles are visible
+      container.draw(false);
+      console.log("handleInitialize: particles added, forced redraw", { 
+        count: container.particles.count,
+        canvasWidth: container.canvas.size.width,
+        canvasHeight: container.canvas.size.height,
+      });
 
       // Initialize GPU if in GPU mode - must happen AFTER particles are added to container
       if (useGPU && particlesLoaded.initializeGPU) {

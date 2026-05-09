@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import PdeParameterPanel from "./PdeParameterPanel";
 const PlotComponent = lazy(() => import("./PlotComponent"));
-const RandomWalkSim = lazy(() => import("./RandomWalkSim"));
+const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 const QuantumWalkPage = lazy(() => import("./QuantumWalkPage"));
 const QuantumWalkPageRefactored = lazy(() => import("./QuantumWalkPageRefactored"));
 const AnalysisPage = lazy(() => import("./components/AnalysisPage"));

@@ -50,8 +50,8 @@
 | T25b | Type Safety Improvements                         | 📝 PLANNED     | HIGH     | 2026-01-12 | T25 |
 | T25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | T25a |
 | T25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | T25c |
-| T26 | Build Performance Optimization and Bundle Size Reduction | ✅ COMPLETED | HIGH | 2026-01-19 | T21 | [Details](tasks/T26.md) |
-| T27 | Simulation Lab Framework | 🔄 IN PROGRESS | HIGH | 2026-01-19 | T7, T7a, T17, T18, T24 | [Details](tasks/T27.md) |
+| T26 | WebGL + tsParticles Visualization Rewrite | 📝 PLANNED | HIGH | 2026-05-09 | T25 | [Details](tasks/T26.md) |
+| T27 | Clean Architecture Rewrite (Physics + WebGL) | 🔄 IN PROGRESS | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
 | T28 | Simplicial Growth Algorithm Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T27 | [Details](tasks/T28.md) |
 | T28a | Simplicial Foundational Core Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28 | [Details](tasks/T28a.md) |
 | T28b | 2D Simplicial Pachner Moves Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28b.md) |
@@ -67,11 +67,11 @@
 
 ## Task Details
 
-### T27: Simulation Lab Framework
-**Description**: Design and implement shared simulation lab infrastructure for PDE, Classical Walk, Quantum Walk, and Simplicial Growth pages
-**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:53:56 IST
-**Files**: `memory-bank/implementation-details/simulation-lab-framework.md`, `memory-bank/implementation-details/shared-component-framework.md`, `frontend/src/lab/` (interfaces, components, hooks, services), `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/QuantumWalkPageRefactored.tsx`
-**Notes**: Framework validated by simplicial growth implementation. Core components working across all 4 simulation domains. Ready for PDE and Classical Walk migrations.
+### T27: Clean Architecture Rewrite (Physics + WebGL)
+**Description**: Complete rewrite of Random Walk simulation with clean architecture: PhysicsEngineV2 (pure physics), WebGLRendererV2 (pure WebGL), React hooks for orchestration. Ditches tsParticles entirely.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 11:45:00 IST
+**Files**: `frontend/src/physics/PhysicsEngineV2.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `frontend/src/hooks/usePhysicsEngine.ts`, `frontend/src/hooks/useWebGLRenderer.ts`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`
+**Notes**: Core architecture built, parameter panel V2 created, compiles clean, particles render and move. Need to verify physics correctness (collision algorithms, random walk behavior).
 
 ### T28: Simplicial Growth Algorithm Implementation
 **Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration

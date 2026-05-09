@@ -127,6 +127,10 @@ export function useRandomWalkEngine({
   // Update physics parameters when store changes
   useEffect(() => {
     if (simulatorRef.current) {
+      // Get actual canvas size if container exists
+      const canvasWidth = tsParticlesContainerRef.current?.canvas?.size?.width || 800;
+      const canvasHeight = tsParticlesContainerRef.current?.canvas?.size?.height || 600;
+      
       simulatorRef.current.updateParameters({
         collisionRate: gridLayoutParams.collisionRate,
         jumpLength: gridLayoutParams.jumpLength,
@@ -150,12 +154,18 @@ export function useRandomWalkEngine({
         distNx: gridLayoutParams.distNx,
         distNy: gridLayoutParams.distNy,
         distJitter: gridLayoutParams.distJitter,
+        canvasWidth,
+        canvasHeight,
       });
 
+      // Update canvas size in particle manager
+      const pm = simulatorRef.current.getParticleManager();
+      (pm as any).setCanvasSize?.(canvasWidth, canvasHeight);
+
       // Re-connect particle manager after parameter updates
-      setParticleManager(simulatorRef.current.getParticleManager());
+      setParticleManager(pm);
     }
-  }, [gridLayoutParams, useGPU]);
+  }, [gridLayoutParams, useGPU, tsParticlesContainerRef]);
 
   return {
     simulatorRef,

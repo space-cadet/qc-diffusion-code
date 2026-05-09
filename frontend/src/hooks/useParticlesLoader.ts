@@ -45,6 +45,13 @@ export const useParticlesLoader = ({
   const animationFrameId = useRef<number | undefined>(undefined);
   const gpuManagerRef = useRef<GPUParticleManager | null>(null);
   const graphPhysicsRef = useRef<GraphPhysicsRef['current']>(null); // Add graph physics ref
+  // Use a local ref to avoid stale closure issues with gridLayoutParamsRef
+  const localGridLayoutParamsRef = useRef<RandomWalkParams | null>(null);
+  
+  // Keep local ref in sync with the passed ref
+  useEffect(() => {
+    localGridLayoutParamsRef.current = gridLayoutParamsRef.current;
+  }, [gridLayoutParamsRef]);
 
   const resetGPU = useCallback(() => {
     if (gpuManagerRef.current) {
@@ -76,11 +83,11 @@ export const useParticlesLoader = ({
       // Combine UI params with simulator bounds and collision state
       const fullParams: Record<string, unknown> = {
         ...params,
-        strategies: gridLayoutParamsRef.current?.strategies || [],
-        collisionRate: gridLayoutParamsRef.current?.collisionRate || 1.0,
-        jumpLength: gridLayoutParamsRef.current?.jumpLength || 1.0,
-        dimension: gridLayoutParamsRef.current?.dimension || '2D',
-        interparticleCollisions: gridLayoutParamsRef.current?.interparticleCollisions || false,
+        strategies: localGridLayoutParamsRef.current?.strategies || [],
+        collisionRate: localGridLayoutParamsRef.current?.collisionRate || 1.0,
+        jumpLength: localGridLayoutParamsRef.current?.jumpLength || 1.0,
+        dimension: localGridLayoutParamsRef.current?.dimension || '2D',
+        interparticleCollisions: localGridLayoutParamsRef.current?.interparticleCollisions || false,
         ...(bounds && { bounds }),
       };
 
@@ -194,7 +201,7 @@ export const useParticlesLoader = ({
         accumulatedTime += renderDeltaTime;
         
         // Use fixed physics timestep from store for stability
-        const physicsTimeStep = Math.max(1e-6, gridLayoutParamsRef.current?.dt ?? 0.01);
+        const physicsTimeStep = Math.max(1e-6, localGridLayoutParamsRef.current?.dt ?? 0.01);
 
         // Step physics multiple times if accumulated time allows
         while (accumulatedTime >= physicsTimeStep) {
@@ -206,7 +213,7 @@ export const useParticlesLoader = ({
           }
           
           // Also step graph physics if available and simulation type is graph (runs on both GPU and CPU paths)
-          if (graphPhysicsRef.current && gridLayoutParamsRef.current?.simulationType === 'graph') {
+          if (graphPhysicsRef.current && localGridLayoutParamsRef.current?.simulationType === 'graph') {
             graphPhysicsRef.current.step(physicsTimeStep);
           }
           
@@ -231,7 +238,7 @@ export const useParticlesLoader = ({
       }
 
     // PHASE B: Rendering - always render when container exists and animation enabled
-      if (container && gridLayoutParamsRef.current?.showAnimation !== false) {
+      if (container && localGridLayoutParamsRef.current?.showAnimation !== false) {
         if ((animate as { _frameCounter?: number })._frameCounter !== undefined && (animate as { _frameCounter?: number })._frameCounter! % 100 === 0) {
           console.log('[useParticlesLoader Log] Phase B Rendering', { 
             useGPU, 
@@ -271,7 +278,12 @@ export const useParticlesLoader = ({
           }
         } else {
           // CPU mode - update particles from strategies
-          updateParticlesFromStrategies(container, true, isRunning || false);
+          // Defensive: if particleManager not set yet, retry next frame
+          if (!particleManager) {
+            console.warn('[CPU] particleManager not set yet, skipping sync');
+          } else {
+            updateParticlesFromStrategies(container, true, isRunning || false);
+          }
         }
         
         // Always draw for smooth UI updates
@@ -301,11 +313,11 @@ export const useParticlesLoader = ({
     console.log('[GPU Debug] useGPU check:', { 
       useGPU, 
       hasGpuManager: !!gpuManagerRef.current,
-      gridLayoutParams: gridLayoutParamsRef.current 
+      gridLayoutParams: localGridLayoutParamsRef.current 
     });
     
     if (useGPU && !gpuManagerRef.current) {
-      const particleCount = gridLayoutParamsRef.current?.particles || 1000;
+      const particleCount = localGridLayoutParamsRef.current?.particles || 1000;
       console.log('[GPU] Creating GPU manager for', particleCount, 'particles');
       
       const htmlCanvas = container?.canvas?.element as HTMLCanvasElement | undefined;
@@ -320,8 +332,8 @@ export const useParticlesLoader = ({
           if (simulatorRef.current) {
             const bounds = simulatorRef.current.getBoundaryConfig();
             const initialParams: Record<string, unknown> = {
-              ...gridLayoutParamsRef.current,
-              interparticleCollisions: gridLayoutParamsRef.current?.interparticleCollisions || false,
+              ...localGridLayoutParamsRef.current,
+              interparticleCollisions: localGridLayoutParamsRef.current?.interparticleCollisions || false,
               ...(bounds && { bounds }),
             };
             gpuManagerRef.current.updateParameters(initialParams);
