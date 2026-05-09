@@ -55,6 +55,15 @@ export const createParticleContainer = async (
     throw new Error("Engine not initialized");
   }
 
+  // Ensure canvas has proper size before creating container
+  const rect = canvasElement.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    console.warn('[tsParticles] Canvas has zero size, waiting for layout...');
+    // Force a layout calculation
+    canvasElement.style.width = '100%';
+    canvasElement.style.height = '100%';
+  }
+
   const container = await engine.load({
     id: "manual-particles",
     element: canvasElement,
@@ -95,6 +104,14 @@ export const createParticleContainer = async (
   if (!container) {
     throw new Error("Failed to create container");
   }
+
+  // Log canvas size for debugging
+  console.log('[tsParticles] Canvas size after init:', {
+    width: container.canvas.size.width,
+    height: container.canvas.size.height,
+    elementWidth: canvasElement.offsetWidth,
+    elementHeight: canvasElement.offsetHeight,
+  });
 
   // Clear any default particles and create our own
   container.particles.clear();
@@ -229,8 +246,8 @@ export const updateParticlesFromStrategies = (
     // This case is normal during initialization, so we don't need to warn.
   }
 
-  // Trigger a redraw to render the changes without resetting particles
-  (container as any).draw?.(false);
+  // Force full redraw to ensure particles are rendered
+  (container as any).draw?.(true);
   _diagFrameCounter++;
 };
 

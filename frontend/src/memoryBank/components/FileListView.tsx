@@ -8,6 +8,7 @@ import { FileListItem } from "./FileListItem";
 import { ViewModeToggle } from "../pages/MemoryBankPage";
 import { SearchBar } from "./SearchBar";
 import { useState } from "react";
+import { useMemoryBankDocs } from "../hooks/useMemoryBankDocs";
 
 interface FileListViewProps {
   onSelectDoc: (filePath: string) => void;
@@ -39,6 +40,7 @@ function SortIcon({ direction }: { direction: "asc" | "desc" }) {
 }
 
 export function FileListView({ onSelectDoc, viewMode, setViewMode }: FileListViewProps) {
+  const memoryBankData = useMemoryBankDocs();
   const {
     currentPath,
     breadcrumbs,
@@ -50,6 +52,14 @@ export function FileListView({ onSelectDoc, viewMode, setViewMode }: FileListVie
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [showDetails, setShowDetails] = useState(true);
+
+  if (memoryBankData.isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading documents...</div>
+      </div>
+    );
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

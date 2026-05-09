@@ -69,6 +69,7 @@ export class RandomWalkSimulator {
       });
     }
     this.initializeParticles();
+    console.log('[RWS:init] Constructor complete, particles:', this.particleManager.getAllParticles().length);
   }
 
   private setupStrategies(): void {
@@ -142,7 +143,9 @@ export class RandomWalkSimulator {
   }
 
   private initializeParticles(): void {
+    console.log('[RWS] initializeParticles START', { count: this.parameterManager.particleCount });
     this.particleManager.clearAllParticles();
+    console.log('[RWS] after clear, particles:', this.particleManager.getAllParticles().length);
     const thermalVelocities = this.generateThermalVelocities(this.parameterManager.particleCount, this.parameterManager.dimension);
     const positions: {x: number, y: number}[] = [];
     
@@ -166,6 +169,7 @@ export class RandomWalkSimulator {
       };
       this.particleManager.initializeParticle(tsParticle);
     }
+    console.log('[RWS] initializeParticles END, particles:', this.particleManager.getAllParticles().length);
   }
 
   private generateThermalVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
@@ -225,6 +229,10 @@ export class RandomWalkSimulator {
         this.parameterManager.dimension
       );
       this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem);
+      
+      // CRITICAL: Always reinitialize particles when ParticleManager is recreated,
+      // otherwise particles are wiped and never restored
+      this.initializeParticles();
     }
     
     this.particleManager.setCanvasSize(this.parameterManager.canvasWidth, this.parameterManager.canvasHeight);
@@ -249,7 +257,8 @@ export class RandomWalkSimulator {
       this.setupSimulationRunner();
     }
 
-    if (needsReinitialization) {
+    // Only reinitialize if ParameterManager explicitly requested it AND we didn't already reinitialize above
+    if (needsReinitialization && !needsStrategyUpdate) {
       this.initializeParticles();
     }
   }

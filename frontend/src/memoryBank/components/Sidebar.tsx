@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useMemoryBankDocs } from "../hooks/useMemoryBankDocs";
-import type { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
+import { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
 
 interface SidebarProps {
   selectedDoc: string | null;
@@ -134,7 +134,23 @@ function CategoryItem({ category, selectedDoc, onSelectDoc, level = 0, parentSti
 export function Sidebar({ selectedDoc, onSelectDoc }: SidebarProps) {
   const memoryBankData = useMemoryBankDocs();
 
-  if (!memoryBankData || memoryBankData.categories.length === 0) {
+  if (memoryBankData.isLoading) {
+    return (
+      <div className="p-4 text-center text-gray-500 text-sm">
+        <div className="animate-pulse">Loading documents...</div>
+      </div>
+    );
+  }
+
+  if (memoryBankData.error) {
+    return (
+      <div className="p-4 text-center text-red-500 text-sm">
+        Error: {memoryBankData.error}
+      </div>
+    );
+  }
+
+  if (!memoryBankData.categories || memoryBankData.categories.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500 text-sm">
         No documents found

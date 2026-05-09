@@ -18,6 +18,7 @@ import { useTemperatureHandler } from './hooks/useTemperatureHandler';
 import { useRandomWalkEngine } from './hooks/useRandomWalkEngine';
 import { useRandomWalkControls } from './hooks/useRandomWalkControls';
 import { useRandomWalkPanels } from './hooks/useRandomWalkPanels';
+import type { RandomWalkSimulationState } from './stores/appStore';
 import { useRandomWalkStateSync } from './lib/useRandomWalkStateSync';
 // CSS imports
 import "react-grid-layout/css/styles.css";
@@ -28,8 +29,7 @@ export default function RandomWalkSim() {
     const storeValues = useAppStore();
     console.log('Full useAppStore return:', storeValues);
     console.log('setIsRunning in store:', 'setIsRunning' in storeValues);
-    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU, setSelectedHistoryIndex, setIsRunning } = storeValues;
-    console.log('useAppStore destructured values:', { setIsRunning: typeof setIsRunning });
+    const { gridLayoutParams, setGridLayoutParams, randomWalkSimLayouts, setRandomWalkSimLayouts, randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics, saveSimulationSnapshot, useNewEngine, useStreamingObservables, useGPU, setSelectedHistoryIndex } = storeValues;
     const { selectedHistoryIndex } = randomWalkSimulationState;
     const selectedRun = randomWalkSimulationState.history?.[selectedHistoryIndex] || null;
 
@@ -50,11 +50,9 @@ export default function RandomWalkSim() {
     const collisionsRef = useRef(0);
     const renderEnabledRef = useRef(true);
 
-    const setSimulationState = (state) => {
-        console.log('setSimulationState called, setIsRunning type:', typeof setIsRunning);
+    const setSimulationState = (state: RandomWalkSimulationState | ((prev: RandomWalkSimulationState) => RandomWalkSimulationState)) => {
         if (typeof state === 'function') {
             const newState = state(randomWalkSimulationState);
-            setIsRunning(newState.isRunning);
             setRandomWalkSimulationState({
                 isRunning: newState.isRunning,
                 time: newState.time,
@@ -69,7 +67,6 @@ export default function RandomWalkSim() {
             });
         }
         else {
-            setIsRunning(state.isRunning);
             setRandomWalkSimulationState({
                 isRunning: state.isRunning,
                 time: state.time,
@@ -107,8 +104,8 @@ export default function RandomWalkSim() {
     
     // Wire graph physics ref to particles loader after it's initialized
     useEffect(() => {
-        if (particlesLoaded && (particlesLoaded as any).setGraphPhysicsRef) {
-            (particlesLoaded as any).setGraphPhysicsRef(graphPhysicsRef);
+        if (particlesLoaded && particlesLoaded.setGraphPhysicsRef) {
+            particlesLoaded.setGraphPhysicsRef(graphPhysicsRef);
         }
     }, [particlesLoaded, graphPhysicsRef]);
     const { handleStart, handlePause, handleReset, handleInitialize } = useRandomWalkControls({
@@ -186,6 +183,26 @@ export default function RandomWalkSim() {
             catch { }
         }
     }, [isRunning]);
+
+    // Handle GPU mode switching - reinitialize when useGPU changes
+    useEffect(() => {
+        // Only act when sim is ready and we have a container
+        if (!simReady || !tsParticlesContainerRef.current) return;
+        
+        console.log('[GPU Mode Switch] useGPU changed to:', useGPU);
+        
+        // Stop current simulation
+        if (isRunning) {
+            setSimulationState((prev) => ({
+                ...prev,
+                isRunning: false,
+                status: 'Paused',
+            }));
+        }
+        
+        // Reinitialize with new GPU mode
+        handleInitialize();
+    }, [useGPU]);
     return (<div className="h-screen flex flex-col bg-gray-50">
       {/* Temperature change prompt */}
       {tempNotice && (<div className="fixed top-4 right-4 z-50 bg-amber-100 border border-amber-300 text-amber-900 px-3 py-2 rounded shadow">

@@ -1,7 +1,47 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-02-09 20:51:40 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
+
+**14:00:20 IST - T27: V2 parity fixes and memory-bank sync**
+
+- Created `memory-bank/edits/2026-05-09/140020-T27-memory-sync.md` - Edit chunk covering source changes and synchronized memory-bank updates for T27
+- Created `memory-bank/tasks/T27a.md` - Backfilled missing subtask file for Vercel/TypeScript strictness fixes
+- Created `memory-bank/tasks/T27b.md` - Backfilled missing subtask file for original engine integration
+- Created `memory-bank/tasks/T27c.md` - Backfilled missing subtask file for frozen-particles fix
+- Created `memory-bank/tasks/T27d.md` - Backfilled missing subtask file for strategy selector restoration
+- Created `memory-bank/tasks/T27e.md` - Backfilled missing subtask file for strategy propagation fix
+- Modified `frontend/src/App.tsx` - Restored scrollable route shell behavior for the random walk page
+- Modified `frontend/src/RandomWalkSimV2.tsx` - Wired engine controls, restored density panel, and updated V2 layout behavior
+- Modified `frontend/src/components/DensityComparison.tsx` - Made density panel tolerate the V2 engine path
+- Modified `frontend/src/components/ParticleCanvasV2.tsx` - Propagated live stats and V2 particle data outward
+- Modified `frontend/src/components/RandomWalkParameterPanelV2.tsx` - Restored distribution-specific controls and corrected boundary option wiring
+- Modified `frontend/src/hooks/useOriginalPhysicsEngine.ts` - Fixed initialization/reset behavior, visible motion path, and initial-distribution wiring
+- Modified `memory-bank/tasks/T27.md` - Updated parent task to reflect the real “Pure WebGL + Original Physics Engine” direction and latest parity fixes
+- Modified `memory-bank/tasks.md` - Added T27a-e detail links, restored missing T27e registry row, and synced T27 status notes
+- Modified `memory-bank/activeContext.md` - Updated current T27 state, parity fixes, and remaining strategy limitation
+- Modified `memory-bank/session_cache.md` - Moved current session to 2026-05-09-afternoon and synced branch/focus
+- Modified `memory-bank/sessions/2026-05-09-afternoon.md` - Appended control, scroll, density, and distribution restoration notes
+- Modified `memory-bank/implementation-details/t27-clean-architecture-rewrite.md` - Updated architecture doc to match the current original-engine adapter reality
+- Modified `memory-bank/edit_history.md` - Added synchronized T27 entry for code + memory updates
+
+**04:46:47 IST - T25: Screenshot Verification and Critical Bug Fixes**
+
+- Created `memory-bank/edits/2026-05-09/044647-T25-memory-bank-async.md` - Memory Bank async loading fix
+- Created `memory-bank/edits/2026-05-09/044647-T25-backend-requirements.md` - Backend requirements fix
+- Created `memory-bank/edits/2026-05-09/044647-T25-websocket-verify.md` - WebSocket route verification
+- Created `memory-bank/sessions/2026-05-09-early.md` - Session documentation
+- Modified `backend/requirements.txt` - Fixed `python-multipart` → `python3-multipart`
+- Modified `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` - Async rewrite with loading states
+- Modified `frontend/src/memoryBank/components/Sidebar.tsx` - Added loading/error UI
+- Modified `frontend/src/memoryBank/components/FileListView.tsx` - Added loading state
+- Modified `frontend/src/memoryBank/components/FileGridView.tsx` - Added loading state
+- Modified `memory-bank/activeContext.md` - Updated with T25 completion
+- Modified `memory-bank/progress.md` - Added recent completions
+- Modified `memory-bank/session_cache.md` - Updated session to 2026-05-09-early
+- Created `scripts/test-websocket.ts` - WebSocket connection verification script
+- Created `scripts/capture-tabs.ts` - Playwright screenshot capture script
+- Captured screenshots: 01-pde-simulation.png, 02-random-walk.png, 03-quantum-walk.png, 04-simplicial-growth.png, 05-memory-bank.png, 06-analysis.png
 
 ### 2026-02-09
 

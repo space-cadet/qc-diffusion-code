@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-02-16 05:27:33 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
 
 ## Active Tasks
 
@@ -50,10 +50,15 @@
 | T25b | Type Safety Improvements                         | 📝 PLANNED     | HIGH     | 2026-01-12 | T25 |
 | T25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | T25a |
 | T25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | T25c |
-| T26 | Build Performance Optimization and Bundle Size Reduction | ✅ COMPLETED | HIGH | 2026-01-19 | T21 | [Details](tasks/T26.md) |
-| T27 | Simulation Lab Framework | 🔄 IN PROGRESS | HIGH | 2026-01-19 | T7, T7a, T17, T18, T24 | [Details](tasks/T27.md) |
+| T26 | WebGL + tsParticles Visualization Rewrite | 📝 PLANNED | HIGH | 2026-05-09 | T25 | [Details](tasks/T26.md) |
+| T27 | Clean Rewrite — Pure WebGL + Original Physics Engine | 🔄 IN PROGRESS | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
+| T27a | Vercel Build Fixes — TypeScript Strictness | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27a.md) |
+| T27b | Original Engine Integration | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27b.md) |
+| T27c | Frozen Particles Fix | ✅ COMPLETED | CRITICAL | 2026-05-09 | T27b | [Details](tasks/T27c.md) |
+| T27d | Strategy Selection UI | ✅ COMPLETED | HIGH | 2026-05-09 | T27b | [Details](tasks/T27d.md) |
+| T27e | Strategy Propagation Fix | ✅ COMPLETED | HIGH | 2026-05-09 | T27d | [Details](tasks/T27e.md) |
 | T28 | Simplicial Growth Algorithm Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T27 | [Details](tasks/T28.md) |
-| T28a | Simplicial Foundational Core Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28 | [Details](tasks/T28a.md) |
+| T28a | Simplicial Foundational Core Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28a.md) |
 | T28b | 2D Simplicial Pachner Moves Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28b.md) |
 | T28c | 3D Simplicial Pachner Moves Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28c.md) |
 | T28d | Simplicial Core Integration and Migration | 🔄 70% COMPLETE | HIGH | 2026-01-28 | T28a, T28b, T28c | [Details](tasks/T28d.md) |
@@ -67,11 +72,46 @@
 
 ## Task Details
 
-### T27: Simulation Lab Framework
-**Description**: Design and implement shared simulation lab infrastructure for PDE, Classical Walk, Quantum Walk, and Simplicial Growth pages
-**Status**: 🔄 IN PROGRESS **Last**: 2026-01-28 22:53:56 IST
-**Files**: `memory-bank/implementation-details/simulation-lab-framework.md`, `memory-bank/implementation-details/shared-component-framework.md`, `frontend/src/lab/` (interfaces, components, hooks, services), `frontend/src/SimplicialGrowthPage.tsx`, `frontend/src/QuantumWalkPageRefactored.tsx`
-**Notes**: Framework validated by simplicial growth implementation. Core components working across all 4 simulation domains. Ready for PDE and Classical Walk migrations.
+### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
+**Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 14:00:20 IST
+**Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
+**Notes**:
+- V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
+- Controls are wired to the live engine: `Initialize`, `Start`, `Pause`, and `Reset` all affect runtime state
+- Density panel restored to the V2 layout; page scrolling restored for lower panels
+- Initial distributions now drive actual particle placement again, with V2 parameter controls restored
+- Live time/stats are propagated back into the V2 UI
+- Remaining gap: `levy` and `fractional` still appear in the strategy dropdown but are not implemented downstream
+
+### T27a: Vercel Build Fixes — TypeScript Strictness
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Issues Fixed**: RandomWalkSimulationState export cleanup, BoundaryType consistency, useParticlesLoader typing, memory-bank type/export fixes needed for clean V2 builds
+
+### T27b: Original Engine Integration
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Files**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`
+**What**: Adapter hook wrapping original PhysicsEngine with ParameterManager, strategy factory, particle initialization, adaptParticles() converter
+**Result**: Original engine's strategy system now drives WebGL renderer
+
+### T27c: Frozen Particles Fix
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Issue**: Particles render but don't move. Time indicator frozen.
+**Root Cause**: `nextCollisionTime` initialized to `Infinity` in `initializeParticles()`. CTRW strategies check `currentTime >= particle.nextCollisionTime` — since currentTime starts at 0, condition never met, so no collisions ever occur.
+**Fix**: Changed to `Math.random() * (1 / (params.collisionRate || 1))` — each particle gets random initial wait time.
+**File**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`
+
+### T27d: Strategy Selection UI
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Issue**: Parameter panel missing strategy type selection (Ballistic, CTRW, Composite, etc.)
+**Fix**: Added `<select>` dropdown with options: Simple (Ballistic), CTRW (Continuous Time Random Walk), Lévy Flight, Fractional Diffusion, Interparticle Collisions.
+**File**: `frontend/src/components/RandomWalkParameterPanelV2.tsx`
+
+### T27e: Strategy Propagation Fix
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Issue**: `createParameterManager()` hardcoded strategies based on collisionRate: `params.collisionRate > 0 ? ['ctrw'] : ['simple']`. The `strategies` array from `RandomWalkParams` was never read.
+**Fix**: Extended `EngineParams` to include `strategies` array; rewrote `createParameterManager()` to read from params with fallback logic; auto-adds 'collisions' when interparticleCollisions enabled; updated `RandomWalkSimV2.tsx` to pass strategies.
+**Files**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/RandomWalkSimV2.tsx`
 
 ### T28: Simplicial Growth Algorithm Implementation
 **Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration
@@ -113,6 +153,7 @@
 **Notes**: New task to show stochastic origin of telegraph equation through discrete particle simulation
 
 ### T5a: Random Walk Architecture Planning
+
 **Description**: Plan and design the architecture for random walk physics simulation with collision mechanisms
 **Status**: 🔄 IN PROGRESS **Last**: 2025-08-21 07:14:04 IST
 **Files**: `memory-bank/implementation-details/random-walks-diff-eq.md`, `memory-bank/implementation-details/random-walk-ui-interface.md`, `memory-bank/tasks/T5a.md`
@@ -146,7 +187,7 @@
 **Description**: Implement Observer pattern with lazy evaluation for numerical observables (N(t), kinetic energy, momentum, MSD) with temporal consistency
 **Status**: ✅ COMPLETED **Last**: 2025-09-03 22:22:05 IST
 **Files**: `frontend/src/physics/ObservableManager.ts`, `frontend/src/physics/stream-ObservableManager.ts`, `frontend/src/physics/observables/`, `frontend/src/components/ObservablesPanel.tsx`, `frontend/src/components/stream-ObservablesPanel.tsx`
-**Notes**: Enhanced with streaming framework (T18) and text-based system (T7a). Dual architecture supports both polling and event-driven observables with feature toggle. Complete UI separation between built-in and custom observables.
+**Notes**: Enhanced with streaming framework (T18) and text-based system (T7a). Dual architecture supports both polling and streaming observables with feature toggle. Complete UI separation between built-in and custom observables.
 
 ### T7a: Modular Transparent Observable System Redesign
 **Description**: Redesign hardcoded observable system into flexible query-based architecture enhanced by GPT-5 with initial state tracking and transform system
@@ -204,9 +245,9 @@
 
 ### META-1: Memory Bank Maintenance and Updates
 **Description**: Recurring maintenance task for memory bank system updates and documentation consistency
-**Status**: 🔄 ACTIVE **Last**: 2025-09-03 21:36:15 IST
+**Status**: 🔄 ACTIVE **Last**: 2026-05-09 14:37:00 IST
 **Files**: `memory-bank/activeContext.md`, `memory-bank/projectbrief.md`, `memory-bank/techContext.md`, `memory-bank/systemPatterns.md`, `memory-bank/implementation-details/random-walk-engine-plan.md`
-**Notes**: Updated core memory bank files with current system timestamps, enhanced architecture documentation with dual physics engine details, added comprehensive execution flow analysis to implementation details
+**Notes**: Updated T27 with evolution from V2 engine to original PhysicsEngine integration. Documented build fixes (T27a), engine integration (T27b), and planned fixes for frozen particles (T27c) and strategy UI (T27d).
 
 ### T15: Physics Engine Architecture Migration
 **Description**: Migrate existing physics engine to new architecture combining system-based separation of concerns, hybrid strategy preservation, and phase-based execution model

@@ -3,7 +3,7 @@
  * T29a: Table layout with columns (Name, Date Modified, Size, Kind)
  */
 
-import type { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
+import { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
 import { formatFileSize, getFileKind } from "../utils/fileTypeUtils";
 
 interface FileListItemProps {

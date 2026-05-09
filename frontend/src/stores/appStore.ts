@@ -34,7 +34,7 @@ interface WindowRect {
   zIndex: number
 }
 
-interface RandomWalkSimulationState {
+export interface RandomWalkSimulationState {
   isRunning: boolean
   time: number
   collisions: number

@@ -107,6 +107,17 @@ const ParticleCanvasComponent = ({ gridLayoutParams, simulationStatus, particles
         }
         const setupContainer = async () => {
             try {
+                // Ensure canvas is visible and has proper dimensions before creating container
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect();
+                
+                // If canvas has no size, wait a frame for layout
+                if (rect.width === 0 || rect.height === 0) {
+                    console.warn('ParticleCanvas: Canvas has zero size, waiting for layout...');
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                }
+                
                 const newContainer = await createParticleContainer(canvasRef.current, gridLayoutParams.particles);
                 setContainer(newContainer);
                 console.log("ParticleCanvas: container created", {
@@ -154,6 +165,28 @@ const ParticleCanvasComponent = ({ gridLayoutParams, simulationStatus, particles
             });
         }
     }, [container, gridLayoutParams.particles]);
+    // Setup ResizeObserver to handle canvas size changes
+    useEffect(() => {
+        if (!container || !canvasRef.current) return;
+        
+        const canvas = canvasRef.current;
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                if (width > 0 && height > 0) {
+                    // Force tsParticles to resize
+                    container.canvas.resize();
+                    console.log('ParticleCanvas: ResizeObserver triggered resize', { width, height });
+                }
+            }
+        });
+        
+        resizeObserver.observe(canvas);
+        
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, [container]);
     // Rendering is now handled exclusively by useParticlesLoader
     // This component only manages container lifecycle and particle count
     // Cleanup on unmount
@@ -168,7 +201,7 @@ const ParticleCanvasComponent = ({ gridLayoutParams, simulationStatus, particles
         };
     }, [container]);
     return (<>
-      <canvas ref={canvasRef} className="w-full h-full" style={{ display: isEngineReady ? "block" : "none" }}/>
+      <canvas ref={canvasRef} className="w-full h-full" style={{ display: 'block' }} />
       {boundaryRect && (<div style={{
                 position: "absolute",
                 left: boundaryRect.x,

@@ -4,7 +4,7 @@
  *       child count for folders. No oversized icon container.
  */
 
-import type { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
+import { IndexCategory, IndexFile } from "../hooks/useMemoryBankDocs";
 
 interface FileGridItemProps {
   item: IndexCategory | IndexFile;
