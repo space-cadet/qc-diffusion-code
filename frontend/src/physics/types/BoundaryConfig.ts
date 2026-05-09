@@ -4,7 +4,7 @@
 // but only use xMin/xMax. The yMin/yMax fields are ignored by 1D strategies.
 // 2D strategies use both x and y bounds. Callers should always provide the full
 // config to keep a single source of truth across the system.
-export type BoundaryType = 'periodic' | 'reflecting' | 'absorbing';
+export type BoundaryType = 'periodic' | 'reflective' | 'absorbing';
 
 export interface BoundaryConfig {
   /**

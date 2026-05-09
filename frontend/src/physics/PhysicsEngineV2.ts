@@ -18,7 +18,7 @@ export interface EngineParamsV2 {
   velocity: number;
   dt: number;
   temperature: number;
-  boundaryCondition: "reflecting" | "absorbing" | "periodic";
+  boundaryCondition: "reflective" | "absorbing" | "periodic";
   interparticleCollisions: boolean;
   collisionRadius: number;
   initialDistType: "uniform" | "gaussian" | "ring" | "stripe" | "grid";
@@ -58,8 +58,6 @@ export class PhysicsEngineV2 {
       xMax: canvasWidth,
       yMin: 0,
       yMax: canvasHeight,
-      width: canvasWidth,
-      height: canvasHeight,
     };
   }
 
@@ -196,7 +194,7 @@ export class PhysicsEngineV2 {
     const { boundaryCondition } = this.params;
     
     switch (boundaryCondition) {
-      case "reflecting":
+      case "reflective":
         this.applyReflectingBoundaries();
         break;
       case "absorbing":
