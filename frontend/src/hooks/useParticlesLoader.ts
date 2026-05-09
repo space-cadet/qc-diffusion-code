@@ -379,7 +379,7 @@ export const useParticlesLoader = ({
   }, [cleanup, startAnimation, restartAnimation]);
 
   // Expose GPU methods
-  const particlesLoader: ParticlesLoader = Object.assign(
+  const particlesLoader = Object.assign(
     particlesLoaderCallback,
     {
       resetGPU,
@@ -388,7 +388,7 @@ export const useParticlesLoader = ({
       getGPUManager: () => gpuManagerRef.current as GPUParticleManager | null,
       setGraphPhysicsRef,
     }
-  );
+  ) as ParticlesLoader;
 
   return particlesLoader;
 };

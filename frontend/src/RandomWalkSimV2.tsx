@@ -36,7 +36,7 @@ export default function RandomWalkSimV2() {
     velocity: gridLayoutParams.velocity,
     dt: gridLayoutParams.dt,
     temperature: gridLayoutParams.temperature,
-    boundaryCondition: gridLayoutParams.boundaryCondition as "reflecting" | "absorbing" | "periodic",
+    boundaryCondition: gridLayoutParams.boundaryCondition as "reflective" | "absorbing" | "periodic",
     interparticleCollisions: gridLayoutParams.interparticleCollisions,
     collisionRadius: gridLayoutParams.collisionRate,
     initialDistType: gridLayoutParams.initialDistType || "uniform",
