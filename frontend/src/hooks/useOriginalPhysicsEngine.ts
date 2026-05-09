@@ -21,6 +21,7 @@ export interface EngineParams {
   collisionRadius: number;
   initialDistType: string;
   strategyType?: string;
+  strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
   distSigmaX?: number;
   distSigmaY?: number;
   distR0?: number;
@@ -61,6 +62,22 @@ function createBoundaryConfig(params: EngineParams): BoundaryConfig {
 }
 
 function createParameterManager(params: EngineParams): ParameterManager {
+  // Determine strategies from params
+  let strategies: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  if (params.strategies && params.strategies.length > 0) {
+    strategies = params.strategies;
+  } else if (params.strategyType) {
+    strategies = [params.strategyType as 'ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions'];
+  } else {
+    // Fallback: use collisionRate to decide
+    strategies = params.collisionRate > 0 ? ['ctrw'] : ['simple'];
+  }
+
+  // Add collisions strategy if interparticleCollisions is enabled
+  if (params.interparticleCollisions && !strategies.includes('collisions')) {
+    strategies = [...strategies, 'collisions'];
+  }
+
   return new ParameterManager({
     collisionRate: params.collisionRate,
     jumpLength: params.velocity * params.dt,
@@ -69,7 +86,7 @@ function createParameterManager(params: EngineParams): ParameterManager {
     particleCount: params.particleCount,
     dimension: params.dimension,
     interparticleCollisions: params.interparticleCollisions,
-    strategies: params.collisionRate > 0 ? ['ctrw'] : ['simple'],
+    strategies,
     boundaryCondition: params.boundaryCondition,
     canvasWidth: params.canvasWidth,
     canvasHeight: params.canvasHeight,
@@ -111,7 +128,7 @@ function initializeParticles(params: EngineParams): Particle[] {
       },
       radius: 3,
       lastCollisionTime: 0,
-      nextCollisionTime: Infinity,
+      nextCollisionTime: Math.random() * (1 / (params.collisionRate || 1)),
       collisionCount: 0,
       waitingTime: 0,
       trajectory: [] as any,

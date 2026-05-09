@@ -42,6 +42,7 @@ export default function RandomWalkSimV2() {
     collisionRadius: gridLayoutParams.collisionRate || 5,
     initialDistType: gridLayoutParams.initialDistType || "uniform",
     strategyType: (gridLayoutParams as any).strategyType,
+    strategies: gridLayoutParams.strategies,
     distSigmaX: gridLayoutParams.distSigmaX,
     distSigmaY: gridLayoutParams.distSigmaY,
     distR0: gridLayoutParams.distR0,

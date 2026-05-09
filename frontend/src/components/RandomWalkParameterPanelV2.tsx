@@ -180,6 +180,25 @@ export const RandomWalkParameterPanelV2 = ({
           />
         </div>
 
+        {/* Strategy Selection */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Strategy:</label>
+          <select
+            value={gridLayoutParams.strategies?.[0] || 'simple'}
+            onChange={(e) => {
+              const strategy = e.target.value as 'ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions';
+              setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy] });
+            }}
+            className="w-full border rounded px-2 py-1 text-sm"
+          >
+            <option value="simple">Simple (Ballistic)</option>
+            <option value="ctrw">CTRW (Continuous Time Random Walk)</option>
+            <option value="levy">Lévy Flight</option>
+            <option value="fractional">Fractional Diffusion</option>
+            <option value="collisions">Interparticle Collisions</option>
+          </select>
+        </div>
+
         {/* Collision Rate */}
         <div>
           <label className="block text-sm font-medium mb-2">

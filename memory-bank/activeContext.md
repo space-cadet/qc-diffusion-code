@@ -1,17 +1,18 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:37:00 IST*
+*Last Updated: 2026-05-09 15:45 IST*
 
 ## Current Focus
 **Task**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
-**Status**: 🔄 IN PROGRESS — Build succeeds, particles frozen, strategies missing
+**Status**: 🔄 IN PROGRESS — Build succeeds, fixes applied, pending deploy
 **Priority**: HIGH
 
-**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. Built clean V2 architecture with WebGLRendererV2 + original PhysicsEngine. TypeScript compiles clean. Build and deploy succeed. Two remaining issues identified for next session:
+**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. Built clean V2 architecture with WebGLRendererV2 + original PhysicsEngine. TypeScript compiles clean. Build and deploy succeed. Three fixes applied this session:
 
-1. **Particles frozen** — animation loop may have closure issue or engine step not advancing time
-2. **Missing walk strategies** — parameter panel doesn't show CTRW, Ballistic, etc. strategy selection
+1. **Frozen particles** ✅ — nextCollisionTime was Infinity, now random wait time
+2. **Missing walk strategies** ✅ — strategy selector added to parameter panel
+3. **Strategy propagation** ✅ — createParameterManager now reads params.strategies
 
 **Architecture Evolution**:
 - Started with: `PhysicsEngineV2` (hardcoded ballistic) + `WebGLRendererV2`
@@ -37,16 +38,19 @@
 - `frontend/src/components/WebGLCanvas.tsx` — canvas.id fix
 - `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` — complete rewrite with types
 - `frontend/src/memoryBank/components/*` — import fixes
+- `frontend/src/hooks/useOriginalPhysicsEngine.ts` — nextCollisionTime fix, strategies propagation
+- `frontend/src/components/RandomWalkParameterPanelV2.tsx` — strategy selector UI
+- `frontend/src/RandomWalkSimV2.tsx` — pass strategies to engine params
 
 **Current State**: 
 - Build: ✅ Compiles clean locally and on Vercel
 - Deploy: ✅ Successful
-- Motion: ❌ Particles frozen, time indicator not advancing
-- Strategies: ❌ Parameter panel missing strategy selection (CTRW, Ballistic, etc.)
+- Motion: ✅ Should work (nextCollisionTime initialized to random wait time)
+- Strategies: ✅ Panel has strategy selection, propagated to engine
 
 **Branch**: `cloud-claw/screenshot-poc`
 
-**Immediate Next Step**: Fix frozen particles and add strategy selection to parameter panel in new session
+**Immediate Next Step**: Build and deploy to Vercel for live testing
 
 ## Recent Completed Work
 
@@ -60,6 +64,10 @@
 - **adaptParticles()**: Converts original Particle[] to SimpleParticle[] for WebGL renderer
 - TypeScript compiles clean locally and on Vercel
 - Build fixes applied: RandomWalkSimulationState export, BoundaryType consistency, useParticlesLoader types, memory bank type exports, various cast fixes, double cast (unknown → ParticlesLoader)
+- **Afternoon fixes (2026-05-09)**:
+  - T27c: Frozen particles — nextCollisionTime initialized to random wait time instead of Infinity
+  - T27d: Strategy UI — strategy selector dropdown added to parameter panel
+  - T27e: Strategy propagation — createParameterManager reads params.strategies with fallback logic
 
 ### T31: Mobile UI Responsiveness and Design
 - Mobile bottom icon navigation bar (4 primary + hamburger overflow)

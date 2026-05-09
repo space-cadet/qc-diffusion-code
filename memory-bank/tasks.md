@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:37:00 IST*
+*Last Updated: 2026-05-09 15:45 IST*
 
 ## Active Tasks
 
@@ -73,15 +73,17 @@
 
 ### T27: Clean Architecture Rewrite (Physics + WebGL)
 **Description**: Complete rewrite of Random Walk simulation with clean architecture. Ditches tsParticles entirely. Evolution: V2 engine (ballistic only) → Original PhysicsEngine (full strategies) + WebGLRendererV2.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 14:37:00 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 15:45 IST
 **Files**: `frontend/src/physics/PhysicsEngineV2.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `frontend/src/hooks/usePhysicsEngine.ts`, `frontend/src/hooks/useWebGLRenderer.ts`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`
 **Notes**: 
 - Phase 1: PhysicsEngineV2 built (limited to ballistic)
 - Phase 2: Swapped to original PhysicsEngine via useOriginalPhysicsEngine.ts adapter
+- Phase 3: Fixed frozen particles (nextCollisionTime init) and missing strategy UI
 - Build: ✅ Compiles clean locally and on Vercel
 - Deploy: ✅ Successful
-- Motion: ❌ Particles frozen (T27c planned fix)
-- Strategies: ❌ Panel missing strategy selection (T27d planned fix)
+- Motion: ✅ Particles should now move (T27c fixed)
+- Strategies: ✅ Panel has strategy selection (T27d fixed)
+- Next: Build and deploy to verify fixes live
 
 ### T27a: Vercel Build Fixes — TypeScript Strictness
 **Status**: ✅ COMPLETED **Last**: 2026-05-09 14:37:00 IST
@@ -94,14 +96,23 @@
 **Result**: Original engine's strategy system now drives WebGL renderer
 
 ### T27c: Frozen Particles Fix
-**Status**: 📝 PLANNED **Priority**: CRITICAL
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
 **Issue**: Particles render but don't move. Time indicator frozen.
-**Possible Causes**: Animation loop closure issue, isRunning state propagation, PhysicsEngine.step() not advancing time
+**Root Cause**: `nextCollisionTime` initialized to `Infinity` in `initializeParticles()`. CTRW strategies check `currentTime >= particle.nextCollisionTime` — since currentTime starts at 0, condition never met, so no collisions ever occur.
+**Fix**: Changed to `Math.random() * (1 / (params.collisionRate || 1))` — each particle gets random initial wait time.
+**File**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`
 
 ### T27d: Strategy Selection UI
-**Status**: 📝 PLANNED **Priority**: HIGH
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
 **Issue**: Parameter panel missing strategy type selection (Ballistic, CTRW, Composite, etc.)
-**Next Steps**: Add strategy selector to RandomWalkParameterPanelV2
+**Fix**: Added `<select>` dropdown with options: Simple (Ballistic), CTRW (Continuous Time Random Walk), Lévy Flight, Fractional Diffusion, Interparticle Collisions.
+**File**: `frontend/src/components/RandomWalkParameterPanelV2.tsx`
+
+### T27e: Strategy Propagation Fix
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
+**Issue**: `createParameterManager()` hardcoded strategies based on collisionRate: `params.collisionRate > 0 ? ['ctrw'] : ['simple']`. The `strategies` array from `RandomWalkParams` was never read.
+**Fix**: Extended `EngineParams` to include `strategies` array; rewrote `createParameterManager()` to read from params with fallback logic; auto-adds 'collisions' when interparticleCollisions enabled; updated `RandomWalkSimV2.tsx` to pass strategies.
+**Files**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/RandomWalkSimV2.tsx`
 
 ### T28: Simplicial Growth Algorithm Implementation
 **Description**: Implement canonical simplicial gravity algorithm from arXiv:1108.1974v2 paper with Pachner moves and comprehensive UI integration
