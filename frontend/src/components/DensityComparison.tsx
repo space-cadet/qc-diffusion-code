@@ -8,7 +8,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
     // Use live particles from simulatorRef when available; fall back to props
     const liveParticles = React.useMemo(() => {
         try {
-            const particlesFromSim = simulatorRef.current?.getParticleManager().getAllParticles();
+            const particlesFromSim = simulatorRef?.current?.getParticleManager?.().getAllParticles?.();
             // console.log('[DensityComparison] Getting live particles:', {
             //   fromSim: !!particlesFromSim,
             //   particleCount: particlesFromSim?.length || 0,

@@ -1,29 +1,29 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 11:13:00 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
 
 ## Current Session
 
-**Session**: 2026-05-09-morning.md
+**Session**: 2026-05-09-afternoon.md
 **Started**: 2026-05-09 08:55:00 IST
-**Focus**: T27 - Clean Architecture Rewrite (Physics + WebGL)
-**Status**: 🔄 IN PROGRESS — Architecture built, debugging integration
-**Branch**: cloud-claw/t27-webgl-rewrite
+**Focus**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
+**Status**: 🔄 IN PROGRESS — V2 parity fixes landed, pending live verification
+**Branch**: cloud-claw/screenshot-poc
 
 ## Overview
 
 - Active: 18 | Paused: 0 | Completed: 23
-- Last Session: `sessions/2026-05-09-early.md`
-- Current Period: morning
+- Last Session: `sessions/2026-05-09-morning.md`
+- Current Period: afternoon
 
 ## Session History (Last 5)
 
-1. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
-2. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
-3. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
-4. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
-5. `sessions/2026-01-30-afternoon.md` - T29a Memory Bank Viewer Enhancements
+1. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
+2. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
+3. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
+4. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
+5. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
 
 ## Task Registry
 
@@ -57,7 +57,7 @@
 - T21a: Dependency Peer Resolution Maintenance - 🔄
 - T25: Random Walk Page Architecture Review and Fix - ✅ COMPLETED (screenshot verification, memory bank async loading fix, backend requirements fix, websocket verification)
 - T26: Build Performance Optimization and Bundle Size Reduction - ✅
-- T27: Simulation Lab Framework - 🔄
+- T27: Pure WebGL + Original Physics Engine - 🔄
 - T28: Simplicial Growth Algorithm Implementation - ✅
 - T29: Memory Bank Feature Implementation - ✅
 - T31: Mobile UI Responsiveness and Design - ✅
@@ -205,7 +205,7 @@
 
 **Status:** 🔄 **Priority:** HIGH
 **Started:** 2025-08-31 **Last**: 2025-08-31 21:44:48 IST
-**Context**: Phase 4 started - fixed dt plumbing from UI through ParameterManager, TimeManager, and physics strategies. Identified memory leak causing high browser memory usage during simulation runs.
+**Context**: V2 random walk page now runs through the original engine adapter. Control wiring, density restoration, page scrolling, and initial-distribution parity have been fixed; remaining open issue is the UI-only `levy` / `fractional` strategy options.
 **Files**: `frontend/src/physics/core/SimulationRunner.ts`, `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/strategies/`, `frontend/src/hooks/useParticlesLoader.ts`, `frontend/src/physics/core/ParameterManager.ts`, `memory-bank/implementation-details/random-walk-verification-plan.md`
 **Progress**:
 1. ✅ Comprehensive code examination completed - 6 critical issues identified

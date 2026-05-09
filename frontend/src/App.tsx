@@ -256,7 +256,7 @@ export default function App() {
       <DesktopTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Content - add bottom padding on mobile for the bottom nav */}
-      <div className="flex-1 overflow-hidden pb-14 md:pb-0">
+      <div className={`flex-1 pb-14 md:pb-0 ${activeTab === 'randomwalksim' ? 'overflow-auto' : 'overflow-hidden'}`}>
         {activeTab === 'simulation' ? (<div className="h-full flex">
             <div className="w-80 hidden md:block">
               <PdeParameterPanel params={simulationParams} onChange={setSimulationParams}/>

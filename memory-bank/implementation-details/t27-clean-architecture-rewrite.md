@@ -1,12 +1,12 @@
 # T27: Clean Architecture Rewrite — Implementation Details
 
 *Created: 2026-05-09 11:55:00 IST*
-*Last Updated: 2026-05-09 11:55:00 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
 *Branch: cloud-claw/t27-webgl-rewrite (merged into cloud-claw/screenshot-poc)*
 
 ## Overview
 
-Complete rewrite of the Random Walk simulation visualization and physics layers. The original architecture (Canvas 2D + tsParticles + RandomWalkSimulator) had fundamental race conditions that made particle initialization unreliable. This rewrite replaces the entire stack with a clean, decoupled architecture.
+Complete rewrite of the Random Walk simulation visualization and control path. The original architecture (Canvas 2D + tsParticles + RandomWalkSimulator) had fundamental race conditions that made particle initialization unreliable. The final T27 direction is not a full greenfield physics rewrite; it is a pure WebGL renderer plus an adapter around the original strategy-capable physics engine.
 
 ## Architecture
 
@@ -31,20 +31,19 @@ Complete rewrite of the Random Walk simulation visualization and physics layers.
                    │
       ┌────────────┴────────────┐
       ▼                         ▼
-┌──────────────┐        ┌──────────────┐
-│ usePhysics   │        │  useWebGL    │
-│   Engine     │        │   Renderer   │
-└──────────────┘        └──────────────┘
+┌─────────────────────┐  ┌──────────────┐
+│ useOriginalPhysics  │  │  useWebGL    │
+│     Engine          │  │   Renderer   │
+└─────────────────────┘  └──────────────┘
       │                         │
       ▼                         ▼
-┌──────────────┐        ┌──────────────┐
-│PhysicsEngineV2│       │WebGLRendererV2│
-│              │        │              │
-│ - particles  │        │ - shaders    │
-│ - step()     │        │ - buffers    │
-│ - boundaries │        │ - draw()     │
-│ - collisions │        │ - resize()   │
-└──────────────┘        └──────────────┘
+┌──────────────────────┐ ┌──────────────┐
+│ Original PhysicsEngine│ │WebGLRendererV2│
+│ + ParameterManager    │ │              │
+│ + StrategyFactory     │ │ - shaders    │
+│ + particle adapter    │ │ - buffers    │
+│ + reset/init bridge   │ │ - draw()     │
+└──────────────────────┘ └──────────────┘
 ```
 
 ## Key Design Decisions
@@ -54,11 +53,11 @@ Complete rewrite of the Random Walk simulation visualization and physics layers.
 - New: Pure WebGL point rendering, no external particle library
 - Benefit: Predictable lifecycle, no race conditions
 
-### 2. PhysicsEngineV2 Design
-- **Single initialization**: Particles created once in constructor
-- **In-place updates**: `step(dt)` updates particle positions, no recreation
-- **Parameter updates**: `updateParams()` modifies behavior without wiping particles
-- **Decoupled from rendering**: Engine knows nothing about WebGL
+### 2. Original Engine Adapter Design
+- **Preserve mature strategy logic**: Reuse the existing `PhysicsEngine`, `ParameterManager`, and `StrategyFactory`
+- **Bridge to V2 renderer**: Convert original particle objects into the simpler WebGL render format
+- **Explicit reset/init path**: `Initialize` and `Reset` now reach the live engine instead of only toggling UI status
+- **Decoupled from rendering**: Physics engine remains independent of WebGL
 
 ### 3. WebGLRendererV2 Design
 - **Shader-based**: Vertex + fragment shaders for point rendering
@@ -67,7 +66,7 @@ Complete rewrite of the Random Walk simulation visualization and physics layers.
 - **Cleanup**: Proper WebGL resource disposal on unmount
 
 ### 4. React Hooks
-- `usePhysicsEngine`: Creates engine once, provides `step/reset/updateParams/getStats`
+- `useOriginalPhysicsEngine`: Creates the adapter-backed engine and provides `step/reset/updateParams/getStats`
 - `useWebGLRenderer`: Initializes renderer on canvas mount, provides `render/resize`
 - Both hooks handle cleanup automatically
 
@@ -75,6 +74,7 @@ Complete rewrite of the Random Walk simulation visualization and physics layers.
 - **Store-only**: Updates Zustand store, no direct engine calls
 - **Decoupled**: No `simulatorRef` prop, no imperative API
 - **Reactive**: Canvas component reacts to store changes via `useEffect`
+- **Parity restored**: Initial-distribution-specific controls and strategy selector are present again
 
 ## File Structure
 
@@ -88,36 +88,27 @@ frontend/src/
 │       ├── particle.vert             # Vertex shader
 │       └── particle.frag             # Fragment shader
 ├── hooks/
-│   ├── usePhysicsEngine.ts           # Physics engine hook
+│   ├── usePhysicsEngine.ts           # Earlier V2-only hook kept as fallback
+│   ├── useOriginalPhysicsEngine.ts   # Original engine adapter hook
 │   └── useWebGLRenderer.ts           # WebGL renderer hook
 ├── components/
 │   ├── ParticleCanvasV2.tsx        # Canvas component
-│   └── RandomWalkParameterPanelV2.tsx # Parameter panel
+│   ├── RandomWalkParameterPanelV2.tsx # Parameter panel
+│   └── DensityComparison.tsx         # Density panel restored to V2 path
 └── RandomWalkSimV2.tsx              # Main component
 ```
 
 ## API Reference
 
-### PhysicsEngineV2
+### useOriginalPhysicsEngine
 
 ```typescript
-class PhysicsEngineV2 {
-  constructor(params: EngineParamsV2)
-  
-  // Core
-  step(dt: number): void              // Advance simulation by dt seconds
-  reset(): void                        // Reset to initial state
-  
-  // Parameters
-  updateParams(params: Partial<EngineParamsV2>): void
-  
-  // State
-  particles: Particle[]                // Current particle states
-  time: number                         // Simulation time
-  collisionCount: number               // Total collisions
-  
-  // Queries
-  getStats(): { time, collisionCount, particleCount }
+type UseOriginalPhysicsEngineReturn = {
+  step(dt: number): void
+  reset(): void
+  updateParams(params: Partial<EngineParams>): void
+  getParticles(): SimpleParticle[]
+  getStats(): { time: number; collisionCount: number; particleCount: number }
 }
 ```
 
@@ -135,14 +126,14 @@ class WebGLRendererV2 {
 
 ## Migration Notes
 
-### From Original to V2
+### From Legacy Page to V2
 
 | Original | V2 | Notes |
 |----------|-----|-------|
 | `RandomWalkSim.tsx` | `RandomWalkSimV2.tsx` | New component, same layout |
 | `ParticleCanvas.tsx` | `ParticleCanvasV2.tsx` | WebGL instead of Canvas 2D |
 | `RandomWalkParameterPanel.tsx` | `RandomWalkParameterPanelV2.tsx` | Decoupled from simulatorRef |
-| `RandomWalkSimulator.ts` | `PhysicsEngineV2.ts` | Clean architecture |
+| `RandomWalkSimulator.ts` | `useOriginalPhysicsEngine.ts` + original `PhysicsEngine` | Adapter-backed runtime |
 | tsParticles | WebGLRendererV2 | Pure WebGL, no library |
 
 ### App.tsx Change
@@ -155,12 +146,18 @@ const RandomWalkSim = lazy(() => import("./RandomWalkSim"));
 const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 ```
 
+## Current State
+
+1. **Controls wired**: `Initialize`, `Start`, `Pause`, and `Reset` affect the live engine
+2. **Visible motion fixed**: Frame-time stepping and render-space scaling make default motion visible
+3. **Density restored**: `DensityComparison` is mounted again on the V2 page
+4. **Initial distributions restored**: V2 uses the shared sampler and exposes per-distribution controls
+
 ## Known Limitations
 
-1. **Physics verification needed**: Collision algorithms, boundary behavior, random walk statistics not yet validated
-2. **Graph mode not implemented**: Only continuum mode works in V2
-3. **Strategy system removed**: CTRW, Lévy, fractional strategies not yet ported
-4. **Observables not connected**: Density profile, MSD, etc. not yet wired
+1. **Graph mode not implemented**: Only continuum mode works in V2
+2. **Strategy dropdown drift**: `levy` and `fractional` are still shown in the UI but are not implemented in `StrategyFactory`
+3. **Physics verification still needed**: Collision statistics, boundary behavior, and long-run random-walk correctness still need broader live validation
 
 ## Testing
 
@@ -170,11 +167,10 @@ const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 
 ## Next Steps
 
-1. Verify physics correctness (collision detection, boundary behavior)
-2. Port graph mode from original
-3. Re-implement strategy system (CTRW, Lévy, fractional)
-4. Wire observables (density, MSD, momentum)
-5. Performance optimization (instanced rendering, spatial hashing)
+1. Verify the current branch live in-browser or on deploy
+2. Remove or implement the fake `levy` / `fractional` strategy options
+3. Port graph mode from the legacy page if still required
+4. Continue deeper physics verification (collision detection, boundary behavior, statistics)
 
 ## References
 

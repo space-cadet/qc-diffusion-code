@@ -1,11 +1,12 @@
 import { useRef, useCallback, useEffect } from "react";
 import { PhysicsEngine, PhysicsEngineConfig } from "../physics/core/PhysicsEngine";
-import { CoordinateSystem, Dimension } from "../physics/core/CoordinateSystem";
+import { Dimension } from "../physics/core/CoordinateSystem";
 import { createPhysicsStrategies } from "../physics/factories/StrategyFactory";
 import { ParameterManager } from "../physics/core/ParameterManager";
 import { BoundaryConfig } from "../physics/types/BoundaryConfig";
 import type { Particle } from "../physics/types/Particle";
 import type { PhysicsStrategy } from "../physics/interfaces/PhysicsStrategy";
+import { sampleCanvasPosition } from "../physics/utils/InitDistributions";
 
 export interface EngineParams {
   particleCount: number;
@@ -49,6 +50,12 @@ interface UseOriginalPhysicsEngineReturn {
   reset: () => void;
   updateParams: (params: Partial<EngineParams>) => void;
   getStats: () => { time: number; collisionCount: number; particleCount: number } | null;
+}
+
+function toVisibleSpeed(params: EngineParams): number {
+  // The V2 renderer uses canvas coordinates directly, so raw "1.0" velocities are
+  // visually imperceptible. Scale them into a visible pixel-space speed.
+  return params.velocity * Math.max(Math.min(params.canvasWidth, params.canvasHeight) / 6, 1);
 }
 
 function createBoundaryConfig(params: EngineParams): BoundaryConfig {
@@ -111,17 +118,33 @@ function createStrategiesFromParams(params: EngineParams): PhysicsStrategy[] {
 
 function initializeParticles(params: EngineParams): Particle[] {
   const particles: Particle[] = [];
-  const { particleCount, dimension, canvasWidth, canvasHeight, velocity } = params;
+  const { particleCount, dimension, canvasWidth, canvasHeight } = params;
+  const visibleSpeed = toVisibleSpeed(params);
 
   for (let i = 0; i < particleCount; i++) {
-    const x = Math.random() * canvasWidth;
-    const y = dimension === "1D" ? canvasHeight / 2 : Math.random() * canvasHeight;
+    const pos = sampleCanvasPosition(i, {
+      canvasWidth,
+      canvasHeight,
+      dimension,
+      initialDistType: params.initialDistType as "uniform" | "gaussian" | "ring" | "stripe" | "grid",
+      distSigmaX: params.distSigmaX ?? 80,
+      distSigmaY: params.distSigmaY ?? 80,
+      distR0: params.distR0 ?? 150,
+      distDR: params.distDR ?? 20,
+      distThickness: params.distThickness ?? 40,
+      distNx: params.distNx ?? 20,
+      distNy: params.distNy ?? 15,
+      distJitter: params.distJitter ?? 4,
+    });
     const angle = Math.random() * 2 * Math.PI;
-    const speed = velocity;
+    const speed = visibleSpeed;
 
     particles.push({
       id: `p-${i}`,
-      position: { x, y },
+      position: {
+        x: pos.x,
+        y: dimension === "1D" ? canvasHeight / 2 : pos.y,
+      },
       velocity: {
         vx: speed * Math.cos(angle),
         vy: dimension === "1D" ? 0 : speed * Math.sin(angle),
@@ -179,6 +202,7 @@ export function useOriginalPhysicsEngine({
   const step = useCallback(
     (dt: number) => {
       if (engineRef.current && isRunning) {
+        engineRef.current.updateConfiguration({ timeStep: dt });
         const actualDt = engineRef.current.step(particlesRef.current);
         timeRef.current += actualDt;
 
@@ -219,6 +243,41 @@ export function useOriginalPhysicsEngine({
 
     if (newParams.particleCount !== undefined && newParams.particleCount !== params.particleCount) {
       particlesRef.current = initializeParticles(updatedParams);
+    }
+
+    if (newParams.dimension !== undefined && newParams.dimension !== params.dimension) {
+      particlesRef.current = initializeParticles(updatedParams);
+    }
+
+    const distributionChanged =
+      newParams.initialDistType !== undefined && newParams.initialDistType !== params.initialDistType;
+    const distributionParamsChanged =
+      newParams.distSigmaX !== undefined ||
+      newParams.distSigmaY !== undefined ||
+      newParams.distR0 !== undefined ||
+      newParams.distDR !== undefined ||
+      newParams.distThickness !== undefined ||
+      newParams.distNx !== undefined ||
+      newParams.distNy !== undefined ||
+      newParams.distJitter !== undefined;
+
+    if (distributionChanged || distributionParamsChanged) {
+      particlesRef.current = initializeParticles(updatedParams);
+    }
+
+    if (newParams.velocity !== undefined && newParams.velocity !== params.velocity) {
+      const newVisibleSpeed = toVisibleSpeed(updatedParams);
+      for (const particle of particlesRef.current) {
+        const currentSpeed = Math.hypot(particle.velocity.vx, particle.velocity.vy);
+        const angle = currentSpeed > 0
+          ? Math.atan2(particle.velocity.vy, particle.velocity.vx)
+          : Math.random() * 2 * Math.PI;
+
+        particle.velocity.vx = newVisibleSpeed * Math.cos(angle);
+        particle.velocity.vy = updatedParams.dimension === "1D"
+          ? 0
+          : newVisibleSpeed * Math.sin(angle);
+      }
     }
   }, [params]);
 

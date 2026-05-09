@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 15:45 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
 
 ## Active Tasks
 
@@ -51,11 +51,12 @@
 | T25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | T25a |
 | T25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | T25c |
 | T26 | WebGL + tsParticles Visualization Rewrite | 📝 PLANNED | HIGH | 2026-05-09 | T25 | [Details](tasks/T26.md) |
-| T27 | Clean Architecture Rewrite (Physics + WebGL) | 🔄 IN PROGRESS | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
-| T27a | Vercel Build Fixes — TypeScript Strictness | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | — |
-| T27b | Original Engine Integration | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | — |
-| T27c | Frozen Particles Fix | 📝 PLANNED | CRITICAL | 2026-05-09 | T27b | — |
-| T27d | Strategy Selection UI | 📝 PLANNED | HIGH | 2026-05-09 | T27b | — |
+| T27 | Clean Rewrite — Pure WebGL + Original Physics Engine | 🔄 IN PROGRESS | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
+| T27a | Vercel Build Fixes — TypeScript Strictness | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27a.md) |
+| T27b | Original Engine Integration | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27b.md) |
+| T27c | Frozen Particles Fix | ✅ COMPLETED | CRITICAL | 2026-05-09 | T27b | [Details](tasks/T27c.md) |
+| T27d | Strategy Selection UI | ✅ COMPLETED | HIGH | 2026-05-09 | T27b | [Details](tasks/T27d.md) |
+| T27e | Strategy Propagation Fix | ✅ COMPLETED | HIGH | 2026-05-09 | T27d | [Details](tasks/T27e.md) |
 | T28 | Simplicial Growth Algorithm Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T27 | [Details](tasks/T28.md) |
 | T28a | Simplicial Foundational Core Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28a.md) |
 | T28b | 2D Simplicial Pachner Moves Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28b.md) |
@@ -71,45 +72,43 @@
 
 ## Task Details
 
-### T27: Clean Architecture Rewrite (Physics + WebGL)
-**Description**: Complete rewrite of Random Walk simulation with clean architecture. Ditches tsParticles entirely. Evolution: V2 engine (ballistic only) → Original PhysicsEngine (full strategies) + WebGLRendererV2.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 15:45 IST
-**Files**: `frontend/src/physics/PhysicsEngineV2.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `frontend/src/hooks/usePhysicsEngine.ts`, `frontend/src/hooks/useWebGLRenderer.ts`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`
-**Notes**: 
-- Phase 1: PhysicsEngineV2 built (limited to ballistic)
-- Phase 2: Swapped to original PhysicsEngine via useOriginalPhysicsEngine.ts adapter
-- Phase 3: Fixed frozen particles (nextCollisionTime init) and missing strategy UI
-- Build: ✅ Compiles clean locally and on Vercel
-- Deploy: ✅ Successful
-- Motion: ✅ Particles should now move (T27c fixed)
-- Strategies: ✅ Panel has strategy selection (T27d fixed)
-- Next: Build and deploy to verify fixes live
+### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
+**Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 14:00:20 IST
+**Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
+**Notes**:
+- V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
+- Controls are wired to the live engine: `Initialize`, `Start`, `Pause`, and `Reset` all affect runtime state
+- Density panel restored to the V2 layout; page scrolling restored for lower panels
+- Initial distributions now drive actual particle placement again, with V2 parameter controls restored
+- Live time/stats are propagated back into the V2 UI
+- Remaining gap: `levy` and `fractional` still appear in the strategy dropdown but are not implemented downstream
 
 ### T27a: Vercel Build Fixes — TypeScript Strictness
-**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:37:00 IST
-**Issues Fixed**: RandomWalkSimulationState duplicate export, BoundaryType consistency, useParticlesLoader double cast, memory bank type exports
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
+**Issues Fixed**: RandomWalkSimulationState export cleanup, BoundaryType consistency, useParticlesLoader typing, memory-bank type/export fixes needed for clean V2 builds
 
 ### T27b: Original Engine Integration
-**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:37:00 IST
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
 **Files**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`
 **What**: Adapter hook wrapping original PhysicsEngine with ParameterManager, strategy factory, particle initialization, adaptParticles() converter
 **Result**: Original engine's strategy system now drives WebGL renderer
 
 ### T27c: Frozen Particles Fix
-**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
 **Issue**: Particles render but don't move. Time indicator frozen.
 **Root Cause**: `nextCollisionTime` initialized to `Infinity` in `initializeParticles()`. CTRW strategies check `currentTime >= particle.nextCollisionTime` — since currentTime starts at 0, condition never met, so no collisions ever occur.
 **Fix**: Changed to `Math.random() * (1 / (params.collisionRate || 1))` — each particle gets random initial wait time.
 **File**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`
 
 ### T27d: Strategy Selection UI
-**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
 **Issue**: Parameter panel missing strategy type selection (Ballistic, CTRW, Composite, etc.)
 **Fix**: Added `<select>` dropdown with options: Simple (Ballistic), CTRW (Continuous Time Random Walk), Lévy Flight, Fractional Diffusion, Interparticle Collisions.
 **File**: `frontend/src/components/RandomWalkParameterPanelV2.tsx`
 
 ### T27e: Strategy Propagation Fix
-**Status**: ✅ COMPLETED **Last**: 2026-05-09 15:45 IST
+**Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST
 **Issue**: `createParameterManager()` hardcoded strategies based on collisionRate: `params.collisionRate > 0 ? ['ctrw'] : ['simple']`. The `strategies` array from `RandomWalkParams` was never read.
 **Fix**: Extended `EngineParams` to include `strategies` array; rewrote `createParameterManager()` to read from params with fallback logic; auto-adds 'collisions' when interparticleCollisions enabled; updated `RandomWalkSimV2.tsx` to pass strategies.
 **Files**: `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/RandomWalkSimV2.tsx`

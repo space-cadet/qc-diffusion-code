@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo, useState } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanelV2 } from "./components/RandomWalkParameterPanelV2";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvasV2 } from "./components/ParticleCanvasV2";
+import { DensityComparison } from "./components/DensityComparison";
 import { RandomWalkHeader } from "./components/RandomWalkHeader";
 import type { EngineParams } from "./hooks/useOriginalPhysicsEngine";
+import type { Particle } from "./physics/types/Particle";
 // CSS imports
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -21,11 +23,15 @@ export default function RandomWalkSimV2() {
     setRandomWalkSimLayouts,
     randomWalkSimulationState,
     setRandomWalkSimulationState,
+    updateSimulationMetrics,
   } = useAppStore();
 
   const isRunning = randomWalkSimulationState.isRunning;
   const timeRef = useRef(0);
   const collisionsRef = useRef(0);
+  const liveParticlesRef = useRef<Particle[]>([]);
+  const [initializeVersion, setInitializeVersion] = useState(0);
+  const [resetVersion, setResetVersion] = useState(0);
 
   // Convert gridLayoutParams to EngineParams
   const engineParams: EngineParams = useMemo(() => ({
@@ -63,20 +69,48 @@ export default function RandomWalkSimV2() {
 
   const handleReset = () => {
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, status: 'Stopped' });
-    // The ParticleCanvasV2 will handle reset internally via key change
+    timeRef.current = 0;
+    collisionsRef.current = 0;
+    updateSimulationMetrics(0, 0, 'Stopped', 0);
+    setResetVersion((version) => version + 1);
   };
 
   const handleInitialize = () => {
-    // Force remount of ParticleCanvasV2 to reinitialize particles
-    setRandomWalkSimulationState({ ...randomWalkSimulationState, status: 'Initialized' });
+    timeRef.current = 0;
+    collisionsRef.current = 0;
+    setRandomWalkSimulationState({
+      ...randomWalkSimulationState,
+      isRunning: false,
+      time: 0,
+      collisions: 0,
+      status: 'Initialized',
+    });
+    updateSimulationMetrics(0, 0, 'Initialized', 0);
+    setInitializeVersion((version) => version + 1);
   };
+
+  const handleStatsUpdate = useCallback((stats: { time: number; collisionCount: number; particleCount: number }) => {
+    timeRef.current = stats.time;
+    collisionsRef.current = stats.collisionCount;
+    updateSimulationMetrics(
+      stats.time,
+      stats.collisionCount,
+      isRunning ? 'Running' : randomWalkSimulationState.status,
+      randomWalkSimulationState.interparticleCollisions ?? 0
+    );
+  }, [
+    isRunning,
+    randomWalkSimulationState.status,
+    randomWalkSimulationState.interparticleCollisions,
+    updateSimulationMetrics,
+  ]);
 
   const onLayoutChange = (layout: any) => {
     setRandomWalkSimLayouts(layout);
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="min-h-full flex flex-col bg-gray-50">
       <RandomWalkHeader />
 
       <div className="flex-1 p-4 relative">
@@ -112,10 +146,20 @@ export default function RandomWalkSimV2() {
               key={`v2-${gridLayoutParams.dimension}`}
               params={engineParams}
               isRunning={isRunning}
-              onStatsUpdate={(stats) => {
-                timeRef.current = stats.time;
-                collisionsRef.current = stats.collisionCount;
-              }}
+              initializeVersion={initializeVersion}
+              resetVersion={resetVersion}
+              liveParticlesRef={liveParticlesRef}
+              onStatsUpdate={handleStatsUpdate}
+            />
+          </div>
+
+          {/* Density Panel */}
+          <div key="density">
+            <DensityComparison
+              particles={liveParticlesRef.current}
+              particleCount={liveParticlesRef.current.length}
+              gridLayoutParams={gridLayoutParams}
+              simulationState={randomWalkSimulationState}
             />
           </div>
 

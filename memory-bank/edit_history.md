@@ -1,7 +1,29 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 07:27:00 IST*
+*Last Updated: 2026-05-09 14:00:20 IST*
+
+**14:00:20 IST - T27: V2 parity fixes and memory-bank sync**
+
+- Created `memory-bank/edits/2026-05-09/140020-T27-memory-sync.md` - Edit chunk covering source changes and synchronized memory-bank updates for T27
+- Created `memory-bank/tasks/T27a.md` - Backfilled missing subtask file for Vercel/TypeScript strictness fixes
+- Created `memory-bank/tasks/T27b.md` - Backfilled missing subtask file for original engine integration
+- Created `memory-bank/tasks/T27c.md` - Backfilled missing subtask file for frozen-particles fix
+- Created `memory-bank/tasks/T27d.md` - Backfilled missing subtask file for strategy selector restoration
+- Created `memory-bank/tasks/T27e.md` - Backfilled missing subtask file for strategy propagation fix
+- Modified `frontend/src/App.tsx` - Restored scrollable route shell behavior for the random walk page
+- Modified `frontend/src/RandomWalkSimV2.tsx` - Wired engine controls, restored density panel, and updated V2 layout behavior
+- Modified `frontend/src/components/DensityComparison.tsx` - Made density panel tolerate the V2 engine path
+- Modified `frontend/src/components/ParticleCanvasV2.tsx` - Propagated live stats and V2 particle data outward
+- Modified `frontend/src/components/RandomWalkParameterPanelV2.tsx` - Restored distribution-specific controls and corrected boundary option wiring
+- Modified `frontend/src/hooks/useOriginalPhysicsEngine.ts` - Fixed initialization/reset behavior, visible motion path, and initial-distribution wiring
+- Modified `memory-bank/tasks/T27.md` - Updated parent task to reflect the real “Pure WebGL + Original Physics Engine” direction and latest parity fixes
+- Modified `memory-bank/tasks.md` - Added T27a-e detail links, restored missing T27e registry row, and synced T27 status notes
+- Modified `memory-bank/activeContext.md` - Updated current T27 state, parity fixes, and remaining strategy limitation
+- Modified `memory-bank/session_cache.md` - Moved current session to 2026-05-09-afternoon and synced branch/focus
+- Modified `memory-bank/sessions/2026-05-09-afternoon.md` - Appended control, scroll, density, and distribution restoration notes
+- Modified `memory-bank/implementation-details/t27-clean-architecture-rewrite.md` - Updated architecture doc to match the current original-engine adapter reality
+- Modified `memory-bank/edit_history.md` - Added synchronized T27 entry for code + memory updates
 
 **04:46:47 IST - T25: Screenshot Verification and Critical Bug Fixes**
 
