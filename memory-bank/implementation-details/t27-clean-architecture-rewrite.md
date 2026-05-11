@@ -61,7 +61,7 @@ Complete rewrite of the Random Walk simulation visualization and control path. T
 
 ### 3. WebGLRendererV2 Design
 - **Shader-based**: Vertex + fragment shaders for point rendering
-- **Color mapping**: Velocity → color (blue = slow, red = fast)
+- **Color mapping**: Currently static blue for all particles; velocity → color mapping (blue = slow, red = fast) is planned but not yet implemented
 - **Buffer management**: Single buffer for all particles, updated each frame
 - **Cleanup**: Proper WebGL resource disposal on unmount
 

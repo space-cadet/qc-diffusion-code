@@ -49,7 +49,7 @@ interface UseOriginalPhysicsEngineReturn {
   step: (dt: number) => void;
   reset: () => void;
   updateParams: (params: Partial<EngineParams>) => void;
-  getStats: () => { time: number; collisionCount: number; particleCount: number } | null;
+  getStats: () => { time: number; collisionCount: number; interparticleCollisionCount: number; particleCount: number } | null;
 }
 
 function toVisibleSpeed(params: EngineParams): number {
@@ -174,6 +174,7 @@ export function useOriginalPhysicsEngine({
   const particlesRef = useRef<Particle[]>([]);
   const timeRef = useRef(0);
   const collisionCountRef = useRef(0);
+  const interparticleCollisionCountRef = useRef(0);
 
   useEffect(() => {
     const boundaryConfig = createBoundaryConfig(params);
@@ -207,10 +208,13 @@ export function useOriginalPhysicsEngine({
         timeRef.current += actualDt;
 
         let collisions = 0;
+        let interparticleCollisions = 0;
         for (const p of particlesRef.current) {
           collisions += p.collisionCount || 0;
+          interparticleCollisions += p.interparticleCollisionCount || 0;
         }
         collisionCountRef.current = collisions;
+        interparticleCollisionCountRef.current = interparticleCollisions;
       }
     },
     [isRunning]
@@ -222,6 +226,7 @@ export function useOriginalPhysicsEngine({
       particlesRef.current = initializeParticles(params);
       timeRef.current = 0;
       collisionCountRef.current = 0;
+      interparticleCollisionCountRef.current = 0;
     }
   }, [params]);
 
@@ -285,6 +290,7 @@ export function useOriginalPhysicsEngine({
     return {
       time: timeRef.current,
       collisionCount: collisionCountRef.current,
+      interparticleCollisionCount: interparticleCollisionCountRef.current,
       particleCount: particlesRef.current.length,
     };
   }, []);

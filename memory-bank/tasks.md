@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:00:20 IST*
+*Last Updated: 2026-05-11 10:23:55 IST*
 
 ## Active Tasks
 
@@ -57,6 +57,7 @@
 | T27c | Frozen Particles Fix | ✅ COMPLETED | CRITICAL | 2026-05-09 | T27b | [Details](tasks/T27c.md) |
 | T27d | Strategy Selection UI | ✅ COMPLETED | HIGH | 2026-05-09 | T27b | [Details](tasks/T27d.md) |
 | T27e | Strategy Propagation Fix | ✅ COMPLETED | HIGH | 2026-05-09 | T27d | [Details](tasks/T27e.md) |
+| T27f | Observables Panel Restoration and Collision Stats Visibility | ✅ COMPLETED | HIGH | 2026-05-11 | T27e | [Details](tasks/T27f.md) |
 | T28 | Simplicial Growth Algorithm Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T27 | [Details](tasks/T28.md) |
 | T28a | Simplicial Foundational Core Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28a.md) |
 | T28b | 2D Simplicial Pachner Moves Implementation | ✅ COMPLETED | HIGH | 2026-01-28 | T28a | [Details](tasks/T28b.md) |
@@ -74,7 +75,7 @@
 
 ### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
 **Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-09 14:00:20 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-11 10:23:55 IST
 **Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
 **Notes**:
 - V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
@@ -82,7 +83,9 @@
 - Density panel restored to the V2 layout; page scrolling restored for lower panels
 - Initial distributions now drive actual particle placement again, with V2 parameter controls restored
 - Live time/stats are propagated back into the V2 UI
-- Remaining gap: `levy` and `fractional` still appear in the strategy dropdown but are not implemented downstream
+- Floating observables panels restored to V2 via `simulatorLikeRef` shim
+- Inter-particle collision counts now tracked and visible in V2 parameter panel
+- Remaining gaps: `levy`/`fractional` strategies UI-only; graph mode not on V2
 
 ### T27a: Vercel Build Fixes — TypeScript Strictness
 **Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST

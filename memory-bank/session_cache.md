@@ -1,29 +1,30 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:00:20 IST*
+*Last Updated: 2026-05-11 10:23:55 IST*
 
 ## Current Session
 
-**Session**: 2026-05-09-afternoon.md
-**Started**: 2026-05-09 08:55:00 IST
+**Session**: 2026-05-11-morning.md
+**Started**: 2026-05-11 10:23:55 IST
 **Focus**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
-**Status**: 🔄 IN PROGRESS — V2 parity fixes landed, pending live verification
-**Branch**: cloud-claw/screenshot-poc
+**Status**: 🔄 IN PROGRESS — floating observables restored, collision stats visible; remaining strategy cleanup and graph mode
+**Branch**: main
 
 ## Overview
 
-- Active: 18 | Paused: 0 | Completed: 23
-- Last Session: `sessions/2026-05-09-morning.md`
-- Current Period: afternoon
+- Active: 18 | Paused: 0 | Completed: 24
+- Last Session: `sessions/2026-05-09-afternoon.md`
+- Current Period: morning
 
 ## Session History (Last 5)
 
-1. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
-2. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
-3. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
-4. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
-5. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
+1. `sessions/2026-05-11-morning.md` - T27f floating observables restoration and collision stats fix
+2. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
+3. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
+4. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
+5. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
+6. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
 
 ## Task Registry
 
@@ -58,6 +59,7 @@
 - T25: Random Walk Page Architecture Review and Fix - ✅ COMPLETED (screenshot verification, memory bank async loading fix, backend requirements fix, websocket verification)
 - T26: Build Performance Optimization and Bundle Size Reduction - ✅
 - T27: Pure WebGL + Original Physics Engine - 🔄
+- T27f: Observables Panel Restoration and Collision Stats Visibility - ✅
 - T28: Simplicial Growth Algorithm Implementation - ✅
 - T29: Memory Bank Feature Implementation - ✅
 - T31: Mobile UI Responsiveness and Design - ✅

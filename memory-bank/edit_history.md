@@ -1,7 +1,20 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:00:20 IST*
+*Last Updated: 2026-05-11 10:23:55 IST*
+
+**10:23:55 IST - T27f: Observables restoration and collision stats fix**
+
+- Created `memory-bank/edits/2026-05-11/102355-T27f-observables-restoration.md` - Edit chunk for T27f code changes
+- Created `memory-bank/tasks/T27f.md` - Subtask for observables panel restoration and collision stats visibility
+- Created `memory-bank/sessions/2026-05-11-morning.md` - Session file for morning work
+- Modified `frontend/src/RandomWalkSimV2.tsx` - Added FloatingPanel, ObservablesPanel, CustomObservablesPanel via simulatorLikeRef shim
+- Modified `frontend/src/hooks/useOriginalPhysicsEngine.ts` - Added interparticleCollisionCount tracking to getStats and reset
+- Modified `frontend/src/components/RandomWalkParameterPanelV2.tsx` - Restored Scattering and Collisions readouts in status display
+- Modified `memory-bank/tasks/T27.md` - Added acceptance criteria and progress entry for T27f
+- Modified `memory-bank/tasks.md` - Added T27f registry row and updated T27 notes
+- Modified `memory-bank/activeContext.md` - Added floating observables and collision stats to parity list
+- Modified `memory-bank/session_cache.md` - Updated current session to 2026-05-11-morning
 
 **14:00:20 IST - T27: V2 parity fixes and memory-bank sync**
 

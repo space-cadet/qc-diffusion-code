@@ -7,6 +7,11 @@ import { ExportPanel } from "./components/ExportPanel";
 import { ParticleCanvasV2 } from "./components/ParticleCanvasV2";
 import { DensityComparison } from "./components/DensityComparison";
 import { RandomWalkHeader } from "./components/RandomWalkHeader";
+import { FloatingPanel } from "./components/common/FloatingPanel";
+import { ObservablesPanel } from "./components/ObservablesPanel";
+import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
+import { useRandomWalkPanels } from "./hooks/useRandomWalkPanels";
+import { ObservableManager } from "./physics/ObservableManager";
 import type { EngineParams } from "./hooks/useOriginalPhysicsEngine";
 import type { Particle } from "./physics/types/Particle";
 // CSS imports
@@ -32,6 +37,7 @@ export default function RandomWalkSimV2() {
   const liveParticlesRef = useRef<Particle[]>([]);
   const [initializeVersion, setInitializeVersion] = useState(0);
   const [resetVersion, setResetVersion] = useState(0);
+  const [simReady] = useState(true);
 
   // Convert gridLayoutParams to EngineParams
   const engineParams: EngineParams = useMemo(() => ({
@@ -89,19 +95,45 @@ export default function RandomWalkSimV2() {
     setInitializeVersion((version) => version + 1);
   };
 
-  const handleStatsUpdate = useCallback((stats: { time: number; collisionCount: number; particleCount: number }) => {
+  // Observable manager and simulator shim for floating panels
+  const observableManagerRef = useRef(
+    new ObservableManager({ width: engineParams.canvasWidth, height: engineParams.canvasHeight })
+  );
+
+  const simulatorLikeRef = useRef<any>({
+    getObservableManager: () => observableManagerRef.current,
+    getParticleManager: () => ({ getAllParticles: () => liveParticlesRef.current }),
+    getTime: () => timeRef.current,
+    getObservableData: (id: string) => observableManagerRef.current.getResult(id),
+  });
+
+  const {
+    observablesWindow,
+    observablesCollapsed,
+    handleObservablesDragStop,
+    handleObservablesResizeStop,
+    handleObservablesMouseDown,
+    handleObservablesToggleCollapse,
+    customObservablesWindow,
+    customObservablesCollapsed,
+    handleCustomObservablesDragStop,
+    handleCustomObservablesResizeStop,
+    handleCustomObservablesMouseDown,
+    handleCustomObservablesToggleCollapse,
+  } = useRandomWalkPanels();
+
+  const handleStatsUpdate = useCallback((stats: { time: number; collisionCount: number; interparticleCollisionCount: number; particleCount: number }) => {
     timeRef.current = stats.time;
     collisionsRef.current = stats.collisionCount;
     updateSimulationMetrics(
       stats.time,
       stats.collisionCount,
       isRunning ? 'Running' : randomWalkSimulationState.status,
-      randomWalkSimulationState.interparticleCollisions ?? 0
+      stats.interparticleCollisionCount
     );
   }, [
     isRunning,
     randomWalkSimulationState.status,
-    randomWalkSimulationState.interparticleCollisions,
     updateSimulationMetrics,
   ]);
 
@@ -178,6 +210,41 @@ export default function RandomWalkSimV2() {
             />
           </div>
         </ReactGridLayout>
+
+        {/* Floating Observables Panel */}
+        <FloatingPanel
+          title="Observables"
+          position={{ x: observablesWindow.left, y: observablesWindow.top }}
+          size={{ width: observablesWindow.width, height: observablesWindow.height }}
+          zIndex={observablesWindow.zIndex}
+          isCollapsed={observablesCollapsed}
+          onToggleCollapse={handleObservablesToggleCollapse}
+          onDragStop={handleObservablesDragStop}
+          onResizeStop={handleObservablesResizeStop}
+          onMouseDown={handleObservablesMouseDown}
+        >
+          <ObservablesPanel
+            simulatorRef={simulatorLikeRef}
+            isRunning={isRunning}
+            simulationStatus={randomWalkSimulationState.status}
+            simReady={simReady}
+          />
+        </FloatingPanel>
+
+        {/* Floating Custom Observables Panel */}
+        <FloatingPanel
+          title="Custom Observables"
+          position={{ x: customObservablesWindow.left, y: customObservablesWindow.top }}
+          size={{ width: customObservablesWindow.width, height: customObservablesWindow.height }}
+          zIndex={customObservablesWindow.zIndex}
+          isCollapsed={customObservablesCollapsed}
+          onToggleCollapse={handleCustomObservablesToggleCollapse}
+          onDragStop={handleCustomObservablesDragStop}
+          onResizeStop={handleCustomObservablesResizeStop}
+          onMouseDown={handleCustomObservablesMouseDown}
+        >
+          <CustomObservablesPanel simulatorRef={simulatorLikeRef} simReady={simReady} />
+        </FloatingPanel>
       </div>
     </div>
   );

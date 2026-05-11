@@ -1,11 +1,11 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 14:00:20 IST*
+*Last Updated: 2026-05-11 10:23:55 IST*
 
 ## Current Focus
 **Task**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
-**Status**: 🔄 IN PROGRESS — V2 parity fixes applied, pending live verification and remaining strategy cleanup
+**Status**: 🔄 IN PROGRESS — V2 parity fixes applied, floating observables restored, collision stats visible; remaining strategy cleanup and graph mode
 **Priority**: HIGH
 
 **Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. The active page now runs through `WebGLRendererV2` plus the original `PhysicsEngine` via `useOriginalPhysicsEngine.ts`. TypeScript compiles clean. The main V2 parity fixes now on the branch are:
@@ -79,6 +79,10 @@
   - V2 control wiring — `Initialize`, `Reset`, and live stats flow are connected to the actual engine
   - V2 layout parity — page scroll restored and density panel re-added to the layout
   - V2 initialization parity — shared initial-distribution sampler and missing distribution-specific controls restored
+- **Morning fixes (2026-05-11)**:
+  - T27f: Floating observables restored — `ObservablesPanel` and `CustomObservablesPanel` mounted on V2 via `simulatorLikeRef` shim
+  - T27f: Collision stats fix — `useOriginalPhysicsEngine` now tracks `interparticleCollisionCount`; V2 panel shows Scattering and Collisions counts
+  - Memory bank discrepancies fixed — velocity-color claim corrected in implementation doc; T27 timestamp inconsistency resolved
 
 ### T31: Mobile UI Responsiveness and Design
 - Mobile bottom icon navigation bar (4 primary + hamburger overflow)
