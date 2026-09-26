@@ -1,17 +1,17 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 17:03:29 IST*
+*Last Updated: 2026-09-26 18:10:09 IST*
 
 ## Current Session
 
-**2026-09-26 review-fix update**: Fixed PR feedback for selectable saved metrics, live comparison coverage through the 50-unit maximum horizon, and walker-count changes restarting the seeded run. The frozen two-unit results are unchanged. Browser QA remains pending. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
+**2026-09-26 closeout update**: PR #19 merged to main at `74ef789`. T39c browser acceptance and the linked paper methods/results note remain open. The paper Memory Bank now records T15a/NUM-7's matched sampler/equation scope and T15b's geometry-first two-anisotropy research. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
 
 **Session**: 2026-09-26-afternoon.md
 **Started**: 2026-09-26 12:03:25 IST
 **Focus**: T39 - Spheroid geometry-space walk experiment
-**Status**: 🔄 IN PROGRESS — review fixes and result regeneration complete; browser QA and paper-repository note remain
-**Branch**: `codex/t39-spheroid-random-walk`
+**Status**: 🔄 IN PROGRESS — PR #19 merged; browser QA and paper-repository note remain
+**Branch**: `codex/t39-memory-bank-closeout`
 
 ## Overview
 

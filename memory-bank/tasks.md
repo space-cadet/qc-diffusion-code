@@ -84,8 +84,8 @@
 
 ### T39: Spheroid Geometry-Space Walk Experiment
 **Description**: Reproducible walks between intrinsic spheroid geometries, independently checked and rendered in 3D.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-26 17:03:29 IST
-**Subtasks**: T39a model ✅, T39b numerical validation ✅ (clean-source result regeneration complete), T39c web page 🔄 (PR fixes applied; browser QA pending).
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-26 18:10:09 IST
+**Subtasks**: T39a model ✅, T39b numerical validation ✅ (clean-source result regeneration complete), T39c web page 🔄 (PR #19 merged; browser QA pending).
 **Files**: `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`, `memory-bank/tasks/T39.md`.
 **Research owner**: Paper repository T15/T15a; spheroid results are methodological and do not establish WDW dynamics.
 

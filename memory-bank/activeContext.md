@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 17:03:29 IST*
+*Last Updated: 2026-09-26 18:10:09 IST*
 
 ## Current Focus
 **Task**: T39 - Spheroid geometry-space walk experiment
-**Status**: 🔄 IN PROGRESS — model and numerical validation complete; page implementation complete, browser QA pending
+**Status**: 🔄 IN PROGRESS — PR #19 merged to main; T39c browser acceptance remains pending
 **Priority**: HIGH
 
-**Context**: T39 adds a seeded spheroid geometry walk with saved numerical comparisons and a 3D visualization. Fixed volume remains the default; fixed surface area is selectable. Browser QA is the remaining code-side acceptance item. The app-shell history below is retained as prior context.
+**Context**: T39 adds a seeded spheroid geometry walk with saved numerical comparisons and a 3D visualization. Fixed volume remains the default; fixed surface area is selectable. PR #19 is merged at `74ef789`; browser QA and the linked paper methods/results note remain open. The app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -57,9 +57,9 @@
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
 - Strategies: ⚠️ `simple`, `ctrw`, and `collisions` work; `levy` and `fractional` are still UI-only
 
-**Branch**: `codex/t39-spheroid-random-walk`
+**Branch**: `codex/t39-memory-bank-closeout` (based on merged T39 PR #19)
 
-**Immediate Next Step**: Complete browser QA for T39c replay, mobile layout, persistence, geometry constraints, and chart labels; then add the code-side result link in the paper checkout when that repository is in scope.
+**Immediate Next Step**: Complete T39c browser QA for replay, mobile layout, persistence, geometry constraints, and chart labels; then add the linked spheroid methods/results note in the paper checkout.
 
 ## 2026-09-26 Spheroid experiment
 
@@ -67,7 +67,7 @@
 - T39/T39a/T39b/T39c own the separate pure model, numerical validation, and interactive 3D page in this repository. The implementation details are in `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`.
 - `spin-network-app` was reviewed for overlap; its fixed-graph walk and future spin-foam type sketch do not replace this repository's simplicial-growth work.
 - T39a geometry/walk and T39b finite-volume comparison are implemented. Frozen run v1 meets its terminal mean $L^1$ criterion at 32,000 walkers for both profiles; see `memory-bank/results/t39-spheroid-run-v1.md`.
-- T39c page is implemented and replays saved frames; browser verification remains open because this checkout has no installed frontend dependencies. The paper checkout was not changed. Existing T38/T27 and simplicial work retain their recorded status.
+- T39c page is implemented and replays saved frames; browser verification remains open because this checkout has no installed frontend dependencies. The paper checkout now records the separate T15a/NUM-7 result and T15b two-anisotropy follow-up; the T39 methods/results link remains open. Existing T38/T27 and simplicial work retain their recorded status.
 - PR feedback fixes now serialize every selected ensemble metric, extend live comparison data to the 50-unit run limit, and restart live simulation when walker count changes. Run v1 was regenerated from a clean source revision; browser QA and the paper note remain open.
 
 ## New Tasks Created (Mem-scan Audit)

@@ -6,7 +6,7 @@ source_commit: ce44fd2af3c628dc25cc3aa2c584d3e79f4cb93f
 # Session 2026-09-26 - Afternoon
 
 *Created: 2026-09-26 12:03:25 IST*
-*Last Updated: 2026-09-26 16:33:38 IST*
+*Last Updated: 2026-09-26 18:10:09 IST*
 
 ## Focus
 
@@ -30,12 +30,12 @@ T39/T39a/T39b/T39c: plan a reproducible spheroid walk, independent numerical che
 
 - T38 remains a plan, not callable runner infrastructure; the experiment uses the existing Mulberry32 algorithm from the separate Bianchi validation. T27 and T28/T30 app work is untouched by this work.
 - This checkout already had unrelated modified and untracked files before the T39 documentation was added; those were preserved.
-- Browser verification remains open because frontend dependencies are not installed and pnpm could not be downloaded from the registry. The paper repository was not modified to honor the code-repository scope.
+- Browser verification remains open because frontend dependencies are not installed and pnpm could not be downloaded from the registry. At that point the paper repository had not been modified; it has since recorded T15a/NUM-7 and opened T15b. The linked T39 results note remains open.
 
 ## Next steps
 
 1. Install dependencies when network access is available and complete T39c browser/replay/responsive QA.
-2. Add a linked methods/results note in the separate paper repository when work is authorized there.
+2. Add a linked methods/results note in the separate paper repository after the code-side result review.
 
 ## Later UI and geometry updates
 
@@ -63,3 +63,10 @@ Browser QA and the separate paper-repository methods/results note remain outstan
 ## 2026-09-26 17:03 IST - Preserve the existing live-run limit
 
 Kept the existing 500-step live-run maximum so persisted settings remain valid. Extended the saved comparison reference and diffusive control to 50 model-time units; the separate frozen acceptance study remains at two units. Regenerated the JSON from clean source commit `e90aa058f17a219a555d41b9c5ff1fb025f05ebd` with source digest `2f1f6ce81c784266073bd771c4c459c83881662b743c55468d789262ee1783a1`.
+
+## 2026-09-26 18:10 IST - Cross-repository Memory Bank closeout
+
+- Verified from the fetched Git history that T39 PR #19 merged into main at `74ef789`; browser acceptance remains pending in T39c.
+- The paper repository now records T15a/NUM-7 as a matched sampler/equation benchmark, not independent evidence for a physical transition law, and tracks the full two-anisotropy geometry-first problem under T15b.
+- The generic isotropic 2D direction-reset failure remains a control for that distinct process and does not settle full Bianchi I.
+- The T39 methods/results link in the paper checkout remains a follow-up after review; it is separate from the paper-side T15a/T15b records.
