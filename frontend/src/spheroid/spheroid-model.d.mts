@@ -5,7 +5,7 @@ export function spheroidGeometry(q: number, theta: number, R?: number, constrain
 };
 export type SpheroidConstraint = 'volume' | 'area';
 export const LIVE_STEP_COUNT_MIN: 1;
-export const LIVE_STEP_COUNT_MAX: 200;
+export const LIVE_STEP_COUNT_MAX: 500;
 export const LIVE_STEP_COUNT_DEFAULT: 200;
 export function liveRunHorizon(stepCount: number, outputStep: number): number;
 export function initialDensity(kind: string, q: number, eta?: number): [number, number];
