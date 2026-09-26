@@ -93,6 +93,7 @@ for (const profile of definitions) {
     return { time: frame.time, mass, meanQ, meanQ2, meanR, meanArea, meanPoleCurvature, meanEquatorCurvature };
   });
   const liveReference = makeReference({ kind: profile.id, eta: profile.eta, finalTime: liveComparisonFinalTime, outputStep });
+  const liveQCenters = Array.from({ length: histogramCells }, (_, i) => -1.5 + (i + 0.5) * (3 / histogramCells));
   const liveReferenceObservables = liveReference.frames.map((frame) => {
     let mass = 0, meanQ = 0, meanQ2 = 0, meanR = 0, meanArea = 0, meanPoleCurvature = 0, meanEquatorCurvature = 0;
     for (let i = 0; i < liveReference.q.length; i++) {
@@ -168,7 +169,7 @@ for (const profile of definitions) {
     profile,
     reference: { q: reference.q, dx: reference.dx, cells: reference.q.length, frames: referenceByTime, observables: referenceObservables, massDriftMax: referenceMassDrift },
     liveComparison: {
-      reference: { q: liveReference.q, frames: liveReference.frames.map(({ time, density, current }) => ({ time, density, current })), observables: liveReferenceObservables },
+      reference: { q: liveQCenters, frames: liveReference.frames.map((frame) => ({ time: frame.time, ...aggregateReferenceFrame(frame, liveReference.dx, histogramCells) })), observables: liveReferenceObservables },
       diffusiveControl: { frames: liveDiffusiveFrames },
     },
     timeResolution,
