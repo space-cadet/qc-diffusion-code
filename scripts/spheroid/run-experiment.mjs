@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { makeReference, runDiffusiveControl, runPersistentEnsemble, spheroidSurfaceArea, transformDensityToAxisRatio } from '../../frontend/src/spheroid/spheroid-model.mjs';
+import { LIVE_STEP_COUNT_MAX, LIVE_STEP_COUNT_DEFAULT, liveRunHorizon, makeReference, runDiffusiveControl, runPersistentEnsemble, spheroidSurfaceArea, transformDensityToAxisRatio } from '../../frontend/src/spheroid/spheroid-model.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const output = resolve(root, 'frontend/public/data/t39-run-v1.json');
@@ -32,6 +32,8 @@ const definitions = [
 const seedList = Array.from({ length: 8 }, (_, i) => 39001 + i);
 const populations = [8000, 16000, 32000];
 const histogramCells = 120;
+const outputStep = 0.1;
+const liveComparisonFinalTime = liveRunHorizon(LIVE_STEP_COUNT_MAX, outputStep);
 const configurations = [];
 
 function aggregateReferenceFrame(frame, refDx, targetCells) {
@@ -90,6 +92,18 @@ for (const profile of definitions) {
     }
     return { time: frame.time, mass, meanQ, meanQ2, meanR, meanArea, meanPoleCurvature, meanEquatorCurvature };
   });
+  const liveReference = makeReference({ kind: profile.id, eta: profile.eta, finalTime: liveComparisonFinalTime, outputStep });
+  const liveReferenceObservables = liveReference.frames.map((frame) => {
+    let mass = 0, meanQ = 0, meanQ2 = 0, meanR = 0, meanArea = 0, meanPoleCurvature = 0, meanEquatorCurvature = 0;
+    for (let i = 0; i < liveReference.q.length; i++) {
+      const shapeQ = liveReference.q[i], probability = frame.density[i] * liveReference.dx;
+      mass += probability; meanQ += probability * shapeQ; meanQ2 += probability * shapeQ * shapeQ;
+      meanR += probability * Math.exp(-3 * shapeQ); meanArea += probability * spheroidSurfaceArea(shapeQ);
+      meanPoleCurvature += probability * Math.exp(-8 * shapeQ); meanEquatorCurvature += probability * Math.exp(4 * shapeQ);
+    }
+    return { time: frame.time, mass, meanQ, meanQ2, meanR, meanArea, meanPoleCurvature, meanEquatorCurvature };
+  });
+  const liveDiffusiveControl = runDiffusiveControl({ kind: profile.id, eta: profile.eta, seed: 49001, population: 4000, finalTime: liveComparisonFinalTime, outputStep });
   const refinement = [];
   const referenceFinalObservables = referenceObservables.at(-1);
   let finalRuns = [];
@@ -132,14 +146,19 @@ for (const profile of definitions) {
   const ensembleFrames = reference.frames.map((refFrame, frameIndex) => {
     const frameMeans = Array.from({ length: histogramCells }, () => 0);
     const currentMeans = Array.from({ length: histogramCells }, () => 0);
-    let meanR = 0, meanArea = 0;
+    let meanQ = 0, meanR = 0, meanArea = 0, meanVolume = 0, meanPoleCurvature = 0, meanEquatorCurvature = 0;
     for (const { run } of finalRuns) for (let cell = 0; cell < histogramCells; cell++) {
       frameMeans[cell] += run.frames[frameIndex].density[cell] / seedList.length;
       currentMeans[cell] += run.frames[frameIndex].current[cell] / seedList.length;
     }
-    for (const { run } of finalRuns) { meanR += run.frames[frameIndex].meanR / seedList.length; meanArea += run.frames[frameIndex].meanArea / seedList.length; }
+    for (const { run } of finalRuns) {
+      const frame = run.frames[frameIndex];
+      meanQ += frame.meanQ / seedList.length; meanR += frame.meanR / seedList.length;
+      meanArea += frame.meanArea / seedList.length; meanVolume += frame.meanVolume / seedList.length;
+      meanPoleCurvature += frame.meanPoleCurvature / seedList.length; meanEquatorCurvature += frame.meanEquatorCurvature / seedList.length;
+    }
     const transformed = transformDensityToAxisRatio(qCenters, frameMeans, 3 / histogramCells);
-    return { time: refFrame.time, density: frameMeans, current: currentMeans, meanR, meanArea, axisRatio: { centers: transformed.rCenters, density: transformed.densityR, massQ: transformed.massQ, massR: transformed.massR } };
+    return { time: refFrame.time, density: frameMeans, current: currentMeans, meanQ, meanR, meanArea, meanVolume, meanPoleCurvature, meanEquatorCurvature, axisRatio: { centers: transformed.rCenters, density: transformed.densityR, massQ: transformed.massQ, massR: transformed.massR } };
   });
 
   const representative = finalRuns[0].run;
@@ -147,6 +166,10 @@ for (const profile of definitions) {
   configurations.push({
     profile,
     reference: { q: reference.q, dx: reference.dx, cells: reference.q.length, frames: referenceByTime, observables: referenceObservables, massDriftMax: referenceMassDrift },
+    liveComparison: {
+      reference: { q: liveReference.q, frames: liveReference.frames.map(({ time, density, current }) => ({ time, density, current })), observables: liveReferenceObservables },
+      diffusiveControl: { frames: liveDiffusiveControl.frames },
+    },
     timeResolution,
     refinement,
     ensembleFrames,
@@ -160,7 +183,7 @@ const payload = {
   createdAt: new Date().toISOString(),
   specification: { version: 't39-pre-run-v1', path: 'memory-bank/implementation-details/spheroid-run-spec-v1.md', sha256: specHash },
   provenance: { repositoryRevision: revision, worktreeWasDirty: dirty, trackedDiffSha256: trackedDiffHash, experimentFilesSha256: experimentHash.digest('hex'), experimentFiles, runtime: process.version, elapsedSeconds: (Date.now() - runStarted) / 1000 },
-  parameters: { R: 1, qMin: -1.5, qMax: 1.5, velocity: 0.6, lambda: 0.8, finalTime: 2, outputStep: 0.1, populationLevels: populations, seeds: seedList, histogramCells, referenceCells: 600 },
+  parameters: { R: 1, qMin: -1.5, qMax: 1.5, velocity: 0.6, lambda: 0.8, finalTime: 2, liveComparisonFinalTime, liveComparisonStepCount: LIVE_STEP_COUNT_MAX, liveComparisonDefaultStepCount: LIVE_STEP_COUNT_DEFAULT, outputStep, populationLevels: populations, seeds: seedList, histogramCells, referenceCells: 600 },
   profiles: configurations,
 };
 mkdirSync(dirname(output), { recursive: true });

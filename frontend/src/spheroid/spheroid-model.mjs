@@ -27,7 +27,7 @@ export function spheroidGeometry(q, theta, R = 1, constraint = 'volume') {
 }
 
 export const LIVE_STEP_COUNT_MIN = 1;
-export const LIVE_STEP_COUNT_MAX = 500;
+export const LIVE_STEP_COUNT_MAX = 200;
 export const LIVE_STEP_COUNT_DEFAULT = 200;
 
 export function liveRunHorizon(stepCount, outputStep) {

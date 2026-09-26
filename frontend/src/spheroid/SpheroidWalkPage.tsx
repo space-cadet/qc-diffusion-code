@@ -12,6 +12,10 @@ type RunData = {
   profiles: Array<{
     profile: { id: string; label: string; eta: number };
     reference: { q: number[]; frames: Array<{ time: number; density: number[]; current: number[] }>; observables: Array<MetricFrame>; massDriftMax: number };
+    liveComparison: {
+      reference: { q: number[]; frames: Array<{ time: number; density: number[]; current: number[] }>; observables: Array<MetricFrame> };
+      diffusiveControl: { frames: Array<MetricFrame & { density: number[] }> };
+    };
     ensembleFrames: Array<MetricFrame & { density: number[]; current: number[] }>;
     representative: { seed: number; path: Array<{ time: number; q: number; r: number; sigma: number }>; eventLog: Array<{ time: number; type: string }> };
     refinement: Array<{ population: number; relativeL1: { mean: number; ci95: number }; meanR: { mean: number; ci95: number } }>;
@@ -154,7 +158,7 @@ export default function SpheroidWalkPage() {
   const [error, setError] = useState('');
   useEffect(() => { fetch('/data/t39-run-v1.json').then((response) => { if (!response.ok) throw new Error('Saved T39 run file was not found.'); return response.json(); }).then(setRun).catch((reason) => setError(String(reason))); }, []);
   const profile = run?.profiles[profileIndex];
-  const startLiveRun = (requestedStepCount?: number, requestedConstraint: SpheroidConstraint = constraint) => {
+  const startLiveRun = (requestedStepCount?: number, requestedConstraint: SpheroidConstraint = constraint, requestedPopulation: number = population) => {
     if (!profile || !run) return;
     const seed = Number(seedInput);
     if (!seedInput.trim() || !Number.isSafeInteger(seed)) { setError('Enter a whole-number seed to start the walk.'); return; }
@@ -162,11 +166,19 @@ export default function SpheroidWalkPage() {
     if (!Number.isInteger(steps) || steps < LIVE_STEP_COUNT_MIN || steps > LIVE_STEP_COUNT_MAX) return;
     const finalTime = liveRunHorizon(steps, run.parameters.outputStep);
     setSpheroidUI({ stepCount: steps }); setStepCountDraft(String(steps));
-    const process = createLivePersistentSimulation({ kind: profile.profile.id, eta: profile.profile.eta, seed, population, ...run.parameters, finalTime, constraint: requestedConstraint, histogramCells: profile.ensembleFrames[0].density.length });
+    const process = createLivePersistentSimulation({ kind: profile.profile.id, eta: profile.profile.eta, seed, population: requestedPopulation, ...run.parameters, finalTime, constraint: requestedConstraint, histogramCells: profile.ensembleFrames[0].density.length });
     const initial = process.initialFrame;
     const first: LiveFrame = { ...initial, pathPoint: { time: initial.time, q: initial.representativeQ, r: Math.exp(-3 * initial.representativeQ), sigma: initial.representativeSigma }, totalFlips: 0, totalReflections: 0, eventLog: [] };
     simulation.current = process;
     setError(''); setIsLiveRun(true); setLiveFrames([first]); setFrameIndex(0); setRunStatus('Running'); setPlaying(true);
+  };
+  const handlePopulationChange = (nextPopulation: number) => {
+    if (isLiveRun && (!seedInput.trim() || !Number.isSafeInteger(Number(seedInput)))) {
+      setError('Enter a whole-number seed before changing walkers on an active live run.');
+      return;
+    }
+    setSpheroidUI({ population: nextPopulation });
+    if (isLiveRun) startLiveRun(stepCount, constraint, nextPopulation);
   };
   const handleStepCountChange = (value: string) => {
     setStepCountDraft(value);
@@ -209,8 +221,10 @@ export default function SpheroidWalkPage() {
   const timeline: Array<MetricFrame & { density: number[]; current: number[] }> = isLiveRun ? liveFrames : profile?.ensembleFrames ?? [];
   const frame = timeline[frameIndex];
   const selected = path[frameIndex];
-  const refDensity = profile ? densityAtTime(profile.reference.frames, selected?.time ?? 0, run?.parameters.outputStep ?? 0.1) : [];
-  const controlDensity = profile ? densityAtTime(profile.diffusiveControl.frames, selected?.time ?? 0, run?.parameters.outputStep ?? 0.1) : [];
+  const referenceFrames = isLiveRun ? profile?.liveComparison.reference.frames ?? [] : profile?.reference.frames ?? [];
+  const controlFrames = isLiveRun ? profile?.liveComparison.diffusiveControl.frames ?? [] : profile?.diffusiveControl.frames ?? [];
+  const refDensity = profile ? densityAtTime(referenceFrames, selected?.time ?? 0, run?.parameters.outputStep ?? 0.1) : [];
+  const controlDensity = profile ? densityAtTime(controlFrames, selected?.time ?? 0, run?.parameters.outputStep ?? 0.1) : [];
   const info = useMemo(() => {
     if (!selected) return null;
     const pole = spheroidGeometry(selected.q, 0, 1, constraint);
@@ -219,18 +233,19 @@ export default function SpheroidWalkPage() {
   }, [selected, constraint]);
   const metricReference = useMemo(() => {
     if (!profile || !run) return [];
-    if (constraint === 'volume') return profile.reference.observables;
-    const dq = (run.parameters.qMax - run.parameters.qMin) / profile.reference.q.length;
-    return metricsFromDensityFrames(profile.reference.frames, profile.reference.q, dq, constraint);
-  }, [constraint, profile, run]);
+    const reference = isLiveRun ? profile.liveComparison.reference : profile.reference;
+    if (constraint === 'volume') return reference.observables;
+    const dq = (run.parameters.qMax - run.parameters.qMin) / reference.q.length;
+    return metricsFromDensityFrames(reference.frames, reference.q, dq, constraint);
+  }, [constraint, isLiveRun, profile, run]);
   const metricControl = useMemo(() => {
     if (!profile || !run) return [];
-    if (constraint === 'volume') return profile.diffusiveControl.frames;
-    const frames = profile.diffusiveControl.frames;
+    const frames = isLiveRun ? profile.liveComparison.diffusiveControl.frames : profile.diffusiveControl.frames;
+    if (constraint === 'volume') return frames;
     const dq = (run.parameters.qMax - run.parameters.qMin) / frames[0].density.length;
     const centers = frames[0].density.map((_, index) => run.parameters.qMin + (index + 0.5) * dq);
     return metricsFromDensityFrames(frames, centers, dq, constraint);
-  }, [constraint, profile, run]);
+  }, [constraint, isLiveRun, profile, run]);
   const metricEnsemble = useMemo(() => {
     if (constraint === 'volume' || !run || !timeline.length) return timeline;
     const dq = (run.parameters.qMax - run.parameters.qMin) / timeline[0].density.length;
@@ -259,11 +274,11 @@ export default function SpheroidWalkPage() {
         <section className="space-y-3 rounded-lg border border-slate-200 bg-gray-50 p-3 text-sm" aria-label="Live walk controls">
           <div className="flex flex-wrap items-end gap-3">
             <label className="space-y-1"><span className="block text-xs font-medium text-slate-600">Seed</span><input className="w-28 max-w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm" type="number" step="1" value={seedInput} onChange={(event) => { setSpheroidUI({ seed: event.target.value }); setError(''); }} /></label>
-            <label className="space-y-1"><span className="block text-xs font-medium text-slate-600">Walkers</span><select className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm" value={population} onChange={(event) => setSpheroidUI({ population: Number(event.target.value) })}><option value={1000}>1,000</option><option value={2000}>2,000</option><option value={5000}>5,000</option></select></label>
+            <label className="space-y-1"><span className="block text-xs font-medium text-slate-600">Walkers</span><select className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm" value={population} onChange={(event) => handlePopulationChange(Number(event.target.value))}><option value={1000}>1,000</option><option value={2000}>2,000</option><option value={5000}>5,000</option></select></label>
             <label className="space-y-1"><span className="block text-xs font-medium text-slate-600">Steps</span><input aria-label="Step count" aria-invalid={!validStepCountDraft} className="w-24 rounded-md border border-slate-300 bg-white px-2 py-2 text-sm" type="number" min={LIVE_STEP_COUNT_MIN} max={LIVE_STEP_COUNT_MAX} step="1" value={stepCountDraft} onChange={(event) => handleStepCountChange(event.target.value)} onBlur={() => { if (!validStepCountDraft) setStepCountDraft(String(stepCount)); }} /></label>
             <button className={`${playButtonClass} bg-green-600 hover:bg-green-700 focus:ring-green-500 disabled:cursor-not-allowed disabled:bg-gray-400`} disabled={!validStepCountDraft} onClick={() => startLiveRun(Number(stepCountDraft))}>Start live run</button>
           </div>
-          <p className="text-xs text-slate-500">1–{LIVE_STEP_COUNT_MAX} steps · {run.parameters.outputStep.toFixed(2)} model time per step. Default is 200 steps (20 model-time units); changing steps restarts an active live run with the same seed.</p>
+          <p className="text-xs text-slate-500">1–{LIVE_STEP_COUNT_MAX} steps · {run.parameters.outputStep.toFixed(2)} model time per step. Default and maximum are 200 steps (20 model-time units), covered by the saved comparisons. Changing steps or walkers restarts an active live run with the same seed.</p>
           {!validStepCountDraft && <p role="alert" className="text-xs text-rose-700">Enter a whole number from {LIVE_STEP_COUNT_MIN} to {LIVE_STEP_COUNT_MAX}.</p>}
           <div className="flex flex-wrap items-center justify-between gap-1 text-xs"><span className="inline-flex items-center gap-2"><i className={`inline-block h-2.5 w-2.5 rounded-full ${runStatus === 'Running' ? 'animate-pulse bg-green-500' : runStatus === 'Paused' ? 'bg-amber-500' : runStatus === 'Complete' ? 'bg-sky-600' : 'bg-slate-300'}`} />{isLiveRun ? `Live run · ${runStatus}` : `Saved run · ${runStatus}`}</span><span className="tabular-nums text-slate-600">Step {displayedStep} / {totalSteps} · {selected.time.toFixed(2)} / {finalTime.toFixed(2)} model time</span></div>
           <div className="h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="Walk progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-valuetext={`Step ${displayedStep} of ${totalSteps}; model time ${selected.time.toFixed(2)} of ${finalTime.toFixed(2)}`}><div className="h-full rounded-full bg-sky-600 transition-[width] duration-100" style={{ width: `${progress}%` }} /></div>
