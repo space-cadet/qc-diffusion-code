@@ -7,6 +7,7 @@ const QuantumWalkPageRefactored = lazy(() => import("./QuantumWalkPageRefactored
 const AnalysisPage = lazy(() => import("./components/AnalysisPage"));
 const LabDemoPage = lazy(() => import("./lab/LabDemoPage"));
 const SimplicialGrowthPage = lazy(() => import("./SimplicialGrowthPage"));
+const SpheroidWalkPage = lazy(() => import("./spheroid/SpheroidWalkPage"));
 const MemoryBankPage = lazy(() => import("./memoryBank").then(module => ({ default: module.MemoryBankPage })));
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
@@ -22,6 +23,7 @@ const ALL_TABS = [
   { id: 'analysis', label: 'Analysis', shortLabel: 'Anal', icon: '📈' },
   { id: 'labdemo', label: 'Lab Demo', shortLabel: 'Lab', icon: '🧪' },
   { id: 'simplicialgrowth', label: 'Simplicial Growth', shortLabel: 'Simp', icon: '🔺' },
+  { id: 'spheroidwalk', label: 'Spheroid Walk', shortLabel: 'Sph', icon: '🌐' },
   { id: 'memorybank', label: 'Memory Bank', shortLabel: 'Mem', icon: '📚' },
 ] as const;
 
@@ -256,8 +258,8 @@ export default function App() {
       <DesktopTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Content - add bottom padding on mobile for the bottom nav */}
-      <div className={`flex-1 pb-14 md:pb-0 ${activeTab === 'randomwalksim' ? 'overflow-auto' : 'overflow-hidden'}`}>
-        {activeTab === 'simulation' ? (<div className="h-full flex">
+      <div className={`flex-1 pb-14 md:pb-0 ${activeTab === 'randomwalksim' || activeTab === 'spheroidwalk' ? 'overflow-auto' : 'overflow-hidden'}`}>
+        {activeTab === 'spheroidwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><SpheroidWalkPage /></Suspense>) : activeTab === 'simulation' ? (<div className="h-full flex">
             <div className="w-80 hidden md:block">
               <PdeParameterPanel params={simulationParams} onChange={setSimulationParams}/>
             </div>

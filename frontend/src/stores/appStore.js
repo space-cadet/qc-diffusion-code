@@ -1,5 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+export const DEFAULT_SPHEROID_WALK_UI_STATE = {
+    profileIndex: 0,
+    seed: '39017',
+    population: 2000,
+    stepCount: 200,
+    colorByCurvature: true,
+    metric: 'meanR',
+    constraint: 'volume',
+};
 export const useAppStore = create()(persist((set) => ({
     activeTab: 'simulation',
     simulationParams: {
@@ -47,6 +56,7 @@ export const useAppStore = create()(persist((set) => ({
         initialConditionsOpen: true,
         simulationSettingsOpen: true,
     },
+    spheroidWalkUIState: { ...DEFAULT_SPHEROID_WALK_UI_STATE },
     gridLayoutParams: {
         particles: 1000,
         minParticles: 0,
@@ -186,9 +196,21 @@ export const useAppStore = create()(persist((set) => ({
     })),
     setPdeState: (partial) => set((state) => ({ pdeState: { ...state.pdeState, ...partial } })),
     setPdeUIState: (partial) => set((state) => ({ pdeUIState: { ...state.pdeUIState, ...partial } })),
+    setSpheroidWalkUIState: (partial) => set((state) => ({ spheroidWalkUIState: { ...DEFAULT_SPHEROID_WALK_UI_STATE, ...state.spheroidWalkUIState, ...partial } })),
 }), {
     name: 'qc-diffusion-app-state',
     version: 1,
+    merge: (persistedState, currentState) => {
+        const persisted = (persistedState ?? {});
+        return {
+            ...currentState,
+            ...persisted,
+            spheroidWalkUIState: {
+                ...DEFAULT_SPHEROID_WALK_UI_STATE,
+                ...persisted.spheroidWalkUIState,
+            },
+        };
+    },
     migrate: (state, version) => {
         if (!state)
             return state;
@@ -221,6 +243,7 @@ export const useAppStore = create()(persist((set) => ({
         gridLayoutParams: state.gridLayoutParams,
         randomWalkSimLayouts: state.randomWalkSimLayouts,
         randomWalkUIState: state.randomWalkUIState,
+        spheroidWalkUIState: state.spheroidWalkUIState,
         randomWalkSimulationState: state.randomWalkSimulationState,
         observablesWindow: state.observablesWindow,
         customObservablesWindow: state.customObservablesWindow,

@@ -25,6 +25,29 @@ export interface RandomWalkUIState {
   densityAutoUpdate: boolean
 }
 
+export type SpheroidConstraint = 'volume' | 'area'
+export type SpheroidMetric = 'meanQ' | 'meanR' | 'meanArea' | 'meanVolume' | 'meanPoleCurvature' | 'meanEquatorCurvature'
+
+export interface SpheroidWalkUIState {
+  profileIndex: number
+  seed: string
+  population: number
+  stepCount: number
+  colorByCurvature: boolean
+  metric: SpheroidMetric
+  constraint: SpheroidConstraint
+}
+
+export const DEFAULT_SPHEROID_WALK_UI_STATE: SpheroidWalkUIState = {
+  profileIndex: 0,
+  seed: '39017',
+  population: 2000,
+  stepCount: 200,
+  colorByCurvature: true,
+  metric: 'meanR',
+  constraint: 'volume',
+}
+
 // Floating window geometry for Observables panel rendered via react-rnd
 interface WindowRect {
   left: number
@@ -87,11 +110,12 @@ interface PdeState {
 }
 
 interface AppState {
-  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'memorybank'
+  activeTab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'spheroidwalk' | 'memorybank'
   simulationParams: SimulationParams
   gridLayoutParams: RandomWalkParams
   randomWalkSimLayouts: Layout[]
   randomWalkUIState: RandomWalkUIState
+  spheroidWalkUIState: SpheroidWalkUIState
   randomWalkSimulationState: RandomWalkSimulationState
   // RND-based Observables floating window state
   observablesWindow: WindowRect
@@ -119,11 +143,12 @@ interface AppState {
     initialConditionsOpen: boolean
     simulationSettingsOpen: boolean
   }
-  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'memorybank') => void
+  setActiveTab: (tab: 'simulation' | 'randomwalk' | 'gridlayout' | 'randomwalksim' | 'analysis' | 'quantumwalk' | 'quantumwalk-refactored' | 'labdemo' | 'simplicialgrowth' | 'spheroidwalk' | 'memorybank') => void
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
   setRandomWalkUIState: (state: Partial<RandomWalkUIState>) => void
+  setSpheroidWalkUIState: (state: Partial<SpheroidWalkUIState>) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
   setSelectedHistoryIndex: (index: number) => void
   setObservablesWindow: (rect: WindowRect) => void
@@ -201,6 +226,7 @@ export const useAppStore = create<AppState>()(
         initialConditionsOpen: true,
         simulationSettingsOpen: true,
       },
+      spheroidWalkUIState: { ...DEFAULT_SPHEROID_WALK_UI_STATE },
       gridLayoutParams: {
         particles: 1000,
         minParticles: 0,
@@ -359,10 +385,23 @@ export const useAppStore = create<AppState>()(
         set((state) => ({ pdeState: { ...state.pdeState, ...partial } })),
       setPdeUIState: (partial) =>
         set((state) => ({ pdeUIState: { ...state.pdeUIState, ...partial } })),
+      setSpheroidWalkUIState: (partial) =>
+        set((state) => ({ spheroidWalkUIState: { ...DEFAULT_SPHEROID_WALK_UI_STATE, ...state.spheroidWalkUIState, ...partial } })),
     }),
     { 
       name: 'qc-diffusion-app-state',
       version: 1,
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState ?? {}) as Partial<AppState>
+        return {
+          ...currentState,
+          ...persisted,
+          spheroidWalkUIState: {
+            ...DEFAULT_SPHEROID_WALK_UI_STATE,
+            ...persisted.spheroidWalkUIState,
+          },
+        }
+      },
       migrate: (state: any, version) => {
         if (!state) return state;
         const glp = state.gridLayoutParams || {};
@@ -390,6 +429,7 @@ export const useAppStore = create<AppState>()(
         gridLayoutParams: state.gridLayoutParams,
         randomWalkSimLayouts: state.randomWalkSimLayouts,
         randomWalkUIState: state.randomWalkUIState,
+        spheroidWalkUIState: state.spheroidWalkUIState,
         randomWalkSimulationState: state.randomWalkSimulationState,
         observablesWindow: state.observablesWindow,
         customObservablesWindow: state.customObservablesWindow,
