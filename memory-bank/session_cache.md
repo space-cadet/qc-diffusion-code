@@ -1,17 +1,17 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 16:33:38 IST*
+*Last Updated: 2026-09-26 17:03:29 IST*
 
 ## Current Session
 
-**2026-09-26 implementation update**: T39a/T39b and frozen run v1 are complete. T39c now has a live seeded run, longer horizon, mobile layout, common-store persistence, and selectable fixed-volume/fixed-area geometry with mean-area/mean-volume plots. Browser QA remains pending. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
+**2026-09-26 review-fix update**: Fixed PR feedback for selectable saved metrics, live comparison coverage through the 50-unit maximum horizon, and walker-count changes restarting the seeded run. The frozen two-unit results are unchanged. Browser QA remains pending. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
 
 **Session**: 2026-09-26-afternoon.md
 **Started**: 2026-09-26 12:03:25 IST
 **Focus**: T39 - Spheroid geometry-space walk experiment
-**Status**: 🔄 IN PROGRESS — implementation and focused checks complete; browser QA and paper-repository note remain
-**Branch**: detached HEAD at `e8420f2afb7d147389b7c9004f3dfe894761c1d3`
+**Status**: 🔄 IN PROGRESS — review fixes and result regeneration complete; browser QA and paper-repository note remain
+**Branch**: `codex/t39-spheroid-random-walk`
 
 ## Overview
 

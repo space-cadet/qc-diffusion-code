@@ -50,3 +50,16 @@ T39/T39a/T39b/T39c: plan a reproducible spheroid walk, independent numerical che
 - Focused TypeScript check, JS syntax checks, `git diff --check`, and fixed-area geometry spot checks passed. Earlier pure-model validation passed 8/8 checks.
 - Full frontend build is blocked by `ts-quantum` import resolution in existing quantum-walk code. No browser session was available for acceptance verification.
 - Browser QA for replay, mobile layout, persistence, constraints, and chart labels remains pending. The separate paper-repository methods/results link remains outstanding.
+
+## 2026-09-26 16:54 IST - PR review corrections
+
+1. Added every selectable geometric metric to the saved ensemble frames so replay charts use measured values.
+2. Added separate directional-reference and diffusive-control data through the 20-unit maximum live horizon. The frozen T39b acceptance run remains at two units; live runs are capped at 200 steps.
+3. Changing the walker count now restarts an active live run with the selected seed and requested population.
+4. Regenerated the JSON/CSV outputs from clean source revision `6a46cd5f119b0e126935625225bfe58dc230a41f`. Source digest: `a89fd367328ed3e3f0df85bae3ea94b80abac17ef926e3c40ffe9e6372d088f8`. Frozen relative-$L^1$ results are unchanged; analytic surface-area errors are now accurately reported as $0.1691\pm0.0788$ and $0.0615\pm0.0318$.
+
+Browser QA and the separate paper-repository methods/results note remain outstanding. The model test suite was not rerun during these review fixes.
+
+## 2026-09-26 17:03 IST - Preserve the existing live-run limit
+
+Kept the existing 500-step live-run maximum so persisted settings remain valid. Extended the saved comparison reference and diffusive control to 50 model-time units; the separate frozen acceptance study remains at two units. Regenerated the JSON from clean source commit `e90aa058f17a219a555d41b9c5ff1fb025f05ebd` with source digest `2f1f6ce81c784266073bd771c4c459c83881662b743c55468d789262ee1783a1`.

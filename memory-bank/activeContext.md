@@ -1,7 +1,7 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 16:33:38 IST*
+*Last Updated: 2026-09-26 17:03:29 IST*
 
 ## Current Focus
 **Task**: T39 - Spheroid geometry-space walk experiment
@@ -57,7 +57,7 @@
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
 - Strategies: ⚠️ `simple`, `ctrw`, and `collisions` work; `levy` and `fractional` are still UI-only
 
-**Branch**: detached HEAD at `e8420f2afb7d147389b7c9004f3dfe894761c1d3`
+**Branch**: `codex/t39-spheroid-random-walk`
 
 **Immediate Next Step**: Complete browser QA for T39c replay, mobile layout, persistence, geometry constraints, and chart labels; then add the code-side result link in the paper checkout when that repository is in scope.
 
@@ -68,6 +68,7 @@
 - `spin-network-app` was reviewed for overlap; its fixed-graph walk and future spin-foam type sketch do not replace this repository's simplicial-growth work.
 - T39a geometry/walk and T39b finite-volume comparison are implemented. Frozen run v1 meets its terminal mean $L^1$ criterion at 32,000 walkers for both profiles; see `memory-bank/results/t39-spheroid-run-v1.md`.
 - T39c page is implemented and replays saved frames; browser verification remains open because this checkout has no installed frontend dependencies. The paper checkout was not changed. Existing T38/T27 and simplicial work retain their recorded status.
+- PR feedback fixes now serialize every selected ensemble metric, extend live comparison data to the 50-unit run limit, and restart live simulation when walker count changes. Run v1 was regenerated from a clean source revision; browser QA and the paper note remain open.
 
 ## New Tasks Created (Mem-scan Audit)
 

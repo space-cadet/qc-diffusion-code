@@ -1,6 +1,6 @@
 # Spheroid geometry-space experiment: implementation plan
 
-*Created: 2026-09-26 12:03:25 IST. Updated: 2026-09-26 16:33 IST. Status: T39a/T39b implemented and run v1 recorded; T39c browser QA pending.*
+*Created: 2026-09-26 12:03:25 IST. Updated: 2026-09-26 17:03 IST. Status: T39a/T39b implemented and run v1 regenerated from clean sources; T39c browser QA pending.*
 
 ## Scientific contract
 
@@ -34,4 +34,4 @@ Ellipsoid surfaces are intrinsically curved; ordinary ellipse boundaries are int
 
 ## Run v1 outcome
 
-The frozen study and numerical results are recorded in `memory-bank/implementation-details/spheroid-run-spec-v1.md` and `memory-bank/results/t39-spheroid-run-v1.md`. Both initial profiles meet the predeclared mean relative-$L^1$ threshold at 32,000 walkers. The page can replay the saved JSON or run a live seeded ensemble. Focused TypeScript, JS syntax, diff whitespace, and geometry spot checks passed; browser verification and a separate paper-repository result link remain outstanding. Full frontend build remains blocked by unresolved `ts-quantum` imports in existing quantum-walk files.
+The frozen study and numerical results are recorded in `memory-bank/implementation-details/spheroid-run-spec-v1.md` and `memory-bank/results/t39-spheroid-run-v1.md`. Both initial profiles meet the predeclared mean relative-$L^1$ threshold at 32,000 walkers. The page can replay the saved JSON or run a live seeded ensemble. The saved ensemble stores every metric offered by its selector. Directional-reference and diffusive-control frames cover the full 50-unit live horizon; live runs retain the existing 500-step maximum, and changing walker count restarts an active run from the selected seed. The review-fix data regeneration is reproducible from a clean source commit. Browser verification and a separate paper-repository result link remain outstanding. Full frontend build remains blocked by unresolved `ts-quantum` imports in existing quantum-walk files.
