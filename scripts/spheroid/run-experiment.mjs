@@ -104,6 +104,7 @@ for (const profile of definitions) {
     return { time: frame.time, mass, meanQ, meanQ2, meanR, meanArea, meanPoleCurvature, meanEquatorCurvature };
   });
   const liveDiffusiveControl = runDiffusiveControl({ kind: profile.id, eta: profile.eta, seed: 49001, population: 4000, finalTime: liveComparisonFinalTime, outputStep });
+  const liveDiffusiveFrames = liveDiffusiveControl.frames.map(({ time, density, meanQ, meanR, meanArea, meanVolume, meanPoleCurvature, meanEquatorCurvature }) => ({ time, density, meanQ, meanR, meanArea, meanVolume, meanPoleCurvature, meanEquatorCurvature }));
   const refinement = [];
   const referenceFinalObservables = referenceObservables.at(-1);
   let finalRuns = [];
@@ -168,7 +169,7 @@ for (const profile of definitions) {
     reference: { q: reference.q, dx: reference.dx, cells: reference.q.length, frames: referenceByTime, observables: referenceObservables, massDriftMax: referenceMassDrift },
     liveComparison: {
       reference: { q: liveReference.q, frames: liveReference.frames.map(({ time, density, current }) => ({ time, density, current })), observables: liveReferenceObservables },
-      diffusiveControl: { frames: liveDiffusiveControl.frames },
+      diffusiveControl: { frames: liveDiffusiveFrames },
     },
     timeResolution,
     refinement,
