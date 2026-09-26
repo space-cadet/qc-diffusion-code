@@ -1,7 +1,53 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-11 10:23:55 IST*
+*Last Updated: 2026-09-26 12:18:05 IST*
+
+#### 12:18:05 IST - T39: Record related app inspection finding
+- Modified `memory-bank/implementation-details/spheroid-geometry-space-experiment.md` - Recorded why spin-network-app is not the owner of the stochastic simplicial growth implementation.
+- Modified `memory-bank/activeContext.md` - Added the related app overlap finding.
+- Modified `memory-bank/session_cache.md` - Refreshed the session timestamp.
+- Modified `memory-bank/sessions/2026-09-26-afternoon.md` - Recorded the fixed-graph and spin-foam type-sketch findings.
+
+#### 12:08:00 IST - T39: Spheroid walk implementation plan
+- Created `memory-bank/tasks/T39.md` - Defined the parent spheroid experiment and scientific scope.
+- Created `memory-bank/tasks/T39a.md` - Defined pure geometry and seeded trajectory implementation.
+- Created `memory-bank/tasks/T39b.md` - Defined independent numerical validation and reproducible results.
+- Created `memory-bank/tasks/T39c.md` - Defined 3D web rendering, controls, and synchronized plots.
+- Created `memory-bank/implementation-details/spheroid-geometry-space-experiment.md` - Recorded model interfaces, invariant checks, and work order.
+- Modified `memory-bank/tasks.md` - Registered the T39 task family.
+- Modified `memory-bank/activeContext.md` - Linked the paper derivation to app implementation ownership.
+- Modified `memory-bank/session_cache.md` - Added the T39 handoff and session reference.
+- Created `memory-bank/sessions/2026-09-26-afternoon.md` - Preserved the planning session and current implementation status.
+
+**15:36:00 IST - T1/T27/T38: Numerical validation and headless-runner planning**
+
+- Created `scripts/bianchi-telegraph-validation.mjs` - Seeded Bianchi I/IX diagnostics with matched density metrics, potential source/sink analysis, and CLI commands
+- Modified `frontend/src/physics/factories/StrategyFactory.ts` and `.js` - Prevented double 2D motion when CTRW is selected
+- Created `frontend/src/physics/__tests__/BianchiTelegraphValidation.test.ts` - Seed/restriction/source-sink regression coverage
+- Created `memory-bank/tasks/T38.md` and `memory-bank/implementation-details/headless-random-walk-runner.md` - Planned direct component-engine statistics CLI
+- Created `memory-bank/sessions/2026-07-21-afternoon.md` and `memory-bank/edits/2026-07-21/153600-T38-headless-runner-plan.md` - Recorded session provenance
+- Resolved literal conflict markers in historical memory-bank files
+
+**11:31:20 IST - META-1: Mem-scan audit and memory bank updates**
+
+- Created `memory-bank/edits/2026-05-11/113120-META1-mem-scan-update.md` - Edit chunk for mem-scan driven task and doc updates
+- Created `memory-bank/tasks/T25b.md` - Type Safety Improvements subtask (backfilled from T25)
+- Created `memory-bank/tasks/T25c.md` - Dependency and State Fixes subtask (backfilled from T25)
+- Created `memory-bank/tasks/T25d.md` - Architecture Refactoring subtask (backfilled from T25)
+- Created `memory-bank/tasks/T34.md` - Frontend Build Artifact Cleanup task
+- Created `memory-bank/tasks/T35.md` - App Shell and Navigation Refactor task
+- Created `memory-bank/tasks/T36.md` - Monorepo Package Hygiene task
+- Created `memory-bank/tasks/T37.md` - Backend API Hardening task
+- Created `memory-bank/implementation-details/frontend-dead-code-inventory.md` - Master inventory of legacy files safe to delete
+- Created `memory-bank/implementation-details/zustand-store-splitting-plan.md` - Proposed domain store boundaries and migration path
+- Modified `memory-bank/tasks/T23.md` - Added vitest config fix note and acceptance criteria
+- Modified `memory-bank/tasks/T27.md` - Added levy/fractional limitation note to acceptance criteria
+- Modified `memory-bank/tasks.md` - Added T34-T37 registry rows and updated T23/T27 detail notes
+- Modified `memory-bank/activeContext.md` - Added new tasks to current focus and recent completed work
+- Modified `memory-bank/session_cache.md` - Updated active tasks list with T34-T37
+- Modified `memory-bank/sessions/2026-05-11-morning.md` - Appended mem-scan and task creation work
+- Modified `memory-bank/edit_history.md` - Added META-1 mem-scan update entry
 
 **10:23:55 IST - T27f: Observables restoration and collision stats fix**
 
@@ -618,9 +664,6 @@
 - Updated `memory-bank/edit_history.md` - This entry
 
 #### 17:28 - T16: Complete GPU Boundary Conditions Implementation
-=======
-
-#### 17:28 - T16: Complete GPU Boundary Conditions Implementation  
 - Enhanced `frontend/src/gpu/GPUParticleManager.ts` - Added absorbing boundary support, dual-shader architecture with velocity updates, two-pass rendering for proper reflective physics (+97 lines)
 - Updated `memory-bank/tasks/T16.md` - Phase 1.6 completion with boundary conditions analysis
 - Updated `memory-bank/tasks.md` - T16 status update reflecting boundary conditions completion

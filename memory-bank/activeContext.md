@@ -1,11 +1,11 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-11 10:23:55 IST*
+*Last Updated: 2026-09-26 12:18:05 IST*
 
 ## Current Focus
-**Task**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
-**Status**: 🔄 IN PROGRESS — V2 parity fixes applied, floating observables restored, collision stats visible; remaining strategy cleanup and graph mode
+**Task**: T1 + T27 + T38 - Bianchi calibration, original physics engine, and headless runner plan
+**Status**: 🔄 IN PROGRESS — V2 parity fixes applied; seeded headless calibration now exposes a non-convergent 2D telegraph match
 **Priority**: HIGH
 
 **Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. The active page now runs through `WebGLRendererV2` plus the original `PhysicsEngine` via `useOriginalPhysicsEngine.ts`. TypeScript compiles clean. The main V2 parity fixes now on the branch are:
@@ -19,6 +19,7 @@
 7. **Density panel restoration** ✅ — density field is back on the V2 page
 8. **Initial distributions restored** ✅ — dropdown and per-distribution controls now affect real particle placement
 9. **Strategy audit** ⚠️ — `levy` and `fractional` remain UI-visible but are not implemented in `StrategyFactory`
+10. **2D CTRW motion** ✅ — CTRW replaces ballistic motion when selected, preventing double position updates
 
 **Architecture Evolution**:
 - Started with: `PhysicsEngineV2` (hardcoded ballistic) + `WebGLRendererV2`
@@ -58,7 +59,24 @@
 
 **Branch**: `cloud-claw/screenshot-poc`
 
-**Immediate Next Step**: Run a fresh live/browser verification of the V2 page, then either remove or implement the fake `levy` / `fractional` strategy options
+**Immediate Next Step**: Implement T38 with injected seeded RNG and direct-engine JSON/CSV output; keep its data separate from the independent Bianchi calibration runner.
+
+## 2026-09-26 Spheroid experiment plan
+
+- Paper research T15/T15a now includes an embedded-surface precursor to the one-anisotropy gravitational derivation. The spheroid's intrinsic metric, curvature, coordinate transformation, and chosen walk equations are in `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/spheroid-geometry-space-walk.md`.
+- T39/T39a/T39b/T39c own the separate pure model, numerical validation, and interactive 3D page in this repository. The implementation details are in `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`.
+- `spin-network-app` was reviewed for overlap; its fixed-graph walk and future spin-foam type sketch do not replace this repository's simplicial-growth work.
+- No spheroid implementation, run, or browser verification has occurred. Existing T38/T27 and simplicial work retain their recorded status; reuse T38 only where its seed/export seam helps.
+
+## New Tasks Created (Mem-scan Audit)
+
+Following a comprehensive codebase audit, four new tasks and two implementation docs were created to track previously undocumented improvement areas:
+
+- **T34: Frontend Build Artifact Cleanup** — Remove 307+ `.js`/`.d.ts`/`.d.ts.map` files from `src/` trees
+- **T35: App Shell and Navigation Refactor** — Replace App.tsx ternary tab switcher, add Error Boundaries, fix mobile labels
+- **T36: Monorepo Package Hygiene** — Decide `graph-ui` fate, clean `graph-core` deps, align versions, delete stray lockfiles
+- **T37: Backend API Hardening** — Add Pydantic validation, fix pause/resume state loss, extract `useWebSocket` hook
+- **T25b/T25c/T25d** — Backfilled missing subtask files for type safety, state fixes, and architecture refactoring
 
 ## Recent Completed Work
 

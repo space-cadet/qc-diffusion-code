@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-11 10:23:55 IST*
+*Last Updated: 2026-09-26 12:03:25 IST*
 
 ## Active Tasks
 
@@ -70,13 +70,36 @@
 | T31 | Mobile UI Responsiveness and Design | ✅ COMPLETED | HIGH | 2026-01-30 | T27, T29a, T30a | [Details](tasks/T31.md) |
 | T32 | Python Backend Environment Setup and Documentation | 🔄 IN PROGRESS | MEDIUM | 2026-02-09 | - | [Details](tasks/T32.md) |
 | T33 | Boundary Growth: Panel Size, Symmetric Simplices, Boundary Conditions Fix | ✅ COMPLETED | HIGH | 2026-02-16 | T30, T30b | [Details](tasks/T33.md) |
+| T34 | Frontend Build Artifact Cleanup | 📝 PLANNED | HIGH | 2026-05-11 | - | [Details](tasks/T34.md) |
+| T35 | App Shell and Navigation Refactor | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T35.md) |
+| T36 | Monorepo Package Hygiene | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T36.md) |
+| T37 | Backend API Hardening | 📝 PLANNED | MEDIUM | 2026-05-11 | T32 | [Details](tasks/T37.md) |
+| T38 | Headless Random Walk Statistics Runner | 📝 PLANNED | HIGH | 2026-07-21 | T1, T15a, T27 | [Details](tasks/T38.md) |
+| T39 | Spheroid Geometry-Space Walk Experiment | 📝 PLANNED | HIGH | 2026-09-26 | - | [Details](tasks/T39.md) |
+| T39a | Seeded Spheroid Geometry and Walk Engine | 📝 PLANNED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
+| T39b | Spheroid Walk Numerical Validation | 📝 PLANNED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
+| T39c | Interactive 3D Spheroid-Walk Page | 📝 PLANNED | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 
 ## Task Details
 
+### T39: Spheroid Geometry-Space Walk Experiment
+**Description**: Reproducible walks between intrinsic spheroid geometries, independently checked and rendered in 3D.
+**Status**: 📝 PLANNED **Last**: 2026-09-26 12:03:25 IST
+**Subtasks**: T39a pure seeded model, T39b numerical validation, T39c web page.
+**Files**: `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`, `memory-bank/tasks/T39.md`.
+**Research owner**: Paper repository T15/T15a; spheroid results are methodological and do not establish WDW dynamics.
+
+### T38: Headless Random Walk Statistics Runner
+**Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.
+**Status**: 📝 PLANNED **Last**: 2026-07-21 15:36:00 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/core/PhysicsEngine.ts`, `memory-bank/implementation-details/headless-random-walk-runner.md`
+**Notes**: The current component engine is UI-independent but uses ambient randomness; the new runner must inject a seed and emit analysis-ready JSON/CSV.
+
 ### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
 **Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-11 10:23:55 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-07-21 14:38:20 IST
 **Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
+**Current physics note**: The 2D CTRW path now owns its motion phase; PDE convergence, Bianchi dynamics, and constrained spin-network evolution remain separate research work.
 **Notes**:
 - V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
 - Controls are wired to the live engine: `Initialize`, `Start`, `Pause`, and `Reset` all affect runtime state
@@ -132,9 +155,9 @@
 ### T1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2025-08-25 03:08:37 IST
-**Files**: `frontend/src/stores/appStore.ts`, `frontend/src/App.tsx`, `frontend/src/PdeParameterPanel.tsx`
-**Notes**: Component separation completed - PDE controls moved to dedicated PdeParameterPanel.tsx with enhanced solver selection, parameter visibility fixes applied
+**Status**: 🔄 IN PROGRESS **Last**: 2026-07-21 15:03:29 IST
+**Files**: `scripts/bianchi-telegraph-validation.mjs`, `frontend/src/physics/__tests__/BianchiTelegraphValidation.test.ts`, `package.json`
+**Notes**: Seeded headless Bianchi I persistent-walk versus telegraph comparison added in $(\beta_+,\beta_-;\alpha)$ with $B=-2\lambda\le0$, matched absorbing boundaries, density/moment/front metrics, and refinement output. The default refinement is non-monotone, so it is a calibration gate rather than convergence evidence.
 
 ### T2: PDE Simulation (Parent Task)
 **Description**: Complete WebGL GPU-based PDE simulation system with multiple solver methods and boundary conditions
@@ -332,9 +355,9 @@
 
 ### T23: Comprehensive Testing Framework Enhancement
 **Description**: Enhance the existing testing framework, including Vitest configuration, JSDOM environment setup, and refinement of physics engine test cases.
-**Status**: 🔄 IN PROGRESS **Last**: 2025-09-10 23:09:55 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-05-11 11:31:20 IST
 **Files**: `frontend/package.json`, `frontend/pnpm-lock.yaml`, `frontend/vite.config.ts`, `frontend/src/physics/__tests__/CTRWStrategy2D.test.ts`, `frontend/src/physics/__tests__/integration.test.ts`, `frontend/src/physics/__tests__/two-phase-engine.test.ts`
-**Notes**: This task consolidates and formalizes ongoing efforts to improve the project's testing infrastructure and test coverage, building upon previous work in dependency resolution and physics engine verification.
+**Notes**: Vitest config fixed: created `frontend/vitest.config.ts` with `globals: true` and `environment: 'jsdom'`. All 9 test suites now pass (40 tests). Legacy `jest.config.js` removed. Remaining: package-level tests and expanded physics test coverage.
 
 ### T24: Quantum Walk Explorer Implementation
 

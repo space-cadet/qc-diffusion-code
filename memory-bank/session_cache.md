@@ -1,14 +1,16 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-11 10:23:55 IST*
+*Last Updated: 2026-09-26 12:18:05 IST*
 
 ## Current Session
 
-**Session**: 2026-05-11-morning.md
-**Started**: 2026-05-11 10:23:55 IST
-**Focus**: T27 - Clean Rewrite — Pure WebGL + Original Physics Engine
-**Status**: 🔄 IN PROGRESS — floating observables restored, collision stats visible; remaining strategy cleanup and graph mode
+**2026-09-26 planning update**: T39/T39a/T39b/T39c record the spheroid geometry-space model, independent numerics, and 3D web page. See `sessions/2026-09-26-afternoon.md`. No implementation or numerical validation was performed in this update.
+
+**Session**: 2026-07-21-afternoon.md
+**Started**: 2026-07-21 15:36:00 IST
+**Focus**: T1/T27/T38 - numerical calibration, physics composition, and headless-engine planning
+**Status**: 🔄 IN PROGRESS — validation runner and Bianchi IX diagnostic complete; direct component-engine CLI planned
 **Branch**: main
 
 ## Overview
@@ -19,7 +21,9 @@
 
 ## Session History (Last 5)
 
-1. `sessions/2026-05-11-morning.md` - T27f floating observables restoration and collision stats fix
+1. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
+1. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential gate, T27 composition fix, and T38 planning
+2. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
 2. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
 3. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
 4. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
@@ -28,6 +32,10 @@
 
 ## Task Registry
 
+- T39: Spheroid geometry-space walk experiment - 📝 PLANNED
+- T39a: Seeded spheroid geometry and walk engine - 📝 PLANNED
+- T39b: Spheroid walk numerical validation - 📝 PLANNED
+- T39c: Interactive 3D spheroid-walk page - 📝 PLANNED
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄
 - T12: Interparticle Collisions and Obstacles Implementation - 🔄
@@ -64,6 +72,10 @@
 - T29: Memory Bank Feature Implementation - ✅
 - T31: Mobile UI Responsiveness and Design - ✅
 - T32: Python Backend Environment Setup and Documentation - 🔄
+- T34: Frontend Build Artifact Cleanup - 📝
+- T35: App Shell and Navigation Refactor - 📝
+- T36: Monorepo Package Hygiene - 📝
+- T37: Backend API Hardening - 📝
 
 ## Active Tasks
 
@@ -102,14 +114,17 @@
 ### T1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Status:** 🔄 **Priority:** HIGH
-**Started:** 2025-08-19 **Last**: 2025-08-25 03:47:05 IST
-**Context**: Component refactoring completed - PDE controls enhanced with solver selection
-**Files**: `frontend/src/PdeParameterPanel.tsx`, `frontend/src/App.tsx`, `frontend/src/stores/appStore.ts`
+**Started:** 2025-08-19 **Last**: 2026-07-21 15:03:29 IST
+**Context**: Seeded headless Bianchi I Monte Carlo and telegraph validation added. The exact scalar correspondence is not yet calibrated: the refinement errors are non-monotone.
+**Files**: `scripts/bianchi-telegraph-validation.mjs`, `frontend/src/physics/__tests__/BianchiTelegraphValidation.test.ts`, `package.json`
 **Progress**:
 
 1. ✅ Telegraph vs diffusion comparison with controls
 2. ✅ Backend-agnostic frontend architecture
 3. ✅ Multi-equation selection system with organized UI
+4. ✅ Seeded persistent-walk versus telegraph runner with matched grid and absorbing boundaries
+5. ✅ $L^1/L^2$, moments, finite-speed-front, and refinement reporting
+6. ⬜ Derive a validated 2D velocity-state closure or rate mapping before making a convergence claim
 
 ### T5: Random Walk Derivation of Telegraph Equation
 
