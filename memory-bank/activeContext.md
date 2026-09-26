@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 12:18:05 IST*
+*Last Updated: 2026-09-26 16:33:38 IST*
 
 ## Current Focus
-**Task**: T1 + T27 + T38 - Bianchi calibration, original physics engine, and headless runner plan
-**Status**: 🔄 IN PROGRESS — V2 parity fixes applied; seeded headless calibration now exposes a non-convergent 2D telegraph match
+**Task**: T39 - Spheroid geometry-space walk experiment
+**Status**: 🔄 IN PROGRESS — model and numerical validation complete; page implementation complete, browser QA pending
 **Priority**: HIGH
 
-**Context**: User decided to ditch tsParticles entirely after seeing the depth of initialization race conditions. The active page now runs through `WebGLRendererV2` plus the original `PhysicsEngine` via `useOriginalPhysicsEngine.ts`. TypeScript compiles clean. The main V2 parity fixes now on the branch are:
+**Context**: T39 adds a seeded spheroid geometry walk with saved numerical comparisons and a 3D visualization. Fixed volume remains the default; fixed surface area is selectable. Browser QA is the remaining code-side acceptance item. The app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -57,16 +57,17 @@
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
 - Strategies: ⚠️ `simple`, `ctrw`, and `collisions` work; `levy` and `fractional` are still UI-only
 
-**Branch**: `cloud-claw/screenshot-poc`
+**Branch**: detached HEAD at `e8420f2afb7d147389b7c9004f3dfe894761c1d3`
 
-**Immediate Next Step**: Implement T38 with injected seeded RNG and direct-engine JSON/CSV output; keep its data separate from the independent Bianchi calibration runner.
+**Immediate Next Step**: Complete browser QA for T39c replay, mobile layout, persistence, geometry constraints, and chart labels; then add the code-side result link in the paper checkout when that repository is in scope.
 
-## 2026-09-26 Spheroid experiment plan
+## 2026-09-26 Spheroid experiment
 
 - Paper research T15/T15a now includes an embedded-surface precursor to the one-anisotropy gravitational derivation. The spheroid's intrinsic metric, curvature, coordinate transformation, and chosen walk equations are in `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/spheroid-geometry-space-walk.md`.
 - T39/T39a/T39b/T39c own the separate pure model, numerical validation, and interactive 3D page in this repository. The implementation details are in `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`.
 - `spin-network-app` was reviewed for overlap; its fixed-graph walk and future spin-foam type sketch do not replace this repository's simplicial-growth work.
-- No spheroid implementation, run, or browser verification has occurred. Existing T38/T27 and simplicial work retain their recorded status; reuse T38 only where its seed/export seam helps.
+- T39a geometry/walk and T39b finite-volume comparison are implemented. Frozen run v1 meets its terminal mean $L^1$ criterion at 32,000 walkers for both profiles; see `memory-bank/results/t39-spheroid-run-v1.md`.
+- T39c page is implemented and replays saved frames; browser verification remains open because this checkout has no installed frontend dependencies. The paper checkout was not changed. Existing T38/T27 and simplicial work retain their recorded status.
 
 ## New Tasks Created (Mem-scan Audit)
 

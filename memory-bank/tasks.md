@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 12:03:25 IST*
+*Last Updated: 2026-09-26 16:33:38 IST*
 
 ## Active Tasks
 
@@ -75,17 +75,17 @@
 | T36 | Monorepo Package Hygiene | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T36.md) |
 | T37 | Backend API Hardening | 📝 PLANNED | MEDIUM | 2026-05-11 | T32 | [Details](tasks/T37.md) |
 | T38 | Headless Random Walk Statistics Runner | 📝 PLANNED | HIGH | 2026-07-21 | T1, T15a, T27 | [Details](tasks/T38.md) |
-| T39 | Spheroid Geometry-Space Walk Experiment | 📝 PLANNED | HIGH | 2026-09-26 | - | [Details](tasks/T39.md) |
-| T39a | Seeded Spheroid Geometry and Walk Engine | 📝 PLANNED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
-| T39b | Spheroid Walk Numerical Validation | 📝 PLANNED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
-| T39c | Interactive 3D Spheroid-Walk Page | 📝 PLANNED | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
+| T39 | Spheroid Geometry-Space Walk Experiment | 🔄 IN PROGRESS | HIGH | 2026-09-26 | - | [Details](tasks/T39.md) |
+| T39a | Seeded Spheroid Geometry and Walk Engine | ✅ COMPLETED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
+| T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
+| T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 
 ## Task Details
 
 ### T39: Spheroid Geometry-Space Walk Experiment
 **Description**: Reproducible walks between intrinsic spheroid geometries, independently checked and rendered in 3D.
-**Status**: 📝 PLANNED **Last**: 2026-09-26 12:03:25 IST
-**Subtasks**: T39a pure seeded model, T39b numerical validation, T39c web page.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-26 16:33:38 IST
+**Subtasks**: T39a model ✅, T39b numerical validation ✅, T39c web page 🔄 (browser QA pending).
 **Files**: `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`, `memory-bank/tasks/T39.md`.
 **Research owner**: Paper repository T15/T15a; spheroid results are methodological and do not establish WDW dynamics.
 

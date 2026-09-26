@@ -1,23 +1,23 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 12:18:05 IST*
+*Last Updated: 2026-09-26 16:33:38 IST*
 
 ## Current Session
 
-**2026-09-26 planning update**: T39/T39a/T39b/T39c record the spheroid geometry-space model, independent numerics, and 3D web page. See `sessions/2026-09-26-afternoon.md`. No implementation or numerical validation was performed in this update.
+**2026-09-26 implementation update**: T39a/T39b and frozen run v1 are complete. T39c now has a live seeded run, longer horizon, mobile layout, common-store persistence, and selectable fixed-volume/fixed-area geometry with mean-area/mean-volume plots. Browser QA remains pending. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
 
-**Session**: 2026-07-21-afternoon.md
-**Started**: 2026-07-21 15:36:00 IST
-**Focus**: T1/T27/T38 - numerical calibration, physics composition, and headless-engine planning
-**Status**: 🔄 IN PROGRESS — validation runner and Bianchi IX diagnostic complete; direct component-engine CLI planned
-**Branch**: main
+**Session**: 2026-09-26-afternoon.md
+**Started**: 2026-09-26 12:03:25 IST
+**Focus**: T39 - Spheroid geometry-space walk experiment
+**Status**: 🔄 IN PROGRESS — implementation and focused checks complete; browser QA and paper-repository note remain
+**Branch**: detached HEAD at `e8420f2afb7d147389b7c9004f3dfe894761c1d3`
 
 ## Overview
 
 - Active: 18 | Paused: 0 | Completed: 24
-- Last Session: `sessions/2026-05-09-afternoon.md`
-- Current Period: morning
+- Last Session: `sessions/2026-09-26-afternoon.md`
+- Current Period: afternoon
 
 ## Session History (Last 5)
 
@@ -32,10 +32,10 @@
 
 ## Task Registry
 
-- T39: Spheroid geometry-space walk experiment - 📝 PLANNED
-- T39a: Seeded spheroid geometry and walk engine - 📝 PLANNED
-- T39b: Spheroid walk numerical validation - 📝 PLANNED
-- T39c: Interactive 3D spheroid-walk page - 📝 PLANNED
+- T39: Spheroid geometry-space walk experiment - 🔄 IN PROGRESS
+- T39a: Seeded spheroid geometry and walk engine - ✅ COMPLETE
+- T39b: Spheroid walk numerical validation - ✅ COMPLETE
+- T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄
 - T12: Interparticle Collisions and Obstacles Implementation - 🔄
