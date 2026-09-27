@@ -1,17 +1,17 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 17:03:29 IST*
+*Last Updated: 2026-09-27 12:56:04 IST*
 
 ## Current Session
 
-**2026-09-26 review-fix update**: Fixed PR feedback for selectable saved metrics, live comparison coverage through the 50-unit maximum horizon, and walker-count changes restarting the seeded run. The frozen two-unit results are unchanged. Browser QA remains pending. See `sessions/2026-09-26-afternoon.md` and `results/t39-spheroid-run-v1.md`.
+**2026-09-27 T15 integration plan**: Recorded T40 to add T15a and T15b as selectable modes within the existing Random Walk page, with no new page or navigation. General engine concerns remain separate under T27. No application code changed. See `sessions/2026-09-27-afternoon.md` and `tasks/T40.md`.
 
-**Session**: 2026-09-26-afternoon.md
-**Started**: 2026-09-26 12:03:25 IST
-**Focus**: T39 - Spheroid geometry-space walk experiment
-**Status**: 🔄 IN PROGRESS — review fixes and result regeneration complete; browser QA and paper-repository note remain
-**Branch**: `codex/t39-spheroid-random-walk`
+**Session**: 2026-09-27-afternoon.md
+**Started**: 2026-09-27 12:46:25 IST
+**Focus**: T40 - T15a/T15b modes in the existing Random Walk page
+**Status**: 📝 PLANNED — integration plan recorded; implementation not started
+**Branch**: `HEAD` (detached at `74ef789`)
 
 ## Overview
 
@@ -21,14 +21,15 @@
 
 ## Session History (Last 5)
 
-1. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
-1. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential gate, T27 composition fix, and T38 planning
-2. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
-2. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
-3. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
-4. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
-5. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
-6. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
+1. `sessions/2026-09-27-afternoon.md` - T15a/T15b integration plan for the existing Random Walk page
+2. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
+3. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential gate, T27 composition fix, and T38 planning
+4. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
+5. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
+6. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
+7. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
+8. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
+9. `sessions/2026-01-30-evening.md` - T30b UI Controls Implementation
 
 ## Task Registry
 
@@ -36,6 +37,7 @@
 - T39a: Seeded spheroid geometry and walk engine - ✅ COMPLETE
 - T39b: Spheroid walk numerical validation - ✅ COMPLETE
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
+- T40: T15a/T15b modes in the existing Random Walk page - 📝 PLANNED
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄
 - T12: Interparticle Collisions and Obstacles Implementation - 🔄

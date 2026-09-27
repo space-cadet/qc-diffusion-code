@@ -1,12 +1,12 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 16:33:38 IST*
+*Last Updated: 2026-09-27 12:56:04 IST*
 
 ## Active Tasks
 
-| ID  | Title                                                 | Status         | Priority | Started    | Dependencies |
-| --- | ----------------------------------------------------- | -------------- | -------- | ---------- | ------------ |
+| ID  | Title                                                 | Status         | Priority | Started    | Dependencies | Details |
+| --- | ----------------------------------------------------- | -------------- | -------- | ---------- | ------------ | ------- |
 | T1  | Numerical Simulations for QC-Diffusion Paper Concepts | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | T2  | PDE Simulation (Parent Task)                          | 🔄 IN PROGRESS | HIGH     | 2025-08-19 | -            |
 | T3  | 1D Adaptive Mesh Refinement Implementation           | 🔄 IN PROGRESS | MEDIUM   | 2025-08-20 | -            |
@@ -79,6 +79,7 @@
 | T39a | Seeded Spheroid Geometry and Walk Engine | ✅ COMPLETED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
 | T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
+| T40 | T15a/T15b Modes in the Existing Random Walk Page | 📝 PLANNED | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
 
 ## Task Details
 
@@ -88,6 +89,12 @@
 **Subtasks**: T39a model ✅, T39b numerical validation ✅ (clean-source result regeneration complete), T39c web page 🔄 (PR fixes applied; browser QA pending).
 **Files**: `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`, `memory-bank/tasks/T39.md`.
 **Research owner**: Paper repository T15/T15a; spheroid results are methodological and do not establish WDW dynamics.
+
+### T40: T15a/T15b Modes in the Existing Random Walk Page
+**Description**: Add selectable, reproducible T15a and T15b simulation modes inside the existing Random Walk page; do not add app pages, tabs, or navigation entries.
+**Status**: 📝 PLANNED **Last**: 2026-09-27 12:56:04 IST
+**Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md`.
+**Notes**: Keep the general simulation-engine audit issues tracked separately under T27. Each T15 mode needs its own seeded model runner; reuse the existing page and visualization where their assumptions fit. T15a/T15b canonical scientific definitions remain in the paper repository.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.
@@ -99,7 +106,7 @@
 **Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
 **Status**: 🔄 IN PROGRESS **Last**: 2026-07-21 14:38:20 IST
 **Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
-**Current physics note**: The 2D CTRW path now owns its motion phase; PDE convergence, Bianchi dynamics, and constrained spin-network evolution remain separate research work.
+**Current physics note**: A 2026-09-27 source audit found that the 2D factory includes both ballistic and CTRW strategies and the orchestrator integrates each configured strategy. This conflicts with the earlier claim that CTRW replaces ballistic motion; verify and resolve before relying on that path. PDE convergence, Bianchi dynamics, and constrained spin-network evolution remain separate research work.
 **Notes**:
 - V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
 - Controls are wired to the live engine: `Initialize`, `Start`, `Pause`, and `Reset` all affect runtime state

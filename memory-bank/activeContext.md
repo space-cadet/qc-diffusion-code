@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-26 17:03:29 IST*
+*Last Updated: 2026-09-27 12:56:04 IST*
 
 ## Current Focus
-**Task**: T39 - Spheroid geometry-space walk experiment
-**Status**: 🔄 IN PROGRESS — model and numerical validation complete; page implementation complete, browser QA pending
+**Task**: T40 - T15a/T15b modes in the existing Random Walk page
+**Status**: 📝 PLANNED — integration plan recorded; app implementation has not started
 **Priority**: HIGH
 
-**Context**: T39 adds a seeded spheroid geometry walk with saved numerical comparisons and a 3D visualization. Fixed volume remains the default; fixed surface area is selectable. Browser QA is the remaining code-side acceptance item. The app-shell history below is retained as prior context.
+**Context**: T40 records a plan to add T15a/T15b as modes inside the existing Random Walk page. T39 remains open for browser QA; the app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -19,7 +19,7 @@
 7. **Density panel restoration** ✅ — density field is back on the V2 page
 8. **Initial distributions restored** ✅ — dropdown and per-distribution controls now affect real particle placement
 9. **Strategy audit** ⚠️ — `levy` and `fractional` remain UI-visible but are not implemented in `StrategyFactory`
-10. **2D CTRW motion** ✅ — CTRW replaces ballistic motion when selected, preventing double position updates
+10. **2D strategy composition** ⚠️ — memory previously claimed CTRW replaces ballistic motion; the 2026-09-27 source audit found both strategies included and integrated. Resolve under T27 before depending on that path.
 
 **Architecture Evolution**:
 - Started with: `PhysicsEngineV2` (hardcoded ballistic) + `WebGLRendererV2`
@@ -59,7 +59,14 @@
 
 **Branch**: `codex/t39-spheroid-random-walk`
 
-**Immediate Next Step**: Complete browser QA for T39c replay, mobile layout, persistence, geometry constraints, and chart labels; then add the code-side result link in the paper checkout when that repository is in scope.
+**Immediate Next Step**: Implement T40 as two selectable modes in the existing Random Walk page, first resolving or bypassing the T27 strategy-composition issue. T39c browser QA remains an open task.
+
+## T40 plan — 2026-09-27
+
+- Add T15a and T15b as selectable modes within the existing Random Walk page. Do not add an app page, tab, or navigation entry.
+- Keep the T15a/T15b integration requirements separate from general engine concerns documented under T27.
+- Use the paper repository task and model documents as the scientific source of truth; this repository's older T15a task is unrelated.
+- See `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md` and `memory-bank/tasks/T40.md`.
 
 ## 2026-09-26 Spheroid experiment
 
