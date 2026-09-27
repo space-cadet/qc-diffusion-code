@@ -141,6 +141,10 @@ const modules = import.meta.glob('/memory-bank/**/*.md', { as: 'raw', eager: tru
 - T29: Memory Bank Feature Implementation
 - META-1: Memory Bank Maintenance and Updates
 
+### Date metadata crash follow-up — 2026-09-27
+
+The viewer could throw `RangeError: invalid date` when a Markdown header included local timezone text such as `IST` or malformed date metadata. `useMemoryBankDocs.ts` now recognizes common ISO/month-name headers, strips supported timezone suffixes, validates parsed dates, and falls back safely when parsing fails. The user reported the viewer works after this change. The frontend TypeScript phase completed; the user stopped the production build before Vite bundling completed.
+
 ## Notes
 - Implementation follows same patterns as arxivite project
 - Adapted to qc-diffusion-code codebase structure and styling conventions

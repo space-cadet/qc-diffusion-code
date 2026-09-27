@@ -1,7 +1,43 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 12:56:04 IST*
+*Last Updated: 2026-09-27 18:01:51 IST*
+
+#### 18:01:51 IST - T40, T29: Record strategy-architecture correction and viewer date fix
+- Modified `memory-bank/tasks/T40.md` - Added the required independent-strategy architecture criterion and marked the standalone runner as an unaccepted prototype.
+- Modified `memory-bank/tasks.md` - Updated the T40 summary to state the strategy integration requirement and current incomplete status.
+- Modified `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md` - Corrected the integration decision and recorded that current prototype results do not satisfy engine-strategy acceptance.
+- Modified `memory-bank/implementation-details/index.md` - Updated the T40 implementation summary and timestamp.
+- Modified `memory-bank/ui-tests/2026-09-27-161000-t15-random-walk.md` - Clarified that existing PASS results cover the standalone prototype only.
+- Modified `memory-bank/activeContext.md` - Set the T40 next step to independent strategy integration in the existing engine.
+- Modified `memory-bank/session_cache.md` - Recorded the T40 architecture correction and T29 viewer fix.
+- Modified `memory-bank/sessions/2026-09-27-afternoon.md` - Appended the strategy-architecture correction and viewer fix while preserving prior session notes.
+- Modified `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts` - Normalized and validated Memory Bank dates and added a safe fallback for invalid metadata.
+- Modified `memory-bank/tasks/T29.md` - Recorded the viewer date-parser crash fix and user-reported working result.
+- Modified `memory-bank/implementation-details/memory-bank-viewer-page.md` - Documented the date metadata crash and fix.
+- Modified `memory-bank/errorLog.md` - Recorded the invalid-date error, cause, fix, and verification limit.
+- Modified `memory-bank/changelog.md` - Added the Memory Bank viewer date-parsing fix under Unreleased.
+- Created `memory-bank/edits/2026-09-27/180151-T40-T29-memory-update-correction.md` - Recorded this update with branch and source provenance.
+- Modified `memory-bank/edit_history.md` - Refreshed the generated view from the new edit chunk.
+
+#### 16:19:23 IST - T40: Implement and verify T15 modes in the existing Random Walk page
+- Modified `frontend/src/RandomWalkSimV2.tsx` - Integrated selectable T15 modes and mode-specific controls, runners, status, and diagnostics into the existing page.
+- Modified `frontend/src/components/RandomWalkParameterPanelV2.tsx` - Added the accessible process selector and T15-specific configuration controls.
+- Created `frontend/src/t15/t15RandomWalk.ts` - Added seeded T15a/T15b runners, normalized settings, diagnostics, and reproducible JSON payload construction.
+- Created `frontend/src/t15/t15aReference.ts` - Added the paper runner's 2048-cell Fourier density/current reference evolution.
+- Created `frontend/src/t15/T15RandomWalkMode.tsx` - Added mode canvases, run controls, live diagnostics, paper-reference displays, and JSON download control.
+- Created `frontend/src/t15/__tests__/t15RandomWalk.test.ts` - Added nine tests for deterministic runs, profiles, ordering rates, live Fourier comparison, finite-speed bounds, zero-rate motion, and JSON serialization.
+- Created `frontend/public/research/t15a-bianchi-i-v1.json` - Added the saved T15a multi-population, multi-seed paper benchmark summary.
+- Created `frontend/public/research/t15b-euclidean-v1.json` - Added the saved T15b radial-density and MSD reference data.
+- Created `memory-bank/ui-tests/2026-09-27-161000-t15-random-walk.md` - Recorded browser results and the unobserved JSON download event.
+- Modified `memory-bank/tasks/T40.md` - Recorded implementation, acceptance evidence, and remaining download verification.
+- Modified `memory-bank/tasks.md` - Updated the T40 registry status to in progress.
+- Modified `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md` - Recorded implementation design, model comparisons, build/test/browser evidence, and limitations.
+- Modified `memory-bank/activeContext.md` - Updated the current branch, T40 implementation status, and next verification step.
+- Modified `memory-bank/session_cache.md` - Updated the active T40/T27 implementation handoff.
+- Modified `memory-bank/sessions/2026-09-27-afternoon.md` - Appended the implementation and acceptance continuation while preserving the planning record.
+- Created `memory-bank/edits/2026-09-27/161923-T40-t15-random-walk-implementation.md` - Recorded this implementation and Memory Bank update.
+- Modified `memory-bank/edit_history.md` - Refreshed the generated view from the new edit chunk.
 
 #### 12:56:04 IST - T40: Record T15 modes in the existing Random Walk page
 - Created `memory-bank/tasks/T40.md` - Planned seeded T15a/T15b modes within the existing page, with no new page or navigation.

@@ -1,6 +1,9 @@
 import React, { useMemo } from "react";
 import { useAppStore } from "../stores/appStore";
 import { LogNumberSlider } from './common/LogNumberSlider';
+import type { T15Mode, T15RunConfig } from "../t15/t15RandomWalk";
+
+type ProcessMode = "standard" | T15Mode;
 
 export const RandomWalkParameterPanelV2 = ({
   gridLayoutParams,
@@ -11,6 +14,10 @@ export const RandomWalkParameterPanelV2 = ({
   handlePause,
   handleReset,
   handleInitialize,
+  processMode,
+  onProcessModeChange,
+  t15Config,
+  onT15ConfigChange,
 }: any) => {
   const { randomWalkUIState, setRandomWalkUIState } = useAppStore();
   
@@ -27,6 +34,22 @@ export const RandomWalkParameterPanelV2 = ({
         Parameters
       </h3>
 
+      <div className="mb-5">
+        <label htmlFor="random-walk-process" className="mb-2 block text-sm font-medium">Process:</label>
+        <select
+          id="random-walk-process"
+          value={processMode}
+          onChange={(event) => onProcessModeChange(event.target.value as ProcessMode)}
+          className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+        >
+          <option value="standard">Standard Random Walk</option>
+          <option value="t15a">T15a · Bianchi I velocity flips</option>
+          <option value="t15b">T15b · Euclidean persistent walk</option>
+        </select>
+        {processMode !== "standard" && <p className="mt-2 text-xs text-slate-500">T15 uses its own model clock and unbounded domain. Canvas edges do not change the walkers.</p>}
+      </div>
+
+      {processMode === "standard" ? <>
       {/* Simulation Controls */}
       <div className="mb-6 space-y-3">
         <button
@@ -360,6 +383,99 @@ export const RandomWalkParameterPanelV2 = ({
           </div>
         )}
       </div>
+      </> : <T15Controls
+        mode={processMode}
+        config={t15Config}
+        onConfigChange={onT15ConfigChange}
+        simulationState={simulationState}
+        handleStart={handleStart}
+        handlePause={handlePause}
+        handleReset={handleReset}
+        handleInitialize={handleInitialize}
+      />}
     </div>
   );
 };
+
+function T15Controls({
+  mode,
+  config,
+  onConfigChange,
+  simulationState,
+  handleStart,
+  handlePause,
+  handleReset,
+  handleInitialize,
+}: {
+  mode: T15Mode;
+  config: T15RunConfig;
+  onConfigChange: (config: T15RunConfig) => void;
+  simulationState: any;
+  handleStart: () => void;
+  handlePause: () => void;
+  handleReset: () => void;
+  handleInitialize: () => void;
+}) {
+  const update = (updates: Partial<T15RunConfig>) => onConfigChange({ ...config, ...updates });
+  return (
+    <>
+      <div className="mb-6 space-y-3">
+        <button type="button" onClick={handleInitialize} className="w-full rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Initialize run</button>
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={handleStart} disabled={simulationState.isRunning} className="rounded-md bg-green-700 px-3 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50">Start</button>
+          <button type="button" onClick={handlePause} className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white hover:bg-amber-800">{simulationState.isRunning ? "Pause" : "Resume"}</button>
+        </div>
+        <button type="button" onClick={handleReset} className="w-full rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800">Reset</button>
+        <div className="rounded-lg border bg-slate-50 p-3 text-sm" role="status" aria-live="polite">
+          <div className="flex justify-between"><span>Status</span><span className="font-medium">{simulationState.status}</span></div>
+          <div className="flex justify-between"><span>Model time</span><span className="font-mono">{(simulationState.time || 0).toFixed(3)}</span></div>
+          <div className="flex justify-between"><span>Walker events</span><span className="font-mono">{(simulationState.collisions || 0).toLocaleString()}</span></div>
+        </div>
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <label htmlFor="t15-walkers" className="mb-2 block text-sm font-medium">Live walkers: {config.walkers.toLocaleString()}</label>
+          <input id="t15-walkers" type="range" min="500" max="50000" step="500" value={config.walkers} onChange={(event) => update({ walkers: Number(event.target.value) })} className="w-full" />
+          <p className="mt-1 text-xs text-slate-500">Large paper ensembles are included as saved references.</p>
+        </div>
+        <div>
+          <label htmlFor="t15-seed" className="mb-2 block text-sm font-medium">Seed</label>
+          <input id="t15-seed" type="number" min="0" step="1" value={config.seed} onChange={(event) => update({ seed: Number(event.target.value) })} className="min-h-10 w-full rounded border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        {mode === "t15a" ? (
+          <>
+            <div>
+              <label htmlFor="t15a-ordering" className="mb-2 block text-sm font-medium">Bianchi ordering case</label>
+              <select id="t15a-ordering" value={config.ordering} onChange={(event) => update({ ordering: event.target.value as T15RunConfig["ordering"] })} className="min-h-10 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm">
+                <option value="reduced">Reduced Laplace–Beltrami · B = 0, a = 0</option>
+                <option value="derivative">Derivative-only · B = −3/2, a = 3/4</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="t15a-profile" className="mb-2 block text-sm font-medium">Initial profile</label>
+              <select id="t15a-profile" value={config.profile} onChange={(event) => update({ profile: event.target.value as T15RunConfig["profile"] })} className="min-h-10 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm">
+                <option value="centered">Centered single bump</option>
+                <option value="bimodal">Symmetric bimodal</option>
+                <option value="asymmetric">Asymmetric · J₀ = 0.4u₀</option>
+              </select>
+            </div>
+            <p className="rounded bg-blue-50 p-3 text-xs leading-5 text-blue-900">Clock α runs from 0 to 1. Direction flips are per walker; the β display window is not a physical boundary.</p>
+          </>
+        ) : (
+          <>
+            <div>
+              <label htmlFor="t15b-speed" className="mb-2 block text-sm font-medium">Speed v: {config.speed.toFixed(2)}</label>
+              <input id="t15b-speed" type="range" min="0.1" max="3" step="0.1" value={config.speed} onChange={(event) => update({ speed: Number(event.target.value) })} className="w-full" />
+            </div>
+            <div>
+              <label htmlFor="t15b-rate" className="mb-2 block text-sm font-medium">Reset rate λ: {config.resetRate.toFixed(2)}</label>
+              <input id="t15b-rate" type="range" min="0" max="5" step="0.1" value={config.resetRate} onChange={(event) => update({ resetRate: Number(event.target.value) })} className="w-full" />
+            </div>
+            <p className="rounded bg-blue-50 p-3 text-xs leading-5 text-blue-900">Walkers start at the origin with uniform headings. The reference run uses v = 1, λ = 1, seed 15026, and 250,000 walkers.</p>
+          </>
+        )}
+      </div>
+    </>
+  );
+}

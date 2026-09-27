@@ -1,6 +1,14 @@
 # Error Log
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2025-08-24 00:02:35 IST*
+*Last Updated: 2026-09-27 18:01:51 IST*
+
+## 2026-09-27 18:01:51 IST: T29 - Invalid date in Memory Bank viewer
+**File:** `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts`
+**Error:** Opening a Markdown document in the Memory Bank viewer could throw `RangeError: invalid date` from `Date.toISOString()`.
+**Cause:** Date metadata containing Markdown delimiters or a local timezone suffix was passed to `Date` without validation; an invalid `Date` is truthy, so the fallback did not run.
+**Fix:** Normalize supported Markdown date headers, validate the parsed timestamp, and use a safe fallback when metadata is missing or invalid.
+**Changes:** The date is parsed once and shared by the document's created/updated metadata. User reported the viewer works; the production build was stopped before Vite bundling completed.
+**Task:** T29
 
 ## 2025-08-23 21:40: T5b - State Restoration Not Working Despite Implementation
 **File:** `frontend/src/RandomWalkSim.tsx`

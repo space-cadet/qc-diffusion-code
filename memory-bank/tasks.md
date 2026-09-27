@@ -79,7 +79,7 @@
 | T39a | Seeded Spheroid Geometry and Walk Engine | ✅ COMPLETED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
 | T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
-| T40 | T15a/T15b Modes in the Existing Random Walk Page | 📝 PLANNED | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
+| T40 | T15a/T15b Modes in the Existing Random Walk Page | 🔄 IN PROGRESS | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
 
 ## Task Details
 
@@ -92,9 +92,9 @@
 
 ### T40: T15a/T15b Modes in the Existing Random Walk Page
 **Description**: Add selectable, reproducible T15a and T15b simulation modes inside the existing Random Walk page; do not add app pages, tabs, or navigation entries.
-**Status**: 📝 PLANNED **Last**: 2026-09-27 12:56:04 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-27 18:01:51 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md`.
-**Notes**: Keep the general simulation-engine audit issues tracked separately under T27. Each T15 mode needs its own seeded model runner; reuse the existing page and visualization where their assumptions fit. T15a/T15b canonical scientific definitions remain in the paper repository.
+**Notes**: Keep general simulation-engine audit issues under T27. T15a and T15b must be independent strategies in the existing engine; the current standalone runner is a prototype and does not satisfy this architecture requirement. Canonical scientific definitions remain in the paper repository.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.

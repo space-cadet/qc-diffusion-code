@@ -64,8 +64,24 @@ function extractTitle(content: string): string | null {
 }
 
 function extractDate(content: string): Date | null {
-  const match = content.match(/(?:created|updated|date):\s*(.+)/i);
-  return match ? new Date(match[1]) : null;
+  const match = content.match(/^\s*\*{0,2}\s*(?:created|(?:last\s+)?updated|date):\s*(.+)$/im);
+  if (!match) return null;
+
+  // Memory Bank headers commonly wrap dates in Markdown emphasis and append
+  // the local timezone (for example, `2025-08-20 08:31:32 IST`). Neither the
+  // asterisks nor the timezone abbreviation is accepted by every browser's
+  // Date parser, so normalize those parts before parsing.
+  const rawValue = match[1]
+    .trim()
+    .replace(/\s+(?:IST|UTC|GMT)$/i, "")
+    .replace(/[,.;]+$/, "");
+  const value = rawValue.match(/^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?/)?.[0]
+    || rawValue.match(/^[A-Za-z]{3}\s+\d{1,2},\s+\d{4}(?:,\s+\d{1,2}:\d{2}(?::\d{2})?)?/)?.[0]
+    || rawValue;
+  const date = new Date(value.replace(/,\s*(\d{1,2}:\d{2}(?::\d{2})?)$/, " $1"));
+  if (!Number.isNaN(date.getTime())) return date;
+
+  return null;
 }
 
 function getContext(content: string, query: string, sectionTitle?: string): string {
@@ -203,12 +219,14 @@ export function useMemoryBankDocument(category: string, file: string) {
 
     if (fileType.displayMode === 'markdown') {
       const content = rawContent as any;
+      const documentDate = extractDate(content);
+      const dateIso = documentDate?.toISOString() || new Date().toISOString();
       return {
         fileName: file,
         filePath: `${category}/${file}`,
         title: extractTitle(content) || file.replace('.md', ''),
-        created: extractDate(content)?.toISOString() || new Date().toISOString(),
-        updated: extractDate(content)?.toISOString() || new Date().toISOString(),
+        created: dateIso,
+        updated: dateIso,
         sections: parseSections(content),
         content,
         mimeType: fileType.mimeType,

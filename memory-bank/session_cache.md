@@ -1,17 +1,17 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 12:56:04 IST*
+*Last Updated: 2026-09-27 18:01:51 IST*
 
 ## Current Session
 
-**2026-09-27 T15 integration plan**: Recorded T40 to add T15a and T15b as selectable modes within the existing Random Walk page, with no new page or navigation. General engine concerns remain separate under T27. No application code changed. See `sessions/2026-09-27-afternoon.md` and `tasks/T40.md`.
+**2026-09-27 T40 architecture correction and T29 viewer fix**: The T15 page prototype uses a separate simulation/canvas path; user requires independent strategies in the existing engine, so T40 remains incomplete and prototype checks are provisional. T27's general engine audit remains separate. Fixed invalid Memory Bank date parsing in `useMemoryBankDocs.ts`; user reports the viewer now works. See `sessions/2026-09-27-afternoon.md`, `tasks/T40.md`, and `tasks/T29.md`.
 
 **Session**: 2026-09-27-afternoon.md
 **Started**: 2026-09-27 12:46:25 IST
 **Focus**: T40 - T15a/T15b modes in the existing Random Walk page
-**Status**: 📝 PLANNED — integration plan recorded; implementation not started
-**Branch**: `HEAD` (detached at `74ef789`)
+**Status**: 🔄 IN PROGRESS — standalone prototype exists; required engine-strategy integration remains
+**Branch**: `codex/t40-t15-random-walk-page` (base `cd9f2a7`)
 
 ## Overview
 
@@ -21,7 +21,7 @@
 
 ## Session History (Last 5)
 
-1. `sessions/2026-09-27-afternoon.md` - T15a/T15b integration plan for the existing Random Walk page
+1. `sessions/2026-09-27-afternoon.md` - T40 plan and implementation verification continuation
 2. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
 3. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential gate, T27 composition fix, and T38 planning
 4. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
@@ -37,7 +37,7 @@
 - T39a: Seeded spheroid geometry and walk engine - ✅ COMPLETE
 - T39b: Spheroid walk numerical validation - ✅ COMPLETE
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
-- T40: T15a/T15b modes in the existing Random Walk page - 📝 PLANNED
+- T40: T15a/T15b modes in the existing Random Walk page - 🔄 IN PROGRESS
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄
 - T12: Interparticle Collisions and Obstacles Implementation - 🔄

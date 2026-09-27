@@ -1,6 +1,11 @@
 # Changelog
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-01-11 15:45:06 IST*
+*Last Updated: 2026-09-27 18:01:51 IST*
+
+## [Unreleased] - 2026-09-27
+
+### Fixed
+- **Memory Bank Viewer Dates**: Normalize and validate Markdown date metadata so timezone suffixes or malformed values cannot crash document rendering.
 
 ## [3.0.0] - 2026-01-11 - Build Pipeline Resolution & Quantum Walk Explorer
 

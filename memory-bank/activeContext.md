@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 12:56:04 IST*
+*Last Updated: 2026-09-27 18:01:51 IST*
 
 ## Current Focus
 **Task**: T40 - T15a/T15b modes in the existing Random Walk page
-**Status**: 📝 PLANNED — integration plan recorded; app implementation has not started
+**Status**: 🔄 IN PROGRESS — the in-page T15 prototype runs, but it bypasses the existing engine; independent strategy integration is still required
 **Priority**: HIGH
 
-**Context**: T40 records a plan to add T15a/T15b as modes inside the existing Random Walk page. T39 remains open for browser QA; the app-shell history below is retained as prior context.
+**Context**: T40 keeps T15a/T15b on the existing Random Walk page and requires them as independent strategies in the existing physics engine. The current standalone runner is an architectural mismatch; its implementation and checks are provisional. General engine audit findings remain separate under T27. T39 remains open for browser QA; the app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -57,9 +57,9 @@
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
 - Strategies: ⚠️ `simple`, `ctrw`, and `collisions` work; `levy` and `fractional` are still UI-only
 
-**Branch**: `codex/t39-spheroid-random-walk`
+**Branch**: `codex/t40-t15-random-walk-page` (based on `cd9f2a7`)
 
-**Immediate Next Step**: Implement T40 as two selectable modes in the existing Random Walk page, first resolving or bypassing the T27 strategy-composition issue. T39c browser QA remains an open task.
+**Immediate Next Step**: In a new session, replace the standalone T15 simulation/canvas path with independent strategies integrated into the existing physics engine, then repeat relevant model and page checks. The JSON download event also remains unverified. T39c browser QA and general T27 engine findings remain separate open work.
 
 ## T40 plan — 2026-09-27
 

@@ -1,0 +1,4536 @@
+{
+  "schemaVersion": "1.0.0",
+  "task": "T9 / NUM-7 / T15a",
+  "generatedAt": "2026-09-26T11:54:20.254350+00:00",
+  "sourceRevision": "0b571ad78f45471f60ed00da1cfe5f2598d6d3ee",
+  "workingTreeDirtyAtRun": true,
+  "specificationPath": "numerics/docs/tasks/t15a-bianchi-i-benchmark-v1.md",
+  "specificationSha256": "13eee4416d593104190df4fbc8bcee217c819509056db9afea3e44f71e297f0c",
+  "runnerPath": "numerics/scripts/run_t15a_bianchi_i.py",
+  "runnerSha256": "2246f4cc761c007b348253fe24fd41e64f84f8f4686ad11ce0bc430f3e1d3ce9",
+  "environment": {
+    "python": "3.14.2",
+    "numpy": "2.4.1",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O"
+  },
+  "settings": {
+    "domain": [
+      -6.0,
+      6.0
+    ],
+    "gridSize": 2048,
+    "gridSpacing": 0.005859375,
+    "clockInterval": [
+      0.0,
+      1.0
+    ],
+    "outputTimes": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "velocity": 1.0,
+    "rootSeed": 20260926,
+    "populations": [
+      20000,
+      80000,
+      320000,
+      640000
+    ],
+    "finalReplicates": 8,
+    "densityL1Gate": 0.05,
+    "confidence": "two-sided 95% Student-t interval across the eight 320,000-walker seeds; upper endpoint must be <= gate"
+  },
+  "elapsedSeconds": 14.330429082969204,
+  "cases": [
+    {
+      "profile": "centered-single-bump",
+      "ordering": "reduced-laplace-beltrami",
+      "B": 0.0,
+      "flipRate": 0.0,
+      "initialMass": 1.0,
+      "initialCurrent": 0.0,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          20280926
+        ],
+        "80000": [
+          20340926
+        ],
+        "320000": [
+          20580926,
+          20581926,
+          20582926,
+          20583926,
+          20584926,
+          20585926,
+          20586926,
+          20587926
+        ],
+        "640000": [
+          20900926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 20280926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.07416660430110468,
+                  "currentL1PerReferenceMass": 0.0855,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008361328125004036,
+                  "varianceBetaError": 0.00042368586989161017,
+                  "meanAxError": 0.0010414050671292419,
+                  "meanAzError": 0.0006070978838079721,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.10068678783725486,
+                  "currentL1PerReferenceMass": 0.09632320195636927,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001990722656250242,
+                  "varianceBetaError": 0.0016973648365946614,
+                  "meanAxError": 0.0036651072246081107,
+                  "meanAzError": 1.5912874548718037e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.11061604814318081,
+                  "currentL1PerReferenceMass": 0.11202051134425124,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.003108105468750219,
+                  "varianceBetaError": 0.0029621630991542025,
+                  "meanAxError": 0.007918741459105538,
+                  "meanAzError": 0.0012065677935360064,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.11110087671122561,
+                  "currentL1PerReferenceMass": 0.1111008767112257,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004286132812500398,
+                  "varianceBetaError": 0.004219588272236008,
+                  "meanAxError": 0.01508876901388323,
+                  "meanAzError": 0.002715740910589126,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.11878752424773768,
+                  "currentL1PerReferenceMass": 0.11878752428779293,
+                  "massError": 0.0,
+                  "meanBetaError": 0.005440722656250341,
+                  "varianceBetaError": 0.005496579865892581,
+                  "meanAxError": 0.02683431929433233,
+                  "meanAzError": 0.006998836767438732,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.11878752424773768,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.11878752424773768,
+            "ci95Upper": 0.11878752424773768,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 20340926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.03579828576093864,
+                  "currentL1PerReferenceMass": 0.03660000000000001,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000618164062500412,
+                  "varianceBetaError": 0.00018107025542016264,
+                  "meanAxError": 0.0007258321133698509,
+                  "meanAzError": 0.0009864656672438077,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.04325876577060738,
+                  "currentL1PerReferenceMass": 0.04399460175319224,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003291503906252685,
+                  "varianceBetaError": 0.0005506256203123006,
+                  "meanAxError": 0.0008747463891494167,
+                  "meanAzError": 0.00015382891073878469,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.05094310455697838,
+                  "currentL1PerReferenceMass": 0.05164885887209125,
+                  "massError": 4.440892098500626e-16,
+                  "meanBetaError": 3.896484375025267e-05,
+                  "varianceBetaError": 0.0009324401103388835,
+                  "meanAxError": 0.0011337343040405123,
+                  "meanAzError": 0.0021045911098589443,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.05069256104535697,
+                  "currentL1PerReferenceMass": 0.05069256104535705,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00024433593749957627,
+                  "varianceBetaError": 0.0012628868228036216,
+                  "meanAxError": 0.0015180694045349163,
+                  "meanAzError": 0.00537948003413824,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.05273435440519068,
+                  "currentL1PerReferenceMass": 0.05273435443428369,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005333496093747614,
+                  "varianceBetaError": 0.0016236672719245338,
+                  "meanAxError": 0.0021574191468465287,
+                  "meanAzError": 0.012836751753834363,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.05273435440519068,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.05273435440519068,
+            "ci95Upper": 0.05273435440519068,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 20580926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01875309631217716,
+                  "currentL1PerReferenceMass": 0.01991875,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00018795776367146888,
+                  "varianceBetaError": 0.00014033827202582227,
+                  "meanAxError": 0.0001289927978562755,
+                  "meanAzError": 0.0007919816620645115,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.021972158371097603,
+                  "currentL1PerReferenceMass": 0.022582799138482705,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010619384765622603,
+                  "varianceBetaError": 8.203859344940723e-06,
+                  "meanAxError": 0.0014593802798534838,
+                  "meanAzError": 0.003699831641090112,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.026147002919200107,
+                  "currentL1PerReferenceMass": 0.02597390745401503,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0019308288574216015,
+                  "varianceBetaError": 0.00012640484153481069,
+                  "meanAxError": 0.0036444178690246964,
+                  "meanAzError": 0.00938048250715795,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.027840116496081802,
+                  "currentL1PerReferenceMass": 0.027840116496081854,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002808270263671503,
+                  "varianceBetaError": 0.00026878841649202734,
+                  "meanAxError": 0.007278950222787461,
+                  "meanAzError": 0.02110968615046538,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.0267544684734892,
+                  "currentL1PerReferenceMass": 0.026754468499990053,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0036822509765622735,
+                  "varianceBetaError": 0.0004094672677443789,
+                  "meanAxError": 0.0132472306632474,
+                  "meanAzError": 0.045607913499138064,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20581926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02160728086563037,
+                  "currentL1PerReferenceMass": 0.02033125,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005587280273441769,
+                  "varianceBetaError": 5.138737852912467e-05,
+                  "meanAxError": 0.0006043005576601423,
+                  "meanAzError": 0.0011477420273870997,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024140991271575464,
+                  "currentL1PerReferenceMass": 0.024474946889280196,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0011643493652346362,
+                  "varianceBetaError": 4.92332947150953e-05,
+                  "meanAxError": 0.001574111474771378,
+                  "meanAzError": 0.004026682953454319,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02830783229227279,
+                  "currentL1PerReferenceMass": 0.028424208718396318,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0017491333007814969,
+                  "varianceBetaError": 0.00016063518127334975,
+                  "meanAxError": 0.003125442579534621,
+                  "meanAzError": 0.009697963986476932,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.029199631377821035,
+                  "currentL1PerReferenceMass": 0.029199631377821125,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0023446655273440947,
+                  "varianceBetaError": 0.00026567229054508257,
+                  "meanAxError": 0.0057159687616650245,
+                  "meanAzError": 0.021508546705065967,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029414496221213844,
+                  "currentL1PerReferenceMass": 0.029414496247007642,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002950286865234575,
+                  "varianceBetaError": 0.00037593602590368924,
+                  "meanAxError": 0.010029969330057398,
+                  "meanAzError": 0.0465126489027714,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20582926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018278016629591477,
+                  "currentL1PerReferenceMass": 0.021574999999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002827880859378948,
+                  "varianceBetaError": 0.00016639753290827175,
+                  "meanAxError": 0.0003820883194265434,
+                  "meanAzError": 0.0002982809702340994,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022104433962228658,
+                  "currentL1PerReferenceMass": 0.02231859731297503,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005943969726564871,
+                  "varianceBetaError": 1.9469779117764485e-05,
+                  "meanAxError": 0.000811132957684535,
+                  "meanAzError": 0.001789790494421073,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.025445421633122575,
+                  "currentL1PerReferenceMass": 0.025250028767780524,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0009201599121096277,
+                  "varianceBetaError": 0.00013854917062350314,
+                  "meanAxError": 0.001535816188549255,
+                  "meanAzError": 0.004819425259357857,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028007814486058973,
+                  "currentL1PerReferenceMass": 0.028007814486059032,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012437255859378826,
+                  "varianceBetaError": 0.00029992836011161206,
+                  "meanAxError": 0.002717394313717314,
+                  "meanAzError": 0.011015465610054065,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.026944166646458337,
+                  "currentL1PerReferenceMass": 0.0269441666712021,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0015553344726564333,
+                  "varianceBetaError": 0.000445953522387299,
+                  "meanAxError": 0.004649300506579301,
+                  "meanAzError": 0.023461092901916558,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20583926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022174680834863167,
+                  "currentL1PerReferenceMass": 0.02034375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00033594360351604097,
+                  "varianceBetaError": 0.0003817630073095074,
+                  "meanAxError": 0.00016776902709469965,
+                  "meanAzError": 0.0017446749032530295,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025347882263607485,
+                  "currentL1PerReferenceMass": 0.023797306462828086,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00098009033203101,
+                  "varianceBetaError": 9.177396306703223e-05,
+                  "meanAxError": 0.0012206278465778375,
+                  "meanAzError": 0.0029570298008407825,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028467308646089786,
+                  "currentL1PerReferenceMass": 0.02866534377226283,
+                  "massError": 4.440892098500626e-16,
+                  "meanBetaError": 0.002298632812499785,
+                  "varianceBetaError": 0.0005544759165846957,
+                  "meanAxError": 0.003521574493706936,
+                  "meanAzError": 0.011426210135113912,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03045220091569245,
+                  "currentL1PerReferenceMass": 0.030452200915692514,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0036203063964840437,
+                  "varianceBetaError": 0.0010070163036804969,
+                  "meanAxError": 0.007335349451261575,
+                  "meanAzError": 0.028213599860777094,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029947680075128692,
+                  "currentL1PerReferenceMass": 0.029947680099162006,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0049363403320309696,
+                  "varianceBetaError": 0.0014662308537847224,
+                  "meanAxError": 0.013570044569475748,
+                  "meanAzError": 0.06280544929339626,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20584926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01988722118266665,
+                  "currentL1PerReferenceMass": 0.020374999999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005171447753902075,
+                  "varianceBetaError": 1.0991915059613278e-05,
+                  "meanAxError": 0.0005148732819106883,
+                  "meanAzError": 0.0010686040621019632,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.021518959458052506,
+                  "currentL1PerReferenceMass": 0.024572932997152148,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00026586914062472905,
+                  "varianceBetaError": 8.716136851688594e-06,
+                  "meanAxError": 0.0003582533574058022,
+                  "meanAzError": 0.0008212216168037578,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02884962206168996,
+                  "currentL1PerReferenceMass": 0.028128230245494885,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 1.5179443359145117e-05,
+                  "varianceBetaError": 4.2410686931115826e-05,
+                  "meanAxError": 0.00011373562533334436,
+                  "meanAzError": 0.0005612698656562998,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028645973130818486,
+                  "currentL1PerReferenceMass": 0.02864597313081854,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00023285522460975155,
+                  "varianceBetaError": 7.08902046904214e-05,
+                  "meanAxError": 0.0002872727601466174,
+                  "meanAzError": 0.0003010727334764596,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.027560555078117114,
+                  "currentL1PerReferenceMass": 0.027560555104564833,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00048413085937529243,
+                  "varianceBetaError": 9.005048743659927e-05,
+                  "meanAxError": 0.0009830772544852096,
+                  "meanAzError": 7.887077071799808e-05,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20585926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022112503754775487,
+                  "currentL1PerReferenceMass": 0.018881250000000002,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006880004882816593,
+                  "varianceBetaError": 5.886001559753107e-05,
+                  "meanAxError": 0.0006635126632006383,
+                  "meanAzError": 0.0015748292219301963,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022673509059288034,
+                  "currentL1PerReferenceMass": 0.024848576948896264,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007024475097658633,
+                  "varianceBetaError": 0.0002502996079118691,
+                  "meanAxError": 0.001064091695347713,
+                  "meanAzError": 0.0009840287720535024,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027497490653990462,
+                  "currentL1PerReferenceMass": 0.02729503769436531,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0007181396484377128,
+                  "varianceBetaError": 0.000546420156248173,
+                  "meanAxError": 0.0017168898768118446,
+                  "meanAzError": 0.0003280852902460829,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02882761041906522,
+                  "currentL1PerReferenceMass": 0.028827610419065283,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007208129882816244,
+                  "varianceBetaError": 0.000846834114156314,
+                  "meanAxError": 0.0027614649528846513,
+                  "meanAzError": 0.0007896684295900513,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.028682429969697807,
+                  "currentL1PerReferenceMass": 0.028682429996123235,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0007352600097658704,
+                  "varianceBetaError": 0.0011569174721974829,
+                  "meanAxError": 0.00454513046595828,
+                  "meanAzError": 0.0029001737177800635,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20586926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018795681185142292,
+                  "currentL1PerReferenceMass": 0.02105,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004942199707035494,
+                  "varianceBetaError": 8.232920654691056e-05,
+                  "meanAxError": 0.00046197286693838713,
+                  "meanAzError": 0.0012590884620777842,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02384140063481306,
+                  "currentL1PerReferenceMass": 0.0248362217121405,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008509460449221407,
+                  "varianceBetaError": 2.113308463227992e-05,
+                  "meanAxError": 0.001159882660592526,
+                  "meanAzError": 0.0029880124348058423,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02685217959360738,
+                  "currentL1PerReferenceMass": 0.027127799988019126,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0012115539550783816,
+                  "varianceBetaError": 3.834490513832112e-05,
+                  "meanAxError": 0.0023142375050095865,
+                  "meanAzError": 0.006592260280673834,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028184966431161973,
+                  "currentL1PerReferenceMass": 0.028184966431162042,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0015770324707035654,
+                  "varianceBetaError": 8.989090604449856e-05,
+                  "meanAxError": 0.00422213178524844,
+                  "meanAzError": 0.01428300243072922,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029672116183875552,
+                  "currentL1PerReferenceMass": 0.029672116208770097,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0019337585449221983,
+                  "varianceBetaError": 0.00014093949305515885,
+                  "meanAxError": 0.007342463333002591,
+                  "meanAzError": 0.030322184978400557,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20587926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021662982767371084,
+                  "currentL1PerReferenceMass": 0.02096875,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00042947387695352335,
+                  "varianceBetaError": 0.00017900444927253234,
+                  "meanAxError": 0.0003432764516304587,
+                  "meanAzError": 0.0012825581262949637,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024229461483680312,
+                  "currentL1PerReferenceMass": 0.024384169529787544,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002455078125002397,
+                  "varianceBetaError": 6.469587212837302e-05,
+                  "meanAxError": 0.000323230020794707,
+                  "meanAzError": 0.0012280225871634798,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02996687247721355,
+                  "currentL1PerReferenceMass": 0.030009824096519762,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 5.352172851584569e-05,
+                  "varianceBetaError": 4.503119890564289e-05,
+                  "meanAxError": 0.00027117412177801725,
+                  "meanAzError": 0.001402628105041881,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.0303921563706933,
+                  "currentL1PerReferenceMass": 0.03039215637069336,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00012365112304647818,
+                  "varianceBetaError": 0.00014100418647799984,
+                  "meanAxError": 0.00020610250154406984,
+                  "meanAzError": 0.00230760678333386,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029537561466728764,
+                  "currentL1PerReferenceMass": 0.029537561492914227,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00030761718749955374,
+                  "varianceBetaError": 0.0002448278790934122,
+                  "meanAxError": 8.932431791475182e-05,
+                  "meanAzError": 0.004094738923328123,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.02856418426433866,
+            "ci95HalfWidth": 0.0010823553606077565,
+            "ci95Lower": 0.027481828903730906,
+            "ci95Upper": 0.029646539624946417,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 20900926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.014359443596145046,
+                  "currentL1PerReferenceMass": 0.013774999999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 1.913452148479683e-05,
+                  "varianceBetaError": 3.067928148994814e-05,
+                  "meanAxError": 1.5901613640956214e-05,
+                  "meanAzError": 0.00022477022992162254,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.016469689022839486,
+                  "currentL1PerReferenceMass": 0.016069534409529768,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00023250732421896403,
+                  "varianceBetaError": 1.9242134084190843e-05,
+                  "meanAxError": 0.00036094899307625994,
+                  "meanAzError": 0.000966126070700124,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.01807684458798787,
+                  "currentL1PerReferenceMass": 0.018077098618970576,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00044274902343773015,
+                  "varianceBetaError": 6.483251024064218e-05,
+                  "meanAxError": 0.0009207478849078132,
+                  "meanAzError": 0.0024251076077703715,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.020067389605062137,
+                  "currentL1PerReferenceMass": 0.02006738960506216,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006496032714847222,
+                  "varianceBetaError": 9.761766712490516e-05,
+                  "meanAxError": 0.0018156409907885696,
+                  "meanAzError": 0.005504164366977982,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.019299294165719943,
+                  "currentL1PerReferenceMass": 0.019299294188083793,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008629760742190351,
+                  "varianceBetaError": 0.0001558851452356791,
+                  "meanAxError": 0.0033655312086686706,
+                  "meanAzError": 0.01177402988691334,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.019299294165719943,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.019299294165719943,
+            "ci95Upper": 0.019299294165719943,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.02856418426433866,
+        "ci95UpperAt320k": 0.029646539624946417,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    },
+    {
+      "profile": "centered-single-bump",
+      "ordering": "manuscript-derivative-only",
+      "B": -1.5,
+      "flipRate": 0.75,
+      "initialMass": 1.0,
+      "initialCurrent": 0.0,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          20380926
+        ],
+        "80000": [
+          20440926
+        ],
+        "320000": [
+          20680926,
+          20681926,
+          20682926,
+          20683926,
+          20684926,
+          20685926,
+          20686926,
+          20687926
+        ],
+        "640000": [
+          21000926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 20380926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.08323575115563582,
+                  "currentL1PerReferenceMass": 0.0836,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0018076171875004085,
+                  "varianceBetaError": 0.0009820485230898485,
+                  "meanAxError": 0.0023796120736885307,
+                  "meanAzError": 0.0020934435796484685,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.09233837525537833,
+                  "currentL1PerReferenceMass": 0.09516685622135161,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010532226562503244,
+                  "varianceBetaError": 0.0006539197262535046,
+                  "meanAxError": 0.001961122802030202,
+                  "meanAzError": 0.002069591495273082,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.10919850733174236,
+                  "currentL1PerReferenceMass": 0.11455357253921719,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0016954101562502016,
+                  "varianceBetaError": 0.0006164247328703243,
+                  "meanAxError": 0.0027257535555447188,
+                  "meanAzError": 0.012545534082886167,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.12100447622628334,
+                  "currentL1PerReferenceMass": 0.12052746041630803,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0023537109375002807,
+                  "varianceBetaError": 0.00024459643257890296,
+                  "meanAxError": 0.006433965681844622,
+                  "meanAzError": 0.016159087248090565,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.13284876905856988,
+                  "currentL1PerReferenceMass": 0.1290590427366019,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0006322265624996716,
+                  "varianceBetaError": 0.0021956249888849255,
+                  "meanAxError": 0.0013965819701140525,
+                  "meanAzError": 0.0388118437297198,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.13284876905856988,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.13284876905856988,
+            "ci95Upper": 0.13284876905856988,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 20440926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.039172773649702314,
+                  "currentL1PerReferenceMass": 0.039875,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006827636718745797,
+                  "varianceBetaError": 0.00016344757311340108,
+                  "meanAxError": 0.0005866884786192017,
+                  "meanAzError": 0.001609513394250861,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.046023338658506927,
+                  "currentL1PerReferenceMass": 0.04576183574754043,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00025385742187466337,
+                  "varianceBetaError": 0.00032732221519804483,
+                  "meanAxError": 8.02118399731988e-05,
+                  "meanAzError": 0.0013929972508230914,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.0480294643486828,
+                  "currentL1PerReferenceMass": 0.053214932165441764,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00011242675781229783,
+                  "varianceBetaError": 0.0002082318222521029,
+                  "meanAxError": 0.0002257120746766983,
+                  "meanAzError": 0.0013006457173032615,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.05401053305878952,
+                  "currentL1PerReferenceMass": 0.0591398330504717,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002191113281250337,
+                  "varianceBetaError": 0.0010716403739567393,
+                  "meanAxError": 0.004239852617484718,
+                  "meanAzError": 0.02247852565327957,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.06382445790511906,
+                  "currentL1PerReferenceMass": 0.06710046754660132,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010107421874996636,
+                  "varianceBetaError": 0.0012375446034478266,
+                  "meanAxError": 0.0011364665608075697,
+                  "meanAzError": 0.023860270638948577,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.06382445790511906,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.06382445790511906,
+            "ci95Upper": 0.06382445790511906,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 20680926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018610391321114743,
+                  "currentL1PerReferenceMass": 0.01914375,
+                  "massError": 0.0,
+                  "meanBetaError": 4.91638183597945e-05,
+                  "varianceBetaError": 2.0644453672682972e-05,
+                  "meanAxError": 5.6777855652612175e-05,
+                  "meanAzError": 3.407244597819492e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022877333880967424,
+                  "currentL1PerReferenceMass": 0.02205961572314083,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00010057983398404496,
+                  "varianceBetaError": 0.00026062160929352096,
+                  "meanAxError": 0.0003242723218757071,
+                  "meanAzError": 0.0003336045486530548,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02569805081415829,
+                  "currentL1PerReferenceMass": 0.02616797295718367,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00027572021484348347,
+                  "varianceBetaError": 0.00044890158362204113,
+                  "meanAxError": 0.0009277455875260632,
+                  "meanAzError": 0.0003054388500212113,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030865558121251115,
+                  "currentL1PerReferenceMass": 0.03141248436302813,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008183898925777366,
+                  "varianceBetaError": 0.0007155469021302152,
+                  "meanAxError": 0.0027530991647148895,
+                  "meanAzError": 0.00014149364899118666,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.031052759432858488,
+                  "currentL1PerReferenceMass": 0.03184140769710137,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003188964843746367,
+                  "varianceBetaError": 0.0009133926055887587,
+                  "meanAxError": 0.001942738120546128,
+                  "meanAzError": 0.008915623879481416,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20681926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.020053159518031757,
+                  "currentL1PerReferenceMass": 0.017881249999999998,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00045146484374958273,
+                  "varianceBetaError": 0.0001151589315962348,
+                  "meanAxError": 0.00040770933898448547,
+                  "meanAzError": 0.0012575596003683298,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.0238010062451999,
+                  "currentL1PerReferenceMass": 0.022256857310612173,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00018676757812464279,
+                  "varianceBetaError": 0.00026251962989476407,
+                  "meanAxError": 0.0004646591095849306,
+                  "meanAzError": 9.498521320083775e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02457559751046887,
+                  "currentL1PerReferenceMass": 0.025953248595503048,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00017351074218728557,
+                  "varianceBetaError": 0.0006467831667802959,
+                  "meanAxError": 0.00099517215057765,
+                  "meanAzError": 0.0009082002236309172,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02999659286010768,
+                  "currentL1PerReferenceMass": 0.02880096051154876,
+                  "massError": 0.0,
+                  "meanBetaError": 7.115478515591633e-05,
+                  "varianceBetaError": 0.0014166388473663694,
+                  "meanAxError": 0.0021320808371605438,
+                  "meanAzError": 0.0041869374636052115,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03258374716713655,
+                  "currentL1PerReferenceMass": 0.03274731429963373,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007416503906245986,
+                  "varianceBetaError": 0.0005686129753089686,
+                  "meanAxError": 0.003792735426873417,
+                  "meanAzError": 0.007211968105014677,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20682926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02174345652039694,
+                  "currentL1PerReferenceMass": 0.020749999999999998,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002414428710941774,
+                  "varianceBetaError": 7.283834288973612e-05,
+                  "meanAxError": 0.00020085870613950618,
+                  "meanAzError": 0.0006186734237705327,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022598643719621617,
+                  "currentL1PerReferenceMass": 0.023753220440623314,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000562518310547204,
+                  "varianceBetaError": 0.00014550989100869938,
+                  "meanAxError": 0.0006733691630351757,
+                  "meanAzError": 0.002195764892664931,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027359390834116683,
+                  "currentL1PerReferenceMass": 0.028061863545868343,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0016717163085939873,
+                  "varianceBetaError": 8.171567927417467e-05,
+                  "meanAxError": 0.002982667134337591,
+                  "meanAzError": 0.008656878680114222,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.029586513648220222,
+                  "currentL1PerReferenceMass": 0.030894995702997672,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007600891113284658,
+                  "varianceBetaError": 0.00046062511290850816,
+                  "meanAxError": 0.002725173031717709,
+                  "meanAzError": 0.005770389254324826,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03227352256182746,
+                  "currentL1PerReferenceMass": 0.03471993209894807,
+                  "massError": 0.0,
+                  "meanBetaError": 5.313720703165048e-05,
+                  "varianceBetaError": 0.0009239370435568661,
+                  "meanAxError": 0.0021478576695610485,
+                  "meanAzError": 0.0036591533092487083,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20683926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019363099498122944,
+                  "currentL1PerReferenceMass": 0.01979375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00027564697265666793,
+                  "varianceBetaError": 6.754053494592571e-05,
+                  "meanAxError": 0.00025963702253051224,
+                  "meanAzError": 0.0008421664744042712,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022261872509511737,
+                  "currentL1PerReferenceMass": 0.02253980033611706,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006491638183597284,
+                  "varianceBetaError": 0.00014019037831036751,
+                  "meanAxError": 0.0008063301510448095,
+                  "meanAzError": 0.0027101910343236835,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02620107113880388,
+                  "currentL1PerReferenceMass": 0.026355909356606685,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012108215332033156,
+                  "varianceBetaError": 5.097287368938108e-05,
+                  "meanAxError": 0.002202409208816203,
+                  "meanAzError": 0.005522965105723365,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028470176649162942,
+                  "currentL1PerReferenceMass": 0.028473094962370497,
+                  "massError": 0.0,
+                  "meanBetaError": 6.58264160152966e-05,
+                  "varianceBetaError": 0.000930919032740174,
+                  "meanAxError": 0.000929361405859197,
+                  "meanAzError": 0.008917282963866846,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.030478713245083777,
+                  "currentL1PerReferenceMass": 0.03385811228430888,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002836853027347319,
+                  "varianceBetaError": 0.0004901552042828605,
+                  "meanAxError": 0.0021115907071718176,
+                  "meanAzError": 0.007136151650719569,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20684926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018553472828669405,
+                  "currentL1PerReferenceMass": 0.020268750000000002,
+                  "massError": 0.0,
+                  "meanBetaError": 9.517822265665138e-05,
+                  "varianceBetaError": 0.00011493455008644571,
+                  "meanAxError": 3.556245131175473e-05,
+                  "meanAzError": 0.00042874640595358393,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02462497323516204,
+                  "currentL1PerReferenceMass": 0.023864813584002477,
+                  "massError": 0.0,
+                  "meanBetaError": 6.882934570347915e-05,
+                  "varianceBetaError": 0.00028647530029352053,
+                  "meanAxError": 0.00014191598774826453,
+                  "meanAzError": 0.0007053606264781909,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.025731110745360733,
+                  "currentL1PerReferenceMass": 0.026602462760592704,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0003991333007814375,
+                  "varianceBetaError": 0.00028748133982825497,
+                  "meanAxError": 0.0003679647257233132,
+                  "meanAzError": 0.0023448827952914364,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.029219512451004997,
+                  "currentL1PerReferenceMass": 0.03007269553337042,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006261291503902866,
+                  "varianceBetaError": 0.00012613913384340592,
+                  "meanAxError": 0.001768595844495291,
+                  "meanAzError": 0.0032781171627656036,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03207919261027791,
+                  "currentL1PerReferenceMass": 0.031238698266660047,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001310577392577672,
+                  "varianceBetaError": 0.0003877121951780804,
+                  "meanAxError": 0.00529534735460091,
+                  "meanAzError": 0.01195652162590477,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20685926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.020219402575673714,
+                  "currentL1PerReferenceMass": 0.02054375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006173217773441653,
+                  "varianceBetaError": 0.00022707122294564341,
+                  "meanAxError": 0.0005192238715416853,
+                  "meanAzError": 0.0018899042728435234,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.022721460928075414,
+                  "currentL1PerReferenceMass": 0.022995385952287135,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006455017089847109,
+                  "varianceBetaError": 0.00012881414376403333,
+                  "meanAxError": 0.0008278076537857615,
+                  "meanAzError": 0.0028920848341076333,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028303083654497206,
+                  "currentL1PerReferenceMass": 0.02603425530724614,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001509448242187711,
+                  "varianceBetaError": 0.0004662833678148459,
+                  "meanAxError": 0.0023146812884780044,
+                  "meanAzError": 0.009616829502076207,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030019248496614487,
+                  "currentL1PerReferenceMass": 0.02950496886077917,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010906677246097507,
+                  "varianceBetaError": 0.0008417550106372684,
+                  "meanAxError": 0.001854857277462596,
+                  "meanAzError": 0.016965139726591083,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.032942992917407994,
+                  "currentL1PerReferenceMass": 0.03195780997911715,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001429248046875442,
+                  "varianceBetaError": 0.0008149113259293683,
+                  "meanAxError": 0.0034211482492847445,
+                  "meanAzError": 0.03132714638664069,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20686926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.020060882246917745,
+                  "currentL1PerReferenceMass": 0.020568749999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000428649902343356,
+                  "varianceBetaError": 0.00011975228502135449,
+                  "meanAxError": 0.00037012462419783176,
+                  "meanAzError": 0.0011467086742042998,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.021503619512428584,
+                  "currentL1PerReferenceMass": 0.0243462983200623,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005775146484371663,
+                  "varianceBetaError": 0.0002219070732732975,
+                  "meanAxError": 0.0009146603357861327,
+                  "meanAzError": 0.0011235953870956106,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.026781453640330584,
+                  "currentL1PerReferenceMass": 0.026526140368486925,
+                  "massError": 0.0,
+                  "meanBetaError": 5.650634765601292e-05,
+                  "varianceBetaError": 0.0007564266305476464,
+                  "meanAxError": 0.0008290730422364501,
+                  "meanAzError": 0.0022982211460509383,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02902864054558509,
+                  "currentL1PerReferenceMass": 0.02920733607483747,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001804504394528339,
+                  "varianceBetaError": 0.0002608668624711208,
+                  "meanAxError": 0.0006077906001866751,
+                  "meanAzError": 0.0024300439236446536,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.031954219367046274,
+                  "currentL1PerReferenceMass": 0.032363605623392994,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006888061523441236,
+                  "varianceBetaError": 0.0006241110380973414,
+                  "meanAxError": 0.0013524786684420143,
+                  "meanAzError": 0.015520894174780864,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 20687926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019901413847064914,
+                  "currentL1PerReferenceMass": 0.021518749999999996,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001952270507816628,
+                  "varianceBetaError": 5.3814719333453165e-05,
+                  "meanAxError": 0.0002472014287826507,
+                  "meanAzError": 0.00047029407557608316,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024610106770585973,
+                  "currentL1PerReferenceMass": 0.023148869525119315,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007301330566409706,
+                  "varianceBetaError": 0.00042437911344322954,
+                  "meanAxError": 0.0012568634687544211,
+                  "meanAzError": 0.0009532239705627443,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02614328161340419,
+                  "currentL1PerReferenceMass": 0.02492843443155761,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008677917480470754,
+                  "varianceBetaError": 0.0006382830803232098,
+                  "meanAxError": 0.0021251969731161946,
+                  "meanAzError": 0.0011633428674637791,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03179699929477309,
+                  "currentL1PerReferenceMass": 0.030807739760882635,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001626782226562859,
+                  "varianceBetaError": 0.0009130157613728151,
+                  "meanAxError": 0.004981633326672785,
+                  "meanAzError": 0.005422913003627627,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03426955259724069,
+                  "currentL1PerReferenceMass": 0.03234409246602908,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002344702148437877,
+                  "varianceBetaError": 0.0005329418555777288,
+                  "meanAxError": 0.008727403149209056,
+                  "meanAzError": 0.021159920910401198,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.032204337487359895,
+            "ci95HalfWidth": 0.0009657809654062457,
+            "ci95Lower": 0.031238556521953648,
+            "ci95Upper": 0.03317011845276614,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 21000926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01355097256365446,
+                  "currentL1PerReferenceMass": 0.014578125,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00014477233886760893,
+                  "varianceBetaError": 0.0001661779151072712,
+                  "meanAxError": 0.0002355099068080957,
+                  "meanAzError": 1.694046340205979e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.016476128115357855,
+                  "currentL1PerReferenceMass": 0.01686370489219178,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00022848815918003612,
+                  "varianceBetaError": 0.00016275453594943867,
+                  "meanAxError": 0.00044484553281343153,
+                  "meanAzError": 0.0004978925522036715,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.0199765920535701,
+                  "currentL1PerReferenceMass": 0.018520318775542777,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00023881530761737935,
+                  "varianceBetaError": 0.00012415226999118456,
+                  "meanAxError": 0.0004536269437547258,
+                  "meanAzError": 0.002733659347429196,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.020594768878114792,
+                  "currentL1PerReferenceMass": 0.020123131651931227,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010641815185550713,
+                  "varianceBetaError": 0.0007162063066130653,
+                  "meanAxError": 0.0035932561243705585,
+                  "meanAzError": 0.005077992975297541,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.022540366720566862,
+                  "currentL1PerReferenceMass": 0.022044433845382815,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0009248016357426281,
+                  "varianceBetaError": 4.1060879096832537e-07,
+                  "meanAxError": 0.003332083147824516,
+                  "meanAzError": 0.01263148353367427,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.022540366720566862,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.022540366720566862,
+            "ci95Upper": 0.022540366720566862,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.032204337487359895,
+        "ci95UpperAt320k": 0.03317011845276614,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    },
+    {
+      "profile": "symmetric-bimodal",
+      "ordering": "reduced-laplace-beltrami",
+      "B": 0.0,
+      "flipRate": 0.0,
+      "initialMass": 1.0,
+      "initialCurrent": 0.0,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          21280926
+        ],
+        "80000": [
+          21340926
+        ],
+        "320000": [
+          21580926,
+          21581926,
+          21582926,
+          21583926,
+          21584926,
+          21585926,
+          21586926,
+          21587926
+        ],
+        "640000": [
+          21900926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 21280926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.07832025967538139,
+                  "currentL1PerReferenceMass": 0.0744,
+                  "massError": 0.0,
+                  "meanBetaError": 0.006484277343749845,
+                  "varianceBetaError": 0.00020395715876220244,
+                  "meanAxError": 0.007022323969264832,
+                  "meanAzError": 0.020091017571052916,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.10720095526197013,
+                  "currentL1PerReferenceMass": 0.10792660212879249,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00513662109374978,
+                  "varianceBetaError": 0.002173047548012619,
+                  "meanAxError": 0.006145628719848695,
+                  "meanAzError": 0.03027558137050468,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.10099842406045655,
+                  "currentL1PerReferenceMass": 0.09836694361268322,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0038006835937498124,
+                  "varianceBetaError": 0.004095879333597785,
+                  "meanAxError": 0.004772327946321653,
+                  "meanAzError": 0.0544245625854094,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.09521166215077174,
+                  "currentL1PerReferenceMass": 0.09394269294182994,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0024342773437498744,
+                  "varianceBetaError": 0.006050087070871735,
+                  "meanAxError": 0.0023955746748383078,
+                  "meanAzError": 0.10781534686088534,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.11100531766537759,
+                  "currentL1PerReferenceMass": 0.11100533576503924,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010866210937499343,
+                  "varianceBetaError": 0.008000644256998868,
+                  "meanAxError": 0.0015189336327905423,
+                  "meanAzError": 0.2225021124262021,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.11100531766537759,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.11100531766537759,
+            "ci95Upper": 0.11100531766537759,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 21340926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.03864396606621531,
+                  "currentL1PerReferenceMass": 0.037975,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002227807617187369,
+                  "varianceBetaError": 0.0002840499514669692,
+                  "meanAxError": 0.0025705841910241833,
+                  "meanAzError": 0.005534468299435602,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.05368428651411806,
+                  "currentL1PerReferenceMass": 0.05357567870288268,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0019359374999998596,
+                  "varianceBetaError": 5.6491237683253814e-05,
+                  "meanAxError": 0.0027965026289762385,
+                  "meanAzError": 0.007642400758710366,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.049176782710731615,
+                  "currentL1PerReferenceMass": 0.05115168308914477,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0016346923828123305,
+                  "varianceBetaError": 0.00014314654236891045,
+                  "meanAxError": 0.003170356239508898,
+                  "meanAzError": 0.012658401804505282,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.04706833716382521,
+                  "currentL1PerReferenceMass": 0.047263170823167035,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013465576171872162,
+                  "varianceBetaError": 0.00034773765320861294,
+                  "meanAxError": 0.0038210640690836684,
+                  "meanAzError": 0.024240131796045006,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.05580846872222966,
+                  "currentL1PerReferenceMass": 0.0558084812521068,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010546874999998734,
+                  "varianceBetaError": 0.0005769425904438297,
+                  "meanAxError": 0.004875875100720073,
+                  "meanAzError": 0.05067416103176825,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.05580846872222966,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.05580846872222966,
+            "ci95Upper": 0.05580846872222966,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 21580926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02018957020840842,
+                  "currentL1PerReferenceMass": 0.02110625,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013098815917967632,
+                  "varianceBetaError": 0.000249965994574719,
+                  "meanAxError": 0.0012899413080931232,
+                  "meanAzError": 0.004298651277933718,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.026726378422389428,
+                  "currentL1PerReferenceMass": 0.026917389994345262,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002043695068359247,
+                  "varianceBetaError": 0.000887903716384586,
+                  "meanAxError": 0.0024552226687364342,
+                  "meanAzError": 0.013099741616415805,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027233951763040446,
+                  "currentL1PerReferenceMass": 0.026873034186157684,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0027738647460936044,
+                  "varianceBetaError": 0.0015185432610752558,
+                  "meanAxError": 0.004372175633730269,
+                  "meanAzError": 0.030679533613754195,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.025829974988482683,
+                  "currentL1PerReferenceMass": 0.02554537066264245,
+                  "massError": 0.0,
+                  "meanBetaError": 0.003508319091796719,
+                  "varianceBetaError": 0.002151598823306955,
+                  "meanAxError": 0.007547144062916011,
+                  "meanAzError": 0.06737310540225572,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.02773163686379409,
+                  "currentL1PerReferenceMass": 0.027731646963404476,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004242132568359369,
+                  "varianceBetaError": 0.0027911623539103037,
+                  "meanAxError": 0.012767126569683818,
+                  "meanAzError": 0.14503908676550736,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21581926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018949261274176874,
+                  "currentL1PerReferenceMass": 0.01960625,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0022302795410157478,
+                  "varianceBetaError": 1.0178677817607173e-05,
+                  "meanAxError": 0.002461852522980479,
+                  "meanAzError": 0.006530369967399086,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024856680700225123,
+                  "currentL1PerReferenceMass": 0.024430421573465852,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0025808166503908103,
+                  "varianceBetaError": 1.1022441976593633e-05,
+                  "meanAxError": 0.003846187703683057,
+                  "meanAzError": 0.011069972536107642,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.0244709767575109,
+                  "currentL1PerReferenceMass": 0.02512834264030814,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0029172546386720816,
+                  "varianceBetaError": 2.6930550701131928e-05,
+                  "meanAxError": 0.00609809079030077,
+                  "meanAzError": 0.021268199751091288,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.025312698451923927,
+                  "currentL1PerReferenceMass": 0.024278128911711435,
+                  "massError": 0.0,
+                  "meanBetaError": 0.003252154541015906,
+                  "varianceBetaError": 3.3135585831622905e-05,
+                  "meanAxError": 0.009776939431669796,
+                  "meanAzError": 0.043257572455720705,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.025741119937553552,
+                  "currentL1PerReferenceMass": 0.025741127861442243,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0036026916503905937,
+                  "varianceBetaError": 5.2100520019360275e-05,
+                  "meanAxError": 0.015942924703001182,
+                  "meanAzError": 0.09040178400563903,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21582926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019639141844927738,
+                  "currentL1PerReferenceMass": 0.021068749999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002985900878906128,
+                  "varianceBetaError": 0.00013730669949063579,
+                  "meanAxError": 0.003321122598853865,
+                  "meanAzError": 0.007921319181773079,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02677244403765176,
+                  "currentL1PerReferenceMass": 0.027833566820648623,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0021028381347654723,
+                  "varianceBetaError": 0.0007530425539887808,
+                  "meanAxError": 0.003495733855721994,
+                  "meanAzError": 0.00498240074266576,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.026841906338077544,
+                  "currentL1PerReferenceMass": 0.02777826953227542,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012097229003904253,
+                  "varianceBetaError": 0.001391020072298299,
+                  "meanAxError": 0.0037786681204323713,
+                  "meanAzError": 0.001154608988833239,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02629605673474306,
+                  "currentL1PerReferenceMass": 0.025810028610813218,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00032340087890608826,
+                  "varianceBetaError": 0.0020284163378567754,
+                  "meanAxError": 0.004263710454074587,
+                  "meanAzError": 0.004947565932210907,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.028425973548693997,
+                  "currentL1PerReferenceMass": 0.028425981960624992,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005596618652343177,
+                  "varianceBetaError": 0.002647270639161592,
+                  "meanAxError": 0.005062486567378066,
+                  "meanAzError": 0.01517194376476283,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21583926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019254787801502082,
+                  "currentL1PerReferenceMass": 0.020381249999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010378601074220173,
+                  "varianceBetaError": 0.00011543674592995323,
+                  "meanAxError": 0.0011844108019385402,
+                  "meanAzError": 0.0023498269285822104,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.028002825833488326,
+                  "currentL1PerReferenceMass": 0.02813424744229242,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005242126464845981,
+                  "varianceBetaError": 0.00045628352755056056,
+                  "meanAxError": 0.0009265662532595975,
+                  "meanAzError": 0.002099487116503429,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.0256454744732104,
+                  "currentL1PerReferenceMass": 0.02518113640428413,
+                  "massError": 0.0,
+                  "meanBetaError": 8.294677734166367e-06,
+                  "varianceBetaError": 0.0007885060134630306,
+                  "meanAxError": 0.0004481473640360889,
+                  "meanAzError": 0.010084145699552849,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02412305439067264,
+                  "currentL1PerReferenceMass": 0.025235455250615255,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005183898925780195,
+                  "varianceBetaError": 0.0011210272759445417,
+                  "meanAxError": 0.0002564490562555477,
+                  "meanAzError": 0.02516465263712675,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029032288058769336,
+                  "currentL1PerReferenceMass": 0.029032297287155152,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010320373535155636,
+                  "varianceBetaError": 0.001465017761484777,
+                  "meanAxError": 0.0014369972703613954,
+                  "meanAzError": 0.05710529146020704,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21584926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021170790412381228,
+                  "currentL1PerReferenceMass": 0.0205375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008120544433592447,
+                  "varianceBetaError": 0.00011996232386407568,
+                  "meanAxError": 0.0007981953507956163,
+                  "meanAzError": 0.0023043653246315188,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.028920259144609047,
+                  "currentL1PerReferenceMass": 0.028984508252224716,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000947735595702992,
+                  "varianceBetaError": 0.0006641287039359511,
+                  "meanAxError": 0.0008837018131204744,
+                  "meanAzError": 0.006172462774857834,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027265349091351608,
+                  "currentL1PerReferenceMass": 0.02737730879701877,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010743713378903869,
+                  "varianceBetaError": 0.0011681372975752558,
+                  "meanAxError": 0.0010420033574232157,
+                  "meanAzError": 0.013789192655323745,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02684459730611907,
+                  "currentL1PerReferenceMass": 0.02758091914966813,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001210491943359232,
+                  "varianceBetaError": 0.0016605383014758335,
+                  "meanAxError": 0.0013485368134320552,
+                  "meanAzError": 0.029474434609182865,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.030021731211983812,
+                  "currentL1PerReferenceMass": 0.030021740092308645,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001346173095703146,
+                  "varianceBetaError": 0.002201923220787494,
+                  "meanAxError": 0.0017628526273041345,
+                  "meanAzError": 0.0640840219356491,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21585926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.018174772465820683,
+                  "currentL1PerReferenceMass": 0.019799999999999998,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004007995605467274,
+                  "varianceBetaError": 0.00030352617279610916,
+                  "meanAxError": 0.00024600910908789686,
+                  "meanAzError": 0.0016761393666220314,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025736366392592545,
+                  "currentL1PerReferenceMass": 0.025188943416837997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00030216064453109093,
+                  "varianceBetaError": 0.0001849633048821575,
+                  "meanAxError": 0.0004937062096308509,
+                  "meanAzError": 8.821873221709353e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.024716807960063824,
+                  "currentL1PerReferenceMass": 0.024631126068521858,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002015808105467337,
+                  "varianceBetaError": 0.0006820384788356337,
+                  "meanAxError": 0.0009084258842313453,
+                  "meanAzError": 0.00306545611400999,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02359863173455253,
+                  "currentL1PerReferenceMass": 0.023808539656579683,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00010079956054676042,
+                  "varianceBetaError": 0.0011820319656312694,
+                  "meanAxError": 0.0015988597335088173,
+                  "meanAzError": 0.008877230062516617,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.026550958893362366,
+                  "currentL1PerReferenceMass": 0.02655097073200452,
+                  "massError": 0.0,
+                  "meanBetaError": 2.160644531290501e-06,
+                  "varianceBetaError": 0.0016694911491188513,
+                  "meanAxError": 0.0026992547599853367,
+                  "meanAzError": 0.020386913870755308,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21586926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01998078235776774,
+                  "currentL1PerReferenceMass": 0.02169375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008450866699216963,
+                  "varianceBetaError": 0.00016748381553388647,
+                  "meanAxError": 0.0009915412065510942,
+                  "meanAzError": 0.0016542610882686049,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.028601411910029868,
+                  "currentL1PerReferenceMass": 0.028583807656759202,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001189526367187374,
+                  "varianceBetaError": 0.0010156236438663147,
+                  "meanAxError": 0.0023861111054135353,
+                  "meanAzError": 0.00029965344945548367,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027382418885699634,
+                  "currentL1PerReferenceMass": 0.02811534781883768,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0015314025878904458,
+                  "varianceBetaError": 0.0018977718213155637,
+                  "meanAxError": 0.004710398797286075,
+                  "meanAzError": 0.002067804652221561,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02690420888427977,
+                  "currentL1PerReferenceMass": 0.025623515327478575,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0018857116699216858,
+                  "varianceBetaError": 0.002800644766423277,
+                  "meanAxError": 0.008619094201766764,
+                  "meanAzError": 0.006509593829726157,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.02969508566417064,
+                  "currentL1PerReferenceMass": 0.029695096266914457,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0022301513671874884,
+                  "varianceBetaError": 0.003654838984288089,
+                  "meanAxError": 0.014915802794998712,
+                  "meanAzError": 0.014801196149250018,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21587926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01995448954974806,
+                  "currentL1PerReferenceMass": 0.02021875,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013519042968751227,
+                  "varianceBetaError": 0.0006106335676133168,
+                  "meanAxError": 0.0017797982361740239,
+                  "meanAzError": 0.0019147167988782243,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.026883792797760313,
+                  "currentL1PerReferenceMass": 0.026492531451829306,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0018743225097658384,
+                  "varianceBetaError": 0.0005525710747086299,
+                  "meanAxError": 0.003162898810900483,
+                  "meanAzError": 0.005930200926048013,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02498591768843004,
+                  "currentL1PerReferenceMass": 0.02489611833851818,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0024030212402345597,
+                  "varianceBetaError": 0.00048396417139573433,
+                  "meanAxError": 0.005451686879259121,
+                  "meanAzError": 0.014169929590208241,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02574661400948076,
+                  "currentL1PerReferenceMass": 0.02549090755287764,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0029315917968752714,
+                  "varianceBetaError": 0.00041388590327651187,
+                  "meanAxError": 0.009221409768388256,
+                  "meanAzError": 0.03139757850039793,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.027866597860610843,
+                  "currentL1PerReferenceMass": 0.027866608583287007,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0034540100097656956,
+                  "varianceBetaError": 0.00034817619123050925,
+                  "meanAxError": 0.015408185708048805,
+                  "meanAzError": 0.06682981715868763,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.02813317400486733,
+            "ci95HalfWidth": 0.00123832637117324,
+            "ci95Lower": 0.02689484763369409,
+            "ci95Upper": 0.02937150037604057,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 21900926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.012883610596011048,
+                  "currentL1PerReferenceMass": 0.013337499999999999,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004461822509764096,
+                  "varianceBetaError": 0.00014771282227227234,
+                  "meanAxError": 0.0005286168860743068,
+                  "meanAzError": 0.0005163448222966771,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.018089595155810313,
+                  "currentL1PerReferenceMass": 0.01774410253400914,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007409545898435649,
+                  "varianceBetaError": 2.7745429400427568e-05,
+                  "meanAxError": 0.0010504584683901363,
+                  "meanAzError": 0.0028354274909458965,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.018070936105571162,
+                  "currentL1PerReferenceMass": 0.018121205490530194,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010488281249998455,
+                  "varianceBetaError": 8.710572978654074e-05,
+                  "meanAxError": 0.0019432140830799582,
+                  "meanAzError": 0.007421074140957273,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.017238713841460418,
+                  "currentL1PerReferenceMass": 0.01712641202656184,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013485260009763467,
+                  "varianceBetaError": 0.00020242249469593077,
+                  "meanAxError": 0.003397238336491526,
+                  "meanAzError": 0.016761442284169092,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.0187034431823998,
+                  "currentL1PerReferenceMass": 0.018703450699545262,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0016432983398437517,
+                  "varianceBetaError": 0.0003129910332899666,
+                  "meanAxError": 0.0057668100583097015,
+                  "meanAzError": 0.036002363673716786,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.0187034431823998,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.0187034431823998,
+            "ci95Upper": 0.0187034431823998,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.02813317400486733,
+        "ci95UpperAt320k": 0.02937150037604057,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    },
+    {
+      "profile": "symmetric-bimodal",
+      "ordering": "manuscript-derivative-only",
+      "B": -1.5,
+      "flipRate": 0.75,
+      "initialMass": 1.0,
+      "initialCurrent": 0.0,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          21380926
+        ],
+        "80000": [
+          21440926
+        ],
+        "320000": [
+          21680926,
+          21681926,
+          21682926,
+          21683926,
+          21684926,
+          21685926,
+          21686926,
+          21687926
+        ],
+        "640000": [
+          22000926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 21380926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.07029299834545445,
+                  "currentL1PerReferenceMass": 0.07650000000000001,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001802343750000171,
+                  "varianceBetaError": 0.00028380983890891054,
+                  "meanAxError": 0.0018973276989160404,
+                  "meanAzError": 0.0061469413529851025,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.10067503175834254,
+                  "currentL1PerReferenceMass": 0.09827992104721628,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00188759765625017,
+                  "varianceBetaError": 0.0007955347716455119,
+                  "meanAxError": 0.0024179653980100912,
+                  "meanAzError": 0.012542405802916878,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.12254845090264811,
+                  "currentL1PerReferenceMass": 0.12367500002753722,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006131835937497887,
+                  "varianceBetaError": 0.003521940474820684,
+                  "meanAxError": 0.004406402793390551,
+                  "meanAzError": 0.017670081048171582,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.12979104129301466,
+                  "currentL1PerReferenceMass": 0.13178219757484277,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004742578124999855,
+                  "varianceBetaError": 0.000970677440135459,
+                  "meanAxError": 0.012046877048327076,
+                  "meanAzError": 0.026528644391270007,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.14055098726363985,
+                  "currentL1PerReferenceMass": 0.13952739205912065,
+                  "massError": 0.0,
+                  "meanBetaError": 2.402343749988156e-05,
+                  "varianceBetaError": 0.0063062145895820265,
+                  "meanAxError": 0.011307959111647392,
+                  "meanAzError": 0.08916455419040226,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.14055098726363985,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.14055098726363985,
+            "ci95Upper": 0.14055098726363985,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 21440926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.0406388138873096,
+                  "currentL1PerReferenceMass": 0.041650000000000006,
+                  "massError": 0.0,
+                  "meanBetaError": 4.3286132812708766e-05,
+                  "varianceBetaError": 0.0005299975500005494,
+                  "meanAxError": 0.0004176465412941699,
+                  "meanAzError": 0.0001835221427857192,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.05204976328840847,
+                  "currentL1PerReferenceMass": 0.054781168591717624,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.001344799804687699,
+                  "varianceBetaError": 0.000876773355618865,
+                  "meanAxError": 0.002358589951144463,
+                  "meanAzError": 0.0008540442314206587,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.06293801177920329,
+                  "currentL1PerReferenceMass": 0.06116350419090537,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0022808349609377554,
+                  "varianceBetaError": 0.00179969701052074,
+                  "meanAxError": 0.006090842535246388,
+                  "meanAzError": 0.00659058452387562,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.06808249434158758,
+                  "currentL1PerReferenceMass": 0.06801722249541484,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004044726562500128,
+                  "varianceBetaError": 0.0016460140669367629,
+                  "meanAxError": 0.01333725821415932,
+                  "meanAzError": 0.03223981985701485,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.07162093546444025,
+                  "currentL1PerReferenceMass": 0.07241548029192091,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004723974609374987,
+                  "varianceBetaError": 0.000361277847911623,
+                  "meanAxError": 0.018784125669961682,
+                  "meanAzError": 0.10296497798505122,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.07162093546444025,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.07162093546444025,
+            "ci95Upper": 0.07162093546444025,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 21680926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021245598418835207,
+                  "currentL1PerReferenceMass": 0.020025,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013092773437498317,
+                  "varianceBetaError": 0.0006049027940999707,
+                  "meanAxError": 0.001122522498842926,
+                  "meanAzError": 0.005568605466026,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02656670631245389,
+                  "currentL1PerReferenceMass": 0.027001375063343946,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0013107421874998387,
+                  "varianceBetaError": 0.0003752286985941322,
+                  "meanAxError": 0.0017153114274592873,
+                  "meanAzError": 0.007566212525480509,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.030066374386094996,
+                  "currentL1PerReferenceMass": 0.03010572486094929,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010216369628904681,
+                  "varianceBetaError": 0.000421904649558158,
+                  "meanAxError": 0.002424477280253079,
+                  "meanAzError": 0.0058194829332611775,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03189220570908378,
+                  "currentL1PerReferenceMass": 0.03366170382622565,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012079650878904502,
+                  "varianceBetaError": 0.001163116438171241,
+                  "meanAxError": 0.004746407522226992,
+                  "meanAzError": 0.007114253100905188,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03414299104508631,
+                  "currentL1PerReferenceMass": 0.035993970687481835,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008652648925780437,
+                  "varianceBetaError": 0.0012841525227560435,
+                  "meanAxError": 0.00477462680817986,
+                  "meanAzError": 0.007731185323267553,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21681926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019706342164156124,
+                  "currentL1PerReferenceMass": 0.018493749999999996,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00015717773437484706,
+                  "varianceBetaError": 0.0003751320373403533,
+                  "meanAxError": 0.000414636817707148,
+                  "meanAzError": 0.0001315325086421737,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025777552150195136,
+                  "currentL1PerReferenceMass": 0.026119882473692946,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0004417236328122798,
+                  "varianceBetaError": 0.0006116647140584353,
+                  "meanAxError": 0.001133297025573743,
+                  "meanAzError": 0.0004295599822752294,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.030547499084223856,
+                  "currentL1PerReferenceMass": 0.03004199998757918,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00024071044921852858,
+                  "varianceBetaError": 0.0015737305669815127,
+                  "meanAxError": 0.001991518015950877,
+                  "meanAzError": 0.005128612348823225,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03201888505683883,
+                  "currentL1PerReferenceMass": 0.032717801040327406,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00044774780273447445,
+                  "varianceBetaError": 0.0010351089840187067,
+                  "meanAxError": 0.00034189383289806585,
+                  "meanAzError": 0.015046814482616355,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.035675857103192925,
+                  "currentL1PerReferenceMass": 0.03382800794444523,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001913818359375874,
+                  "varianceBetaError": 0.0027036574797882906,
+                  "meanAxError": 0.0030733893256318368,
+                  "meanAzError": 0.029836722423004503,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21682926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.016273394277482246,
+                  "currentL1PerReferenceMass": 0.018862499999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00010237426757828127,
+                  "varianceBetaError": 0.0005423420802357914,
+                  "meanAxError": 0.0003981151534284688,
+                  "meanAzError": 0.0011623017406408032,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.027026401139566603,
+                  "currentL1PerReferenceMass": 0.02652038304649746,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0004268188476560658,
+                  "varianceBetaError": 0.0003295993185692958,
+                  "meanAxError": 0.0005666007209683688,
+                  "meanAzError": 0.004777291839060727,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.03096828496086527,
+                  "currentL1PerReferenceMass": 0.02909226685696393,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0008560180664059921,
+                  "varianceBetaError": 0.0005042265570336379,
+                  "meanAxError": 0.001464954996510226,
+                  "meanAzError": 0.010892477040011173,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03042169192572926,
+                  "currentL1PerReferenceMass": 0.03033494787856904,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00024006958007827262,
+                  "varianceBetaError": 0.0008823203368290011,
+                  "meanAxError": 0.0005390013874739807,
+                  "meanAzError": 0.006564867371423588,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03468612565111012,
+                  "currentL1PerReferenceMass": 0.03520774286689263,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0009694335937498744,
+                  "varianceBetaError": 0.0010684792448192315,
+                  "meanAxError": 0.006655465136402583,
+                  "meanAzError": 0.016074684742294565,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21683926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01943221217703964,
+                  "currentL1PerReferenceMass": 0.019812499999999997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0015519470214845343,
+                  "varianceBetaError": 7.704431242105958e-05,
+                  "meanAxError": 0.0017007068653753787,
+                  "meanAzError": 0.0037426517047554064,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.028669271286321726,
+                  "currentL1PerReferenceMass": 0.02844876835254913,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.002133801269531485,
+                  "varianceBetaError": 0.0002136896333009286,
+                  "meanAxError": 0.003044570237187294,
+                  "meanAzError": 0.010004471536463111,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.03303265362223719,
+                  "currentL1PerReferenceMass": 0.02972152880769951,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002602441406250211,
+                  "varianceBetaError": 0.0008904242859596456,
+                  "meanAxError": 0.006255014016303129,
+                  "meanAzError": 0.01528789523444729,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03404085381569107,
+                  "currentL1PerReferenceMass": 0.034514164999006475,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0036826354980469683,
+                  "varianceBetaError": 0.0005288945399088973,
+                  "meanAxError": 0.010537584288986324,
+                  "meanAzError": 0.034743033537358414,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03617989463362775,
+                  "currentL1PerReferenceMass": 0.0355214059198217,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0034632568359375393,
+                  "varianceBetaError": 0.0006661601209321244,
+                  "meanAxError": 0.011873481452117751,
+                  "meanAzError": 0.07085373389210403,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21684926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021392317981963754,
+                  "currentL1PerReferenceMass": 0.019206249999999998,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0027473144531247745,
+                  "varianceBetaError": 5.3065708306987425e-05,
+                  "meanAxError": 0.00291021476354425,
+                  "meanAzError": 0.00737162288117954,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02763073559552021,
+                  "currentL1PerReferenceMass": 0.02864243184148689,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.003135571289062361,
+                  "varianceBetaError": 0.0003002627005733727,
+                  "meanAxError": 0.004263068754936761,
+                  "meanAzError": 0.013451165912625296,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.030739801189589876,
+                  "currentL1PerReferenceMass": 0.031404528762266466,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0041174743652341445,
+                  "varianceBetaError": 0.00010554954538155581,
+                  "meanAxError": 0.008092701027588856,
+                  "meanAzError": 0.029157823041525255,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.033715740839995366,
+                  "currentL1PerReferenceMass": 0.03288690939847983,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0033387451171873195,
+                  "varianceBetaError": 0.00024567575719181,
+                  "meanAxError": 0.008920304237211685,
+                  "meanAzError": 0.031986658326589534,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03427517992352907,
+                  "currentL1PerReferenceMass": 0.03353976508372948,
+                  "massError": 0.0,
+                  "meanBetaError": 0.003284381103515477,
+                  "varianceBetaError": 0.001494221047777522,
+                  "meanAxError": 0.009400519355764914,
+                  "meanAzError": 0.07345062515774714,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21685926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.019374615721824022,
+                  "currentL1PerReferenceMass": 0.019275,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000832086181640837,
+                  "varianceBetaError": 0.0004524411238317483,
+                  "meanAxError": 0.0011534815600211523,
+                  "meanAzError": 0.0011801708857634985,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.027344927102677954,
+                  "currentL1PerReferenceMass": 0.026082213843730682,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0016209777832032757,
+                  "varianceBetaError": 0.00029998421948712606,
+                  "meanAxError": 0.002689310366947417,
+                  "meanAzError": 0.006216606820553583,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.029529564069751612,
+                  "currentL1PerReferenceMass": 0.031846580982347515,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0021254882812502818,
+                  "varianceBetaError": 4.322776714860144e-05,
+                  "meanAxError": 0.004452328730092159,
+                  "meanAzError": 0.014972753987481546,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03165519210279776,
+                  "currentL1PerReferenceMass": 0.032345976693617204,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0018394409179688515,
+                  "varianceBetaError": 0.000835170935037155,
+                  "meanAxError": 0.0042987179265185915,
+                  "meanAzError": 0.024287028200483007,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.038226213381917264,
+                  "currentL1PerReferenceMass": 0.03615994525340353,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0021146667480470005,
+                  "varianceBetaError": 0.00034954152363630975,
+                  "meanAxError": 0.008388846962345653,
+                  "meanAzError": 0.048413947580710825,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21686926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.016335676636438024,
+                  "currentL1PerReferenceMass": 0.0207375,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006788452148439178,
+                  "varianceBetaError": 0.00011808403737295636,
+                  "meanAxError": 0.000805763586491981,
+                  "meanAzError": 0.0014840114402736582,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02693975216304115,
+                  "currentL1PerReferenceMass": 0.026587355378219855,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0005637084960938843,
+                  "varianceBetaError": 0.0006040206485420918,
+                  "meanAxError": 0.0011347132946284422,
+                  "meanAzError": 0.00167910936448612,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.0297549247795129,
+                  "currentL1PerReferenceMass": 0.03003226214372811,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005091796875002497,
+                  "varianceBetaError": 0.00062244688999602,
+                  "meanAxError": 0.0015240081350147427,
+                  "meanAzError": 0.003389530349696024,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03086307042980458,
+                  "currentL1PerReferenceMass": 0.03223919325061859,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001239367675781436,
+                  "varianceBetaError": 0.001878323800043824,
+                  "meanAxError": 0.005688694798022809,
+                  "meanAzError": 0.008403704189372974,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03542164229561003,
+                  "currentL1PerReferenceMass": 0.035715934836706736,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003946289062498609,
+                  "varianceBetaError": 0.0023548035277027868,
+                  "meanAxError": 0.002073680131216449,
+                  "meanAzError": 0.04614322524363601,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 21687926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01996636912304333,
+                  "currentL1PerReferenceMass": 0.0205625,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008242675781248016,
+                  "varianceBetaError": 3.0293687166060845e-05,
+                  "meanAxError": 0.0009038221890689258,
+                  "meanAzError": 0.0025314177671962312,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02654504851239813,
+                  "currentL1PerReferenceMass": 0.02745357692564588,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00043432617187484646,
+                  "varianceBetaError": 0.0013626660405488544,
+                  "meanAxError": 0.00030158611505681776,
+                  "meanAzError": 0.007191794442839683,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.031191527081821817,
+                  "currentL1PerReferenceMass": 0.031425461461328075,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00021156005859351845,
+                  "varianceBetaError": 0.0019944355690746374,
+                  "meanAxError": 0.0016000466984094075,
+                  "meanAzError": 0.008456741319725403,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03159254249699996,
+                  "currentL1PerReferenceMass": 0.033416601077769184,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001419744873047038,
+                  "varianceBetaError": 0.0010349614758822234,
+                  "meanAxError": 0.004878401400142174,
+                  "meanAzError": 0.005673226666301545,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03533786173691949,
+                  "currentL1PerReferenceMass": 0.035658073747184826,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0019374206542969452,
+                  "varianceBetaError": 0.004258409478252068,
+                  "meanAxError": 0.014565669877786291,
+                  "meanAzError": 0.02106378924972674,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.03549322072137412,
+            "ci95HalfWidth": 0.0010928524423730248,
+            "ci95Lower": 0.034400368279001094,
+            "ci95Upper": 0.036586073163747145,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 22000926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.01254651541440358,
+                  "currentL1PerReferenceMass": 0.013903124999999999,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005144714355470453,
+                  "varianceBetaError": 0.00031346743414006895,
+                  "meanAxError": 0.0006938481163503152,
+                  "meanAzError": 0.0003041264417280587,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.019119851478556153,
+                  "currentL1PerReferenceMass": 0.019376061090291927,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00031115112304708203,
+                  "varianceBetaError": 8.159055396161907e-05,
+                  "meanAxError": 0.0003642395284884081,
+                  "meanAzError": 0.0012924863663119623,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.021417588421320258,
+                  "currentL1PerReferenceMass": 0.0217862722870659,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006598571777346879,
+                  "varianceBetaError": 0.0001343045677750787,
+                  "meanAxError": 0.00113428846136987,
+                  "meanAzError": 0.004315703651844416,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02296474205394142,
+                  "currentL1PerReferenceMass": 0.021257545163041403,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001011877441406378,
+                  "varianceBetaError": 0.0011950014908467255,
+                  "meanAxError": 0.004585669975394779,
+                  "meanAzError": 0.00529284095085103,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.024304062150629746,
+                  "currentL1PerReferenceMass": 0.02600806817372493,
+                  "massError": 0.0,
+                  "meanBetaError": 9.590148925786579e-05,
+                  "varianceBetaError": 0.000471035329647318,
+                  "meanAxError": 0.001316930145941697,
+                  "meanAzError": 0.002339349966860027,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.024304062150629746,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.024304062150629746,
+            "ci95Upper": 0.024304062150629746,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.03549322072137412,
+        "ci95UpperAt320k": 0.036586073163747145,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    },
+    {
+      "profile": "asymmetric-nonzero-current",
+      "ordering": "reduced-laplace-beltrami",
+      "B": 0.0,
+      "flipRate": 0.0,
+      "initialMass": 1.0,
+      "initialCurrent": 0.4000000000000001,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          22280926
+        ],
+        "80000": [
+          22340926
+        ],
+        "320000": [
+          22580926,
+          22581926,
+          22582926,
+          22583926,
+          22584926,
+          22585926,
+          22586926,
+          22587926
+        ],
+        "640000": [
+          22900926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 22280926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.08485485815734684,
+                  "currentL1PerReferenceMass": 0.08854793589969814,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0033705078125018106,
+                  "varianceBetaError": 0.001260861588432735,
+                  "meanAxError": 0.003397004305172757,
+                  "meanAzError": 0.007314375848400223,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.09813617657659264,
+                  "currentL1PerReferenceMass": 0.10000319013124354,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002419433593757625,
+                  "varianceBetaError": 0.002799076382315524,
+                  "meanAxError": 0.004618875330762551,
+                  "meanAzError": 0.0019417756079271875,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.11063925568423481,
+                  "currentL1PerReferenceMass": 0.11266872656080991,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0014797851562417946,
+                  "varianceBetaError": 0.004672712506125831,
+                  "meanAxError": 0.006622605926095648,
+                  "meanAzError": 0.017372597392152578,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.12158724957651035,
+                  "currentL1PerReferenceMass": 0.12174552201310293,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005205078125016666,
+                  "varianceBetaError": 0.006932927545463707,
+                  "meanAxError": 0.009884767351361123,
+                  "meanAzError": 0.04730008171282751,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.12164113714444533,
+                  "currentL1PerReferenceMass": 0.12164113714813377,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00043056640623034825,
+                  "varianceBetaError": 0.009580730981918473,
+                  "meanAxError": 0.015321817863521048,
+                  "meanAzError": 0.10820444203611146,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.12164113714444533,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.12164113714444533,
+            "ci95Upper": 0.12164113714444533,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 22340926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.04793847426806043,
+                  "currentL1PerReferenceMass": 0.046352444389130915,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0011322265625017813,
+                  "varianceBetaError": 6.148801284068528e-05,
+                  "meanAxError": 0.0010242753782471192,
+                  "meanAzError": 0.004064253784673122,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.048995834575354266,
+                  "currentL1PerReferenceMass": 0.04906969308167655,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0022396240234451303,
+                  "varianceBetaError": 0.0006748105487611455,
+                  "meanAxError": 0.0024331074518872953,
+                  "meanAzError": 0.01212049411830085,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.05802319853439274,
+                  "currentL1PerReferenceMass": 0.05958963024007631,
+                  "massError": 0.0,
+                  "meanBetaError": 0.003348852539054245,
+                  "varianceBetaError": 0.001853684769808961,
+                  "meanAxError": 0.004762610823416669,
+                  "meanAzError": 0.028356164558017927,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.06561779502453578,
+                  "currentL1PerReferenceMass": 0.06570250773549052,
+                  "massError": 0.0,
+                  "meanBetaError": 0.004450976562501624,
+                  "varianceBetaError": 0.003480071027686882,
+                  "meanAxError": 0.00857843587062268,
+                  "meanAzError": 0.06216253780447456,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.06106717660060777,
+                  "currentL1PerReferenceMass": 0.061067176603443955,
+                  "massError": 0.0,
+                  "meanBetaError": 0.005558374023457019,
+                  "varianceBetaError": 0.0055791911313483045,
+                  "meanAxError": 0.014857494668845561,
+                  "meanAzError": 0.1336754929823325,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.06106717660060777,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.06106717660060777,
+            "ci95Upper": 0.06106717660060777,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 22580926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02091195106628422,
+                  "currentL1PerReferenceMass": 0.02340487859489988,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008520690917950269,
+                  "varianceBetaError": 0.00028787601370179605,
+                  "meanAxError": 0.0006116316368339758,
+                  "meanAzError": 0.0040613946377106025,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02562266882349887,
+                  "currentL1PerReferenceMass": 0.02590229709688455,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002077087402267419,
+                  "varianceBetaError": 0.0002101710837188464,
+                  "meanAxError": 0.00015561868415270297,
+                  "meanAzError": 0.0022017488594885393,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028216175252400503,
+                  "currentL1PerReferenceMass": 0.02858642439734213,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004329345703042442,
+                  "varianceBetaError": 0.00013435739435407879,
+                  "meanAxError": 0.0005840014068576593,
+                  "meanAzError": 0.0003569180283591322,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030669758616240744,
+                  "currentL1PerReferenceMass": 0.030601952164913286,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010885559082047525,
+                  "varianceBetaError": 0.0007349101890343768,
+                  "meanAxError": 0.0018420090832922398,
+                  "meanAzError": 0.004760882049618331,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.031099001490023766,
+                  "currentL1PerReferenceMass": 0.031099001491477613,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0017329162597851666,
+                  "varianceBetaError": 0.0015951123805287848,
+                  "meanAxError": 0.0038806621006308717,
+                  "meanAzError": 0.012968397753541083,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22581926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02216853955290342,
+                  "currentL1PerReferenceMass": 0.020935046559953974,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00022537231445132755,
+                  "varianceBetaError": 0.00012801138121880384,
+                  "meanAxError": 0.00023563127827119779,
+                  "meanAzError": 0.0002397679650818496,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.023727165694440732,
+                  "currentL1PerReferenceMass": 0.02509573048513072,
+                  "massError": 0.0,
+                  "meanBetaError": 8.193359374236708e-05,
+                  "varianceBetaError": 0.0005444116223307927,
+                  "meanAxError": 0.0003990041278418843,
+                  "meanAzError": 0.0023436403561261088,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02714652787822409,
+                  "currentL1PerReferenceMass": 0.026228317681033644,
+                  "massError": 0.0,
+                  "meanBetaError": 5.760498046053497e-05,
+                  "varianceBetaError": 0.0010227060857884718,
+                  "meanAxError": 0.0006790064998913881,
+                  "meanAzError": 0.007198534339768248,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030095079100784253,
+                  "currentL1PerReferenceMass": 0.030010646532118393,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00020119018554851098,
+                  "varianceBetaError": 0.001549031339467155,
+                  "meanAxError": 0.0011261597618461572,
+                  "meanAzError": 0.016860921942230434,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.029890708057981656,
+                  "currentL1PerReferenceMass": 0.029890708059229144,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00034462890626965614,
+                  "varianceBetaError": 0.0021413333706893356,
+                  "meanAxError": 0.001866927428666898,
+                  "meanAzError": 0.037173682587576806,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22582926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.023291977249937704,
+                  "currentL1PerReferenceMass": 0.023681278660024868,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002593627929705633,
+                  "varianceBetaError": 0.00019957723503845337,
+                  "meanAxError": 0.00014729281599246136,
+                  "meanAzError": 0.0018076755695868307,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024456035184739214,
+                  "currentL1PerReferenceMass": 0.026260975375235158,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006193420410233047,
+                  "varianceBetaError": 5.337706056082747e-05,
+                  "meanAxError": 0.0007777034929057347,
+                  "meanAzError": 0.003478122432578612,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02963490721858481,
+                  "currentL1PerReferenceMass": 0.029587886784047248,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0009846496581948916,
+                  "varianceBetaError": 6.507483307427453e-05,
+                  "meanAxError": 0.0018135456516297221,
+                  "meanAzError": 0.007141036964928293,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03226537722045705,
+                  "currentL1PerReferenceMass": 0.03231268405053089,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0013515502929704742,
+                  "varianceBetaError": 0.00023383604382332113,
+                  "meanAxError": 0.0035157534237182375,
+                  "meanAzError": 0.015163853349710266,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03096649724855413,
+                  "currentL1PerReferenceMass": 0.03096649725117817,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0017115295410352616,
+                  "varianceBetaError": 0.0005293932683576585,
+                  "meanAxError": 0.006335054980476151,
+                  "meanAzError": 0.031825042475635,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22583926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021529831232187928,
+                  "currentL1PerReferenceMass": 0.02001703497317912,
+                  "massError": 0.0,
+                  "meanBetaError": 6.096801757993209e-05,
+                  "varianceBetaError": 6.245023274562e-05,
+                  "meanAxError": 7.985402638865935e-05,
+                  "meanAzError": 0.00010097791502761133,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.023143236263340486,
+                  "currentL1PerReferenceMass": 0.02375718902076491,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005860229492110902,
+                  "varianceBetaError": 0.00025823073187372647,
+                  "meanAxError": 0.0005842461845271263,
+                  "meanAzError": 0.0036049952098866633,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028364016707319688,
+                  "currentL1PerReferenceMass": 0.027149002418395678,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012251953125082815,
+                  "varianceBetaError": 0.0007066249625715115,
+                  "meanAxError": 0.0016661705397436055,
+                  "meanAzError": 0.010473309356336724,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028765717696758564,
+                  "currentL1PerReferenceMass": 0.02875155974872195,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0018749694824202051,
+                  "varianceBetaError": 0.0014036613396749553,
+                  "meanAxError": 0.0034880954822860133,
+                  "meanAzError": 0.02441414208420767,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.02890853957620107,
+                  "currentL1PerReferenceMass": 0.02890853957698949,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0025219604491991954,
+                  "varianceBetaError": 0.002360499392717763,
+                  "meanAxError": 0.00647988728237614,
+                  "meanAzError": 0.053638235693657776,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22584926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021554685527353477,
+                  "currentL1PerReferenceMass": 0.02136734061739841,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006770202636700584,
+                  "varianceBetaError": 8.997127661967974e-05,
+                  "meanAxError": 0.0005367675599722288,
+                  "meanAzError": 0.002629588222333723,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.023664171049785094,
+                  "currentL1PerReferenceMass": 0.024269787466535298,
+                  "massError": 0.0,
+                  "meanBetaError": 3.06640624923582e-05,
+                  "varianceBetaError": 0.00012728144355092508,
+                  "meanAxError": 7.757129751917446e-05,
+                  "meanAzError": 2.737974391031628e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02798449953850861,
+                  "currentL1PerReferenceMass": 0.027643699389701473,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000606994628897975,
+                  "varianceBetaError": 9.627422526170548e-05,
+                  "meanAxError": 0.0010721996635030262,
+                  "meanAzError": 0.004193000623979426,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030022605079873255,
+                  "currentL1PerReferenceMass": 0.02994499424551377,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012589172363297457,
+                  "varianceBetaError": 0.0005968302883793131,
+                  "meanAxError": 0.002730449514741995,
+                  "meanAzError": 0.012624871260957349,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.0295830095996341,
+                  "currentL1PerReferenceMass": 0.0295830096007711,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001905273437519589,
+                  "varianceBetaError": 0.001330111721128513,
+                  "meanAxError": 0.005484388180978073,
+                  "meanAzError": 0.028959173826434537,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22585926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022314148136366722,
+                  "currentL1PerReferenceMass": 0.02331919148614565,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00035748901367371744,
+                  "varianceBetaError": 0.000351901771147467,
+                  "meanAxError": 0.00046190078522378997,
+                  "meanAzError": 0.00018236379196268082,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025239033840511897,
+                  "currentL1PerReferenceMass": 0.024992009691443117,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002830871582107791,
+                  "varianceBetaError": 0.0006685154407251037,
+                  "meanAxError": 0.0007319017251765647,
+                  "meanAzError": 0.001947981056042103,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.026776081630204642,
+                  "currentL1PerReferenceMass": 0.02667819343317117,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00018588867186676572,
+                  "varianceBetaError": 0.0010032162568959224,
+                  "meanAxError": 0.0011264491554083822,
+                  "meanAzError": 0.005986822110891854,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.031476576044323246,
+                  "currentL1PerReferenceMass": 0.03141128862908109,
+                  "massError": 0.0,
+                  "meanBetaError": 9.498901367348267e-05,
+                  "varianceBetaError": 0.0013763766257308685,
+                  "meanAxError": 0.0017858007310147528,
+                  "meanAzError": 0.01412801638149741,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.030973955529215686,
+                  "currentL1PerReferenceMass": 0.030973955530941108,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 2.0587158222701296e-05,
+                  "varianceBetaError": 0.0017997236952660423,
+                  "meanAxError": 0.002982194713602837,
+                  "meanAzError": 0.030912236272978788,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22586926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021957034201271403,
+                  "currentL1PerReferenceMass": 0.02154350064796997,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00010763549804507222,
+                  "varianceBetaError": 0.0001215201136966354,
+                  "meanAxError": 4.016371413484432e-05,
+                  "meanAzError": 0.0007806575704119023,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024321744181179984,
+                  "currentL1PerReferenceMass": 0.02532942872860871,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00022399902344512335,
+                  "varianceBetaError": 0.0004750395440843158,
+                  "meanAxError": 7.231091355919261e-06,
+                  "meanAzError": 0.0030451754577920376,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027719284328971038,
+                  "currentL1PerReferenceMass": 0.028600182624212704,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005453613281167918,
+                  "varianceBetaError": 0.0012097370800868146,
+                  "meanAxError": 6.278080462296387e-05,
+                  "meanAzError": 0.01010611186746102,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030218590470578295,
+                  "currentL1PerReferenceMass": 0.030203828475742277,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008767395019547986,
+                  "varianceBetaError": 0.002077079380284119,
+                  "meanAxError": 0.000170943938393453,
+                  "meanAzError": 0.024234339582333675,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.030748480298186484,
+                  "currentL1PerReferenceMass": 0.030748480299697303,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0012083740234570817,
+                  "varianceBetaError": 0.003065652417168385,
+                  "meanAxError": 0.00038279582191336203,
+                  "meanAzError": 0.0535469171740548,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22587926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.020774612541410293,
+                  "currentL1PerReferenceMass": 0.02222011312273494,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00022468261718922022,
+                  "varianceBetaError": 0.00015871760043451033,
+                  "meanAxError": 0.0001199798080879777,
+                  "meanAzError": 0.001219224487342352,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.02415466811029657,
+                  "currentL1PerReferenceMass": 0.025441197016484667,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003437133789138819,
+                  "varianceBetaError": 0.00032432061165671433,
+                  "meanAxError": 0.00024971389246597475,
+                  "meanAzError": 0.0029399327227053185,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027386886059102188,
+                  "currentL1PerReferenceMass": 0.028082639207826117,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00046997680663243835,
+                  "varianceBetaError": 0.0005593810650489361,
+                  "meanAxError": 0.0004600413005235726,
+                  "meanAzError": 0.006682459727664014,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02955247269256158,
+                  "currentL1PerReferenceMass": 0.029618454405205344,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005996826171891512,
+                  "varianceBetaError": 0.0008411202432569986,
+                  "meanAxError": 0.0008188651276230807,
+                  "meanAzError": 0.014565600257744116,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03084086590606914,
+                  "currentL1PerReferenceMass": 0.030840865907134467,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007187133789258171,
+                  "varianceBetaError": 0.001157936795134984,
+                  "meanAxError": 0.0013981315428113206,
+                  "meanAzError": 0.030538987638061954,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.030376382213233254,
+            "ci95HalfWidth": 0.0006778321631237589,
+            "ci95Lower": 0.029698550050109497,
+            "ci95Upper": 0.03105421437635701,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 22900926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.016097643055089404,
+                  "currentL1PerReferenceMass": 0.015856817363526572,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000390350341795076,
+                  "varianceBetaError": 7.885737625758227e-05,
+                  "meanAxError": 0.00036867276763608015,
+                  "meanAzError": 0.0011632248611759266,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.016913504552866852,
+                  "currentL1PerReferenceMass": 0.017417199821420273,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003069976806564234,
+                  "varianceBetaError": 0.00010226971658069961,
+                  "meanAxError": 0.00048449999474242667,
+                  "meanAzError": 0.001550875956590314,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02015607700322631,
+                  "currentL1PerReferenceMass": 0.020330135599893013,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002245880127035721,
+                  "varianceBetaError": 0.00016553937628233095,
+                  "meanAxError": 0.0006820603874475584,
+                  "meanAzError": 0.002531875991492072,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.02249780028632812,
+                  "currentL1PerReferenceMass": 0.02242908040963707,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001442565917952887,
+                  "varianceBetaError": 0.00027080802718837393,
+                  "meanAxError": 0.0010239171299910588,
+                  "meanAzError": 0.004688369539103121,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.021461478022678525,
+                  "currentL1PerReferenceMass": 0.02146147802361604,
+                  "massError": 0.0,
+                  "meanBetaError": 6.090393064445143e-05,
+                  "varianceBetaError": 0.0003862636509563977,
+                  "meanAxError": 0.0015398746093708837,
+                  "meanAzError": 0.009723070558743885,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.021461478022678525,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.021461478022678525,
+            "ci95Upper": 0.021461478022678525,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.030376382213233254,
+        "ci95UpperAt320k": 0.03105421437635701,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    },
+    {
+      "profile": "asymmetric-nonzero-current",
+      "ordering": "manuscript-derivative-only",
+      "B": -1.5,
+      "flipRate": 0.75,
+      "initialMass": 1.0,
+      "initialCurrent": 0.4000000000000001,
+      "initialPopulationMinimum": 0.0,
+      "seedMap": {
+        "20000": [
+          22380926
+        ],
+        "80000": [
+          22440926
+        ],
+        "320000": [
+          22680926,
+          22681926,
+          22682926,
+          22683926,
+          22684926,
+          22685926,
+          22686926,
+          22687926
+        ],
+        "640000": [
+          23000926
+        ]
+      },
+      "levels": [
+        {
+          "population": 20000,
+          "replicates": [
+            {
+              "seed": 22380926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.08802983649454318,
+                  "currentL1PerReferenceMass": 0.08546468929482726,
+                  "massError": 0.0,
+                  "meanBetaError": 6.376953125178386e-05,
+                  "varianceBetaError": 0.0014642634021545115,
+                  "meanAxError": 0.0005430700298376667,
+                  "meanAzError": 0.005635008653538165,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.09578277691451359,
+                  "currentL1PerReferenceMass": 0.09523736525803879,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002021361593234086,
+                  "varianceBetaError": 0.0031432074825853695,
+                  "meanAxError": 0.004429108421377448,
+                  "meanAzError": 0.0019988785522015995,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.12051032918439251,
+                  "currentL1PerReferenceMass": 0.11146485536209545,
+                  "massError": 0.0,
+                  "meanBetaError": 0.003026080727401237,
+                  "varianceBetaError": 0.007446679396190148,
+                  "meanAxError": 0.01131109892766835,
+                  "meanAzError": 0.02284413009320163,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.1224693014650123,
+                  "currentL1PerReferenceMass": 0.11847856524668407,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00684072224610506,
+                  "varianceBetaError": 0.004234694948389739,
+                  "meanAxError": 0.020545723138316596,
+                  "meanAzError": 0.011108485996118134,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.1412029813926792,
+                  "currentL1PerReferenceMass": 0.12925138757046842,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00810952890832513,
+                  "varianceBetaError": 0.008592109706675566,
+                  "meanAxError": 0.040615241817951286,
+                  "meanAzError": 0.006640207379907892,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.1412029813926792,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.1412029813926792,
+            "ci95Upper": 0.1412029813926792,
+            "n": 1
+          }
+        },
+        {
+          "population": 80000,
+          "replicates": [
+            {
+              "seed": 22440926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.04476642631286427,
+                  "currentL1PerReferenceMass": 0.04284126797282701,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002202441406251837,
+                  "varianceBetaError": 2.64796020293806e-05,
+                  "meanAxError": 0.0018847223058500173,
+                  "meanAzError": 0.0078286766550546,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.04941055620163051,
+                  "currentL1PerReferenceMass": 0.051524104917816616,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0029839362583284346,
+                  "varianceBetaError": 0.00042209511140825495,
+                  "meanAxError": 0.0034849395126632654,
+                  "meanAzError": 0.01532278640361806,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.05701968427354877,
+                  "currentL1PerReferenceMass": 0.057771940935133825,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001361785483536354,
+                  "varianceBetaError": 0.000310821298275088,
+                  "meanAxError": 0.002390037473016804,
+                  "meanAzError": 0.014705968051120788,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.06175604944233494,
+                  "currentL1PerReferenceMass": 0.057752914795904255,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0024808841992074032,
+                  "varianceBetaError": 0.00089331637960266,
+                  "meanAxError": 0.006134830280965176,
+                  "meanAzError": 0.045883728266879586,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.06416467348128684,
+                  "currentL1PerReferenceMass": 0.06684241461047678,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0032671800760498398,
+                  "varianceBetaError": 6.896773939091272e-05,
+                  "meanAxError": 0.011912214888401884,
+                  "meanAzError": 0.06074543904390417,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.06416467348128684,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.06416467348128684,
+            "ci95Upper": 0.06416467348128684,
+            "n": 1
+          }
+        },
+        {
+          "population": 320000,
+          "replicates": [
+            {
+              "seed": 22680926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022593790764429047,
+                  "currentL1PerReferenceMass": 0.02112856234406902,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000762127685545122,
+                  "varianceBetaError": 5.300645877164001e-05,
+                  "meanAxError": 0.0006762383422125318,
+                  "meanAzError": 0.002545754775545195,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.0264108652435623,
+                  "currentL1PerReferenceMass": 0.024239657224589137,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000721495870577793,
+                  "varianceBetaError": 4.206108928994645e-05,
+                  "meanAxError": 0.0009092804452242031,
+                  "meanAzError": 0.0029108577808250047,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028455591396374363,
+                  "currentL1PerReferenceMass": 0.029692296407631734,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001129584145369969,
+                  "varianceBetaError": 0.0004387226917264009,
+                  "meanAxError": 0.0023589009402251726,
+                  "meanAzError": 0.005434168810639406,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030356006468252473,
+                  "currentL1PerReferenceMass": 0.03100452469916861,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005702388476675896,
+                  "varianceBetaError": 0.0006746530529531114,
+                  "meanAxError": 0.0021504631313571387,
+                  "meanAzError": 0.000590865124777018,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03441409073872172,
+                  "currentL1PerReferenceMass": 0.03490074590319797,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0007148145528564648,
+                  "varianceBetaError": 0.0020394023228976765,
+                  "meanAxError": 0.0056813894417890864,
+                  "meanAzError": 0.009033721095955016,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22681926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022159782502557564,
+                  "currentL1PerReferenceMass": 0.02040189420359428,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002787170410174511,
+                  "varianceBetaError": 8.342355138310498e-05,
+                  "meanAxError": 0.00017864835098013732,
+                  "meanAzError": 0.0008523328056295743,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024824979584807696,
+                  "currentL1PerReferenceMass": 0.023715555270604927,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0003058722934846936,
+                  "varianceBetaError": 0.00026934579607681974,
+                  "meanAxError": 0.0002342157756984875,
+                  "meanAzError": 0.0029929692755272796,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027808410666298966,
+                  "currentL1PerReferenceMass": 0.02822127568807802,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005020869972082037,
+                  "varianceBetaError": 0.00015388922550813033,
+                  "meanAxError": 0.0008474699996694479,
+                  "meanAzError": 0.006220484034107798,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030012723986616988,
+                  "currentL1PerReferenceMass": 0.02941421322014508,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001782230663949641,
+                  "varianceBetaError": 0.0005608998651149277,
+                  "meanAxError": 0.00020578825437445047,
+                  "meanAzError": 0.015001401283377014,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.032972206725108213,
+                  "currentL1PerReferenceMass": 0.032395234267048545,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00014039438684081314,
+                  "varianceBetaError": 0.0007505921931346693,
+                  "meanAxError": 0.0015211320990737853,
+                  "meanAzError": 0.014609496318493953,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22682926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022185389425770585,
+                  "currentL1PerReferenceMass": 0.021494644041073978,
+                  "massError": 0.0,
+                  "meanBetaError": 0.000976129150392413,
+                  "varianceBetaError": 0.00026085426827955616,
+                  "meanAxError": 0.0009530586828412346,
+                  "meanAzError": 0.0027437713795079866,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025183515326765226,
+                  "currentL1PerReferenceMass": 0.023248786734139878,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0010626838169221497,
+                  "varianceBetaError": 3.223298944313169e-05,
+                  "meanAxError": 0.0012797807604019162,
+                  "meanAzError": 0.004512216709709804,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.025348023468202075,
+                  "currentL1PerReferenceMass": 0.026691192335863066,
+                  "massError": 0.0,
+                  "meanBetaError": 0.001046752524551997,
+                  "varianceBetaError": 0.0002122475511716071,
+                  "meanAxError": 0.0018007510146080818,
+                  "meanAzError": 0.009926273926633034,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.032937984566933025,
+                  "currentL1PerReferenceMass": 0.032905819509530934,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008302119921987788,
+                  "varianceBetaError": 0.0003946639281424136,
+                  "meanAxError": 0.0009416063405529584,
+                  "meanAzError": 0.0031857948211690967,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03495091406970849,
+                  "currentL1PerReferenceMass": 0.03299769649055461,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0005478624490966987,
+                  "varianceBetaError": 0.000779395562576557,
+                  "meanAxError": 0.0013434901133200228,
+                  "meanAzError": 0.025685841372176554,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22683926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02098474343381912,
+                  "currentL1PerReferenceMass": 0.022446282907062836,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008375183105486517,
+                  "varianceBetaError": 0.00022814553069312737,
+                  "meanAxError": 0.0008134394078138651,
+                  "meanAzError": 0.0021484910789679734,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.023913759446526715,
+                  "currentL1PerReferenceMass": 0.024181701457542504,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0011791755161409123,
+                  "varianceBetaError": 0.00020166461561382798,
+                  "meanAxError": 0.0013489819310326112,
+                  "meanAzError": 0.006455379888236745,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.026977750324045056,
+                  "currentL1PerReferenceMass": 0.026929665475931733,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0015245845558019555,
+                  "varianceBetaError": 0.0004623377065263168,
+                  "meanAxError": 0.002270243284892892,
+                  "meanAzError": 0.011282822976247164,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030536236267195278,
+                  "currentL1PerReferenceMass": 0.03049482698638209,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0009098209667855878,
+                  "varianceBetaError": 1.5431343138583298e-05,
+                  "meanAxError": 0.0025503759468707976,
+                  "meanAzError": 0.0141305227843187,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03215383336419305,
+                  "currentL1PerReferenceMass": 0.0322332925226969,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.001735301413940472,
+                  "varianceBetaError": 0.00041370903276882753,
+                  "meanAxError": 0.005449365849141241,
+                  "meanAzError": 0.03117672305473107,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22684926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.020241471403966406,
+                  "currentL1PerReferenceMass": 0.022577819540003173,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00044121704101385273,
+                  "varianceBetaError": 1.4622644448167299e-05,
+                  "meanAxError": 0.0003454353571928914,
+                  "meanAzError": 0.0012126590708507745,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024602462880983715,
+                  "currentL1PerReferenceMass": 0.02396108893802681,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0009500847377652555,
+                  "varianceBetaError": 0.00014152574843454002,
+                  "meanAxError": 0.001052429461127602,
+                  "meanAzError": 0.004417938792373732,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027118238242491842,
+                  "currentL1PerReferenceMass": 0.027668997985633978,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00038522379380742655,
+                  "varianceBetaError": 0.00015053719626823003,
+                  "meanAxError": 0.0005893740903839539,
+                  "meanAzError": 0.004149147220264382,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.030560313817692773,
+                  "currentL1PerReferenceMass": 0.03222718861936339,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004979671191519125,
+                  "varianceBetaError": 0.00043573894618453846,
+                  "meanAxError": 0.0009348222544991458,
+                  "meanAzError": 0.014587867628378604,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03296251533178512,
+                  "currentL1PerReferenceMass": 0.03285639357689405,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 1.9932761596700918e-05,
+                  "varianceBetaError": 0.0003541231187708105,
+                  "meanAxError": 0.00037417611600210066,
+                  "meanAzError": 0.009744368734795117,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22685926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.022805638895160907,
+                  "currentL1PerReferenceMass": 0.024005799925782306,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00022358398437680171,
+                  "varianceBetaError": 7.977826577183766e-05,
+                  "meanAxError": 0.00022521916677020748,
+                  "meanAzError": 0.0005647280438114688,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.024464340592837964,
+                  "currentL1PerReferenceMass": 0.026656094051923457,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0008288581333284473,
+                  "varianceBetaError": 0.0001935370841979478,
+                  "meanAxError": 0.0011343466869118135,
+                  "meanAzError": 0.0027975756402924823,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.028482225358413053,
+                  "currentL1PerReferenceMass": 0.031331967669106654,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0014498409034581494,
+                  "varianceBetaError": 0.0007639084147406661,
+                  "meanAxError": 0.0018043036078676522,
+                  "meanAzError": 0.010541318809244693,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.0318833497037698,
+                  "currentL1PerReferenceMass": 0.03209023329768636,
+                  "massError": 0.0,
+                  "meanBetaError": 0.002038812666004336,
+                  "varianceBetaError": 0.0009487932071133853,
+                  "meanAxError": 0.003659283086121956,
+                  "meanAzError": 0.020423639291505147,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03348550836253395,
+                  "currentL1PerReferenceMass": 0.03303194344381916,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.003257988181518524,
+                  "varianceBetaError": 0.0010927226307330118,
+                  "meanAxError": 0.009041422497421792,
+                  "meanAzError": 0.05375097009444296,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22686926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.021002326239407905,
+                  "currentL1PerReferenceMass": 0.021012417479590394,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0002168090820330315,
+                  "varianceBetaError": 8.138406597353598e-05,
+                  "meanAxError": 0.000230707874161018,
+                  "meanAzError": 0.0006453538692436922,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.025187139862663816,
+                  "currentL1PerReferenceMass": 0.023722513610491467,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006417609653596723,
+                  "varianceBetaError": 6.161435998838782e-05,
+                  "meanAxError": 0.0008178412583446093,
+                  "meanAzError": 0.002214596758199683,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.02861066096374724,
+                  "currentL1PerReferenceMass": 0.029892656593346476,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0007271236183019197,
+                  "varianceBetaError": 0.00011889659040553724,
+                  "meanAxError": 0.001173793403983936,
+                  "meanAzError": 0.004594081856417631,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.03165572010687452,
+                  "currentL1PerReferenceMass": 0.03127935537753318,
+                  "massError": 0.0,
+                  "meanBetaError": 8.965654308176751e-06,
+                  "varianceBetaError": 0.00019485347470582504,
+                  "meanAxError": 0.00038540530127040284,
+                  "meanAzError": 0.0009690982016863359,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.03479639758467259,
+                  "currentL1PerReferenceMass": 0.035214252716626336,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0009977857442627098,
+                  "varianceBetaError": 0.001063352143094498,
+                  "meanAxError": 0.001899980791693956,
+                  "meanAzError": 0.03780363385172514,
+                  "volumeError": 0.0
+                }
+              ]
+            },
+            {
+              "seed": 22687926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.02023531783467783,
+                  "currentL1PerReferenceMass": 0.021836187352108672,
+                  "massError": 0.0,
+                  "meanBetaError": 0.00011251220703303866,
+                  "varianceBetaError": 0.00022346216297886023,
+                  "meanAxError": 8.502707645630103e-06,
+                  "meanAzError": 0.0009658459454473522,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.023432348069668797,
+                  "currentL1PerReferenceMass": 0.023447866221007613,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005286491908903235,
+                  "varianceBetaError": 0.00011696759912804833,
+                  "meanAxError": 0.0007528860943708526,
+                  "meanAzError": 0.0024073109879108046,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.027683466690378838,
+                  "currentL1PerReferenceMass": 0.02717683487744421,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0014931400535730527,
+                  "varianceBetaError": 0.0005967932555882571,
+                  "meanAxError": 0.0030221650684711943,
+                  "meanAzError": 0.004550671374156323,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.028571209054149282,
+                  "currentL1PerReferenceMass": 0.02967803713474776,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.00047180134766765594,
+                  "varianceBetaError": 0.0006678642557651493,
+                  "meanAxError": 0.00195668101665758,
+                  "meanAzError": 0.0025255802864032617,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.030980693385907403,
+                  "currentL1PerReferenceMass": 0.0314904080226856,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.000544581398559606,
+                  "varianceBetaError": 3.832203786857669e-06,
+                  "meanAxError": 0.0026689794121366184,
+                  "meanAzError": 0.014953379962074465,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.03333951994532881,
+            "ci95HalfWidth": 0.001145512776626956,
+            "ci95Lower": 0.032194007168701855,
+            "ci95Upper": 0.03448503272195577,
+            "n": 8
+          }
+        },
+        {
+          "population": 640000,
+          "replicates": [
+            {
+              "seed": 23000926,
+              "errors": [
+                {
+                  "time": 0.0,
+                  "densityRelativeL1": 0.014879105268940297,
+                  "currentL1PerReferenceMass": 0.015365311044892041,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0001157196044904163,
+                  "varianceBetaError": 5.661102637956328e-05,
+                  "meanAxError": 0.00011642995529759226,
+                  "meanAzError": 6.685763509750586e-05,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.25,
+                  "densityRelativeL1": 0.0176415802252133,
+                  "currentL1PerReferenceMass": 0.01626875401723079,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0004360893764371737,
+                  "varianceBetaError": 0.00013783031352901376,
+                  "meanAxError": 0.0004501738637918695,
+                  "meanAzError": 0.002549251576549949,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.5,
+                  "densityRelativeL1": 0.01922559754486683,
+                  "currentL1PerReferenceMass": 0.02055933380287772,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0005920871971277913,
+                  "varianceBetaError": 0.0003715798517851532,
+                  "meanAxError": 0.0007801459625140783,
+                  "meanAzError": 0.006327551452560254,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 0.75,
+                  "densityRelativeL1": 0.020721677351660965,
+                  "currentL1PerReferenceMass": 0.020606268627759043,
+                  "massError": 0.0,
+                  "meanBetaError": 0.0006008540820425651,
+                  "varianceBetaError": 0.0004639374348226477,
+                  "meanAxError": 0.001169749783518803,
+                  "meanAzError": 0.012661147453462362,
+                  "volumeError": 0.0
+                },
+                {
+                  "time": 1.0,
+                  "densityRelativeL1": 0.02282568405703918,
+                  "currentL1PerReferenceMass": 0.02209084415556189,
+                  "massError": 2.220446049250313e-16,
+                  "meanBetaError": 0.0001535722879638362,
+                  "varianceBetaError": 0.0007791823896120542,
+                  "meanAxError": 0.001322909378164816,
+                  "meanAzError": 0.010690209380173954,
+                  "volumeError": 0.0
+                }
+              ]
+            }
+          ],
+          "finalDensityRelativeL1": {
+            "mean": 0.02282568405703918,
+            "ci95HalfWidth": 0.0,
+            "ci95Lower": 0.02282568405703918,
+            "ci95Upper": 0.02282568405703918,
+            "n": 1
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "densityGate": 0.05,
+        "meanAt320k": 0.03333951994532881,
+        "ci95UpperAt320k": 0.03448503272195577,
+        "claim": "Seeded Bianchi I velocity-flip paths reproduce the reduced telegraph/Wheeler-DeWitt field for this ordering and initial-data case."
+      }
+    }
+  ],
+  "overallAssessment": {
+    "status": "passed",
+    "claim": "All six profile/ordering cases met the preregistered density gate.",
+    "qualification": "This tests a chosen positive stochastic realization of reduced LRS Bianchi I; it does not establish microscopic quantum-geometric dynamics or general complex WDW amplitudes."
+  }
+}

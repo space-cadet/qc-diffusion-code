@@ -14,6 +14,15 @@ import { useRandomWalkPanels } from "./hooks/useRandomWalkPanels";
 import { ObservableManager } from "./physics/ObservableManager";
 import type { EngineParams } from "./hooks/useOriginalPhysicsEngine";
 import type { Particle } from "./physics/types/Particle";
+import {
+  DEFAULT_T15_RUN_CONFIG,
+  T15_REFERENCE_SEEDS,
+  normalizeT15RunConfig,
+  type T15Diagnostics,
+  type T15Mode,
+  type T15RunConfig,
+} from "./t15/t15RandomWalk";
+import { T15DiagnosticsPanel, T15RandomWalkCanvas } from "./t15/T15RandomWalkMode";
 // CSS imports
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -38,6 +47,9 @@ export default function RandomWalkSimV2() {
   const [initializeVersion, setInitializeVersion] = useState(0);
   const [resetVersion, setResetVersion] = useState(0);
   const [simReady] = useState(true);
+  const [processMode, setProcessMode] = useState<"standard" | T15Mode>("standard");
+  const [t15Config, setT15Config] = useState<T15RunConfig>(DEFAULT_T15_RUN_CONFIG);
+  const [t15Diagnostics, setT15Diagnostics] = useState<T15Diagnostics | null>(null);
 
   // Convert gridLayoutParams to EngineParams
   const engineParams: EngineParams = useMemo(() => ({
@@ -66,6 +78,11 @@ export default function RandomWalkSimV2() {
   }), [gridLayoutParams]);
 
   const handleStart = () => {
+    const horizon = processMode === "t15a" ? 1 : 4;
+    if (processMode !== "standard" && (t15Diagnostics?.time ?? 0) >= horizon) {
+      timeRef.current = 0;
+      setInitializeVersion((version) => version + 1);
+    }
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: true, status: 'Running' });
   };
 
@@ -94,6 +111,46 @@ export default function RandomWalkSimV2() {
     updateSimulationMetrics(0, 0, 'Initialized', 0);
     setInitializeVersion((version) => version + 1);
   };
+
+  const handleProcessModeChange = useCallback((mode: "standard" | T15Mode) => {
+    setProcessMode(mode);
+    if (mode !== "standard") {
+      setT15Config((current) => ({ ...current, seed: T15_REFERENCE_SEEDS[mode] }));
+    }
+    setT15Diagnostics(null);
+    timeRef.current = 0;
+    collisionsRef.current = 0;
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
+    updateSimulationMetrics(0, 0, "Initialized", 0);
+    setInitializeVersion((version) => version + 1);
+  }, [randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics]);
+
+  const handleT15ConfigChange = useCallback((config: T15RunConfig) => {
+    setT15Config(normalizeT15RunConfig(config));
+    setT15Diagnostics(null);
+    timeRef.current = 0;
+    setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
+    updateSimulationMetrics(0, 0, "Initialized", 0);
+  }, [randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics]);
+
+  const handleT15Diagnostics = useCallback((diagnostics: T15Diagnostics) => {
+    setT15Diagnostics(diagnostics);
+  }, []);
+
+  const handleT15Stats = useCallback((time: number, events: number) => {
+    timeRef.current = time;
+    collisionsRef.current = events;
+    const horizon = processMode === "t15a" ? 1 : 4;
+    const status = time >= horizon ? "Paused" : isRunning ? "Running" : randomWalkSimulationState.status;
+    updateSimulationMetrics(time, events, status, 0);
+  }, [isRunning, processMode, randomWalkSimulationState.status, updateSimulationMetrics]);
+
+  const handleT15Complete = useCallback((time: number, events: number) => {
+    const horizon = processMode === "t15a" ? 1 : 4;
+    const currentState = useAppStore.getState().randomWalkSimulationState;
+    setRandomWalkSimulationState({ ...currentState, isRunning: false, time: Math.min(horizon, time), collisions: events, status: "Paused" });
+    updateSimulationMetrics(Math.min(horizon, time), events, "Paused", 0);
+  }, [processMode, setRandomWalkSimulationState, updateSimulationMetrics]);
 
   // Observable manager and simulator shim for floating panels
   const observableManagerRef = useRef(
@@ -138,8 +195,14 @@ export default function RandomWalkSimV2() {
   ]);
 
   const onLayoutChange = (layout: any) => {
-    setRandomWalkSimLayouts(layout);
+    if (processMode === "standard") setRandomWalkSimLayouts(layout);
   };
+
+  const displayedLayout = processMode === "standard" ? randomWalkSimLayouts : [
+    { i: "parameters", x: 0, y: 0, w: 3, h: 9, minW: 3, minH: 6 },
+    { i: "canvas", x: 3, y: 0, w: 9, h: 9, minW: 6, minH: 6 },
+    { i: "density", x: 0, y: 9, w: 12, h: 5, minW: 8, minH: 4 },
+  ];
 
   return (
     <div className="min-h-full flex flex-col bg-gray-50">
@@ -148,7 +211,7 @@ export default function RandomWalkSimV2() {
       <div className="flex-1 p-4 relative">
         <ReactGridLayout
           className="layout"
-          layout={randomWalkSimLayouts}
+          layout={displayedLayout}
           onLayoutChange={onLayoutChange}
           cols={12}
           rowHeight={50}
@@ -169,48 +232,71 @@ export default function RandomWalkSimV2() {
               handlePause={handlePause}
               handleReset={handleReset}
               handleInitialize={handleInitialize}
+              processMode={processMode}
+              onProcessModeChange={handleProcessModeChange}
+              t15Config={t15Config}
+              onT15ConfigChange={handleT15ConfigChange}
             />
           </div>
 
           {/* Canvas Panel */}
           <div key="canvas">
-            <ParticleCanvasV2
-              key={`v2-${gridLayoutParams.dimension}`}
-              params={engineParams}
-              isRunning={isRunning}
-              initializeVersion={initializeVersion}
-              resetVersion={resetVersion}
-              liveParticlesRef={liveParticlesRef}
-              onStatsUpdate={handleStatsUpdate}
-            />
+            {processMode === "standard" ? (
+              <ParticleCanvasV2
+                key={`v2-${gridLayoutParams.dimension}`}
+                params={engineParams}
+                isRunning={isRunning}
+                initializeVersion={initializeVersion}
+                resetVersion={resetVersion}
+                liveParticlesRef={liveParticlesRef}
+                onStatsUpdate={handleStatsUpdate}
+              />
+            ) : (
+              <T15RandomWalkCanvas
+                key={`t15-${processMode}`}
+                mode={processMode}
+                config={t15Config}
+                isRunning={isRunning}
+                initializeVersion={initializeVersion}
+                resetVersion={resetVersion}
+                onDiagnostics={handleT15Diagnostics}
+                onStats={handleT15Stats}
+                onComplete={handleT15Complete}
+              />
+            )}
           </div>
 
           {/* Density Panel */}
           <div key="density">
-            <DensityComparison
-              particles={liveParticlesRef.current}
-              particleCount={liveParticlesRef.current.length}
-              gridLayoutParams={gridLayoutParams}
-              simulationState={randomWalkSimulationState}
-            />
+            {processMode === "standard" ? (
+              <DensityComparison
+                particles={liveParticlesRef.current}
+                particleCount={liveParticlesRef.current.length}
+                gridLayoutParams={gridLayoutParams}
+                simulationState={randomWalkSimulationState}
+              />
+            ) : (
+              <T15DiagnosticsPanel mode={processMode} config={t15Config} diagnostics={t15Diagnostics} />
+            )}
           </div>
 
           {/* History Panel */}
-          <div key="history">
+          {processMode === "standard" && <div key="history">
             <HistoryPanel simulationState={randomWalkSimulationState} />
-          </div>
+          </div>}
 
           {/* Export Panel */}
-          <div key="export">
+          {processMode === "standard" && <div key="export">
             <ExportPanel
               simulationState={randomWalkSimulationState}
               onExport={() => console.log('Export')}
               onCopy={() => console.log('Copy')}
               onShare={() => console.log('Share')}
             />
-          </div>
+          </div>}
         </ReactGridLayout>
 
+        {processMode === "standard" && <>
         {/* Floating Observables Panel */}
         <FloatingPanel
           title="Observables"
@@ -245,6 +331,7 @@ export default function RandomWalkSimV2() {
         >
           <CustomObservablesPanel simulatorRef={simulatorLikeRef} simReady={simReady} />
         </FloatingPanel>
+        </>}
       </div>
     </div>
   );
