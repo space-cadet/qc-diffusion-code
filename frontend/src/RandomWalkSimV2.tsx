@@ -60,13 +60,19 @@ export default function RandomWalkSimV2() {
     velocity: gridLayoutParams.velocity,
     dt: gridLayoutParams.dt,
     temperature: gridLayoutParams.temperature,
-    boundaryCondition: gridLayoutParams.boundaryCondition as "reflective" | "absorbing" | "periodic",
+    boundaryCondition: gridLayoutParams.boundaryCondition,
     interparticleCollisions: gridLayoutParams.interparticleCollisions,
     collisionRate: gridLayoutParams.collisionRate,
     collisionRadius: gridLayoutParams.collisionRate || 5,
     initialDistType: gridLayoutParams.initialDistType || "uniform",
     strategyType: (gridLayoutParams as any).strategyType,
     strategies: gridLayoutParams.strategies,
+    seed: gridLayoutParams.seed ?? 42,
+    levyAlpha: gridLayoutParams.levyAlpha ?? 1.5,
+    levyScale: gridLayoutParams.levyScale ?? 20,
+    fractionalBeta: gridLayoutParams.fractionalBeta ?? 0.7,
+    fractionalWaitingScale: gridLayoutParams.fractionalWaitingScale ?? 0.1,
+    fractionalJumpLength: gridLayoutParams.fractionalJumpLength ?? 10,
     distSigmaX: gridLayoutParams.distSigmaX,
     distSigmaY: gridLayoutParams.distSigmaY,
     distR0: gridLayoutParams.distR0,
@@ -313,6 +319,7 @@ export default function RandomWalkSimV2() {
             simulatorRef={simulatorLikeRef}
             isRunning={isRunning}
             simulationStatus={randomWalkSimulationState.status}
+            simulationTime={randomWalkSimulationState.time}
             simReady={simReady}
           />
         </FloatingPanel>

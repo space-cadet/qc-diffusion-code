@@ -12,14 +12,14 @@ The two models have different state spaces and stochastic rules. Implement them 
 
 ## General simulation issues (separate from T15 requirements)
 
-These findings concern the existing general-purpose Random Walk engine and are tracked under T27. They are not additional T15 model requirements:
+These findings concerned the existing general-purpose Random Walk engine and were addressed in the completed T27 work. They are not additional T15 model requirements:
 
-- The 2D factory and orchestrator appear to include and integrate both ballistic and CTRW strategies. This contradicts the earlier memory claim that CTRW replaces ballistic motion; verify and resolve that path.
-- The page engine uses ambient randomness, so general runs cannot be reproduced from a recorded seed today.
-- The current frame-based CTRW timing and canvas-scaled coordinates do not directly provide the model-time/event semantics or unbounded domains required by the paper models.
-- The current density display rescales from each update and does not provide fixed, comparable research snapshots; general-page export callbacks are stubs.
+- The 2D factory previously integrated both ballistic and CTRW motion. The strategy selection was corrected to use one motion strategy and compose interparticle collisions separately.
+- The page engine previously used ambient randomness; seeded run initialization is now available for the general Random Walk path.
+- The former frame-based CTRW timing and canvas-scaled coordinates did not directly provide the model-time/event semantics or unbounded domains required by the paper models; T40 still needs independent model strategies.
+- The general density display and export path are not scientific reference outputs; T40 retains its model-specific comparison and export requirements.
 
-These are ensembles of walkers, but their stochastic events are individual direction reversals or heading resets, not pairwise collisions between walkers. Do not substitute the page's elastic interparticle collision strategy for those model events. General engine concerns belong under T27; they do not change the T40 requirement that both models integrate through independent strategies in the existing engine.
+These are ensembles of walkers, but their stochastic events are individual direction reversals or heading resets, not pairwise collisions between walkers. Do not substitute the page's elastic interparticle collision strategy for those model events. T27 is complete and does not own future strategy-diagnostic plots. This does not change T40’s requirement that both models integrate through independent strategies in the existing engine.
 
 ## T15a model mode
 
@@ -46,8 +46,8 @@ These are ensembles of walkers, but their stochastic events are individual direc
 
 ## Scientific source of truth
 
-- T15a derivation and benchmark: `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/bianchi-i-one-anisotropy-derivation.md` and `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/docs/tasks/t15a-bianchi-i-benchmark-v1.md`.
-- T15b process and benchmark: `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/t15b-euclidean-persistent-walk.md` and `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/docs/t15b-ml-fluid-limit-v2.md`.
+- `qc-diffusion-T15a` derivation and benchmark: `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/bianchi-i-one-anisotropy-derivation.md` and `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/docs/tasks/t15a-bianchi-i-benchmark-v1.md`.
+- `qc-diffusion-T15b` process and benchmark: `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/t15b-euclidean-persistent-walk.md` and `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/docs/t15b-ml-fluid-limit-v2.md`.
 - Reference runners: `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/scripts/run_t15a_bianchi_i.py` and `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/numerics/scripts/run_t15b_euclidean.py`.
 
 ## Implementation and verification record — 2026-09-27

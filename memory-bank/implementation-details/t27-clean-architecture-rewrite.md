@@ -156,8 +156,11 @@ const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 ## Known Limitations
 
 1. **Graph mode not implemented**: Only continuum mode works in V2
-2. **Strategy dropdown drift**: `levy` and `fractional` are still shown in the UI but are not implemented in `StrategyFactory`
-3. **Physics verification still needed**: Collision statistics, boundary behavior, and long-run random-walk correctness still need broader live validation
+2. **Physics verification still needed**: Collision statistics, boundary behavior, and long-run random-walk correctness still need broader live validation
+
+The V2 adapter selects one motion strategy at a time. Lévy flight uses exponentially timed events and symmetric Pareto-tailed jump lengths. Fractional diffusion is time-fractional subdiffusion, using fixed-length jumps and Pareto-distributed waiting times. Their controls and run seed are persisted with `gridLayoutParams`. The engine uses the configured fixed timestep with a frame-time accumulator and resets the V2 random source from the saved seed on initialization. Observable registration now uses registered text IDs, inline observable syntax is parsed, and shared simulation time is displayed once at the top of the Observables panel. The Lévy alpha control tolerates older persisted state without `levyAlpha`. Repeated Random Walk render logging was removed.
+
+T27 is the completed clean rewrite task. Strategy diagnostic plots are tracked separately under T41; they are not additional T27 rewrite scope.
 
 ## Testing
 
@@ -168,9 +171,7 @@ const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 ## Next Steps
 
 1. Verify the current branch live in-browser or on deploy
-2. Remove or implement the fake `levy` / `fractional` strategy options
-3. Port graph mode from the legacy page if still required
-4. Continue deeper physics verification (collision detection, boundary behavior, statistics)
+Follow-up work outside completed T27: graph-mode parity if still required, and broader long-run physics verification. Strategy diagnostic plots are tracked under T41.
 
 ## References
 

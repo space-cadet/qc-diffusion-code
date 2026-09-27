@@ -238,7 +238,13 @@ export const useAppStore = create<AppState>()(
         simulationType: 'continuum',
         dimension: '2D',
         interparticleCollisions: false,
-        strategies: [],
+        strategies: ['simple'],
+        seed: 42,
+        levyAlpha: 1.5,
+        levyScale: 20,
+        fractionalBeta: 0.7,
+        fractionalWaitingScale: 0.1,
+        fractionalJumpLength: 10,
         boundaryCondition: 'periodic',
         graphType: 'lattice1D',
         graphSize: 20,
@@ -324,7 +330,27 @@ export const useAppStore = create<AppState>()(
       useGPU: false, // Default to CPU physics
       setActiveTab: (tab) => set({ activeTab: tab }),
       setSimulationParams: (params) => set({ simulationParams: params }),
-      setGridLayoutParams: (params) => set({ gridLayoutParams: params }),
+      setGridLayoutParams: (params) => set((state) => {
+        const current = state.gridLayoutParams as Partial<RandomWalkParams> | undefined;
+        const requestedStrategies = params.strategies ?? current?.strategies ?? ['simple'];
+        const motionStrategies = requestedStrategies.filter((strategy) => strategy !== 'collisions');
+        return {
+          gridLayoutParams: {
+            ...current,
+            ...params,
+            strategies: motionStrategies.length ? motionStrategies : ['simple'],
+            interparticleCollisions: params.interparticleCollisions === undefined
+              ? Boolean(current?.interparticleCollisions || requestedStrategies.includes('collisions'))
+              : params.interparticleCollisions,
+            seed: params.seed ?? current?.seed ?? 42,
+            levyAlpha: params.levyAlpha ?? current?.levyAlpha ?? 1.5,
+            levyScale: params.levyScale ?? current?.levyScale ?? 20,
+            fractionalBeta: params.fractionalBeta ?? current?.fractionalBeta ?? 0.7,
+            fractionalWaitingScale: params.fractionalWaitingScale ?? current?.fractionalWaitingScale ?? 0.1,
+            fractionalJumpLength: params.fractionalJumpLength ?? current?.fractionalJumpLength ?? 10,
+          } as RandomWalkParams,
+        };
+      }),
       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
       setRandomWalkUIState: (partial) => set((state) => ({ randomWalkUIState: { ...state.randomWalkUIState, ...partial } })),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
@@ -393,9 +419,26 @@ export const useAppStore = create<AppState>()(
       version: 1,
       merge: (persistedState, currentState) => {
         const persisted = (persistedState ?? {}) as Partial<AppState>
+        const savedGridParams = persisted.gridLayoutParams as Partial<RandomWalkParams> | undefined
         return {
           ...currentState,
           ...persisted,
+          gridLayoutParams: {
+            ...currentState.gridLayoutParams,
+            ...savedGridParams,
+            strategies: savedGridParams?.strategies?.filter((strategy) => strategy !== 'collisions').length
+              ? savedGridParams.strategies.filter((strategy) => strategy !== 'collisions')
+              : ['simple'],
+            interparticleCollisions: Boolean(
+              savedGridParams?.interparticleCollisions || savedGridParams?.strategies?.includes('collisions')
+            ),
+            seed: savedGridParams?.seed ?? currentState.gridLayoutParams.seed,
+            levyAlpha: savedGridParams?.levyAlpha ?? currentState.gridLayoutParams.levyAlpha,
+            levyScale: savedGridParams?.levyScale ?? currentState.gridLayoutParams.levyScale,
+            fractionalBeta: savedGridParams?.fractionalBeta ?? currentState.gridLayoutParams.fractionalBeta,
+            fractionalWaitingScale: savedGridParams?.fractionalWaitingScale ?? currentState.gridLayoutParams.fractionalWaitingScale,
+            fractionalJumpLength: savedGridParams?.fractionalJumpLength ?? currentState.gridLayoutParams.fractionalJumpLength,
+          },
           spheroidWalkUIState: {
             ...DEFAULT_SPHEROID_WALK_UI_STATE,
             ...persisted.spheroidWalkUIState,
@@ -408,6 +451,16 @@ export const useAppStore = create<AppState>()(
         if (glp.minParticles === undefined) glp.minParticles = 0;
         if (glp.maxParticles === undefined) glp.maxParticles = 2000;
         if (glp.dt === undefined) glp.dt = 0.01;
+        if (!Array.isArray(glp.strategies)) glp.strategies = ['simple'];
+        if (glp.strategies.includes('collisions')) glp.interparticleCollisions = true;
+        glp.strategies = glp.strategies.filter((strategy: string) => strategy !== 'collisions');
+        if (glp.strategies.length === 0) glp.strategies = ['simple'];
+        if (glp.seed === undefined) glp.seed = 42;
+        if (glp.levyAlpha === undefined) glp.levyAlpha = 1.5;
+        if (glp.levyScale === undefined) glp.levyScale = 20;
+        if (glp.fractionalBeta === undefined) glp.fractionalBeta = 0.7;
+        if (glp.fractionalWaitingScale === undefined) glp.fractionalWaitingScale = 0.1;
+        if (glp.fractionalJumpLength === undefined) glp.fractionalJumpLength = 10;
         const ui = state.randomWalkUIState || {};
         if (ui.particlesLogScale === undefined) ui.particlesLogScale = true;
         return {

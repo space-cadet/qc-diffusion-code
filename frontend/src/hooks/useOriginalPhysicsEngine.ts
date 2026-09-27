@@ -7,6 +7,7 @@ import { BoundaryConfig } from "../physics/types/BoundaryConfig";
 import type { Particle } from "../physics/types/Particle";
 import type { PhysicsStrategy } from "../physics/interfaces/PhysicsStrategy";
 import { sampleCanvasPosition } from "../physics/utils/InitDistributions";
+import { SeededRandom } from "../physics/utils/SeededRandom";
 
 export interface EngineParams {
   particleCount: number;
@@ -16,7 +17,7 @@ export interface EngineParams {
   velocity: number;
   dt: number;
   temperature: number;
-  boundaryCondition: "reflective" | "absorbing" | "periodic";
+  boundaryCondition: "reflective" | "absorbing" | "periodic" | "unbounded";
   interparticleCollisions: boolean;
   collisionRate: number;
   collisionRadius: number;
@@ -31,6 +32,12 @@ export interface EngineParams {
   distNx?: number;
   distNy?: number;
   distJitter?: number;
+  seed: number;
+  levyAlpha: number;
+  levyScale: number;
+  fractionalBeta: number;
+  fractionalWaitingScale: number;
+  fractionalJumpLength: number;
 }
 
 export interface SimpleParticle {
@@ -53,8 +60,6 @@ interface UseOriginalPhysicsEngineReturn {
 }
 
 function toVisibleSpeed(params: EngineParams): number {
-  // The V2 renderer uses canvas coordinates directly, so raw "1.0" velocities are
-  // visually imperceptible. Scale them into a visible pixel-space speed.
   return params.velocity * Math.max(Math.min(params.canvasWidth, params.canvasHeight) / 6, 1);
 }
 
@@ -107,6 +112,11 @@ function createParameterManager(params: EngineParams): ParameterManager {
     distNy: params.distNy,
     distJitter: params.distJitter,
     temperature: params.temperature,
+    levyAlpha: params.levyAlpha,
+    levyScale: params.levyScale,
+    fractionalBeta: params.fractionalBeta,
+    fractionalWaitingScale: params.fractionalWaitingScale,
+    fractionalJumpLength: params.fractionalJumpLength,
   });
 }
 
@@ -116,10 +126,13 @@ function createStrategiesFromParams(params: EngineParams): PhysicsStrategy[] {
   return createPhysicsStrategies(paramManager, boundaryConfig);
 }
 
-function initializeParticles(params: EngineParams): Particle[] {
+function initializeParticles(params: EngineParams, random: () => number): Particle[] {
   const particles: Particle[] = [];
   const { particleCount, dimension, canvasWidth, canvasHeight } = params;
   const visibleSpeed = toVisibleSpeed(params);
+  const selected = params.strategies?.find((strategy) => ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy))
+    ?? (params.strategyType as 'simple' | 'ctrw' | 'levy' | 'fractional' | undefined)
+    ?? (params.collisionRate > 0 ? 'ctrw' : 'simple');
 
   for (let i = 0; i < particleCount; i++) {
     const pos = sampleCanvasPosition(i, {
@@ -135,9 +148,15 @@ function initializeParticles(params: EngineParams): Particle[] {
       distNx: params.distNx ?? 20,
       distNy: params.distNy ?? 15,
       distJitter: params.distJitter ?? 4,
-    });
-    const angle = Math.random() * 2 * Math.PI;
+    }, random);
+    const angle = random() * 2 * Math.PI;
     const speed = visibleSpeed;
+    const uniform = Math.max(random(), Number.EPSILON);
+    const nextCollisionTime = selected === 'fractional'
+      ? params.fractionalWaitingScale / Math.pow(uniform, 1 / params.fractionalBeta)
+      : selected === 'simple'
+        ? Infinity
+        : params.collisionRate > 0 ? -Math.log(uniform) / params.collisionRate : Infinity;
 
     particles.push({
       id: `p-${i}`,
@@ -151,7 +170,7 @@ function initializeParticles(params: EngineParams): Particle[] {
       },
       radius: 3,
       lastCollisionTime: 0,
-      nextCollisionTime: Math.random() * (1 / (params.collisionRate || 1)),
+      nextCollisionTime,
       collisionCount: 0,
       waitingTime: 0,
       trajectory: [] as any,
@@ -175,6 +194,8 @@ export function useOriginalPhysicsEngine({
   const timeRef = useRef(0);
   const collisionCountRef = useRef(0);
   const interparticleCollisionCountRef = useRef(0);
+  const randomRef = useRef(new SeededRandom(params.seed));
+  const accumulatorRef = useRef(0);
 
   useEffect(() => {
     const boundaryConfig = createBoundaryConfig(params);
@@ -186,10 +207,12 @@ export function useOriginalPhysicsEngine({
       canvasSize: { width: params.canvasWidth, height: params.canvasHeight },
       dimension: params.dimension as Dimension,
       strategies,
+      random: () => randomRef.current.next(),
     };
 
     engineRef.current = new PhysicsEngine(config);
-    particlesRef.current = initializeParticles(params);
+    randomRef.current.reset(params.seed);
+    particlesRef.current = initializeParticles(params, () => randomRef.current.next());
 
     console.log("[useOriginalPhysicsEngine] Engine created with", strategies.length, "strategies");
 
@@ -203,9 +226,14 @@ export function useOriginalPhysicsEngine({
   const step = useCallback(
     (dt: number) => {
       if (engineRef.current && isRunning) {
-        engineRef.current.updateConfiguration({ timeStep: dt });
-        const actualDt = engineRef.current.step(particlesRef.current);
-        timeRef.current += actualDt;
+        accumulatorRef.current += Math.min(Math.max(dt, 0), 0.05);
+        let steps = 0;
+        while (accumulatorRef.current >= params.dt && steps < 10) {
+          const actualDt = engineRef.current.step(particlesRef.current);
+          timeRef.current += actualDt;
+          accumulatorRef.current -= params.dt;
+          steps++;
+        }
 
         let collisions = 0;
         let interparticleCollisions = 0;
@@ -217,13 +245,15 @@ export function useOriginalPhysicsEngine({
         interparticleCollisionCountRef.current = interparticleCollisions;
       }
     },
-    [isRunning]
+    [isRunning, params.dt]
   );
 
   const reset = useCallback(() => {
     if (engineRef.current) {
       engineRef.current.reset();
-      particlesRef.current = initializeParticles(params);
+      randomRef.current.reset(params.seed);
+      accumulatorRef.current = 0;
+      particlesRef.current = initializeParticles(params, () => randomRef.current.next());
       timeRef.current = 0;
       collisionCountRef.current = 0;
       interparticleCollisionCountRef.current = 0;
@@ -246,43 +276,23 @@ export function useOriginalPhysicsEngine({
       strategies,
     });
 
-    if (newParams.particleCount !== undefined && newParams.particleCount !== params.particleCount) {
-      particlesRef.current = initializeParticles(updatedParams);
-    }
-
-    if (newParams.dimension !== undefined && newParams.dimension !== params.dimension) {
-      particlesRef.current = initializeParticles(updatedParams);
-    }
-
-    const distributionChanged =
-      newParams.initialDistType !== undefined && newParams.initialDistType !== params.initialDistType;
-    const distributionParamsChanged =
-      newParams.distSigmaX !== undefined ||
-      newParams.distSigmaY !== undefined ||
-      newParams.distR0 !== undefined ||
-      newParams.distDR !== undefined ||
-      newParams.distThickness !== undefined ||
-      newParams.distNx !== undefined ||
-      newParams.distNy !== undefined ||
-      newParams.distJitter !== undefined;
-
-    if (distributionChanged || distributionParamsChanged) {
-      particlesRef.current = initializeParticles(updatedParams);
-    }
-
-    if (newParams.velocity !== undefined && newParams.velocity !== params.velocity) {
-      const newVisibleSpeed = toVisibleSpeed(updatedParams);
-      for (const particle of particlesRef.current) {
-        const currentSpeed = Math.hypot(particle.velocity.vx, particle.velocity.vy);
-        const angle = currentSpeed > 0
-          ? Math.atan2(particle.velocity.vy, particle.velocity.vx)
-          : Math.random() * 2 * Math.PI;
-
-        particle.velocity.vx = newVisibleSpeed * Math.cos(angle);
-        particle.velocity.vy = updatedParams.dimension === "1D"
-          ? 0
-          : newVisibleSpeed * Math.sin(angle);
-      }
+    const reinitializeKeys: Array<keyof EngineParams> = [
+      'particleCount', 'dimension', 'seed', 'initialDistType', 'distSigmaX', 'distSigmaY',
+      'distR0', 'distDR', 'distThickness', 'distNx', 'distNy', 'distJitter', 'strategies',
+      'strategyType', 'collisionRate', 'velocity', 'levyAlpha', 'levyScale', 'fractionalBeta',
+      'fractionalWaitingScale', 'fractionalJumpLength',
+    ];
+    const shouldReinitialize = reinitializeKeys.some((key) =>
+      newParams[key] !== undefined && newParams[key] !== params[key]
+    );
+    if (shouldReinitialize) {
+      randomRef.current.reset(updatedParams.seed);
+      particlesRef.current = initializeParticles(updatedParams, () => randomRef.current.next());
+      timeRef.current = 0;
+      accumulatorRef.current = 0;
+      collisionCountRef.current = 0;
+      interparticleCollisionCountRef.current = 0;
+      engineRef.current.reset();
     }
   }, [params]);
 

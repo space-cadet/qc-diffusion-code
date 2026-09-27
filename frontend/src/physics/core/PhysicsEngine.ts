@@ -13,6 +13,7 @@ export interface PhysicsEngineConfig {
   canvasSize: { width: number; height: number };
   dimension: Dimension;
   strategies: PhysicsStrategy[];
+  random?: () => number;
 }
 
 export interface PhysicsEngine {
@@ -27,6 +28,7 @@ export class PhysicsEngine implements PhysicsEngine {
   private timeManager: TimeManager;
   private coordinateSystem: CoordinateSystem;
   private orchestrator: StrategyOrchestrator;
+  private random: () => number;
 
   constructor(config: PhysicsEngineConfig) {
     this.timeManager = new TimeManager(config.timeStep);
@@ -36,6 +38,7 @@ export class PhysicsEngine implements PhysicsEngine {
       config.dimension,
     );
     this.orchestrator = new StrategyOrchestrator(config.strategies);
+    this.random = config.random ?? Math.random;
   }
 
   step(particles: Particle[]): number {
@@ -44,6 +47,8 @@ export class PhysicsEngine implements PhysicsEngine {
       timeManager: this.timeManager,
       coordinateSystem: this.coordinateSystem,
       currentTime: this.timeManager.getCurrentTime(),
+      dt,
+      random: this.random,
     };
 
     // Expose unified simulation time and dt to legacy-compatible utilities

@@ -120,11 +120,11 @@ export class CoordinateSystem {
     }
   }
 
-  getRandomPosition(): Position {
+  getRandomPosition(random: () => number = Math.random): Position {
     return {
-      x: this.boundaries.xMin + Math.random() * (this.boundaries.xMax - this.boundaries.xMin),
+      x: this.boundaries.xMin + random() * (this.boundaries.xMax - this.boundaries.xMin),
       y: this.dimension === '1D' ? 0 : 
-         this.boundaries.yMin + Math.random() * (this.boundaries.yMax - this.boundaries.yMin)
+         this.boundaries.yMin + random() * (this.boundaries.yMax - this.boundaries.yMin)
     };
   }
 }

@@ -25,8 +25,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     uiToggle: 'showParticleCount',
     pollingInterval: 200, // Less frequent updates needed
     fields: [
-      { label: 'Count', path: 'value', format: 'number' },
-      { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+      { label: 'Count', path: 'value', format: 'number' }
     ]
   },
   kineticEnergy: {
@@ -36,8 +35,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
     uiToggle: 'showKineticEnergy',
     pollingInterval: 100, // Standard polling for energy values
     fields: [
-      { label: 'Average KE', path: 'value', format: 'number', precision: 10 },
-      { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+      { label: 'Average KE', path: 'value', format: 'number', precision: 10 }
     ]
   },
   momentum: {
@@ -51,8 +49,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
       { label: 'Px', path: 'totalMomentumX', format: 'fixed', precision: 2, color: 'red' },
       { label: 'Py', path: 'totalMomentumY', format: 'fixed', precision: 2, color: 'green' },
       { label: '|P| avg', path: 'averageMomentumMagnitude', format: 'fixed', precision: 4 },
-      { label: 'Active particles', path: 'activeParticleCount', format: 'number' },
-      { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+      { label: 'Active particles', path: 'activeParticleCount', format: 'number' }
     ]
   },
   msd: {
@@ -66,8 +63,7 @@ export const BUILT_IN_OBSERVABLES: Record<string, ObservableConfig> = {
       { label: 'RMSD', path: 'rootMeanSquaredDisplacement', format: 'fixed', precision: 2 },
       { label: 'Max disp', path: 'maxDisplacement', format: 'fixed', precision: 2, color: 'orange' },
       { label: 'Min disp', path: 'minDisplacement', format: 'fixed', precision: 2, color: 'blue' },
-      { label: 'Active particles', path: 'activeParticleCount', format: 'number' },
-      { label: 'Time', path: 'timestamp', format: 'fixed', precision: 2 }
+      { label: 'Active particles', path: 'activeParticleCount', format: 'number' }
     ]
   }
 };

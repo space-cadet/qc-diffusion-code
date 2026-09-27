@@ -122,8 +122,6 @@ export default function App() {
     const { initSolver, runAnimation, stop } = useWebGLSolver();
     const isWebGL = simulationParams.solver_type === 'webgl';
 
-    console.debug('[App] Render, activeTab:', activeTab);
-
     const initializeConditions = useCallback((params) => {
         console.log("Generating initial conditions with params:", params);
         const initialFrame = generateInitialConditions(params);

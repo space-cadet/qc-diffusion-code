@@ -126,6 +126,8 @@ export class ParticleManager {
       timeManager: this.timeManager,
       coordinateSystem: this.coordSystem,
       currentTime: simTime(),
+      dt,
+      random: Math.random,
     };
 
     for (const particle of allParticles) {

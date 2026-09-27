@@ -27,8 +27,7 @@ export class TextObservableParser {
         if (normalized.includes('observable "')) {
             return this.parseBlock(text);
         }
-        // Fallback to empty array if no valid syntax detected
-        return [];
+        return this.parseInline(text);
     }
     static parseInline(text) {
         debug('Parsing inline syntax:', text);
@@ -36,7 +35,7 @@ export class TextObservableParser {
         const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
         for (const line of lines) {
             const current = {};
-            const pairs = line.split(',').map(pair => pair.trim());
+            const pairs = this.splitTopLevelByComma(line).map(pair => pair.trim());
             for (const pair of pairs) {
                 const [key, ...valueParts] = pair.split(':');
                 const value = valueParts.join(':').trim();

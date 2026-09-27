@@ -1,6 +1,22 @@
 # Error Log
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 18:01:51 IST*
+*Last Updated: 2026-09-27 21:42:33 IST*
+
+## 2026-09-27 21:30:22 IST: T27 - Random Walk built-in observables show no data
+**File:** `frontend/src/components/useObservablesPolling.ts`, `frontend/src/physics/observables/TextObservableParser.ts`
+**Error:** Built-in particle count and kinetic energy stayed at “No data”; logs reported no observer for built-in IDs.
+**Cause:** Polling used display IDs instead of registered `text_*` IDs, setup could precede observer registration, and inline definitions were accepted without being parsed into observables.
+**Fix:** Map built-ins to registered text IDs, start polling after registration, parse inline definitions through the existing parser, and reject empty parse results.
+**Changes:** Updated TypeScript and runtime JavaScript counterparts. No browser re-verification was run after these changes.
+**Task:** T27
+
+## 2026-09-27 21:30:22 IST: T27 - Missing Lévy alpha in persisted parameters
+**File:** `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`
+**Error:** `gridLayoutParams.levyAlpha` was undefined when the parameter panel formatted it with `toFixed`.
+**Cause:** Persisted parameter state created before the Lévy control was added had no `levyAlpha` field.
+**Fix:** Normalize missing values to the strategy default and use a safe UI fallback.
+**Changes:** Source correction recorded; no browser re-verification was run after this fix.
+**Task:** T27
 
 ## 2026-09-27 18:01:51 IST: T29 - Invalid date in Memory Bank viewer
 **File:** `frontend/src/memoryBank/hooks/useMemoryBankDocs.ts`

@@ -5,4 +5,6 @@ export interface PhysicsContext {
   timeManager: TimeManager;
   coordinateSystem: CoordinateSystem;
   currentTime: number; // seconds
+  dt: number;
+  random: () => number;
 }

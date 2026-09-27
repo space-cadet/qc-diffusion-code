@@ -45,6 +45,12 @@
 - ✅ Monorepo build pipeline optimization with TypeScript/JSX resolution
 - ✅ Vercel deployment error resolution and CI/CD stabilization
 
+## 2026-09-27 Random Walk Status
+- ✅ T27 clean rewrite confirmed complete; strategy diagnostic plots are outside its scope.
+- 🔄 T40 remains active: implement `qc-diffusion-T15a` and `qc-diffusion-T15b` as independent strategies in the existing engine and repeat model/page checks.
+- 📝 T41 planned: add strategy diagnostic plots to the existing Random Walk UI.
+- Current Random Walk engine changes include Lévy/Fractional strategies and controls, deterministic run setup/persistence, strategy-composition correction, and observable/UI fixes. Build, tests, and browser verification were not run for this follow-up.
+
 ## Current Focus Areas
 ### Active Development
 - T25 Screenshot verification and critical bug fixes (COMPLETED 2026-05-09)

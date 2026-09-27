@@ -40,7 +40,7 @@ function ObservableDisplay({ config, data, isVisible, onToggle }: any) {
         </div>)}
     </div>);
 }
-export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, simReady }) {
+export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, simReady, simulationTime = 0 }) {
     const { randomWalkUIState, setRandomWalkUIState, customObservables, customObservableVisibility, setCustomObservableVisibility } = useAppStore();
     // Parse custom observables to extract names and intervals
     const customObservableConfigs = useMemo(() => {
@@ -75,8 +75,6 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         ...visibleBuiltInObservables,
         ...visibleCustomObservableIds
     ], [visibleBuiltInObservables, visibleCustomObservableIds]);
-    // Use unified polling hook for all observables
-    const observableData = useObservablesPolling(simulatorRef, allVisibleObservables, customObservableConfigs, isRunning, simReady || false);
     // Toggle functions for built-in observables
     const toggleObservable = (observableId, visible) => {
         switch (observableId) {
@@ -116,7 +114,10 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         const prev = prevVisibleRef.current;
         // Register newly visible
         current.forEach(observableId => {
-            if (prev.has(observableId))
+            const registrationId = ['particleCount', 'kineticEnergy'].includes(observableId)
+                ? `text_${observableId}`
+                : observableId;
+            if (prev.has(observableId) && manager.hasObserver(registrationId))
                 return;
             const config = BUILT_IN_OBSERVABLES[observableId];
             if (!config)
@@ -171,7 +172,10 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
             if (current.has(observableId))
                 return;
             try {
-                manager.unregister(observableId);
+                const registeredId = ['particleCount', 'kineticEnergy'].includes(observableId)
+                    ? `text_${observableId}`
+                    : observableId;
+                if (manager.hasObserver(registeredId)) manager.unregister(registeredId);
                 console.log(`[ObservablesPanel] Unregistered ${observableId}`);
             }
             catch (e) {
@@ -191,7 +195,7 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         const prevVisible = prevVisibleCustomRef.current;
         // Register newly visible custom observables
         customObservableConfigs.filter(c => customObservableVisibility[c.name]).forEach(config => {
-            if (!config.valid || prevVisible.has(config.name))
+            if (!config.valid || (prevVisible.has(config.name) && manager.hasObserver(`text_${config.name}`)))
                 return;
             try {
                 manager.registerTextObservable(config.text);
@@ -216,6 +220,8 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         // Update prev ref
         prevVisibleCustomRef.current = currentVisible;
     }, [simReady, customObservableConfigs, customObservableVisibility]);
+    // Register observers before the polling hook performs its initial read.
+    const observableData = useObservablesPolling(simulatorRef, allVisibleObservables, customObservableConfigs, isRunning, simReady || false);
     const [storeSize, setStoreSize] = useState(null);
     const calculateStoreSize = () => {
         const state = useAppStore.getState();
@@ -243,6 +249,10 @@ export function ObservablesPanel({ simulatorRef, isRunning, simulationStatus, si
         setStoreSize(sizeInBytes);
     };
     return (<div className="space-y-4">
+      <div className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2 text-sm">
+        <span className="font-medium">Simulation time</span>
+        <span className="font-mono">{Number.isFinite(simulationTime) ? simulationTime.toFixed(2) : '0.00'} s</span>
+      </div>
       {/* Built-in Observables */}
       {Object.entries(BUILT_IN_OBSERVABLES).map(([id, config]) => (<ObservableDisplay key={id} config={config} data={observableData[id]} isVisible={visibleBuiltInObservables.includes(id)} onToggle={(visible) => toggleObservable(id, visible)}/>))}
 

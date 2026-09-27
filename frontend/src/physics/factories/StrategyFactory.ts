@@ -9,6 +9,8 @@ import { InterparticleCollisionStrategy2D } from '../strategies/InterparticleCol
 import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCollisionStrategy1D';
 import { getNewEngineFlag } from '../config/flags';
 import { BallisticStrategy } from '../strategies/BallisticStrategy';
+import { LevyFlightStrategy } from '../strategies/LevyFlightStrategy';
+import { FractionalDiffusionStrategy } from '../strategies/FractionalDiffusionStrategy';
 
 import { ParameterManager } from '../core/ParameterManager';
 
@@ -29,6 +31,10 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
   const config = { dimension: parameterManager.dimension, strategies: parameterManager.strategies };
   const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
+  const motionStrategy = selectedStrategies.find((strategy) =>
+    ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy)
+  ) ?? 'simple';
+  const includeInterparticleCollisions = parameterManager.interparticleCollisions || selectedStrategies.includes('collisions');
 
   // Create coordinate system instance for strategies that need it (use actual canvas size)
   const coordSystem = new CoordinateSystem(
@@ -37,10 +43,9 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
     config.dimension
   );
 
-  // For 1D, compose strategies: base is CTRW1D if selected else Ballistic; collisions added if selected
   if (config.dimension === '1D') {
     const oneDStrategies: PhysicsStrategy[] = [];
-    if (selectedStrategies.includes('ctrw')) {
+    if (motionStrategy === 'ctrw') {
       oneDStrategies.push(new CTRWStrategy1D({
         collisionRate: physicsParams.collisionRate,
         jumpLength: physicsParams.jumpLength,
@@ -49,11 +54,14 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
         interparticleCollisions: false, // collisions handled via separate 1D strategy below
         coordSystem,
       }));
+    } else if (motionStrategy === 'levy') {
+      oneDStrategies.push(new LevyFlightStrategy({ collisionRate: physicsParams.collisionRate, alpha: parameterManager.levyAlpha, scale: parameterManager.levyScale, dimension: '1D', boundaryConfig }));
+    } else if (motionStrategy === 'fractional') {
+      oneDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '1D', boundaryConfig }));
     } else {
-      // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
       oneDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
-    if (selectedStrategies.includes('collisions')) {
+    if (includeInterparticleCollisions) {
       oneDStrategies.push(new InterparticleCollisionStrategy1D({ boundaryConfig: boundaryConfig, coordSystem }));
     }
     
@@ -66,14 +74,9 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
     }
   }
 
-  // For 2D, compose strategies: base is Ballistic; others are added if selected
   else {
-    // Always use modern BallisticStrategy (uses BoundaryManager). LegacyBallisticStrategy is deprecated.
-    const twoDStrategies: PhysicsStrategy[] = [
-      new BallisticStrategy({ boundaryConfig, coordSystem })
-    ];
-
-    if (selectedStrategies.includes('ctrw')) {
+    const twoDStrategies: PhysicsStrategy[] = [];
+    if (motionStrategy === 'ctrw') {
       twoDStrategies.push(new CTRWStrategy2D({
         collisionRate: physicsParams.collisionRate,
         jumpLength: physicsParams.jumpLength,
@@ -81,9 +84,15 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
         boundaryConfig: boundaryConfig,
         coordSystem
       }));
+    } else if (motionStrategy === 'levy') {
+      twoDStrategies.push(new LevyFlightStrategy({ collisionRate: physicsParams.collisionRate, alpha: parameterManager.levyAlpha, scale: parameterManager.levyScale, dimension: '2D', boundaryConfig }));
+    } else if (motionStrategy === 'fractional') {
+      twoDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '2D', boundaryConfig }));
+    } else {
+      twoDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
 
-    if (selectedStrategies.includes('collisions')) {
+    if (includeInterparticleCollisions) {
       twoDStrategies.push(new InterparticleCollisionStrategy2D({ boundaryConfig, coordSystem }));
     }
 

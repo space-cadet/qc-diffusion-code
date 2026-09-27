@@ -47,15 +47,18 @@ export function useObservablesPolling(simulatorRef, visibleObservables, customOb
         if (!('getResult' in observableManager)) {
             return;
         }
+        const resultId = observableManager.hasObserver(observableId)
+            ? observableId
+            : !observableId.startsWith('text_') && observableManager.hasObserver(`text_${observableId}`)
+                ? `text_${observableId}`
+                : null;
+        if (!resultId)
+            return;
         // Update snapshot only when polling (not every simulation frame)
         const particles = simulatorRef.current.getParticleManager().getAllParticles();
         const timestamp = simulatorRef.current.getTime();
         observableManager.updateSnapshot(particles, timestamp);
-        // For built-in observables that now use text system, try text_ prefix
-        let data = simulatorRef.current.getObservableData(observableId);
-        if (!data && (observableId === 'particleCount' || observableId === 'kineticEnergy')) {
-            data = simulatorRef.current.getObservableData(`text_${observableId}`);
-        }
+        const data = simulatorRef.current.getObservableData(resultId);
         if (data) {
             setObservableData(prev => ({
                 ...prev,

@@ -16,16 +16,16 @@ export class InterparticleCollisionStrategy1D implements PhysicsStrategy {
     this.coordSystem = params.coordSystem;
   }
 
-  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
+  preUpdate(particle: Particle, allParticles: Particle[], context: PhysicsContext): void {
     // Handle inter-particle collisions in the preUpdate phase
-    this.handleCollisions(particle, allParticles);
+    this.handleCollisions(particle, allParticles, context.random);
   }
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
     // No-op: collision strategy only modifies velocities, not positions
   }
   
-  private handleCollisions(particle: Particle, allParticles: Particle[] = []): void {
+  private handleCollisions(particle: Particle, allParticles: Particle[] = [], random: () => number): void {
     // Simple 1D elastic collisions: swap vx when overlapping
     // Ensure each pair is processed only once per frame using numeric id ordering
     const toNum = (id: string | number): number =>
@@ -51,7 +51,7 @@ export class InterparticleCollisionStrategy1D implements PhysicsStrategy {
 
           // Separate positions to remove overlap and avoid immediate re-collision
           const overlap = r - dist;
-          const sign = dx === 0 ? (Math.random() < 0.5 ? -1 : 1) : Math.sign(dx);
+          const sign = dx === 0 ? (random() < 0.5 ? -1 : 1) : Math.sign(dx);
           const push = (overlap / 2) * sign;
           particle.position.x += push;
           other.position.x -= push;

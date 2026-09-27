@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 12:56:04 IST*
+*Last Updated: 2026-09-27 21:42:33 IST*
 
 ## Active Tasks
 
@@ -51,7 +51,7 @@
 | T25c | Dependency and State Fixes                       | 📝 PLANNED     | HIGH     | 2026-01-12 | T25a |
 | T25d | Architecture Refactoring (Long-term)            | 📝 PLANNED     | MEDIUM   | 2026-01-12 | T25c |
 | T26 | WebGL + tsParticles Visualization Rewrite | 📝 PLANNED | HIGH | 2026-05-09 | T25 | [Details](tasks/T26.md) |
-| T27 | Clean Rewrite — Pure WebGL + Original Physics Engine | 🔄 IN PROGRESS | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
+| T27 | Clean Rewrite — Pure WebGL + Original Physics Engine | ✅ COMPLETED | HIGH | 2026-05-09 | T26 | [Details](tasks/T27.md) |
 | T27a | Vercel Build Fixes — TypeScript Strictness | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27a.md) |
 | T27b | Original Engine Integration | ✅ COMPLETED | HIGH | 2026-05-09 | T27 | [Details](tasks/T27b.md) |
 | T27c | Frozen Particles Fix | ✅ COMPLETED | CRITICAL | 2026-05-09 | T27b | [Details](tasks/T27c.md) |
@@ -80,6 +80,7 @@
 | T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 | T40 | T15a/T15b Modes in the Existing Random Walk Page | 🔄 IN PROGRESS | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
+| T41 | Random Walk Strategy Diagnostics and Plots | 📝 PLANNED | HIGH | 2026-09-27 | - | [Details](tasks/T41.md) |
 
 ## Task Details
 
@@ -88,13 +89,19 @@
 **Status**: 🔄 IN PROGRESS **Last**: 2026-09-26 17:03:29 IST
 **Subtasks**: T39a model ✅, T39b numerical validation ✅ (clean-source result regeneration complete), T39c web page 🔄 (PR fixes applied; browser QA pending).
 **Files**: `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`, `memory-bank/tasks/T39.md`.
-**Research owner**: Paper repository T15/T15a; spheroid results are methodological and do not establish WDW dynamics.
+**Research owner**: `qc-diffusion-T15` and `qc-diffusion-T15a` in the qc-diffusion repository; spheroid results are methodological and do not establish WDW dynamics.
 
 ### T40: T15a/T15b Modes in the Existing Random Walk Page
 **Description**: Add selectable, reproducible T15a and T15b simulation modes inside the existing Random Walk page; do not add app pages, tabs, or navigation entries.
 **Status**: 🔄 IN PROGRESS **Last**: 2026-09-27 18:01:51 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md`.
-**Notes**: Keep general simulation-engine audit issues under T27. T15a and T15b must be independent strategies in the existing engine; the current standalone runner is a prototype and does not satisfy this architecture requirement. Canonical scientific definitions remain in the paper repository.
+**Notes**: T27 is the completed general clean rewrite. T15a and T15b must be independent strategies in the existing engine; the current standalone runner is a prototype and does not satisfy this architecture requirement. Canonical task owners are `qc-diffusion-T15a` and `qc-diffusion-T15b` in the qc-diffusion repository.
+
+### T41: Random Walk Strategy Diagnostics and Plots
+**Description**: Add strategy-specific diagnostic plots to the existing Random Walk page so users can distinguish motion rules over time.
+**Status**: 📝 PLANNED **Last**: 2026-09-27 21:30:22 IST
+**Files**: `frontend/src/RandomWalkSimV2.tsx`, strategy/event data adapters, plot components.
+**Notes**: T41 is separate from the completed T27 clean rewrite and T17’s dedicated Analysis tab. Include ensemble spread over time with a fitted exponent and robust Lévy radius quantiles; jump-length and waiting-time CCDFs; radial density at multiple times; event counts; and applicable heading autocorrelation/trajectory event markers. Preserve strategy-specific meanings and avoid boundary-truncated comparisons. T15a/T15b-specific diagnostics may connect after their `qc-diffusion-T15a` and `qc-diffusion-T15b` engine strategy integration under T40.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.
@@ -104,9 +111,9 @@
 
 ### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
 **Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-07-21 14:38:20 IST
+**Status**: ✅ COMPLETED **Last**: 2026-09-27 21:30:22 IST
 **Files**: `frontend/src/App.tsx`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/components/DensityComparison.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/webgl/WebGLRendererV2.ts`, `memory-bank/implementation-details/t27-clean-architecture-rewrite.md`
-**Current physics note**: A 2026-09-27 source audit found that the 2D factory includes both ballistic and CTRW strategies and the orchestrator integrates each configured strategy. This conflicts with the earlier claim that CTRW replaces ballistic motion; verify and resolve before relying on that path. PDE convergence, Bianchi dynamics, and constrained spin-network evolution remain separate research work.
+**Current physics note**: The 2026-09-27 general engine audit findings recorded under T27 have been resolved, including the 2D motion-strategy composition issue. T27 is complete; Random Walk diagnostic plots are planned separately under T41. PDE convergence, Bianchi dynamics, and constrained spin-network evolution remain separate research work.
 **Notes**:
 - V2 architecture is now original `PhysicsEngine` + `useOriginalPhysicsEngine.ts` adapter + `WebGLRendererV2`
 - Controls are wired to the live engine: `Initialize`, `Start`, `Pause`, and `Reset` all affect runtime state
@@ -115,7 +122,7 @@
 - Live time/stats are propagated back into the V2 UI
 - Floating observables panels restored to V2 via `simulatorLikeRef` shim
 - Inter-particle collision counts now tracked and visible in V2 parameter panel
-- Remaining gaps: `levy`/`fractional` strategies UI-only; graph mode not on V2
+- User confirmed the T27 clean rewrite was completed before this session. The Lévy and Fractional strategies and observable fixes are recorded in `tasks/T27.md`; graph-mode parity remains a separate follow-up. Diagnostic plots are owned by T41, not T27.
 
 ### T27a: Vercel Build Fixes — TypeScript Strictness
 **Status**: ✅ COMPLETED **Last**: 2026-05-09 14:00:20 IST

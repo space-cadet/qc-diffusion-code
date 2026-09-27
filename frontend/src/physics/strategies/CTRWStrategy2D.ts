@@ -46,14 +46,24 @@ export class CTRWStrategy2D implements PhysicsStrategy {
 
 
 
-  preUpdate(particle: Particle, allParticles: Particle[], _context: PhysicsContext): void {
-    const collision = this.handleCollision(particle);
-    
-    if (collision.occurred && collision.newVelocity) {
-      particle.velocity = collision.newVelocity;
-      particle.lastCollisionTime = collision.timestamp;
-      particle.nextCollisionTime = collision.timestamp + collision.waitTime;
-      particle.collisionCount++;
+  preUpdate(particle: Particle, _allParticles: Particle[], context: PhysicsContext): void {
+    if (this.collisionRate <= 0 || !particle.isActive) return;
+    let nextTime = particle.nextCollisionTime;
+    let events = 0;
+    const velocity = this.coordSystem.toVector(particle.velocity);
+    const speed = Math.hypot(velocity.x, velocity.y);
+
+    while (nextTime <= context.currentTime && events < 256) {
+      const angle = context.random() * 2 * Math.PI;
+      particle.velocity = this.coordSystem.toVelocity({ x: speed * Math.cos(angle), y: speed * Math.sin(angle) });
+      nextTime += this.generateCollisionTime(context.random);
+      events++;
+    }
+
+    if (events > 0) {
+      particle.lastCollisionTime = context.currentTime;
+      particle.nextCollisionTime = nextTime;
+      particle.collisionCount += events;
     }
   }
 
@@ -91,9 +101,7 @@ export class CTRWStrategy2D implements PhysicsStrategy {
 
   calculateStep(particle: Particle): Step {
     const currentTime = simTime();
-    const collision = this.handleCollision(particle);
-    
-    const timeStep = Math.min(collision.waitTime, simDt());
+    const timeStep = simDt();
     const velocity = this.coordSystem.toVector(particle.velocity);
     const dx = velocity.x * timeStep;
     const dy = velocity.y * timeStep;
@@ -103,51 +111,14 @@ export class CTRWStrategy2D implements PhysicsStrategy {
      return {
        deltaX: dx,
        deltaY: dy,
-       collision,
+       collision: { occurred: false, newDirection: 0, waitTime: Infinity, energyChange: 0, timestamp: currentTime },
        timestamp: currentTime,
        particleId: particle.id
      };
    }
 
-  private generateCollisionTime(): number {
-    return -Math.log(Math.random()) / this.collisionRate;
-  }
-
-  private handleCollision(particle: Particle): CollisionEvent {
-    const currentTime = simTime();
-    const waitTime = this.generateCollisionTime();
-    
-    const shouldCollide = currentTime >= particle.nextCollisionTime;
-    
-    if (!shouldCollide) {
-      return {
-        occurred: false,
-        newDirection: 0,
-        waitTime,
-        energyChange: 0,
-        timestamp: currentTime
-      };
-    }
-    
-    const newDirection = Math.random() * 2 * Math.PI;
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    const speed = Math.sqrt(velocity.x ** 2 + velocity.y ** 2);
-    
-    const newVelocity = {
-      x: speed * Math.cos(newDirection),
-      y: speed * Math.sin(newDirection)
-    };
-
-    return {
-      occurred: true,
-      newDirection,
-      waitTime,
-      energyChange: 0,
-      timestamp: currentTime,
-      position: { ...particle.position },
-      oldVelocity: { ...particle.velocity },
-      newVelocity: this.coordSystem.toVelocity(newVelocity)
-    };
+  private generateCollisionTime(random: () => number): number {
+    return -Math.log(Math.max(random(), Number.EPSILON)) / this.collisionRate;
   }
 
   validateParameters(params: any): boolean {

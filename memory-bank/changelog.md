@@ -1,10 +1,15 @@
 # Changelog
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 18:01:51 IST*
+*Last Updated: 2026-09-27 21:42:33 IST*
 
 ## [Unreleased] - 2026-09-27
 
+### Added
+- **Random Walk strategies**: Added Lévy flight and time-fractional subdiffusion strategies, parameter controls, seeded initialization, fixed-step accumulation, and persisted settings.
+
 ### Fixed
+- **Random Walk strategy composition**: Ensure 2D motion uses one selected motion strategy, with interparticle collisions composed separately.
+- **Random Walk observables and UI**: Register built-in observables under their text IDs, parse inline definitions, restore particle-count and kinetic-energy data, display shared simulation time once, guard missing persisted Lévy alpha, and remove repeated active-tab render logging.
 - **Memory Bank Viewer Dates**: Normalize and validate Markdown date metadata so timezone suffixes or malformed values cannot crash document rendering.
 
 ## [3.0.0] - 2026-01-11 - Build Pipeline Resolution & Quantum Walk Explorer

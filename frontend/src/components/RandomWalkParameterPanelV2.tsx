@@ -27,6 +27,14 @@ export const RandomWalkParameterPanelV2 = ({
 
   const minP = useMemo(() => gridLayoutParams.minParticles ?? 0, [gridLayoutParams.minParticles]);
   const maxP = useMemo(() => gridLayoutParams.maxParticles ?? 2000, [gridLayoutParams.maxParticles]);
+  const selectedStrategy = gridLayoutParams.strategies?.find((strategy: string) =>
+    ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy)
+  ) || 'simple';
+  const levyAlpha = gridLayoutParams.levyAlpha ?? 1.5;
+  const levyScale = gridLayoutParams.levyScale ?? 20;
+  const fractionalBeta = gridLayoutParams.fractionalBeta ?? 0.7;
+  const fractionalWaitingScale = gridLayoutParams.fractionalWaitingScale ?? 0.1;
+  const fractionalJumpLength = gridLayoutParams.fractionalJumpLength ?? 10;
 
   return (
     <div className="bg-white border rounded-lg p-4 h-full overflow-auto">
@@ -215,9 +223,9 @@ export const RandomWalkParameterPanelV2 = ({
         <div>
           <label className="block text-sm font-medium mb-2">Strategy:</label>
           <select
-            value={gridLayoutParams.strategies?.[0] || 'simple'}
+            value={selectedStrategy}
             onChange={(e) => {
-              const strategy = e.target.value as 'ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions';
+              const strategy = e.target.value as 'ctrw' | 'simple' | 'levy' | 'fractional';
               setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy] });
             }}
             className="w-full border rounded px-2 py-1 text-sm"
@@ -225,10 +233,41 @@ export const RandomWalkParameterPanelV2 = ({
             <option value="simple">Simple (Ballistic)</option>
             <option value="ctrw">CTRW (Continuous Time Random Walk)</option>
             <option value="levy">Lévy Flight</option>
-            <option value="fractional">Fractional Diffusion</option>
-            <option value="collisions">Interparticle Collisions</option>
+            <option value="fractional">Time-Fractional Subdiffusion</option>
           </select>
         </div>
+
+        <div>
+          <label htmlFor="random-walk-seed" className="block text-sm font-medium mb-2">Random seed</label>
+          <input id="random-walk-seed" type="number" min="0" step="1" value={gridLayoutParams.seed ?? 42}
+            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, seed: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+            className="w-full border rounded px-2 py-1 text-sm" />
+        </div>
+
+        {selectedStrategy === 'levy' && <div className="space-y-3 rounded border bg-slate-50 p-3">
+          <p className="text-sm font-medium">Lévy flight parameters</p>
+          <label className="block text-xs">Tail exponent α: {levyAlpha.toFixed(2)}
+            <input type="range" min="0.2" max="2" step="0.05" value={levyAlpha} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, levyAlpha: Number(e.target.value) })} className="w-full" />
+          </label>
+          <label className="block text-xs">Jump scale: {levyScale.toFixed(1)}
+            <input type="range" min="1" max="100" step="1" value={levyScale} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, levyScale: Number(e.target.value) })} className="w-full" />
+          </label>
+          <p className="text-xs text-slate-600">Jump lengths have a Pareto tail; collision rate sets the jump event rate.</p>
+        </div>}
+
+        {selectedStrategy === 'fractional' && <div className="space-y-3 rounded border bg-slate-50 p-3">
+          <p className="text-sm font-medium">Time-fractional subdiffusion</p>
+          <label className="block text-xs">Fractional order β: {fractionalBeta.toFixed(2)}
+            <input type="range" min="0.1" max="0.95" step="0.01" value={fractionalBeta} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, fractionalBeta: Number(e.target.value) })} className="w-full" />
+          </label>
+          <label className="block text-xs">Waiting-time scale: {fractionalWaitingScale.toFixed(2)} s
+            <input type="range" min="0.01" max="2" step="0.01" value={fractionalWaitingScale} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, fractionalWaitingScale: Number(e.target.value) })} className="w-full" />
+          </label>
+          <label className="block text-xs">Jump length: {fractionalJumpLength.toFixed(1)}
+            <input type="range" min="1" max="50" step="1" value={fractionalJumpLength} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, fractionalJumpLength: Number(e.target.value) })} className="w-full" />
+          </label>
+          <p className="text-xs text-slate-600">Walkers make fixed-length jumps after heavy-tailed waiting times. β below 1 produces subdiffusion.</p>
+        </div>}
 
         {/* Collision Rate */}
         <div>
@@ -257,6 +296,7 @@ export const RandomWalkParameterPanelV2 = ({
             <option value="periodic">Periodic</option>
             <option value="reflective">Reflective</option>
             <option value="absorbing">Absorbing</option>
+            <option value="unbounded">Unbounded</option>
           </select>
         </div>
 

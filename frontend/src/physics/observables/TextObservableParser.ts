@@ -64,8 +64,7 @@ export class TextObservableParser {
       return this.parseBlock(text);
     }
     
-    // Fallback to empty array if no valid syntax detected
-    return [];
+    return this.parseInline(text);
   }
 
   private static parseInline(text: string): ParsedObservable[] {
@@ -76,7 +75,7 @@ export class TextObservableParser {
     
     for (const line of lines) {
       const current: Partial<ParsedObservable> = {};
-      const pairs = line.split(',').map(pair => pair.trim());
+      const pairs = this.splitTopLevelByComma(line).map(pair => pair.trim());
       
       for (const pair of pairs) {
         const [key, ...valueParts] = pair.split(':');

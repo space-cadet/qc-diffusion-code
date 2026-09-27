@@ -25,6 +25,11 @@ export interface SimulatorParams {
   distNy?: number;
   distJitter?: number;
   temperature?: number;
+  levyAlpha?: number;
+  levyScale?: number;
+  fractionalBeta?: number;
+  fractionalWaitingScale?: number;
+  fractionalJumpLength?: number;
 }
 
 export class ParameterManager {
@@ -52,6 +57,11 @@ export class ParameterManager {
   public distNy: number;
   public distJitter: number;
   public temperature: number;
+  public levyAlpha: number;
+  public levyScale: number;
+  public fractionalBeta: number;
+  public fractionalWaitingScale: number;
+  public fractionalJumpLength: number;
 
   constructor(params: SimulatorParams) {
     this.collisionRate = params.collisionRate;
@@ -78,6 +88,11 @@ export class ParameterManager {
     this.distNy = params.distNy || 15;
     this.distJitter = params.distJitter || 4;
     this.temperature = params.temperature || 1.0;
+    this.levyAlpha = params.levyAlpha ?? 1.5;
+    this.levyScale = params.levyScale ?? 0.1;
+    this.fractionalBeta = params.fractionalBeta ?? 0.7;
+    this.fractionalWaitingScale = params.fractionalWaitingScale ?? 0.1;
+    this.fractionalJumpLength = params.fractionalJumpLength ?? 0.1;
   }
 
   public updateParameters(params: Partial<SimulatorParams>): boolean {
@@ -146,6 +161,11 @@ export class ParameterManager {
     if (params.temperature !== undefined) {
       this.temperature = params.temperature;
     }
+    if (params.levyAlpha !== undefined) this.levyAlpha = params.levyAlpha;
+    if (params.levyScale !== undefined) this.levyScale = params.levyScale;
+    if (params.fractionalBeta !== undefined) this.fractionalBeta = params.fractionalBeta;
+    if (params.fractionalWaitingScale !== undefined) this.fractionalWaitingScale = params.fractionalWaitingScale;
+    if (params.fractionalJumpLength !== undefined) this.fractionalJumpLength = params.fractionalJumpLength;
     if (params.strategies) {
         this.strategies = params.strategies;
     }
@@ -181,7 +201,7 @@ export class ParameterManager {
     const halfWidth = this.canvasWidth / 2;
     const halfHeight = this.canvasHeight / 2;
     return {
-      type: (this.boundaryCondition || 'periodic') as 'periodic' | 'reflective' | 'absorbing',
+      type: (this.boundaryCondition || 'periodic') as BoundaryConfig['type'],
       xMin: -halfWidth,
       xMax: halfWidth,
       yMin: -halfHeight,

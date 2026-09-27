@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 18:01:51 IST*
+*Last Updated: 2026-09-27 21:42:33 IST*
 
 ## Current Focus
 **Task**: T40 - T15a/T15b modes in the existing Random Walk page
-**Status**: 🔄 IN PROGRESS — the in-page T15 prototype runs, but it bypasses the existing engine; independent strategy integration is still required
+**Status**: 🔄 IN PROGRESS — T15 strategies must still be integrated into the existing engine. T27 is complete; T41 is planned for Random Walk diagnostics plots.
 **Priority**: HIGH
 
-**Context**: T40 keeps T15a/T15b on the existing Random Walk page and requires them as independent strategies in the existing physics engine. The current standalone runner is an architectural mismatch; its implementation and checks are provisional. General engine audit findings remain separate under T27. T39 remains open for browser QA; the app-shell history below is retained as prior context.
+**Context**: T40 keeps T15a/T15b on the existing Random Walk page and requires them as independent strategies in the existing physics engine. The current standalone runner is an architectural mismatch; its implementation and checks are provisional. The general engine fixes recorded here close the remaining T27 findings; diagnostic plots are tracked separately under planned T41. T39 remains open for browser QA; the app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -18,8 +18,8 @@
 6. **Scroll restoration** ✅ — random walk page can scroll to lower panels
 7. **Density panel restoration** ✅ — density field is back on the V2 page
 8. **Initial distributions restored** ✅ — dropdown and per-distribution controls now affect real particle placement
-9. **Strategy audit** ⚠️ — `levy` and `fractional` remain UI-visible but are not implemented in `StrategyFactory`
-10. **2D strategy composition** ⚠️ — memory previously claimed CTRW replaces ballistic motion; the 2026-09-27 source audit found both strategies included and integrated. Resolve under T27 before depending on that path.
+9. **Strategy audit** ✅ — Lévy and time-fractional strategies are implemented and selected through `StrategyFactory`.
+10. **2D strategy composition** ✅ — the factory selects one motion strategy and applies interparticle collisions separately.
 
 **Architecture Evolution**:
 - Started with: `PhysicsEngineV2` (hardcoded ballistic) + `WebGLRendererV2`
@@ -55,22 +55,22 @@
 - Motion: ✅ Controls and visible evolution now work on the V2 page
 - Density: ✅ Restored below the main canvas
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
-- Strategies: ⚠️ `simple`, `ctrw`, and `collisions` work; `levy` and `fractional` are still UI-only
+- Strategies: ✅ `simple`, `ctrw`, `collisions`, `levy`, and `fractional` use the existing engine path
 
 **Branch**: `codex/t40-t15-random-walk-page` (based on `cd9f2a7`)
 
-**Immediate Next Step**: In a new session, replace the standalone T15 simulation/canvas path with independent strategies integrated into the existing physics engine, then repeat relevant model and page checks. The JSON download event also remains unverified. T39c browser QA and general T27 engine findings remain separate open work.
+**Immediate Next Steps**: Under T40, replace the standalone T15 simulation/canvas path with independent strategies integrated into the existing physics engine, then repeat model/reference and same-page checks; confirm JSON download delivery. Under planned T41, add strategy diagnostic plots to the existing Random Walk page. T27 is complete and does not own this plotting work.
 
 ## T40 plan — 2026-09-27
 
 - Add T15a and T15b as selectable modes within the existing Random Walk page. Do not add an app page, tab, or navigation entry.
-- Keep the T15a/T15b integration requirements separate from general engine concerns documented under T27.
-- Use the paper repository task and model documents as the scientific source of truth; this repository's older T15a task is unrelated.
+- Keep T15a/T15b strategy integration under T40; T27 is the completed general clean rewrite.
+- Use `qc-diffusion-T15a` and `qc-diffusion-T15b` and their model documents as the scientific source of truth; this repository's older `memory-bank/tasks/T15a.md` is an unrelated engine-verification task.
 - See `memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md` and `memory-bank/tasks/T40.md`.
 
 ## 2026-09-26 Spheroid experiment
 
-- Paper research T15/T15a now includes an embedded-surface precursor to the one-anisotropy gravitational derivation. The spheroid's intrinsic metric, curvature, coordinate transformation, and chosen walk equations are in `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/spheroid-geometry-space-walk.md`.
+- Paper research `qc-diffusion-T15`/`qc-diffusion-T15a` now includes an embedded-surface precursor to the one-anisotropy gravitational derivation. The spheroid's intrinsic metric, curvature, coordinate transformation, and chosen walk equations are in `/Volumes/Data/owncloud/root/research/articles/qc-diffusion/docs/spheroid-geometry-space-walk.md`.
 - T39/T39a/T39b/T39c own the separate pure model, numerical validation, and interactive 3D page in this repository. The implementation details are in `memory-bank/implementation-details/spheroid-geometry-space-experiment.md`.
 - `spin-network-app` was reviewed for overlap; its fixed-graph walk and future spin-foam type sketch do not replace this repository's simplicial-growth work.
 - T39a geometry/walk and T39b finite-volume comparison are implemented. Frozen run v1 meets its terminal mean $L^1$ criterion at 32,000 walkers for both profiles; see `memory-bank/results/t39-spheroid-run-v1.md`.

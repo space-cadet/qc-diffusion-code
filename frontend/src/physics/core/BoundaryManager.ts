@@ -22,6 +22,8 @@ export class BoundaryManager {
         return applyReflectiveBoundary(particle.position, particle.velocity, this.config);
       case 'absorbing':
         return applyAbsorbingBoundary(particle.position, this.config);
+      case 'unbounded':
+        return { position: particle.position };
       default:
         console.warn('[BoundaryManager] Unknown boundary type:', this.config.type, '- returning unchanged position');
         return { position: particle.position };

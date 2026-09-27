@@ -109,6 +109,10 @@ export class TextObservable {
         const errors = [];
         try {
             const parsed = TextObservableParser.parse(text);
+            if (parsed.length === 0) {
+                errors.push('No valid observable definition found');
+                return { valid: false, errors };
+            }
             for (const def of parsed) {
                 if (!def.name)
                     errors.push('Observable missing name');

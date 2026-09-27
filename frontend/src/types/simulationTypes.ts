@@ -28,7 +28,13 @@ export interface RandomWalkParams {
   showEdgeWeights: boolean;
   showAnimation: boolean;
   strategies: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
-  boundaryCondition: 'periodic' | 'reflective' | 'absorbing';
+  seed: number;
+  levyAlpha: number;
+  levyScale: number;
+  fractionalBeta: number;
+  fractionalWaitingScale: number;
+  fractionalJumpLength: number;
+  boundaryCondition: 'periodic' | 'reflective' | 'absorbing' | 'unbounded';
   initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
   distSigmaX: number;
   distSigmaY: number;
