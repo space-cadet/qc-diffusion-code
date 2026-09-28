@@ -44,6 +44,14 @@ function resampleT15bReferenceToNormalizedRadius(
     for (let sourceIndex = 0; sourceIndex < sourceCount; sourceIndex++) {
       const sourceCenter = snapshot.radius[sourceIndex];
       const sourceStart = Math.max(0, sourceCenter - sourceStep / 2);
+      if (sourceCenter > frontRadius && sourceStart <= frontRadius + 1e-12) {
+        // The saved histogram places the finite-speed front atom in the first
+        // bin whose center lies beyond vt. Keep that full bin mass at x=1.
+        if (targetIndex === targetBinCount - 1) {
+          probabilityMass += snapshot.radialProbabilityDensity[sourceIndex] * sourceStep;
+        }
+        continue;
+      }
       const sourceEnd = Math.min(frontRadius, sourceCenter + sourceStep / 2);
       const overlap = Math.max(0, Math.min(targetRadiusEnd, sourceEnd) - Math.max(targetRadiusStart, sourceStart));
       probabilityMass += snapshot.radialProbabilityDensity[sourceIndex] * overlap;

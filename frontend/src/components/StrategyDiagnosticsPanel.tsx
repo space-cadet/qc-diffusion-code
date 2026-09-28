@@ -155,13 +155,25 @@ function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnostics
   const speedB = configB.parameters.velocity ?? configB.parameters.speed ?? 1;
   const rateA = configA.parameters.collisionRate ?? configA.parameters.flipRate ?? configA.parameters.resetRate ?? 0;
   const rateB = configB.parameters.collisionRate ?? configB.parameters.flipRate ?? configB.parameters.resetRate ?? 0;
+  const strategyParameters: Record<string, string[]> = {
+    levy: ['levyAlpha', 'levyScale'],
+    fractional: ['fractionalBeta', 'fractionalWaitingScale', 'fractionalJumpLength'],
+    t15a: ['ordering'],
+  };
+  const sameStrategyParameters = configA.strategy !== configB.strategy
+    || (strategyParameters[configA.strategy] ?? []).every((key) => {
+      const valueA = configA.parameters[key];
+      const valueB = configB.parameters[key];
+      return valueA !== undefined && valueB !== undefined && Math.abs(valueA - valueB) < 1e-9;
+    });
   return configA.seed === configB.seed
     && configA.dimension === configB.dimension
     && configA.particleCount === configB.particleCount
     && configA.initialDistribution === configB.initialDistribution
     && configA.boundary === configB.boundary
     && Math.abs(speedA - speedB) < 1e-9
-    && Math.abs(rateA - rateB) < 1e-9;
+    && Math.abs(rateA - rateB) < 1e-9
+    && sameStrategyParameters;
 }
 
 function comparisonSpreadKind(snapshot: StrategyDiagnosticsSnapshot): 'msd' | 'medianR2' {
@@ -238,7 +250,7 @@ export function StrategyDiagnosticsPanel({ snapshot, comparison, onCaptureCompar
         <button type="button" onClick={onCaptureComparison} className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">Use this run as comparison</button>
         {comparison && <button type="button" onClick={onClearComparison} className="rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-600 hover:bg-slate-50">Clear comparison</button>}
         {comparison && <span className={`text-xs ${comparisonIsLikeForLike ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {comparisonIsLikeForLike ? `Overlaying matching setup: ${comparisonLabel}` : `Comparison paused: ${comparisonLabel} differs in seed, dimension, count, initial state, boundary, speed, or event rate.`}
+          {comparisonIsLikeForLike ? `Overlaying matching setup: ${comparisonLabel}` : `Comparison paused: ${comparisonLabel} differs in seed, dimension, count, initial state, boundary, speed, event rate, or strategy parameters.`}
         </span>}
       </div>
       {comparison && comparisonIsLikeForLike && !comparisonMetricMatches && <p className="mt-1 text-xs text-amber-700">Spread overlay is omitted because the saved run uses a different spread statistic (MSD versus median radius²).</p>}

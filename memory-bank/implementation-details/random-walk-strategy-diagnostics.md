@@ -21,6 +21,8 @@ The recorder samples ensemble frames at increasing simulation-time intervals, re
 
 Users can save the current run as a reference, change strategy, and overlay comparable curves. The panel enables overlays only when seed, dimension, walker count, initial distribution, boundary, speed, and event rate match. It reports the mismatch if those setup values differ. The spread curve is omitted when the reference and current runs use different statistics (MSD versus median squared radius).
 
+When both runs use the same Lévy or fractional strategy, the overlay check also requires its distribution parameters to match (`levyAlpha`/`levyScale`, or `fractionalBeta`/waiting scale/jump length). Cross-strategy comparisons remain available when the shared setup matches.
+
 Finite boundary modes can reflect, wrap, or absorb walkers. The panel identifies the active boundary and warns that finite domains transform paths or truncate tails; the raw generated Lévy jump length is kept distinct from the boundary-transformed displacement.
 
 The frontend production build passes. Live browser acceptance remains necessary to confirm that the plots populate during a run and that comparison setup checks behave as intended.

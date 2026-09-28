@@ -7,6 +7,7 @@ import type { CoordinateSystem } from '../core/CoordinateSystem';
 import type { PhysicsContext } from '../types/PhysicsContext';
 import { BoundaryManager } from '../core/BoundaryManager';
 import { simTime, simDt } from '../core/GlobalTime';
+import { advanceCTWRSegment } from './advanceCTWRSegment';
 
 export class CTRWStrategy2D implements PhysicsStrategy {
   private collisionRate: number;
@@ -17,7 +18,11 @@ export class CTRWStrategy2D implements PhysicsStrategy {
   private graph?: IGraph;
   private boundaryManager: BoundaryManager;
   private coordSystem: CoordinateSystem;
-  private stepDisplacements = new WeakMap<Particle, { x: number; y: number }>();
+  private stepPaths = new WeakMap<Particle, {
+    startPosition: { x: number; y: number };
+    position: { x: number; y: number };
+    absorbed: boolean;
+  }>();
 
   constructor(params: {
     collisionRate: number;
@@ -57,14 +62,25 @@ export class CTRWStrategy2D implements PhysicsStrategy {
     let eventPosition = { ...particle.position };
     let cursorTime = context.currentTime - context.dt;
     let previousEventTime = particle.lastEventTime ?? particle.lastCollisionTime;
+    let absorbed = false;
 
-    while (nextTime <= context.currentTime && events < 256) {
+    while (nextTime <= context.currentTime && events < 256 && !absorbed) {
       const eventTime = nextTime;
-      const worldVelocity = this.coordSystem.toVector(eventVelocity);
-      const waitTime = Math.max(0, eventTime - previousEventTime);
-      eventPosition.x += worldVelocity.x * Math.max(0, eventTime - cursorTime);
-      eventPosition.y += worldVelocity.y * Math.max(0, eventTime - cursorTime);
+      const segment = advanceCTWRSegment(
+        eventPosition,
+        eventVelocity,
+        Math.max(0, eventTime - cursorTime),
+        this.boundaryManager,
+        '2D',
+      );
+      eventPosition = segment.position;
+      eventVelocity = segment.velocity;
       cursorTime = eventTime;
+      if (segment.absorbed) {
+        absorbed = true;
+        break;
+      }
+      const waitTime = Math.max(0, eventTime - previousEventTime);
       const angle = context.random() * 2 * Math.PI;
       const nextVelocity = this.coordSystem.toVelocity({ x: speed * Math.cos(angle), y: speed * Math.sin(angle) });
       context.onStrategyEvent?.({
@@ -83,37 +99,52 @@ export class CTRWStrategy2D implements PhysicsStrategy {
       events++;
     }
 
-    if (events > 0) {
-      const finalVelocity = this.coordSystem.toVector(eventVelocity);
-      const remainingTime = Math.max(0, context.currentTime - cursorTime);
-      eventPosition.x += finalVelocity.x * remainingTime;
-      eventPosition.y += finalVelocity.y * remainingTime;
-      this.stepDisplacements.set(particle, {
-        x: eventPosition.x - particle.position.x,
-        y: eventPosition.y - particle.position.y,
+    if (!absorbed && events > 0) {
+      const segment = advanceCTWRSegment(
+        eventPosition,
+        eventVelocity,
+        Math.max(0, context.currentTime - cursorTime),
+        this.boundaryManager,
+        '2D',
+      );
+      eventPosition = segment.position;
+      eventVelocity = segment.velocity;
+      absorbed = segment.absorbed;
+    }
+    if (events > 0 || absorbed) {
+      this.stepPaths.set(particle, {
+        startPosition: { ...particle.position },
+        position: eventPosition,
+        absorbed,
       });
       particle.velocity = eventVelocity;
-      particle.lastCollisionTime = context.currentTime;
-      particle.lastEventTime = previousEventTime;
-      particle.nextCollisionTime = nextTime;
-      particle.collisionCount += events;
+      if (events > 0) {
+        particle.lastCollisionTime = context.currentTime;
+        particle.lastEventTime = previousEventTime;
+        particle.nextCollisionTime = nextTime;
+        particle.collisionCount += events;
+      }
     }
   }
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
     const velocity = this.coordSystem.toVector(particle.velocity);
-    const displacement = this.stepDisplacements.get(particle);
-    this.stepDisplacements.delete(particle);
-    particle.position.x += displacement?.x ?? velocity.x * dt;
-    particle.position.y += displacement?.y ?? velocity.y * dt;
+    const path = this.stepPaths.get(particle);
+    this.stepPaths.delete(particle);
+    if (path) {
+      particle.position = {
+        x: path.position.x + particle.position.x - path.startPosition.x,
+        y: path.position.y + particle.position.y - path.startPosition.y,
+      };
+      if (path.absorbed) particle.isActive = false;
+    } else if (particle.isActive) {
+      particle.position.x += velocity.x * dt;
+      particle.position.y += velocity.y * dt;
 
-    const boundaryResult = this.boundaryManager.apply(particle);
-    particle.position = boundaryResult.position;
-    if (boundaryResult.velocity) {
-      particle.velocity = boundaryResult.velocity;
-    }
-    if (boundaryResult.absorbed) {
-      particle.isActive = false;
+      const boundaryResult = this.boundaryManager.apply(particle);
+      particle.position = boundaryResult.position;
+      if (boundaryResult.velocity) particle.velocity = boundaryResult.velocity;
+      if (boundaryResult.absorbed) particle.isActive = false;
     }
     
     // Record trajectory point (CircularBuffer auto-manages capacity)

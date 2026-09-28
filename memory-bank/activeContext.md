@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 12:13:09 IST*
+*Last Updated: 2026-09-28 12:30:24 IST*
 
 ## Current Focus
 **Task**: T41 - Random Walk strategy diagnostics and plots
-**Status**: 🔄 IN PROGRESS — diagnostics and Codex review fixes are implemented; frontend production build passes. Live browser acceptance remains. T40 JSON file delivery is still unverified.
+**Status**: 🔄 IN PROGRESS — diagnostics and two rounds of Codex review fixes are implemented; frontend production build passes. Live browser acceptance remains. T40 JSON file delivery is still unverified.
 **Priority**: HIGH
 
-**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page. PR #20 review fixes now cover prior-parameter comparisons, exact CTRW in-step displacement, normalized T15b reference binning, and forced terminal diagnostics publication. Live browser acceptance and T40 JSON file delivery remain open; T39 browser QA is separate.
+**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page. PR #20 findings are addressed for prior-parameter comparisons, exact CTRW in-step displacement and segment boundaries, normalized T15b reference binning with causal-front mass retained, strategy-specific comparison parameters, and forced terminal diagnostics publication. Live browser acceptance and T40 JSON file delivery remain open; T39 browser QA is separate.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -59,7 +59,7 @@
 
 **Branch**: `codex/t40-t15-random-walk-page` (based on `cd9f2a7`)
 
-**Immediate Next Steps**: Complete live browser acceptance for T41 plots and comparison checks, confirm T40 JSON download delivery in a normal browser, and request Codex re-review after pushing the review fixes. T39 browser QA is separate. T27 is complete and does not own this plotting work.
+**Immediate Next Steps**: Push the latest PR #20 review fixes and request Codex re-review; complete live browser acceptance for T41 plots and comparison checks; confirm T40 JSON download delivery in a normal browser. T39 browser QA is separate. T27 is complete and does not own this plotting work.
 
 ## T40 plan — 2026-09-27
 
