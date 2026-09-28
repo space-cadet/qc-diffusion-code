@@ -12,8 +12,8 @@ import { BallisticStrategy } from '../strategies/BallisticStrategy';
 import { LevyFlightStrategy } from '../strategies/LevyFlightStrategy';
 import { LevyWalkStrategy } from '../strategies/LevyWalkStrategy';
 import { FractionalDiffusionStrategy } from '../strategies/FractionalDiffusionStrategy';
-import { KacGoldsteinVelocityFlipStrategy } from '../strategies/KacGoldsteinStrategy';
-import { MasoliverLindenberghHeadingResetStrategy } from '../strategies/MasoliverLindenberghWalkStrategy';
+import { KacGoldsteinStrategy } from '../strategies/KacGoldsteinStrategy';
+import { MasoliverLindenberghWalkStrategy } from '../strategies/MasoliverLindenberghWalkStrategy';
 
 import { ParameterManager } from '../core/ParameterManager';
 
@@ -66,10 +66,10 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       oneDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '1D', boundaryConfig }));
     } else if (motionStrategy === 'kac-goldstein') {
       const speed = physicsParams.velocity * Math.max(parameterManager.canvasWidth / 12, 1);
-      oneDStrategies.push(new KacGoldsteinVelocityFlipStrategy(speed, physicsParams.collisionRate, boundaryConfig));
+      oneDStrategies.push(new KacGoldsteinStrategy(speed, physicsParams.collisionRate, boundaryConfig));
     } else if (motionStrategy === 'masoliver-lindenbergh') {
       const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
-      oneDStrategies.push(new MasoliverLindenberghHeadingResetStrategy(speed, physicsParams.collisionRate, boundaryConfig));
+      oneDStrategies.push(new MasoliverLindenberghWalkStrategy(speed, physicsParams.collisionRate, boundaryConfig));
     } else {
       oneDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
@@ -105,7 +105,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       twoDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '2D', boundaryConfig }));
     } else if (motionStrategy === 'masoliver-lindenbergh') {
       const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
-      twoDStrategies.push(new MasoliverLindenberghHeadingResetStrategy(speed, physicsParams.collisionRate, boundaryConfig));
+      twoDStrategies.push(new MasoliverLindenberghWalkStrategy(speed, physicsParams.collisionRate, boundaryConfig));
     } else {
       // Kac-Goldstein is one-dimensional; keep the selected process's dimension authoritative.
 

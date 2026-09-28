@@ -5,6 +5,7 @@ import {
   type PersistentWalkMode,
   type PersistentWalkRunConfig,
 } from "./persistentWalkRandomWalk";
+import { triggerJsonDownload } from "./downloadJson";
 import { kacGoldsteinSpectralReference } from "./kacGoldsteinReference";
 
 interface ReferenceData {
@@ -115,12 +116,7 @@ function PersistentWalkChart({
 function downloadRun(mode: PersistentWalkMode, config: PersistentWalkRunConfig, diagnostics: PersistentWalkDiagnostics | null) {
   if (!diagnostics) return;
   const payload = createPersistentWalkRunExport(mode, config, diagnostics);
-  const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `${mode}-seed-${config.seed}-t${diagnostics.time.toFixed(3)}.json`;
-  anchor.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  triggerJsonDownload(payload, `${mode}-seed-${config.seed}-t${diagnostics.time.toFixed(3)}.json`);
 }
 
 export const PersistentWalkDiagnosticsPanel: React.FC<DiagnosticsProps> = ({ mode, config, diagnostics }) => {

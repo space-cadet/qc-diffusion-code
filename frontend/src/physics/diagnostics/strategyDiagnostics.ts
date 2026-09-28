@@ -44,6 +44,34 @@ export interface StrategyDiagnosticsSnapshot {
   trails: Array<{ id: string; points: TrailPoint[] }>;
 }
 
+export function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnosticsSnapshot): boolean {
+  const configA = a.config;
+  const configB = b.config;
+  const speedA = configA.parameters.velocity ?? configA.parameters.speed ?? 1;
+  const speedB = configB.parameters.velocity ?? configB.parameters.speed ?? 1;
+  const rateA = configA.parameters.collisionRate ?? configA.parameters.flipRate ?? configA.parameters.resetRate ?? 0;
+  const rateB = configB.parameters.collisionRate ?? configB.parameters.flipRate ?? configB.parameters.resetRate ?? 0;
+  const strategyParameters: Record<string, string[]> = {
+    levy: ['levyAlpha', 'levyScale'],
+    fractional: ['fractionalBeta', 'fractionalWaitingScale', 'fractionalJumpLength'],
+    'kac-goldstein': ['kacGoldsteinOrdering'],
+  };
+  const sameStrategyParameters = configA.strategy !== configB.strategy
+    || (strategyParameters[configA.strategy] ?? []).every((key) => {
+      const valueA = configA.parameters[key];
+      const valueB = configB.parameters[key];
+      return valueA !== undefined && valueB !== undefined && Math.abs(valueA - valueB) < 1e-9;
+    });
+  return configA.seed === configB.seed
+    && configA.dimension === configB.dimension
+    && configA.particleCount === configB.particleCount
+    && configA.initialDistribution === configB.initialDistribution
+    && configA.boundary === configB.boundary
+    && Math.abs(speedA - speedB) < 1e-9
+    && Math.abs(rateA - rateB) < 1e-9
+    && sameStrategyParameters;
+}
+
 const SAMPLE_LIMIT = 1200;
 const EVENT_SAMPLE_LIMIT = 24000;
 const TRAIL_PARTICLE_COUNT = 8;

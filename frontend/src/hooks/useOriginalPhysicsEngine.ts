@@ -2,6 +2,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { PhysicsEngine, PhysicsEngineConfig } from "../physics/core/PhysicsEngine";
 import { Dimension } from "../physics/core/CoordinateSystem";
 import { createPhysicsStrategies } from "../physics/factories/StrategyFactory";
+import type { PhysicsStrategy } from "../physics/interfaces/PhysicsStrategy";
 import { ParameterManager } from "../physics/core/ParameterManager";
 import { BoundaryConfig } from "../physics/types/BoundaryConfig";
 import type { Particle } from "../physics/types/Particle";

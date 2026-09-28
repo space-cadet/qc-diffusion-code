@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import {
+  comparableSetups,
   fitGrowthExponent,
   type StrategyDiagnosticsSnapshot,
 } from '../physics/diagnostics/strategyDiagnostics';
@@ -146,34 +147,6 @@ function TrajectoryPlot({ trails, comparisonTrails = [], comparisonLabel = 'comp
     </svg>
     <div className="flex flex-wrap gap-4 text-xs text-slate-600"><span>● Turn / reset</span><span>■ Discrete jump</span><span>▲ Wait ends / jump starts</span>{comparisonTrails.length > 0 && <span>Dashed paths: {comparisonLabel}</span>}</div>
   </section>;
-}
-
-function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnosticsSnapshot): boolean {
-  const configA = a.config;
-  const configB = b.config;
-  const speedA = configA.parameters.velocity ?? configA.parameters.speed ?? 1;
-  const speedB = configB.parameters.velocity ?? configB.parameters.speed ?? 1;
-  const rateA = configA.parameters.collisionRate ?? configA.parameters.flipRate ?? configA.parameters.resetRate ?? 0;
-  const rateB = configB.parameters.collisionRate ?? configB.parameters.flipRate ?? configB.parameters.resetRate ?? 0;
-  const strategyParameters: Record<string, string[]> = {
-    levy: ['levyAlpha', 'levyScale'],
-    fractional: ['fractionalBeta', 'fractionalWaitingScale', 'fractionalJumpLength'],
-    "kac-goldstein": ['kacGoldsteinOrdering'],
-  };
-  const sameStrategyParameters = configA.strategy !== configB.strategy
-    || (strategyParameters[configA.strategy] ?? []).every((key) => {
-      const valueA = configA.parameters[key];
-      const valueB = configB.parameters[key];
-      return valueA !== undefined && valueB !== undefined && Math.abs(valueA - valueB) < 1e-9;
-    });
-  return configA.seed === configB.seed
-    && configA.dimension === configB.dimension
-    && configA.particleCount === configB.particleCount
-    && configA.initialDistribution === configB.initialDistribution
-    && configA.boundary === configB.boundary
-    && Math.abs(speedA - speedB) < 1e-9
-    && Math.abs(rateA - rateB) < 1e-9
-    && sameStrategyParameters;
 }
 
 function comparisonSpreadKind(snapshot: StrategyDiagnosticsSnapshot): 'msd' | 'medianR2' {
