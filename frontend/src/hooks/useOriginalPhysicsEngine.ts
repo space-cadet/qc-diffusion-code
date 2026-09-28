@@ -40,6 +40,11 @@ export interface EngineParams {
   fractionalJumpLength: number;
 }
 
+export interface PhysicsEngineRuntime {
+  createStrategies: (params: EngineParams, boundaries: BoundaryConfig) => PhysicsStrategy[];
+  initializeParticles: (params: EngineParams, random: () => number) => Particle[];
+}
+
 export interface SimpleParticle {
   id: number;
   x: number;
@@ -53,7 +58,7 @@ export interface SimpleParticle {
 interface UseOriginalPhysicsEngineReturn {
   engineRef: React.MutableRefObject<PhysicsEngine | null>;
   particlesRef: React.MutableRefObject<Particle[]>;
-  step: (dt: number) => void;
+  step: (dt: number, stopAtTime?: number) => void;
   reset: () => void;
   updateParams: (params: Partial<EngineParams>) => void;
   getStats: () => { time: number; collisionCount: number; interparticleCollisionCount: number; particleCount: number } | null;
@@ -126,7 +131,7 @@ function createStrategiesFromParams(params: EngineParams): PhysicsStrategy[] {
   return createPhysicsStrategies(paramManager, boundaryConfig);
 }
 
-function initializeParticles(params: EngineParams, random: () => number): Particle[] {
+function initializeDefaultParticles(params: EngineParams, random: () => number): Particle[] {
   const particles: Particle[] = [];
   const { particleCount, dimension, canvasWidth, canvasHeight } = params;
   const visibleSpeed = toVisibleSpeed(params);
@@ -185,9 +190,11 @@ function initializeParticles(params: EngineParams, random: () => number): Partic
 export function useOriginalPhysicsEngine({
   params,
   isRunning,
+  runtime,
 }: {
   params: EngineParams;
   isRunning: boolean;
+  runtime?: PhysicsEngineRuntime;
 }): UseOriginalPhysicsEngineReturn {
   const engineRef = useRef<PhysicsEngine | null>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -199,7 +206,9 @@ export function useOriginalPhysicsEngine({
 
   useEffect(() => {
     const boundaryConfig = createBoundaryConfig(params);
-    const strategies = createStrategiesFromParams(params);
+    const strategies = runtime
+      ? runtime.createStrategies(params, boundaryConfig)
+      : createStrategiesFromParams(params);
 
     const config: PhysicsEngineConfig = {
       timeStep: params.dt,
@@ -212,7 +221,9 @@ export function useOriginalPhysicsEngine({
 
     engineRef.current = new PhysicsEngine(config);
     randomRef.current.reset(params.seed);
-    particlesRef.current = initializeParticles(params, () => randomRef.current.next());
+    particlesRef.current = runtime
+      ? runtime.initializeParticles(params, () => randomRef.current.next())
+      : initializeDefaultParticles(params, () => randomRef.current.next());
 
     console.log("[useOriginalPhysicsEngine] Engine created with", strategies.length, "strategies");
 
@@ -224,11 +235,15 @@ export function useOriginalPhysicsEngine({
   }, []);
 
   const step = useCallback(
-    (dt: number) => {
+    (dt: number, stopAtTime?: number) => {
       if (engineRef.current && isRunning) {
         accumulatorRef.current += Math.min(Math.max(dt, 0), 0.05);
         let steps = 0;
-        while (accumulatorRef.current >= params.dt && steps < 10) {
+        while (
+          accumulatorRef.current >= params.dt
+          && steps < 10
+          && (stopAtTime === undefined || timeRef.current + params.dt <= stopAtTime + 1e-12)
+        ) {
           const actualDt = engineRef.current.step(particlesRef.current);
           timeRef.current += actualDt;
           accumulatorRef.current -= params.dt;
@@ -253,12 +268,14 @@ export function useOriginalPhysicsEngine({
       engineRef.current.reset();
       randomRef.current.reset(params.seed);
       accumulatorRef.current = 0;
-      particlesRef.current = initializeParticles(params, () => randomRef.current.next());
+      particlesRef.current = runtime
+        ? runtime.initializeParticles(params, () => randomRef.current.next())
+        : initializeDefaultParticles(params, () => randomRef.current.next());
       timeRef.current = 0;
       collisionCountRef.current = 0;
       interparticleCollisionCountRef.current = 0;
     }
-  }, [params]);
+  }, [params, runtime]);
 
   const updateParams = useCallback((newParams: Partial<EngineParams>) => {
     if (!engineRef.current) return;
@@ -266,7 +283,9 @@ export function useOriginalPhysicsEngine({
     const updatedParams = { ...params, ...newParams };
 
     const boundaryConfig = createBoundaryConfig(updatedParams);
-    const strategies = createStrategiesFromParams(updatedParams);
+    const strategies = runtime
+      ? runtime.createStrategies(updatedParams, boundaryConfig)
+      : createStrategiesFromParams(updatedParams);
 
     engineRef.current.updateConfiguration({
       timeStep: updatedParams.dt,
@@ -287,14 +306,16 @@ export function useOriginalPhysicsEngine({
     );
     if (shouldReinitialize) {
       randomRef.current.reset(updatedParams.seed);
-      particlesRef.current = initializeParticles(updatedParams, () => randomRef.current.next());
+      particlesRef.current = runtime
+        ? runtime.initializeParticles(updatedParams, () => randomRef.current.next())
+        : initializeDefaultParticles(updatedParams, () => randomRef.current.next());
       timeRef.current = 0;
       accumulatorRef.current = 0;
       collisionCountRef.current = 0;
       interparticleCollisionCountRef.current = 0;
       engineRef.current.reset();
     }
-  }, [params]);
+  }, [params, runtime]);
 
   const getStats = useCallback(() => {
     return {
@@ -315,11 +336,13 @@ export function useOriginalPhysicsEngine({
   };
 }
 
-export function adaptParticles(particles: Particle[]): SimpleParticle[] {
+export function adaptParticles(
+  particles: Particle[],
+  projectPosition?: (particle: Particle, index: number) => { x: number; y: number },
+): SimpleParticle[] {
   return particles.map((p, index) => ({
     id: index,
-    x: p.position.x,
-    y: p.position.y,
+    ...(projectPosition?.(p, index) ?? p.position),
     vx: p.velocity.vx,
     vy: p.velocity.vy,
     radius: p.radius || 3,

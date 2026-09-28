@@ -13,8 +13,10 @@ import { CustomObservablesPanel } from "./components/CustomObservablesPanel";
 import { useRandomWalkPanels } from "./hooks/useRandomWalkPanels";
 import { ObservableManager } from "./physics/ObservableManager";
 import type { EngineParams } from "./hooks/useOriginalPhysicsEngine";
+import { createT15PhysicsRuntime } from "./t15/t15PhysicsRuntime";
 import type { Particle } from "./physics/types/Particle";
 import {
+  calculateT15Diagnostics,
   DEFAULT_T15_RUN_CONFIG,
   T15_REFERENCE_SEEDS,
   normalizeT15RunConfig,
@@ -22,7 +24,7 @@ import {
   type T15Mode,
   type T15RunConfig,
 } from "./t15/t15RandomWalk";
-import { T15DiagnosticsPanel, T15RandomWalkCanvas } from "./t15/T15RandomWalkMode";
+import { T15DiagnosticsPanel } from "./t15/T15RandomWalkMode";
 // CSS imports
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -50,6 +52,8 @@ export default function RandomWalkSimV2() {
   const [processMode, setProcessMode] = useState<"standard" | T15Mode>("standard");
   const [t15Config, setT15Config] = useState<T15RunConfig>(DEFAULT_T15_RUN_CONFIG);
   const [t15Diagnostics, setT15Diagnostics] = useState<T15Diagnostics | null>(null);
+  const lastT15DiagnosticsTimeRef = useRef(0);
+  const t15CompleteRef = useRef(false);
 
   // Convert gridLayoutParams to EngineParams
   const engineParams: EngineParams = useMemo(() => ({
@@ -83,10 +87,65 @@ export default function RandomWalkSimV2() {
     distJitter: gridLayoutParams.distJitter,
   }), [gridLayoutParams]);
 
+  const t15EngineParams = useMemo<EngineParams>(() => ({
+    ...engineParams,
+    particleCount: t15Config.walkers,
+    dimension: processMode === "t15a" ? "1D" : "2D",
+    velocity: processMode === "t15a" ? 1 : t15Config.speed,
+    dt: 0.01,
+    boundaryCondition: "unbounded",
+    interparticleCollisions: false,
+    collisionRate: processMode === "t15a"
+      ? (t15Config.ordering === "derivative" ? 0.75 : 0)
+      : t15Config.resetRate,
+    initialDistType: "uniform",
+    strategies: ["simple"],
+  }), [engineParams, processMode, t15Config]);
+
+  const t15Runtime = useMemo(() => processMode === "standard"
+    ? undefined
+    : createT15PhysicsRuntime(processMode, t15Config), [processMode, t15Config]);
+
+  const projectT15Position = useCallback((
+    particle: Particle,
+    _index: number,
+    size: { width: number; height: number },
+    time: number,
+  ) => {
+    if (processMode === "t15a") {
+      return {
+        x: ((particle.position.x + 6) / 12) * size.width,
+        y: size.height / 2 + (particle.velocity.vx > 0 ? -7 : 7),
+      };
+    }
+    const radius = Math.max(t15Config.speed * time, 0.5);
+    const scale = Math.min(size.width, size.height) / (2 * radius * 1.08);
+    return {
+      x: size.width / 2 + particle.position.x * scale,
+      y: size.height / 2 - particle.position.y * scale,
+    };
+  }, [processMode, t15Config.speed]);
+
+  const t15Overlay = useMemo(() => processMode === "t15a" ? (
+    <>
+      <div className="absolute left-2 right-2 top-1/2 border-t border-slate-300" />
+      <span className="absolute left-2 bottom-2 text-xs text-slate-700">β = −6</span>
+      <span className="absolute right-2 bottom-2 text-xs text-slate-700">β = 6 · viewport only</span>
+    </>
+  ) : processMode === "t15b" ? (
+    <>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full">
+        <circle cx="50" cy="50" r="46.3" fill="none" stroke="#f97316" strokeDasharray="5 4" />
+      </svg>
+      <span className="absolute left-2 top-2 rounded bg-white/80 px-1 text-xs text-slate-700">Causal front r = vt = {(t15Diagnostics?.frontRadius ?? 0).toFixed(2)}</span>
+    </>
+  ) : null, [processMode, t15Diagnostics?.frontRadius]);
+
   const handleStart = () => {
     const horizon = processMode === "t15a" ? 1 : 4;
     if (processMode !== "standard" && (t15Diagnostics?.time ?? 0) >= horizon) {
       timeRef.current = 0;
+      t15CompleteRef.current = false;
       setInitializeVersion((version) => version + 1);
     }
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: true, status: 'Running' });
@@ -100,6 +159,9 @@ export default function RandomWalkSimV2() {
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, status: 'Stopped' });
     timeRef.current = 0;
     collisionsRef.current = 0;
+    t15CompleteRef.current = false;
+    lastT15DiagnosticsTimeRef.current = 0;
+    if (processMode !== "standard") setT15Diagnostics(null);
     updateSimulationMetrics(0, 0, 'Stopped', 0);
     setResetVersion((version) => version + 1);
   };
@@ -107,6 +169,9 @@ export default function RandomWalkSimV2() {
   const handleInitialize = () => {
     timeRef.current = 0;
     collisionsRef.current = 0;
+    t15CompleteRef.current = false;
+    lastT15DiagnosticsTimeRef.current = 0;
+    if (processMode !== "standard") setT15Diagnostics(null);
     setRandomWalkSimulationState({
       ...randomWalkSimulationState,
       isRunning: false,
@@ -124,6 +189,8 @@ export default function RandomWalkSimV2() {
       setT15Config((current) => ({ ...current, seed: T15_REFERENCE_SEEDS[mode] }));
     }
     setT15Diagnostics(null);
+    t15CompleteRef.current = false;
+    lastT15DiagnosticsTimeRef.current = 0;
     timeRef.current = 0;
     collisionsRef.current = 0;
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
@@ -134,7 +201,10 @@ export default function RandomWalkSimV2() {
   const handleT15ConfigChange = useCallback((config: T15RunConfig) => {
     setT15Config(normalizeT15RunConfig(config));
     setT15Diagnostics(null);
+    t15CompleteRef.current = false;
+    lastT15DiagnosticsTimeRef.current = 0;
     timeRef.current = 0;
+    setInitializeVersion((version) => version + 1);
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
     updateSimulationMetrics(0, 0, "Initialized", 0);
   }, [randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics]);
@@ -144,11 +214,12 @@ export default function RandomWalkSimV2() {
   }, []);
 
   const handleT15Stats = useCallback((time: number, events: number) => {
-    timeRef.current = time;
-    collisionsRef.current = events;
     const horizon = processMode === "t15a" ? 1 : 4;
-    const status = time >= horizon ? "Paused" : isRunning ? "Running" : randomWalkSimulationState.status;
-    updateSimulationMetrics(time, events, status, 0);
+    const modelTime = Math.min(horizon, time);
+    timeRef.current = modelTime;
+    collisionsRef.current = events;
+    const status = modelTime >= horizon ? "Paused" : isRunning ? "Running" : randomWalkSimulationState.status;
+    updateSimulationMetrics(modelTime, events, status, 0);
   }, [isRunning, processMode, randomWalkSimulationState.status, updateSimulationMetrics]);
 
   const handleT15Complete = useCallback((time: number, events: number) => {
@@ -157,6 +228,26 @@ export default function RandomWalkSimV2() {
     setRandomWalkSimulationState({ ...currentState, isRunning: false, time: Math.min(horizon, time), collisions: events, status: "Paused" });
     updateSimulationMetrics(Math.min(horizon, time), events, "Paused", 0);
   }, [processMode, setRandomWalkSimulationState, updateSimulationMetrics]);
+
+  const handleT15EngineFrame = useCallback((particles: Particle[], stats: {
+    time: number;
+    collisionCount: number;
+    interparticleCollisionCount: number;
+    particleCount: number;
+  }) => {
+    const horizon = processMode === "t15a" ? 1 : 4;
+    const modelTime = stats.time >= horizon - 1e-9 ? horizon : stats.time;
+    const now = performance.now();
+    if (now - lastT15DiagnosticsTimeRef.current >= 200 || modelTime === 0 || modelTime === horizon) {
+      setT15Diagnostics(calculateT15Diagnostics(processMode as T15Mode, t15Config, modelTime, particles));
+      lastT15DiagnosticsTimeRef.current = now;
+    }
+    handleT15Stats(modelTime, stats.collisionCount);
+    if (modelTime >= horizon && !t15CompleteRef.current) {
+      t15CompleteRef.current = true;
+      handleT15Complete(modelTime, stats.collisionCount);
+    }
+  }, [handleT15Complete, handleT15Stats, processMode, t15Config]);
 
   // Observable manager and simulator shim for floating panels
   const observableManagerRef = useRef(
@@ -258,16 +349,18 @@ export default function RandomWalkSimV2() {
                 onStatsUpdate={handleStatsUpdate}
               />
             ) : (
-              <T15RandomWalkCanvas
+              <ParticleCanvasV2
                 key={`t15-${processMode}`}
-                mode={processMode}
-                config={t15Config}
+                params={t15EngineParams}
+                runtime={t15Runtime}
+                projectPosition={projectT15Position}
+                overlay={t15Overlay}
                 isRunning={isRunning}
+                stopAtTime={processMode === "t15a" ? 1 : 4}
                 initializeVersion={initializeVersion}
                 resetVersion={resetVersion}
-                onDiagnostics={handleT15Diagnostics}
-                onStats={handleT15Stats}
-                onComplete={handleT15Complete}
+                liveParticlesRef={liveParticlesRef}
+                onEngineFrame={handleT15EngineFrame}
               />
             )}
           </div>

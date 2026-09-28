@@ -1,8 +1,8 @@
 // CrankNicolsonSolver.ts - Crank-Nicolson implicit solver strategy
 
 import type { SolverStrategy } from './BaseSolver';
-import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders.js';
-import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs.js';
+import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders';
+import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs';
 
 export class CrankNicolsonSolver implements SolverStrategy {
   private iterativeTextures: WebGLTexture[] = [];

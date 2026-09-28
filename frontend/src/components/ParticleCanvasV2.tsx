@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useOriginalPhysicsEngine, adaptParticles } from "../hooks/useOriginalPhysicsEngine";
 import { useWebGLRenderer } from "../hooks/useWebGLRenderer";
-import type { EngineParams } from "../hooks/useOriginalPhysicsEngine";
+import type { EngineParams, PhysicsEngineRuntime } from "../hooks/useOriginalPhysicsEngine";
 import type { Particle } from "../physics/types/Particle";
 
 interface ParticleCanvasV2Props {
@@ -9,7 +9,12 @@ interface ParticleCanvasV2Props {
   isRunning: boolean;
   initializeVersion?: number;
   resetVersion?: number;
+  stopAtTime?: number;
   liveParticlesRef?: React.MutableRefObject<Particle[]>;
+  runtime?: PhysicsEngineRuntime;
+  projectPosition?: (particle: Particle, index: number, size: { width: number; height: number }, time: number) => { x: number; y: number };
+  overlay?: React.ReactNode;
+  onEngineFrame?: (particles: Particle[], stats: { time: number; collisionCount: number; interparticleCollisionCount: number; particleCount: number }) => void;
   onStatsUpdate?: (stats: { time: number; collisionCount: number; particleCount: number }) => void;
 }
 
@@ -18,7 +23,12 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   isRunning,
   initializeVersion = 0,
   resetVersion = 0,
+  stopAtTime,
   liveParticlesRef,
+  runtime,
+  projectPosition,
+  overlay,
+  onEngineFrame,
   onStatsUpdate,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,6 +36,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   const { engineRef, particlesRef, step, reset, updateParams, getStats } = useOriginalPhysicsEngine({
     params,
     isRunning,
+    runtime,
   });
 
   const { render, resize } = useWebGLRenderer({
@@ -70,23 +81,28 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
 
       // Step physics only if running
       if (isRunning) {
-        step(dt);
+        step(dt, stopAtTime);
       }
 
       // Always render
       const particles = particlesRef.current;
+      const stats = getStats();
       if (liveParticlesRef) {
         liveParticlesRef.current = particles;
       }
       if (particles.length > 0) {
-        render(adaptParticles(particles));
+        const rect = canvasRef.current?.getBoundingClientRect();
+        const size = { width: rect?.width ?? params.canvasWidth, height: rect?.height ?? params.canvasHeight };
+        render(adaptParticles(particles, projectPosition
+          ? (particle, index) => projectPosition(particle, index, size, stats?.time ?? 0)
+          : undefined));
       }
 
       // Report stats
-      const stats = getStats();
       if (stats && onStatsUpdate) {
         onStatsUpdate(stats);
       }
+      if (stats && onEngineFrame) onEngineFrame(particles, stats);
     };
 
     animFrameId = requestAnimationFrame(animate);
@@ -94,7 +110,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
     return () => {
       cancelAnimationFrame(animFrameId);
     };
-  }, [isRunning, render, step, engineRef, getStats, liveParticlesRef, onStatsUpdate]);
+  }, [isRunning, render, step, stopAtTime, engineRef, getStats, liveParticlesRef, onEngineFrame, onStatsUpdate, params.canvasWidth, params.canvasHeight, projectPosition]);
 
   // Handle resize
   useEffect(() => {
@@ -120,13 +136,12 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   }, [resize]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "block",
-      }}
-    />
+    <div className="relative h-full min-h-64 w-full">
+      <canvas
+        ref={canvasRef}
+        style={{ width: "100%", height: "100%", display: "block" }}
+      />
+      {overlay && <div className="pointer-events-none absolute inset-0">{overlay}</div>}
+    </div>
   );
 };

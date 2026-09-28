@@ -1,11 +1,14 @@
 // webgl-solver.js - Minimal WebGL PDE solver wrapper
 
-import { RDShaderTop, RDShaderMain, RDShaderBot } from './simulation_shaders.js';
-import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs.js';
-import { genericVertexShader } from './generic_shaders.js';
+import { RDShaderTop, RDShaderMain, RDShaderBot } from './simulation_shaders';
+import { auxiliary_GLSL_funs } from './auxiliary_GLSL_funs';
+import { genericVertexShader } from './generic_shaders';
 import { ForwardEulerSolver } from './solvers/ForwardEulerSolver.ts';
 import { CrankNicolsonSolver } from './solvers/CrankNicolsonSolver.ts';
-import { createBoundaryTextures } from './solvers/BaseSolver.ts';
+import { createBoundaryTextures, type SolverStrategy } from './solvers/BaseSolver.ts';
+import type { BoundaryConditionType } from '../types';
+
+type SolverParameters = Record<string, number | undefined>;
 
 /** @typedef {import('./solvers/BaseSolver').SolverStrategy} SolverStrategy */
 
@@ -14,6 +17,25 @@ import { createBoundaryTextures } from './solvers/BaseSolver.ts';
  */
 
 export class WebGLSolver {
+  private solverStrategy: SolverStrategy;
+  private canvas: HTMLCanvasElement;
+  private gl: WebGL2RenderingContext;
+  private floatTextureSupported: boolean;
+  private textures: WebGLTexture[];
+  private framebuffers: WebGLFramebuffer[];
+  private currentTexture: number;
+  private program: WebGLProgram | null;
+  private uniforms: Record<string, WebGLUniformLocation | null>;
+  private initialized: boolean;
+  private currentEquationType: string | null;
+  private currentParameters: SolverParameters | null;
+  private bcType: BoundaryConditionType;
+  private dirichletValue: number;
+  private enforceDirichletProgram: WebGLProgram | null;
+  private quadBuffer: WebGLBuffer | null;
+  private width: number;
+  private height: number;
+
   /**
    * @param {SolverType} solverType
    * @returns {SolverStrategy}
@@ -32,13 +54,14 @@ export class WebGLSolver {
   constructor(canvas) {
     this.solverStrategy = new ForwardEulerSolver();
     this.canvas = canvas;
-    this.gl = canvas.getContext('webgl2', {
+    const gl = canvas.getContext('webgl2', {
       powerPreference: 'high-performance',
     });
     
-    if (!this.gl) {
+    if (!gl) {
       throw new Error('WebGL2 not supported');
     }
+    this.gl = gl;
     
     // Check and enable required extensions
     const ext = this.gl.getExtension('EXT_color_buffer_float');
@@ -72,19 +95,7 @@ export class WebGLSolver {
     }
   }
 
-  static createSolver(solverType) {
-    switch (solverType) {
-      case 'forward-euler':
-        return new ForwardEulerSolver();
-      case 'crank-nicolson':
-        return new CrankNicolsonSolver();
-      default:
-        console.warn(`Unknown solver type: ${solverType}, using forward-euler`);
-        return new ForwardEulerSolver();
-    }
-  }
-
-  init(width, height, bcType = 'neumann', dirichletValue = 0.0) {
+  init(width: number, height: number, bcType: BoundaryConditionType = 'neumann', dirichletValue = 0.0) {
     this.width = width;
     this.height = height;
     this.bcType = bcType;
@@ -97,7 +108,7 @@ export class WebGLSolver {
     this.initialized = true;
   }
 
-  createTextures(bcType = 'neumann', dirichletValue = 0.0) {
+  createTextures(bcType: BoundaryConditionType = 'neumann', dirichletValue = 0.0) {
     const gl = this.gl;
     
     // Clear existing textures

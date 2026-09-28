@@ -1,3 +1,6 @@
+import { CircularBuffer } from "../physics/utils/CircularBuffer";
+import type { Particle } from "../physics/types/Particle";
+
 export type T15Mode = "t15a" | "t15b";
 export type T15Profile = "centered" | "bimodal" | "asymmetric";
 export type T15Ordering = "reduced" | "derivative";
@@ -72,20 +75,9 @@ export function normalizeT15RunConfig(config: T15RunConfig): T15RunConfig {
 const T15A_DOMAIN: [number, number] = [-6, 6];
 const HISTOGRAM_BINS = 120;
 
-function createRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state += 0x6d2b79f5;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function exponentialSample(random: () => number, rate: number): number {
+export function sampleT15Wait(random: () => number, rate: number): number {
   if (rate <= 0) return Number.POSITIVE_INFINITY;
-  return -Math.log(Math.max(1e-12, 1 - random())) / rate;
+  return -Math.log(Math.max(1 - random(), Number.EPSILON)) / rate;
 }
 
 function sampleBump(random: () => number, center: number, width: number): number {
@@ -95,7 +87,7 @@ function sampleBump(random: () => number, center: number, width: number): number
   }
 }
 
-function sampleProfile(random: () => number, profile: T15Profile): number {
+export function sampleT15Profile(random: () => number, profile: T15Profile): number {
   if (profile === "bimodal") {
     return random() < 0.5
       ? sampleBump(random, -0.65, 0.35)
@@ -105,137 +97,76 @@ function sampleProfile(random: () => number, profile: T15Profile): number {
   return sampleBump(random, 0, 0.7);
 }
 
-export class T15RandomWalkSimulation {
-  readonly mode: T15Mode;
-  readonly config: T15RunConfig;
-  readonly x: Float64Array;
-  readonly y: Float64Array;
-  readonly direction: Int8Array;
-  readonly heading: Float64Array;
-
-  private readonly nextEvent: Float64Array;
-  private readonly eventCounts: Uint32Array;
-  private readonly random: () => number;
-  private timeValue = 0;
-  private totalEvents = 0;
-  private readonly flipRate: number;
-
-  constructor(mode: T15Mode, config: T15RunConfig) {
-    this.mode = mode;
-    this.config = {
-      ...config,
-      walkers: Math.max(1, Math.min(50000, Math.floor(config.walkers) || 1)),
-      seed: Math.floor(config.seed) >>> 0,
-      speed: Math.max(0.01, config.speed),
-      resetRate: Math.max(0, config.resetRate),
+export function createT15Particles(
+  mode: T15Mode,
+  inputConfig: T15RunConfig,
+  random: () => number,
+): Particle[] {
+  const config = normalizeT15RunConfig(inputConfig);
+  const flipRate = config.ordering === "derivative" ? 0.75 : 0;
+  return Array.from({ length: config.walkers }, (_, index) => {
+    const x = mode === "t15a" ? sampleT15Profile(random, config.profile) : 0;
+    const angle = mode === "t15b" ? random() * 2 * Math.PI : 0;
+    const speed = mode === "t15a" ? 1 : config.speed;
+    const direction = mode === "t15a"
+      ? (random() < (config.profile === "asymmetric" ? 0.7 : 0.5) ? 1 : -1)
+      : 1;
+    const velocity = mode === "t15a"
+      ? { vx: direction * speed, vy: 0 }
+      : { vx: speed * Math.cos(angle), vy: speed * Math.sin(angle) };
+    const eventRate = mode === "t15a" ? flipRate : config.resetRate;
+    return {
+      id: `t15-${index}`,
+      position: { x, y: 0 },
+      velocity,
+      radius: 3,
+      lastCollisionTime: 0,
+      nextCollisionTime: sampleT15Wait(random, eventRate),
+      collisionCount: 0,
+      waitingTime: 0,
+      trajectory: new CircularBuffer(100),
+      isActive: true,
+      lastUpdate: 0,
     };
-    this.random = createRandom(this.config.seed);
-    this.x = new Float64Array(this.config.walkers);
-    this.y = new Float64Array(this.config.walkers);
-    this.direction = new Int8Array(this.config.walkers);
-    this.heading = new Float64Array(this.config.walkers);
-    this.nextEvent = new Float64Array(this.config.walkers);
-    this.eventCounts = new Uint32Array(this.config.walkers);
-    this.flipRate = this.config.ordering === "derivative" ? 0.75 : 0;
+  });
+}
 
-    for (let i = 0; i < this.config.walkers; i += 1) {
-      if (mode === "t15a") {
-        this.x[i] = sampleProfile(this.random, this.config.profile);
-        const plusProbability = this.config.profile === "asymmetric" ? 0.7 : 0.5;
-        this.direction[i] = this.random() < plusProbability ? 1 : -1;
-        this.nextEvent[i] = exponentialSample(this.random, this.flipRate);
-      } else {
-        this.heading[i] = this.random() * 2 * Math.PI;
-        this.nextEvent[i] = exponentialSample(this.random, this.config.resetRate);
-      }
-    }
-  }
-
-  get time(): number {
-    return this.timeValue;
-  }
-
-  get events(): number {
-    return this.totalEvents;
-  }
-
-  advance(deltaTime: number): void {
-    const dt = Math.max(0, deltaTime);
-    if (dt === 0) return;
-    const targetTime = this.timeValue + dt;
-
-    if (this.mode === "t15a") {
-      for (let i = 0; i < this.x.length; i += 1) {
-        let walkerTime = this.timeValue;
-        while (this.nextEvent[i] <= targetTime) {
-          const eventTime = this.nextEvent[i];
-          this.x[i] += this.direction[i] * (eventTime - walkerTime);
-          this.direction[i] = -this.direction[i];
-          this.eventCounts[i] += 1;
-          this.totalEvents += 1;
-          walkerTime = eventTime;
-          this.nextEvent[i] += exponentialSample(this.random, this.flipRate);
-        }
-        this.x[i] += this.direction[i] * (targetTime - walkerTime);
-      }
-    } else {
-      const speed = this.config.speed;
-      for (let i = 0; i < this.x.length; i += 1) {
-        let walkerTime = this.timeValue;
-        while (this.nextEvent[i] <= targetTime) {
-          const eventTime = this.nextEvent[i];
-          const segment = eventTime - walkerTime;
-          this.x[i] += speed * Math.cos(this.heading[i]) * segment;
-          this.y[i] += speed * Math.sin(this.heading[i]) * segment;
-          this.heading[i] = this.random() * 2 * Math.PI;
-          this.eventCounts[i] += 1;
-          this.totalEvents += 1;
-          walkerTime = eventTime;
-          this.nextEvent[i] += exponentialSample(this.random, this.config.resetRate);
-        }
-        const remainder = targetTime - walkerTime;
-        this.x[i] += speed * Math.cos(this.heading[i]) * remainder;
-        this.y[i] += speed * Math.sin(this.heading[i]) * remainder;
-      }
-    }
-
-    this.timeValue = targetTime;
-  }
-
-  diagnostics(): T15Diagnostics {
-    if (this.mode === "t15a") return this.t15aDiagnostics();
-    return this.t15bDiagnostics();
-  }
-
-  private t15aDiagnostics(): T15Diagnostics {
+export function calculateT15Diagnostics(
+  mode: T15Mode,
+  config: T15RunConfig,
+  time: number,
+  particles: Particle[],
+): T15Diagnostics {
+  if (mode === "t15a") {
     const density = new Float64Array(HISTOGRAM_BINS);
     const current = new Float64Array(HISTOGRAM_BINS);
     const dx = (T15A_DOMAIN[1] - T15A_DOMAIN[0]) / HISTOGRAM_BINS;
-    const count = this.x.length;
     let sum = 0;
     let sumSquares = 0;
     let meanAx = 0;
     let meanAz = 0;
-
-    for (let i = 0; i < count; i += 1) {
-      const beta = this.x[i];
+    let inDomain = 0;
+    for (const particle of particles) {
+      const beta = particle.position.x;
       sum += beta;
       sumSquares += beta * beta;
-      meanAx += Math.exp(this.timeValue + beta);
-      meanAz += Math.exp(this.timeValue - 2 * beta);
+      meanAx += Math.exp(time + beta);
+      meanAz += Math.exp(time - 2 * beta);
       const bin = Math.floor((beta - T15A_DOMAIN[0]) / dx);
       if (bin >= 0 && bin < HISTOGRAM_BINS) {
-        density[bin] += 1 / (count * dx);
-        current[bin] += this.direction[i] / (count * dx);
+        inDomain += 1;
+        density[bin] += 1 / (particles.length * dx);
+        current[bin] += Math.sign(particle.velocity.vx) / (particles.length * dx);
       }
     }
+    const count = Math.max(1, particles.length);
     const mean = sum / count;
     return {
-      mode: this.mode,
-      time: this.timeValue,
-      walkers: count,
-      eventCount: this.totalEvents,
-      mass: 1,
+      mode,
+      time,
+      walkers: particles.length,
+      eventCount: particles.reduce((total, particle) => total + particle.collisionCount, 0),
+      mass: inDomain / count,
       mean,
       variance: Math.max(0, sumSquares / count - mean * mean),
       meanAx: meanAx / count,
@@ -247,52 +178,47 @@ export class T15RandomWalkSimulation {
     };
   }
 
-  private t15bDiagnostics(): T15Diagnostics {
-    const count = this.x.length;
-    const speed = this.config.speed;
-    const frontRadius = speed * this.timeValue;
-    const maxRadius = Math.max(frontRadius, 0.1);
-    const dr = maxRadius / HISTOGRAM_BINS;
-    const radialCounts = new Float64Array(HISTOGRAM_BINS);
-    let sumX = 0;
-    let sumY = 0;
-    let sumRadiusSquared = 0;
-    let sumXX = 0;
-    let sumYY = 0;
-    let sumXY = 0;
-
-    for (let i = 0; i < count; i += 1) {
-      const x = this.x[i];
-      const y = this.y[i];
-      const radiusSquared = x * x + y * y;
-      sumX += x;
-      sumY += y;
-      sumRadiusSquared += radiusSquared;
-      sumXX += x * x;
-      sumYY += y * y;
-      sumXY += x * y;
-      const bin = Math.min(HISTOGRAM_BINS - 1, Math.floor(Math.sqrt(radiusSquared) / dr));
-      radialCounts[bin] += 1;
-    }
-
-    const meanX = sumX / count;
-    const meanY = sumY / count;
-    return {
-      mode: this.mode,
-      time: this.timeValue,
-      walkers: count,
-      eventCount: this.totalEvents,
-      mass: 1,
-      mean: Math.sqrt(meanX * meanX + meanY * meanY),
-      variance: Math.max(0, sumRadiusSquared / count - meanX * meanX - meanY * meanY),
-      meanSquareDisplacement: sumRadiusSquared / count,
-      covarianceXX: sumXX / count - meanX * meanX,
-      covarianceYY: sumYY / count - meanY * meanY,
-      covarianceXY: sumXY / count - meanX * meanY,
-      frontRadius,
-      radii: Array.from({ length: HISTOGRAM_BINS }, (_, i) => (i + 0.5) * dr),
-      density: Array.from(radialCounts, (n) => n / (count * dr)),
-      domain: [0, maxRadius],
-    };
+  const count = Math.max(1, particles.length);
+  const frontRadius = config.speed * time;
+  const maxRadius = Math.max(frontRadius, 0.1);
+  const dr = maxRadius / HISTOGRAM_BINS;
+  const radialCounts = new Float64Array(HISTOGRAM_BINS);
+  let sumX = 0;
+  let sumY = 0;
+  let sumRadiusSquared = 0;
+  let sumXX = 0;
+  let sumYY = 0;
+  let sumXY = 0;
+  for (const particle of particles) {
+    const x = particle.position.x;
+    const y = particle.position.y;
+    const radiusSquared = x * x + y * y;
+    sumX += x;
+    sumY += y;
+    sumRadiusSquared += radiusSquared;
+    sumXX += x * x;
+    sumYY += y * y;
+    sumXY += x * y;
+    const bin = Math.min(HISTOGRAM_BINS - 1, Math.floor(Math.sqrt(radiusSquared) / dr));
+    radialCounts[bin] += 1;
   }
+  const meanX = sumX / count;
+  const meanY = sumY / count;
+  return {
+    mode,
+    time,
+    walkers: particles.length,
+    eventCount: particles.reduce((total, particle) => total + particle.collisionCount, 0),
+    mass: 1,
+    mean: Math.hypot(meanX, meanY),
+    variance: Math.max(0, sumRadiusSquared / count - meanX * meanX - meanY * meanY),
+    meanSquareDisplacement: sumRadiusSquared / count,
+    covarianceXX: sumXX / count - meanX * meanX,
+    covarianceYY: sumYY / count - meanY * meanY,
+    covarianceXY: sumXY / count - meanX * meanY,
+    frontRadius,
+    radii: Array.from({ length: HISTOGRAM_BINS }, (_, i) => (i + 0.5) * dr),
+    density: Array.from(radialCounts, (n) => n / (count * dr)),
+    domain: [0, maxRadius],
+  };
 }

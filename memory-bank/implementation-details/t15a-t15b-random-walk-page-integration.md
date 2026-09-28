@@ -1,7 +1,7 @@
 # T15a/T15b Modes in the Existing Random Walk Page
 
 *Created: 2026-09-27 12:46:25 IST*
-*Last Updated: 2026-09-27 18:01:51 IST*
+*Last Updated: 2026-09-28 00:31:00 IST*
 *Task: T40*
 
 ## Page integration decision
@@ -67,3 +67,11 @@ These are ensembles of walkers, but their stochastic events are individual direc
 - The current `T15RandomWalkSimulation` and `T15RandomWalkCanvas` form a separate simulation and animation path. They display inside the Random Walk page, but they do not implement T15a and T15b as strategies in the existing physics engine.
 - The user rejected that architecture and clarified that each process must be an independent strategy. Keep the current implementation, numerical results, and browser checks labeled as a prototype only; they do not satisfy the engine-integration acceptance criterion.
 - T40 remains in progress. The next implementation must use the existing strategy/engine/page runtime, preserve the models' distinct state spaces and stochastic events, and then rerun model and same-page checks. Actual JSON browser download is also still unverified.
+
+## Strategy integration and verification — 2026-09-28 00:25:29 IST
+
+- Added `T15aVelocityFlipStrategy` and `T15bHeadingResetStrategy`, each using engine model time and seeded randomness. Their event segments are integrated at event times within each fixed engine step; both ignore canvas boundaries. Pairwise collisions remain disabled for these modes.
+- Bound the strategies and seeded particle initialization through `t15PhysicsRuntime`. The existing `ParticleCanvasV2` animation and renderer now handle both modes; the separate T15 canvas loop and standalone simulation class were removed.
+- Added an engine stop-time limit and roundoff-safe horizon completion. Browser checks reached T15a α=1.000 and T15b t=4.000, and confirmed Reset and Initialize return T15b to time zero before another successful run.
+- T15 tests compare engine-backed T15a density/current with the Fourier reference and T15b radial CDF/MSD with the saved 250,000-walker reference. Configured T15, physics, and WebGL suites pass 38/38; the final frontend production build and `git diff --check` pass.
+- Browser verification stayed on the existing `/` route and showed no runtime errors. The in-app browser still did not expose a download event or save the JSON file; the control remains enabled and its serialized payload is unit-tested. A normal-browser download check remains open.

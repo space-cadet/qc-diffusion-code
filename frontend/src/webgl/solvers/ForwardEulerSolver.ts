@@ -1,8 +1,8 @@
 // ForwardEulerSolver.ts - Forward Euler solver strategy
 
 import type { SolverStrategy } from './BaseSolver';
-import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders.js';
-import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs.js';
+import { RDShaderTop, RDShaderMain, RDShaderBot } from '../simulation_shaders';
+import { auxiliary_GLSL_funs } from '../auxiliary_GLSL_funs';
 
 export class ForwardEulerSolver implements SolverStrategy {
   getName(): string {

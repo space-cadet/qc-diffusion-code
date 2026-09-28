@@ -2,10 +2,13 @@ import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { CircularBuffer } from '../utils/CircularBuffer';
 import type { Particle, TrajectoryPoint } from '../types/Particle';
 import { CoordinateSystem } from '../core/CoordinateSystem';
+import { TimeManager } from '../core/TimeManager';
+import type { PhysicsContext } from '../types/PhysicsContext';
 
 describe('CTRWStrategy2D', () => {
   let strategy: CTRWStrategy2D;
   let mockParticle: Particle;
+  let context: PhysicsContext;
 
   beforeEach(() => {
     const coordSystem = new CoordinateSystem(
@@ -19,6 +22,14 @@ describe('CTRWStrategy2D', () => {
       },
       '2D'
     );
+    const timeManager = new TimeManager(0.01);
+    context = {
+      timeManager,
+      coordinateSystem: coordSystem,
+      currentTime: 0,
+      dt: 0.01,
+      random: Math.random,
+    };
 
     strategy = new CTRWStrategy2D({
       collisionRate: 1.0,
@@ -50,8 +61,8 @@ describe('CTRWStrategy2D', () => {
 
   test('particle updates preserve momentum in absence of collisions', () => {
     const initialVelocity = { ...mockParticle.velocity };
-    strategy.preUpdate(mockParticle, [], {} as any);
-    strategy.integrate(mockParticle, 0.01, {} as any);
+    strategy.preUpdate(mockParticle, [], context);
+    strategy.integrate(mockParticle, 0.01, context);
     expect(mockParticle.velocity).toEqual(initialVelocity);
   });
 
@@ -61,8 +72,8 @@ describe('CTRWStrategy2D', () => {
       mockParticle.velocity.vx ** 2 + mockParticle.velocity.vy ** 2
     );
     
-    strategy.preUpdate(mockParticle, [], {} as any);
-    strategy.integrate(mockParticle, 0.01, {} as any);
+    strategy.preUpdate(mockParticle, [], context);
+    strategy.integrate(mockParticle, 0.01, context);
     
     const newSpeed = Math.sqrt(
       mockParticle.velocity.vx ** 2 + mockParticle.velocity.vy ** 2
@@ -75,8 +86,8 @@ describe('CTRWStrategy2D', () => {
     
     // Fill buffer beyond capacity
     for (let i = 0; i < bufferSize + 10; i++) {
-      strategy.preUpdate(mockParticle, [], {} as any);
-      strategy.integrate(mockParticle, 0.01, {} as any);
+      strategy.preUpdate(mockParticle, [], context);
+      strategy.integrate(mockParticle, 0.01, context);
     }
     
     expect(mockParticle.trajectory.getSize()).toBe(bufferSize);
@@ -88,8 +99,8 @@ describe('CTRWStrategy2D', () => {
     
     for (let i = 0; i < samples; i++) {
       mockParticle.nextCollisionTime = 0; // Force collision
-      strategy.preUpdate(mockParticle, [], {} as any);
-      strategy.integrate(mockParticle, 0.01, {} as any);
+      strategy.preUpdate(mockParticle, [], context);
+      strategy.integrate(mockParticle, 0.01, context);
       times.push(mockParticle.nextCollisionTime - mockParticle.lastCollisionTime);
     }
     

@@ -5,7 +5,7 @@
  * @param {string} type - The timestepping scheme to generate the shader for.
  * @returns {string} The generated shader code.
  */
-export function RDShaderTop(type) {
+export function RDShaderTop(type: string): string {
   let numInputs = 0;
   switch (type) {
     case "FE":
@@ -33,7 +33,7 @@ export function RDShaderTop(type) {
       numInputs = 4;
       break;
   }
-  let parts = [];
+  const parts: string[] = [];
   parts[0] =
     "#version 300 es\nprecision highp float; precision highp sampler2D; in vec2 textureCoords;";
   parts[1] = "uniform sampler2D textureSource;";
@@ -115,8 +115,8 @@ export function RDShaderTop(type) {
  * @param {string} type - The type of timestepping scheme ("FE", "AB2", "Mid1", "Mid2", "RK41", "RK42", "RK43", "RK44").
  * @returns {string} - The generated shader code.
  */
-export function RDShaderMain(type) {
-  let update = {};
+export function RDShaderMain(type: string): string {
+  const update: Record<string, string> = {};
   update.FE = `uvwq = texture(textureSource, textureCoords);
     uvwqL = texture(textureSource, textureCoordsL);
     uvwqR = texture(textureSource, textureCoordsR);
