@@ -16,6 +16,7 @@ export class CTRWStrategy1D implements PhysicsStrategy {
   private boundaryManager: BoundaryManager;
   private interparticleCollisions: boolean;
   private coordSystem: CoordinateSystem;
+  private stepDisplacements = new WeakMap<Particle, { x: number; y: number }>();
 
   constructor(params: {
     collisionRate: number;
@@ -81,6 +82,14 @@ export class CTRWStrategy1D implements PhysicsStrategy {
       events++;
     }
     if (events > 0) {
+      const finalVelocity = this.coordSystem.toVector(eventVelocity);
+      const remainingTime = Math.max(0, context.currentTime - cursorTime);
+      eventPosition.x += finalVelocity.x * remainingTime;
+      eventPosition.y += finalVelocity.y * remainingTime;
+      this.stepDisplacements.set(particle, {
+        x: eventPosition.x - particle.position.x,
+        y: eventPosition.y - particle.position.y,
+      });
       particle.velocity = eventVelocity;
       particle.lastEventTime = previousEventTime;
       particle.lastCollisionTime = context.currentTime;
@@ -91,7 +100,10 @@ export class CTRWStrategy1D implements PhysicsStrategy {
 
   integrate(particle: Particle, dt: number, _context: PhysicsContext): void {
     const velocity = this.coordSystem.toVector(particle.velocity);
-    particle.position.x += velocity.x * dt;
+    const displacement = this.stepDisplacements.get(particle);
+    this.stepDisplacements.delete(particle);
+    particle.position.x += displacement?.x ?? velocity.x * dt;
+    particle.position.y += displacement?.y ?? 0;
     
     // Apply boundary conditions
     const boundaryResult = this.boundaryManager.apply(particle);

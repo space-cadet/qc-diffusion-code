@@ -89,6 +89,7 @@ export class StrategyDiagnosticsRecorder {
   private currentTime = 0;
   private activeParticles = 0;
   private lastPublishAt = 0;
+  private hasUnpublishedData = false;
 
   constructor(readonly config: DiagnosticsConfig) {}
 
@@ -109,6 +110,7 @@ export class StrategyDiagnosticsRecorder {
     this.currentTime = 0;
     this.activeParticles = 0;
     this.lastPublishAt = 0;
+    this.hasUnpublishedData = false;
   }
 
   recordEvent(event: StrategyEvent): void {
@@ -129,8 +131,10 @@ export class StrategyDiagnosticsRecorder {
     this.trails.set(event.particleId, points);
   }
 
-  recordFrame(particles: Particle[], time: number): boolean {
-    if (!Number.isFinite(time) || time + 1e-9 < this.nextSampleTime) return false;
+  recordFrame(particles: Particle[], time: number, force = false): boolean {
+    if (!Number.isFinite(time)) return false;
+    if (!force && time + 1e-9 < this.nextSampleTime) return false;
+    if (force && this.spread.length > 0 && time <= this.currentTime + 1e-9) return false;
     this.currentTime = time;
     this.activeParticles = particles.reduce((count, particle) => count + Number(particle.isActive), 0);
     if (!this.selectedIds) {
@@ -196,6 +200,7 @@ export class StrategyDiagnosticsRecorder {
       this.sampleInterval *= 2;
     }
     this.nextSampleTime = time + this.sampleInterval;
+    this.hasUnpublishedData = true;
 
     if (time > 0 && (!this.radialDensity.length || time + 1e-9 >= this.nextDensityTime)) {
       this.radialDensity.push(this.buildRadialDensity(particles, time));
@@ -206,9 +211,11 @@ export class StrategyDiagnosticsRecorder {
     return true;
   }
 
-  shouldPublish(now: number): boolean {
-    if (now - this.lastPublishAt < 350 && this.currentTime > 0) return false;
+  shouldPublish(now: number, force = false): boolean {
+    if (!this.hasUnpublishedData) return false;
+    if (now - this.lastPublishAt < 350 && this.currentTime > 0 && !force) return false;
     this.lastPublishAt = now;
+    this.hasUnpublishedData = false;
     return true;
   }
 

@@ -24,6 +24,37 @@ interface ReferenceData {
 
 type T15bReferenceSnapshot = NonNullable<ReferenceData["radialSnapshots"]>[number];
 
+function resampleT15bReferenceToNormalizedRadius(
+  snapshot: T15bReferenceSnapshot,
+  speed: number,
+  targetBinCount: number,
+): number[] | undefined {
+  const frontRadius = speed * snapshot.time;
+  if (frontRadius <= 0 || targetBinCount <= 0 || snapshot.radius.length < 2) return undefined;
+
+  const sourceStep = snapshot.radius[1] - snapshot.radius[0];
+  if (sourceStep <= 0) return undefined;
+  const sourceCount = Math.min(snapshot.radius.length, snapshot.radialProbabilityDensity.length);
+
+  return Array.from({ length: targetBinCount }, (_unused, targetIndex) => {
+    const targetRadiusStart = (targetIndex / targetBinCount) * frontRadius;
+    const targetRadiusEnd = ((targetIndex + 1) / targetBinCount) * frontRadius;
+    let probabilityMass = 0;
+
+    for (let sourceIndex = 0; sourceIndex < sourceCount; sourceIndex++) {
+      const sourceCenter = snapshot.radius[sourceIndex];
+      const sourceStart = Math.max(0, sourceCenter - sourceStep / 2);
+      const sourceEnd = Math.min(frontRadius, sourceCenter + sourceStep / 2);
+      const overlap = Math.max(0, Math.min(targetRadiusEnd, sourceEnd) - Math.max(targetRadiusStart, sourceStart));
+      probabilityMass += snapshot.radialProbabilityDensity[sourceIndex] * overlap;
+    }
+
+    // The source is a density per unit radius. Divide the rebinned probability
+    // mass by the target width in r/(vt) to obtain density in normalized radius.
+    return probabilityMass * targetBinCount;
+  });
+}
+
 interface DiagnosticsProps {
   mode: T15Mode;
   config: T15RunConfig;
@@ -203,7 +234,11 @@ export const T15DiagnosticsPanel: React.FC<DiagnosticsProps> = ({ mode, config, 
             title="Radial density in normalized radius r/(vt)"
             values={diagnostics.density.map((value) => value * (diagnostics.frontRadius ?? 0))}
             reference={diagnostics.time > 0 && canCompareT15bBaseline && referenceSnapshot
-              ? referenceSnapshot.radialProbabilityDensity.map((value) => value * referenceSnapshot.time * (reference?.protocol?.speed ?? 1))
+              ? resampleT15bReferenceToNormalizedRadius(
+                  referenceSnapshot,
+                  reference?.protocol?.speed ?? 1,
+                  diagnostics.density.length,
+                )
               : undefined}
             labels="T15b radial probability density in normalized radius, with the saved 250 thousand walker reference when available."
           />

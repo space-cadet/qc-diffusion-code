@@ -99,9 +99,9 @@
 
 ### T41: Random Walk Strategy Diagnostics and Plots
 **Description**: Add strategy-specific diagnostic plots to the existing Random Walk page so users can distinguish motion rules over time.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-28 11:47:56 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-28 12:13:09 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters.
-**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. Saved-run overlays enforce matching seed, dimension, count, initial distribution, boundary, speed, and event rate. Frontend production build passes; live browser acceptance remains. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
+**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. Codex PR #20 findings were fixed for terminal sample publishing and parameter-aware reinitialization; related fixes correct exact CTRW event-time displacement and T15b normalized reference binning. Frontend production build passes; live browser acceptance remains. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.

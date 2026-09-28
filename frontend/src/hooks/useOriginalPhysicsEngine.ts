@@ -210,6 +210,7 @@ export function useOriginalPhysicsEngine({
   const interparticleCollisionCountRef = useRef(0);
   const randomRef = useRef(new SeededRandom(params.seed));
   const accumulatorRef = useRef(0);
+  const appliedParamsRef = useRef(params);
 
   useEffect(() => {
     const boundaryConfig = createBoundaryConfig(params);
@@ -288,7 +289,8 @@ export function useOriginalPhysicsEngine({
   const updateParams = useCallback((newParams: Partial<EngineParams>) => {
     if (!engineRef.current) return;
 
-    const updatedParams = { ...params, ...newParams };
+    const previousParams = appliedParamsRef.current;
+    const updatedParams = { ...previousParams, ...newParams };
 
     const boundaryConfig = createBoundaryConfig(updatedParams);
     const strategies = runtime
@@ -310,8 +312,9 @@ export function useOriginalPhysicsEngine({
       'fractionalWaitingScale', 'fractionalJumpLength',
     ];
     const shouldReinitialize = reinitializeKeys.some((key) =>
-      newParams[key] !== undefined && newParams[key] !== params[key]
+      newParams[key] !== undefined && newParams[key] !== previousParams[key]
     );
+    appliedParamsRef.current = updatedParams;
     if (shouldReinitialize) {
       randomRef.current.reset(updatedParams.seed);
       particlesRef.current = runtime
@@ -323,7 +326,7 @@ export function useOriginalPhysicsEngine({
       interparticleCollisionCountRef.current = 0;
       engineRef.current.reset();
     }
-  }, [params, runtime]);
+  }, [runtime]);
 
   const getStats = useCallback(() => {
     return {

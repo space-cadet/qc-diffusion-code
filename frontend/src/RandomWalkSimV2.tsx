@@ -304,11 +304,14 @@ export default function RandomWalkSimV2() {
     particleCount: number;
   }) => {
     const recorder = diagnosticsRecorderRef.current;
-    if (recorder?.recordFrame(particles, stats.time) && recorder.shouldPublish(performance.now())) {
+    const horizon = processMode === "t15a" ? 1 : processMode === "t15b" ? 4 : Infinity;
+    const terminalFrame = stats.time >= horizon - 1e-9;
+    const forcePublish = !isRunning || terminalFrame;
+    recorder?.recordFrame(particles, stats.time, forcePublish);
+    if (recorder?.shouldPublish(performance.now(), forcePublish)) {
       setStrategyDiagnostics(recorder.snapshot());
     }
     if (processMode === "standard") return;
-    const horizon = processMode === "t15a" ? 1 : 4;
     const modelTime = stats.time >= horizon - 1e-9 ? horizon : stats.time;
     const now = performance.now();
     if (now - lastT15DiagnosticsTimeRef.current >= 200 || modelTime === 0 || modelTime === horizon) {
@@ -320,7 +323,7 @@ export default function RandomWalkSimV2() {
       t15CompleteRef.current = true;
       handleT15Complete(modelTime, stats.collisionCount);
     }
-  }, [handleT15Complete, handleT15Stats, processMode, t15Config]);
+  }, [handleT15Complete, handleT15Stats, isRunning, processMode, t15Config]);
 
   // Observable manager and simulator shim for floating panels
   const observableManagerRef = useRef(
