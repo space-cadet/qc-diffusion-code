@@ -80,7 +80,7 @@
 | T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 | T40 | T15a/T15b Modes in the Existing Random Walk Page | 🔄 IN PROGRESS | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
-| T41 | Random Walk Strategy Diagnostics and Plots | 📝 PLANNED | HIGH | 2026-09-27 | - | [Details](tasks/T41.md) |
+| T41 | Random Walk Strategy Diagnostics and Plots | 🔄 IN PROGRESS | HIGH | 2026-09-27 | - | [Details](tasks/T41.md) |
 
 ## Task Details
 
@@ -99,9 +99,9 @@
 
 ### T41: Random Walk Strategy Diagnostics and Plots
 **Description**: Add strategy-specific diagnostic plots to the existing Random Walk page so users can distinguish motion rules over time.
-**Status**: 📝 PLANNED **Last**: 2026-09-27 21:30:22 IST
-**Files**: `frontend/src/RandomWalkSimV2.tsx`, strategy/event data adapters, plot components.
-**Notes**: T41 is separate from the completed T27 clean rewrite and T17’s dedicated Analysis tab. Include ensemble spread over time with a fitted exponent and robust Lévy radius quantiles; jump-length and waiting-time CCDFs; radial density at multiple times; event counts; and applicable heading autocorrelation/trajectory event markers. Preserve strategy-specific meanings and avoid boundary-truncated comparisons. T15a/T15b-specific diagnostics may connect after their `qc-diffusion-T15a` and `qc-diffusion-T15b` engine strategy integration under T40.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-28 11:47:56 IST
+**Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters.
+**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. Saved-run overlays enforce matching seed, dimension, count, initial distribution, boundary, speed, and event rate. Frontend production build passes; live browser acceptance remains. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.

@@ -3,6 +3,7 @@ import { useOriginalPhysicsEngine, adaptParticles } from "../hooks/useOriginalPh
 import { useWebGLRenderer } from "../hooks/useWebGLRenderer";
 import type { EngineParams, PhysicsEngineRuntime } from "../hooks/useOriginalPhysicsEngine";
 import type { Particle } from "../physics/types/Particle";
+import type { StrategyEvent } from "../physics/types/PhysicsContext";
 
 interface ParticleCanvasV2Props {
   params: EngineParams;
@@ -15,6 +16,7 @@ interface ParticleCanvasV2Props {
   projectPosition?: (particle: Particle, index: number, size: { width: number; height: number }, time: number) => { x: number; y: number };
   overlay?: React.ReactNode;
   onEngineFrame?: (particles: Particle[], stats: { time: number; collisionCount: number; interparticleCollisionCount: number; particleCount: number }) => void;
+  onStrategyEvent?: (event: StrategyEvent) => void;
   onStatsUpdate?: (stats: { time: number; collisionCount: number; particleCount: number }) => void;
 }
 
@@ -29,6 +31,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   projectPosition,
   overlay,
   onEngineFrame,
+  onStrategyEvent,
   onStatsUpdate,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,6 +40,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
     params,
     isRunning,
     runtime,
+    onStrategyEvent,
   });
 
   const { render, resize } = useWebGLRenderer({

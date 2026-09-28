@@ -6,6 +6,7 @@ import { ParameterManager } from "../physics/core/ParameterManager";
 import { BoundaryConfig } from "../physics/types/BoundaryConfig";
 import type { Particle } from "../physics/types/Particle";
 import type { PhysicsStrategy } from "../physics/interfaces/PhysicsStrategy";
+import type { StrategyEvent } from "../physics/types/PhysicsContext";
 import { sampleCanvasPosition } from "../physics/utils/InitDistributions";
 import { SeededRandom } from "../physics/utils/SeededRandom";
 
@@ -163,24 +164,28 @@ function initializeDefaultParticles(params: EngineParams, random: () => number):
         ? Infinity
         : params.collisionRate > 0 ? -Math.log(uniform) / params.collisionRate : Infinity;
 
+    const position = {
+      x: pos.x,
+      y: dimension === "1D" ? canvasHeight / 2 : pos.y,
+    };
+    const velocity = {
+      vx: speed * Math.cos(angle),
+      vy: dimension === "1D" ? 0 : speed * Math.sin(angle),
+    };
     particles.push({
       id: `p-${i}`,
-      position: {
-        x: pos.x,
-        y: dimension === "1D" ? canvasHeight / 2 : pos.y,
-      },
-      velocity: {
-        vx: speed * Math.cos(angle),
-        vy: dimension === "1D" ? 0 : speed * Math.sin(angle),
-      },
+      position,
+      velocity,
       radius: 3,
       lastCollisionTime: 0,
+      lastEventTime: 0,
       nextCollisionTime,
       collisionCount: 0,
       waitingTime: 0,
       trajectory: [] as any,
       isActive: true,
       lastUpdate: 0,
+      initial: { position: { ...position }, velocity: { ...velocity }, timestamp: 0 },
     });
   }
 
@@ -191,10 +196,12 @@ export function useOriginalPhysicsEngine({
   params,
   isRunning,
   runtime,
+  onStrategyEvent,
 }: {
   params: EngineParams;
   isRunning: boolean;
   runtime?: PhysicsEngineRuntime;
+  onStrategyEvent?: (event: StrategyEvent) => void;
 }): UseOriginalPhysicsEngineReturn {
   const engineRef = useRef<PhysicsEngine | null>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -217,6 +224,7 @@ export function useOriginalPhysicsEngine({
       dimension: params.dimension as Dimension,
       strategies,
       random: () => randomRef.current.next(),
+      onStrategyEvent,
     };
 
     engineRef.current = new PhysicsEngine(config);

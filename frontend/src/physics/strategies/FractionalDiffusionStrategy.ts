@@ -20,11 +20,14 @@ export class FractionalDiffusionStrategy implements PhysicsStrategy {
     if (!particle.isActive) return;
     let nextTime = particle.nextCollisionTime;
     let events = 0;
+    let previousEventTime = particle.lastEventTime ?? particle.lastCollisionTime;
     while (nextTime <= context.currentTime && events < 256) {
       const angle = context.random() * 2 * Math.PI;
       const direction = this.params.dimension === '1D'
         ? { x: context.random() < 0.5 ? -1 : 1, y: 0 }
         : { x: Math.cos(angle), y: Math.sin(angle) };
+      const eventTime = nextTime;
+      const previousPosition = { ...particle.position };
       particle.position = {
         x: particle.position.x + direction.x * this.params.jumpLength,
         y: particle.position.y + direction.y * this.params.jumpLength,
@@ -34,12 +37,23 @@ export class FractionalDiffusionStrategy implements PhysicsStrategy {
       if (boundary.velocity) particle.velocity = boundary.velocity;
       if (boundary.absorbed) particle.isActive = false;
       particle.trajectory.push({ position: { ...particle.position }, timestamp: nextTime });
+      context.onStrategyEvent?.({
+        particleId: particle.id,
+        time: eventTime,
+        kind: 'jump',
+        position: { ...particle.position },
+        waitTime: Math.max(0, eventTime - previousEventTime),
+        waitPosition: previousPosition,
+        jumpLength: this.params.jumpLength,
+      });
+      previousEventTime = eventTime;
       nextTime += this.sampleWaitingTime(context.random);
       events++;
       if (!particle.isActive) break;
     }
     if (events > 0) {
       particle.lastCollisionTime = context.currentTime;
+      particle.lastEventTime = previousEventTime;
       particle.nextCollisionTime = nextTime;
       particle.waitingTime = Math.max(0, nextTime - context.currentTime);
       particle.collisionCount += events;

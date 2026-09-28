@@ -56,13 +56,33 @@ export class CTRWStrategy1D implements PhysicsStrategy {
     let nextTime = particle.nextCollisionTime;
     let events = 0;
     const speed = Math.abs(particle.velocity.vx);
+    let eventVelocity = { ...particle.velocity };
+    let eventPosition = { ...particle.position };
+    let cursorTime = context.currentTime - context.dt;
+    let previousEventTime = particle.lastEventTime ?? particle.lastCollisionTime;
     while (nextTime <= context.currentTime && events < 256) {
-      particle.velocity.vx = (context.random() < 0.5 ? -1 : 1) * speed;
-      particle.velocity.vy = 0;
+      const eventTime = nextTime;
+      eventPosition.x += eventVelocity.vx * Math.max(0, eventTime - cursorTime);
+      cursorTime = eventTime;
+      const nextVelocity = { vx: (context.random() < 0.5 ? -1 : 1) * speed, vy: 0 };
+      context.onStrategyEvent?.({
+        particleId: particle.id,
+        time: eventTime,
+        kind: 'turn',
+        position: { ...eventPosition },
+        waitTime: Math.max(0, eventTime - previousEventTime),
+        jumpLength: speed * Math.max(0, eventTime - previousEventTime),
+        previousVelocity: { ...eventVelocity },
+        velocity: { ...nextVelocity },
+      });
+      eventVelocity = nextVelocity;
+      previousEventTime = eventTime;
       nextTime += this.generateCollisionTime(context.random);
       events++;
     }
     if (events > 0) {
+      particle.velocity = eventVelocity;
+      particle.lastEventTime = previousEventTime;
       particle.lastCollisionTime = context.currentTime;
       particle.nextCollisionTime = nextTime;
       particle.collisionCount += events;

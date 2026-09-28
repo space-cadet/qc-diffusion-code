@@ -27,6 +27,8 @@ export interface Particle {
   velocity: Velocity;
   radius?: number;
   lastCollisionTime: number;
+  /** Exact model time of the previous stochastic event, independent of frame time. */
+  lastEventTime?: number;
   nextCollisionTime: number;
   // CTRW scattering count
   collisionCount: number;

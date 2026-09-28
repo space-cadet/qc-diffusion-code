@@ -51,6 +51,10 @@
 - 📝 T41 planned: add strategy diagnostic plots to the existing Random Walk UI.
 - Current Random Walk engine changes include Lévy/Fractional strategies and controls, deterministic run setup/persistence, strategy-composition correction, and observable/UI fixes. Build, tests, and browser verification were not run for this follow-up.
 
+## 2026-09-28 Random Walk Diagnostics
+- ✅ T40 T15a/T15b engine integration committed and pushed as `679cf8d`; JSON download delivery remains unverified.
+- 🔄 T41 plots and strategy telemetry implemented on the existing Random Walk page. Frontend production build passes; browser acceptance is pending.
+
 ## Current Focus Areas
 ### Active Development
 - T25 Screenshot verification and critical bug fixes (COMPLETED 2026-05-09)

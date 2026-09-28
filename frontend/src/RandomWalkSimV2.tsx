@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useMemo, useState } from "react";
+import React, { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { useAppStore } from "./stores/appStore";
 import { RandomWalkParameterPanelV2 } from "./components/RandomWalkParameterPanelV2";
@@ -25,6 +25,13 @@ import {
   type T15RunConfig,
 } from "./t15/t15RandomWalk";
 import { T15DiagnosticsPanel } from "./t15/T15RandomWalkMode";
+import { StrategyDiagnosticsPanel } from "./components/StrategyDiagnosticsPanel";
+import {
+  StrategyDiagnosticsRecorder,
+  type DiagnosticsConfig,
+  type StrategyDiagnosticsSnapshot,
+} from "./physics/diagnostics/strategyDiagnostics";
+import type { StrategyEvent } from "./physics/types/PhysicsContext";
 // CSS imports
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -52,6 +59,9 @@ export default function RandomWalkSimV2() {
   const [processMode, setProcessMode] = useState<"standard" | T15Mode>("standard");
   const [t15Config, setT15Config] = useState<T15RunConfig>(DEFAULT_T15_RUN_CONFIG);
   const [t15Diagnostics, setT15Diagnostics] = useState<T15Diagnostics | null>(null);
+  const diagnosticsRecorderRef = useRef<StrategyDiagnosticsRecorder | null>(null);
+  const [strategyDiagnostics, setStrategyDiagnostics] = useState<StrategyDiagnosticsSnapshot | null>(null);
+  const [diagnosticComparison, setDiagnosticComparison] = useState<StrategyDiagnosticsSnapshot | null>(null);
   const lastT15DiagnosticsTimeRef = useRef(0);
   const t15CompleteRef = useRef(false);
 
@@ -106,6 +116,60 @@ export default function RandomWalkSimV2() {
     ? undefined
     : createT15PhysicsRuntime(processMode, t15Config), [processMode, t15Config]);
 
+  const diagnosticsConfig = useMemo<DiagnosticsConfig>(() => {
+    if (processMode !== "standard") {
+      return {
+        strategy: processMode,
+        dimension: processMode === "t15a" ? "1D" : "2D",
+        boundary: "unbounded",
+        seed: t15Config.seed,
+        particleCount: t15Config.walkers,
+        initialDistribution: processMode === "t15a" ? t15Config.profile : "origin",
+        parameters: processMode === "t15a"
+          ? { flipRate: t15Config.ordering === "derivative" ? 0.75 : 0, ordering: t15Config.ordering === "derivative" ? 1 : 0 }
+          : { speed: t15Config.speed, resetRate: t15Config.resetRate },
+      };
+    }
+    const strategy = engineParams.strategies?.find((value) => ["simple", "ctrw", "levy", "fractional"].includes(value))
+      ?? engineParams.strategyType
+      ?? (engineParams.collisionRate > 0 ? "ctrw" : "simple");
+    return {
+      strategy,
+      dimension: engineParams.dimension,
+      boundary: engineParams.boundaryCondition,
+      seed: engineParams.seed,
+      particleCount: engineParams.particleCount,
+      initialDistribution: engineParams.initialDistType,
+      parameters: {
+        velocity: engineParams.velocity,
+        collisionRate: engineParams.collisionRate,
+        levyAlpha: engineParams.levyAlpha,
+        levyScale: engineParams.levyScale,
+        fractionalBeta: engineParams.fractionalBeta,
+        fractionalWaitingScale: engineParams.fractionalWaitingScale,
+        fractionalJumpLength: engineParams.fractionalJumpLength,
+      },
+    };
+  }, [engineParams, processMode, t15Config]);
+
+  useEffect(() => {
+    diagnosticsRecorderRef.current = new StrategyDiagnosticsRecorder(diagnosticsConfig);
+    setStrategyDiagnostics(diagnosticsRecorderRef.current.snapshot());
+  }, [diagnosticsConfig]);
+
+  const resetStrategyDiagnostics = useCallback(() => {
+    diagnosticsRecorderRef.current?.reset();
+    setStrategyDiagnostics(diagnosticsRecorderRef.current?.snapshot() ?? null);
+  }, []);
+
+  const handleStrategyEvent = useCallback((event: StrategyEvent) => {
+    diagnosticsRecorderRef.current?.recordEvent(event);
+  }, []);
+
+  const handleCaptureDiagnosticComparison = useCallback(() => {
+    if (strategyDiagnostics) setDiagnosticComparison(strategyDiagnostics);
+  }, [strategyDiagnostics]);
+
   const projectT15Position = useCallback((
     particle: Particle,
     _index: number,
@@ -156,6 +220,7 @@ export default function RandomWalkSimV2() {
   };
 
   const handleReset = () => {
+    resetStrategyDiagnostics();
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, status: 'Stopped' });
     timeRef.current = 0;
     collisionsRef.current = 0;
@@ -167,6 +232,7 @@ export default function RandomWalkSimV2() {
   };
 
   const handleInitialize = () => {
+    resetStrategyDiagnostics();
     timeRef.current = 0;
     collisionsRef.current = 0;
     t15CompleteRef.current = false;
@@ -184,6 +250,7 @@ export default function RandomWalkSimV2() {
   };
 
   const handleProcessModeChange = useCallback((mode: "standard" | T15Mode) => {
+    resetStrategyDiagnostics();
     setProcessMode(mode);
     if (mode !== "standard") {
       setT15Config((current) => ({ ...current, seed: T15_REFERENCE_SEEDS[mode] }));
@@ -196,9 +263,10 @@ export default function RandomWalkSimV2() {
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
     updateSimulationMetrics(0, 0, "Initialized", 0);
     setInitializeVersion((version) => version + 1);
-  }, [randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics]);
+  }, [randomWalkSimulationState, resetStrategyDiagnostics, setRandomWalkSimulationState, updateSimulationMetrics]);
 
   const handleT15ConfigChange = useCallback((config: T15RunConfig) => {
+    resetStrategyDiagnostics();
     setT15Config(normalizeT15RunConfig(config));
     setT15Diagnostics(null);
     t15CompleteRef.current = false;
@@ -207,7 +275,7 @@ export default function RandomWalkSimV2() {
     setInitializeVersion((version) => version + 1);
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, interparticleCollisions: 0, status: "Initialized" });
     updateSimulationMetrics(0, 0, "Initialized", 0);
-  }, [randomWalkSimulationState, setRandomWalkSimulationState, updateSimulationMetrics]);
+  }, [randomWalkSimulationState, resetStrategyDiagnostics, setRandomWalkSimulationState, updateSimulationMetrics]);
 
   const handleT15Diagnostics = useCallback((diagnostics: T15Diagnostics) => {
     setT15Diagnostics(diagnostics);
@@ -235,6 +303,11 @@ export default function RandomWalkSimV2() {
     interparticleCollisionCount: number;
     particleCount: number;
   }) => {
+    const recorder = diagnosticsRecorderRef.current;
+    if (recorder?.recordFrame(particles, stats.time) && recorder.shouldPublish(performance.now())) {
+      setStrategyDiagnostics(recorder.snapshot());
+    }
+    if (processMode === "standard") return;
     const horizon = processMode === "t15a" ? 1 : 4;
     const modelTime = stats.time >= horizon - 1e-9 ? horizon : stats.time;
     const now = performance.now();
@@ -347,6 +420,8 @@ export default function RandomWalkSimV2() {
                 resetVersion={resetVersion}
                 liveParticlesRef={liveParticlesRef}
                 onStatsUpdate={handleStatsUpdate}
+                onEngineFrame={handleT15EngineFrame}
+                onStrategyEvent={handleStrategyEvent}
               />
             ) : (
               <ParticleCanvasV2
@@ -361,6 +436,7 @@ export default function RandomWalkSimV2() {
                 resetVersion={resetVersion}
                 liveParticlesRef={liveParticlesRef}
                 onEngineFrame={handleT15EngineFrame}
+                onStrategyEvent={handleStrategyEvent}
               />
             )}
           </div>
@@ -394,6 +470,13 @@ export default function RandomWalkSimV2() {
             />
           </div>}
         </ReactGridLayout>
+
+        <StrategyDiagnosticsPanel
+          snapshot={strategyDiagnostics}
+          comparison={diagnosticComparison}
+          onCaptureComparison={handleCaptureDiagnosticComparison}
+          onClearComparison={() => setDiagnosticComparison(null)}
+        />
 
         {processMode === "standard" && <>
         {/* Floating Observables Panel */}

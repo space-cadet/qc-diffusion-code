@@ -114,19 +114,22 @@ export function createT15Particles(
     const velocity = mode === "t15a"
       ? { vx: direction * speed, vy: 0 }
       : { vx: speed * Math.cos(angle), vy: speed * Math.sin(angle) };
+    const position = { x, y: 0 };
     const eventRate = mode === "t15a" ? flipRate : config.resetRate;
     return {
       id: `t15-${index}`,
-      position: { x, y: 0 },
+      position,
       velocity,
       radius: 3,
       lastCollisionTime: 0,
+      lastEventTime: 0,
       nextCollisionTime: sampleT15Wait(random, eventRate),
       collisionCount: 0,
       waitingTime: 0,
       trajectory: new CircularBuffer(100),
       isActive: true,
       lastUpdate: 0,
+      initial: { position: { ...position }, velocity: { ...velocity }, timestamp: 0 },
     };
   });
 }

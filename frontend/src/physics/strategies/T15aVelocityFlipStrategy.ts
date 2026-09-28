@@ -30,15 +30,34 @@ export class T15aVelocityFlipStrategy implements PhysicsStrategy {
     const initialVelocity = { ...particle.velocity };
     const events: PendingEvent[] = [];
     let nextTime = particle.nextCollisionTime;
+    let eventTimeCursor = context.currentTime - context.dt;
+    let previousEventTime = particle.lastEventTime ?? particle.lastCollisionTime;
+    let eventPosition = { ...particle.position };
     while (nextTime <= context.currentTime && events.length < 256) {
+      const eventTime = nextTime;
+      eventPosition.x += initialVelocity.vx * Math.max(0, eventTime - eventTimeCursor);
+      eventPosition.y += initialVelocity.vy * Math.max(0, eventTime - eventTimeCursor);
+      eventTimeCursor = eventTime;
       const velocity = { vx: -initialVelocity.vx, vy: 0 };
-      events.push({ time: nextTime, velocity });
+      context.onStrategyEvent?.({
+        particleId: particle.id,
+        time: eventTime,
+        kind: 'turn',
+        position: { ...eventPosition },
+        waitTime: Math.max(0, eventTime - previousEventTime),
+        jumpLength: Math.abs(initialVelocity.vx) * Math.max(0, eventTime - previousEventTime),
+        previousVelocity: { ...initialVelocity },
+        velocity: { ...velocity },
+      });
+      previousEventTime = eventTime;
+      events.push({ time: eventTime, velocity });
       initialVelocity.vx = velocity.vx;
       nextTime += this.sampleWait(context.random);
     }
 
     if (events.length > 0) {
       particle.velocity = { ...events[events.length - 1].velocity };
+      particle.lastEventTime = previousEventTime;
       particle.lastCollisionTime = events[events.length - 1].time;
       particle.nextCollisionTime = nextTime;
       particle.collisionCount += events.length;

@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 21:42:33 IST*
+*Last Updated: 2026-09-28 11:47:56 IST*
 
 ## Current Focus
-**Task**: T40 - T15a/T15b modes in the existing Random Walk page
-**Status**: 🔄 IN PROGRESS — T15 strategies must still be integrated into the existing engine. T27 is complete; T41 is planned for Random Walk diagnostics plots.
+**Task**: T41 - Random Walk strategy diagnostics and plots
+**Status**: 🔄 IN PROGRESS — diagnostics are implemented and the frontend build passes; live browser acceptance remains. T40's engine integration is committed and pushed, with JSON file delivery still unverified.
 **Priority**: HIGH
 
-**Context**: T40 keeps T15a/T15b on the existing Random Walk page and requires them as independent strategies in the existing physics engine. The current standalone runner is an architectural mismatch; its implementation and checks are provisional. The general engine fixes recorded here close the remaining T27 findings; diagnostic plots are tracked separately under planned T41. T39 remains open for browser QA; the app-shell history below is retained as prior context.
+**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page; live browser acceptance remains. T40 JSON file delivery and T39 browser QA are separate follow-ups; the app-shell history below is retained as prior context.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel

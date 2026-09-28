@@ -50,18 +50,42 @@ export class CTRWStrategy2D implements PhysicsStrategy {
     if (this.collisionRate <= 0 || !particle.isActive) return;
     let nextTime = particle.nextCollisionTime;
     let events = 0;
-    const velocity = this.coordSystem.toVector(particle.velocity);
-    const speed = Math.hypot(velocity.x, velocity.y);
+    const startVelocity = this.coordSystem.toVector(particle.velocity);
+    const speed = Math.hypot(startVelocity.x, startVelocity.y);
+    let eventVelocity = { ...particle.velocity };
+    let eventPosition = { ...particle.position };
+    let cursorTime = context.currentTime - context.dt;
+    let previousEventTime = particle.lastEventTime ?? particle.lastCollisionTime;
 
     while (nextTime <= context.currentTime && events < 256) {
+      const eventTime = nextTime;
+      const worldVelocity = this.coordSystem.toVector(eventVelocity);
+      const waitTime = Math.max(0, eventTime - previousEventTime);
+      eventPosition.x += worldVelocity.x * Math.max(0, eventTime - cursorTime);
+      eventPosition.y += worldVelocity.y * Math.max(0, eventTime - cursorTime);
+      cursorTime = eventTime;
       const angle = context.random() * 2 * Math.PI;
-      particle.velocity = this.coordSystem.toVelocity({ x: speed * Math.cos(angle), y: speed * Math.sin(angle) });
+      const nextVelocity = this.coordSystem.toVelocity({ x: speed * Math.cos(angle), y: speed * Math.sin(angle) });
+      context.onStrategyEvent?.({
+        particleId: particle.id,
+        time: eventTime,
+        kind: 'turn',
+        position: { ...eventPosition },
+        waitTime,
+        jumpLength: speed * waitTime,
+        previousVelocity: { ...eventVelocity },
+        velocity: { ...nextVelocity },
+      });
+      eventVelocity = nextVelocity;
+      previousEventTime = eventTime;
       nextTime += this.generateCollisionTime(context.random);
       events++;
     }
 
     if (events > 0) {
+      particle.velocity = eventVelocity;
       particle.lastCollisionTime = context.currentTime;
+      particle.lastEventTime = previousEventTime;
       particle.nextCollisionTime = nextTime;
       particle.collisionCount += events;
     }
