@@ -1,35 +1,21 @@
 import React, { useMemo } from "react";
-import { useAppStore } from "../stores/appStore";
-import { LogNumberSlider } from './common/LogNumberSlider';
-import type { T15Mode, T15RunConfig } from "../t15/t15RandomWalk";
-
-type ProcessMode = "standard" | T15Mode;
 
 export const RandomWalkParameterPanelV2 = ({
   gridLayoutParams,
   setGridLayoutParams,
   simulationState,
-  setSimulationState,
   handleStart,
   handlePause,
   handleReset,
   handleInitialize,
-  processMode,
-  onProcessModeChange,
-  t15Config,
-  onT15ConfigChange,
 }: any) => {
-  const { randomWalkUIState, setRandomWalkUIState } = useAppStore();
-  
-  const updateUIState = (updates: any) => {
-    setRandomWalkUIState({ ...randomWalkUIState, ...updates });
-  };
-
   const minP = useMemo(() => gridLayoutParams.minParticles ?? 0, [gridLayoutParams.minParticles]);
   const maxP = useMemo(() => gridLayoutParams.maxParticles ?? 2000, [gridLayoutParams.maxParticles]);
   const selectedStrategy = gridLayoutParams.strategies?.find((strategy: string) =>
-    ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy)
+    ['simple', 'ctrw', 'levy', 'levy-walk', 'fractional', 'kac-goldstein', 'masoliver-lindenbergh'].includes(strategy)
   ) || 'simple';
+  const isKacGoldstein = selectedStrategy === 'kac-goldstein';
+  const isMasoliverLindenbergh = selectedStrategy === 'masoliver-lindenbergh';
   const levyAlpha = gridLayoutParams.levyAlpha ?? 1.5;
   const levyScale = gridLayoutParams.levyScale ?? 20;
   const fractionalBeta = gridLayoutParams.fractionalBeta ?? 0.7;
@@ -43,21 +29,30 @@ export const RandomWalkParameterPanelV2 = ({
       </h3>
 
       <div className="mb-5">
-        <label htmlFor="random-walk-process" className="mb-2 block text-sm font-medium">Process:</label>
+        <label htmlFor="random-walk-strategy" className="mb-2 block text-sm font-medium">Strategy:</label>
         <select
-          id="random-walk-process"
-          value={processMode}
-          onChange={(event) => onProcessModeChange(event.target.value as ProcessMode)}
+          id="random-walk-strategy"
+          value={selectedStrategy}
+          onChange={(event) => {
+            const strategy = event.target.value;
+            const dimension = strategy === 'kac-goldstein' ? '1D' : strategy === 'masoliver-lindenbergh' ? '2D' : gridLayoutParams.dimension;
+            const currentInitial = gridLayoutParams.initialDistType;
+            const initialDistType = strategy === 'kac-goldstein' ? 'centered' : strategy === 'masoliver-lindenbergh' ? 'origin' : ['origin', 'centered', 'bimodal', 'asymmetric'].includes(currentInitial) ? 'uniform' : currentInitial;
+            setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy], dimension, initialDistType });
+          }}
           className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
         >
-          <option value="standard">Standard Random Walk</option>
-          <option value="t15a">T15a · Bianchi I velocity flips</option>
-          <option value="t15b">T15b · Euclidean persistent walk</option>
+          <option value="simple">Simple (Ballistic)</option>
+          <option value="ctrw">CTRW (Continuous Time Random Walk)</option>
+          <option value="levy">Lévy Flight</option>
+          <option value="levy-walk">Lévy Walk</option>
+          <option value="fractional">Time-Fractional Subdiffusion</option>
+          <option value="kac-goldstein">Kac–Goldstein 1D Walk</option>
+          <option value="masoliver-lindenbergh">Masoliver-Lindenbergh 2D Walk</option>
         </select>
-        {processMode !== "standard" && <p className="mt-2 text-xs text-slate-500">T15 uses its own model clock and unbounded domain. Canvas edges do not change the walkers.</p>}
+        {(isKacGoldstein || isMasoliverLindenbergh) && <p className="mt-2 text-xs text-slate-500">The selected walk uses the shared controls and simulation clock.</p>}
       </div>
 
-      {processMode === "standard" ? <>
       {/* Simulation Controls */}
       <div className="mb-6 space-y-3">
         <button
@@ -104,7 +99,7 @@ export const RandomWalkParameterPanelV2 = ({
             <span className="font-mono">{(simulationState.time || 0).toFixed(1)}s</span>
           </div>
           <div className="flex justify-between">
-            <span>Scattering:</span>
+            <span>Scattering / walk events:</span>
             <span className="font-mono">{(simulationState.collisions || 0).toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
@@ -114,145 +109,119 @@ export const RandomWalkParameterPanelV2 = ({
         </div>
       </div>
 
-      <div className="space-y-6">
-        {/* Simulation Type */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Simulation Type:</label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="continuum"
-                checked={gridLayoutParams.simulationType === "continuum"}
-                onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, simulationType: e.target.value })}
-                className="mr-2"
-              />
-              Continuum
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="simulationType"
-                value="graph"
-                checked={gridLayoutParams.simulationType === "graph"}
-                onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, simulationType: e.target.value })}
-                className="mr-2"
-              />
-              Graph
-            </label>
-          </div>
-
-          <div className="mt-4">
-            <label className="block text-sm font-medium mb-2">Dimension:</label>
+      <div className="mb-5">
+            <label className="block text-sm font-medium mb-2">Simulation Type:</label>
             <div className="flex gap-4">
               <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="dimension"
-                  value="1D"
-                  checked={gridLayoutParams.dimension === "1D"}
-                  onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, dimension: e.target.value })}
-                  className="mr-2"
-                />
-                1D
+                <input type="radio" name="simulationType" value="continuum" checked={gridLayoutParams.simulationType === "continuum"} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, simulationType: event.target.value })} className="mr-2" />
+                Continuum
               </label>
               <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="dimension"
-                  value="2D"
-                  checked={gridLayoutParams.dimension === "2D"}
-                  onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, dimension: e.target.value })}
-                  className="mr-2"
-                />
-                2D
+                <input type="radio" name="simulationType" value="graph" checked={gridLayoutParams.simulationType === "graph"} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, simulationType: event.target.value })} className="mr-2" />
+                Graph
               </label>
             </div>
-          </div>
-        </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium mb-2">Dimension:</label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input type="radio" name="dimension" value="1D" checked={gridLayoutParams.dimension === "1D"} disabled={isMasoliverLindenbergh} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, dimension: event.target.value })} className="mr-2" />
+                  1D
+                </label>
+                <label className="flex items-center">
+                  <input type="radio" name="dimension" value="2D" checked={gridLayoutParams.dimension === "2D"} disabled={isKacGoldstein} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, dimension: event.target.value })} className="mr-2" />
+                  2D
+                </label>
+              </div>
+            </div>
+      </div>
 
-        {/* Particles */}
+      <div className="space-y-5 mb-6">
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Particles: {gridLayoutParams.particles}
-          </label>
+          <label className="block text-sm font-medium mb-2">Particles: {gridLayoutParams.particles.toLocaleString()}</label>
           <input
             type="range"
             min={minP}
             max={maxP}
+            step={1}
             value={gridLayoutParams.particles}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, particles: parseInt(e.target.value) })}
+            onChange={(event) => {
+              const particles = Number(event.target.value);
+              setGridLayoutParams({ ...gridLayoutParams, particles });
+            }}
             className="w-full"
           />
         </div>
-
-        {/* Velocity */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Velocity: {gridLayoutParams.velocity}
-          </label>
+          <label className="block text-sm font-medium mb-2">Velocity: {gridLayoutParams.velocity.toFixed(1)}</label>
           <input
             type="range"
             min={0.1}
             max={10}
             step={0.1}
             value={gridLayoutParams.velocity}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, velocity: parseFloat(e.target.value) })}
-            className="w-full"
+            disabled={['levy', 'fractional'].includes(selectedStrategy)}
+            onChange={(event) => {
+              const velocity = Number(event.target.value);
+              setGridLayoutParams({ ...gridLayoutParams, velocity });
+            }}
+            className="w-full disabled:opacity-50"
+          />
+          {(isKacGoldstein || isMasoliverLindenbergh || selectedStrategy === "levy-walk") && <p className="mt-1 text-xs text-slate-500">Sets the continuous travel speed.</p>}
+          {['levy', 'fractional'].includes(selectedStrategy) && <p className="mt-1 text-xs text-slate-500">This jump process does not use continuous velocity.</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Temperature: {gridLayoutParams.temperature}</label>
+          <input type="range" min={0.1} max={10} step={0.1} value={gridLayoutParams.temperature} disabled className="w-full disabled:opacity-50" />
+          <p className="mt-1 text-xs text-slate-500">Temperature is not currently used by this simulation engine.</p>
+        </div>
+        <div>
+          <label htmlFor="random-walk-seed" className="block text-sm font-medium mb-2">Random seed</label>
+          <input
+            id="random-walk-seed"
+            type="number"
+            min="0"
+            step="1"
+            value={gridLayoutParams.seed ?? 42}
+            onChange={(event) => {
+              const seed = Math.max(0, Math.floor(Number(event.target.value) || 0));
+              setGridLayoutParams({ ...gridLayoutParams, seed });
+            }}
+            className="w-full border rounded px-2 py-1 text-sm"
           />
         </div>
-
-        {/* Temperature */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Temperature: {gridLayoutParams.temperature}
+            {isMasoliverLindenbergh ? "Heading reset rate λ" : isKacGoldstein ? "Direction flip rate λ" : "Collision Rate"}: {gridLayoutParams.collisionRate.toFixed(2)}
           </label>
           <input
             type="range"
-            min={0.1}
+            min={0}
             max={10}
             step={0.1}
-            value={gridLayoutParams.temperature}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, temperature: parseFloat(e.target.value) })}
-            className="w-full"
-          />
-        </div>
-
-        {/* Strategy Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Strategy:</label>
-          <select
-            value={selectedStrategy}
-            onChange={(e) => {
-              const strategy = e.target.value as 'ctrw' | 'simple' | 'levy' | 'fractional';
-              setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy] });
+            value={gridLayoutParams.collisionRate}
+            disabled={!(["ctrw", "levy", "kac-goldstein", "masoliver-lindenbergh"].includes(selectedStrategy))}
+            onChange={(event) => {
+              const rate = Number(event.target.value);
+              setGridLayoutParams({ ...gridLayoutParams, collisionRate: rate });
             }}
-            className="w-full border rounded px-2 py-1 text-sm"
-          >
-            <option value="simple">Simple (Ballistic)</option>
-            <option value="ctrw">CTRW (Continuous Time Random Walk)</option>
-            <option value="levy">Lévy Flight</option>
-            <option value="fractional">Time-Fractional Subdiffusion</option>
-          </select>
+            className="w-full disabled:opacity-50"
+          />
+          {!["ctrw", "levy", "kac-goldstein", "masoliver-lindenbergh"].includes(selectedStrategy) && <p className="mt-1 text-xs text-slate-500">{selectedStrategy === "levy-walk" ? "Turn times come from the heavy-tailed flight durations." : selectedStrategy === "fractional" ? "Waiting times come from the fractional waiting-time law." : "This strategy does not use a collision rate."}</p>}
         </div>
+      </div>
 
-        <div>
-          <label htmlFor="random-walk-seed" className="block text-sm font-medium mb-2">Random seed</label>
-          <input id="random-walk-seed" type="number" min="0" step="1" value={gridLayoutParams.seed ?? 42}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, seed: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
-            className="w-full border rounded px-2 py-1 text-sm" />
-        </div>
-
-        {selectedStrategy === 'levy' && <div className="space-y-3 rounded border bg-slate-50 p-3">
-          <p className="text-sm font-medium">Lévy flight parameters</p>
+      <div className="space-y-6">
+        {isKacGoldstein && <label className="block text-sm">Ordering reference case<select value={gridLayoutParams.kacGoldsteinOrdering ?? "reduced"} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, kacGoldsteinOrdering: event.target.value })} className="mt-1 w-full rounded border px-2 py-1"><option value="reduced">Reduced Laplace-Beltrami · B = 0, a = 0</option><option value="derivative">Derivative-only · B = −3/2, a = 3/4</option></select></label>}
+        {(selectedStrategy === 'levy' || selectedStrategy === 'levy-walk') && <div className="space-y-3 rounded border bg-slate-50 p-3">
+          <p className="text-sm font-medium">{selectedStrategy === 'levy-walk' ? 'Lévy walk parameters' : 'Lévy flight parameters'}</p>
           <label className="block text-xs">Tail exponent α: {levyAlpha.toFixed(2)}
             <input type="range" min="0.2" max="2" step="0.05" value={levyAlpha} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, levyAlpha: Number(e.target.value) })} className="w-full" />
           </label>
-          <label className="block text-xs">Jump scale: {levyScale.toFixed(1)}
+          <label className="block text-xs">{selectedStrategy === 'levy-walk' ? 'Minimum flight length ℓ₀' : 'Jump scale'}: {levyScale.toFixed(1)}
             <input type="range" min="1" max="100" step="1" value={levyScale} onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, levyScale: Number(e.target.value) })} className="w-full" />
           </label>
-          <p className="text-xs text-slate-600">Jump lengths have a Pareto tail; collision rate sets the jump event rate.</p>
+          <p className="text-xs text-slate-600">{selectedStrategy === 'levy-walk' ? 'Flight durations have a Pareto tail with minimum duration ℓ₀/v; particles travel continuously at the Velocity setting.' : 'Jump lengths have a Pareto tail; collision rate sets the jump event rate.'}</p>
         </div>}
 
         {selectedStrategy === 'fractional' && <div className="space-y-3 rounded border bg-slate-50 p-3">
@@ -268,22 +237,6 @@ export const RandomWalkParameterPanelV2 = ({
           </label>
           <p className="text-xs text-slate-600">Walkers make fixed-length jumps after heavy-tailed waiting times. β below 1 produces subdiffusion.</p>
         </div>}
-
-        {/* Collision Rate */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Collision Rate: {gridLayoutParams.collisionRate}
-          </label>
-          <input
-            type="range"
-            min={0}
-            max={10}
-            step={0.1}
-            value={gridLayoutParams.collisionRate}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, collisionRate: parseFloat(e.target.value) })}
-            className="w-full"
-          />
-        </div>
 
         {/* Boundary Condition */}
         <div>
@@ -321,6 +274,8 @@ export const RandomWalkParameterPanelV2 = ({
             onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, initialDistType: e.target.value })}
             className="w-full border rounded px-2 py-1 text-sm"
           >
+            {isMasoliverLindenbergh && <option value="origin">Point source at origin</option>}
+            {isKacGoldstein && <><option value="centered">Centered single bump</option><option value="bimodal">Symmetric bimodal</option><option value="asymmetric">Asymmetric initial profile</option></>}
             <option value="uniform">Uniform</option>
             <option value="gaussian">Gaussian</option>
             <option value="ring">Ring</option>
@@ -423,99 +378,6 @@ export const RandomWalkParameterPanelV2 = ({
           </div>
         )}
       </div>
-      </> : <T15Controls
-        mode={processMode}
-        config={t15Config}
-        onConfigChange={onT15ConfigChange}
-        simulationState={simulationState}
-        handleStart={handleStart}
-        handlePause={handlePause}
-        handleReset={handleReset}
-        handleInitialize={handleInitialize}
-      />}
     </div>
   );
 };
-
-function T15Controls({
-  mode,
-  config,
-  onConfigChange,
-  simulationState,
-  handleStart,
-  handlePause,
-  handleReset,
-  handleInitialize,
-}: {
-  mode: T15Mode;
-  config: T15RunConfig;
-  onConfigChange: (config: T15RunConfig) => void;
-  simulationState: any;
-  handleStart: () => void;
-  handlePause: () => void;
-  handleReset: () => void;
-  handleInitialize: () => void;
-}) {
-  const update = (updates: Partial<T15RunConfig>) => onConfigChange({ ...config, ...updates });
-  return (
-    <>
-      <div className="mb-6 space-y-3">
-        <button type="button" onClick={handleInitialize} className="w-full rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Initialize run</button>
-        <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={handleStart} disabled={simulationState.isRunning} className="rounded-md bg-green-700 px-3 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50">Start</button>
-          <button type="button" onClick={handlePause} className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white hover:bg-amber-800">{simulationState.isRunning ? "Pause" : "Resume"}</button>
-        </div>
-        <button type="button" onClick={handleReset} className="w-full rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800">Reset</button>
-        <div className="rounded-lg border bg-slate-50 p-3 text-sm" role="status" aria-live="polite">
-          <div className="flex justify-between"><span>Status</span><span className="font-medium">{simulationState.status}</span></div>
-          <div className="flex justify-between"><span>Model time</span><span className="font-mono">{(simulationState.time || 0).toFixed(3)}</span></div>
-          <div className="flex justify-between"><span>Walker events</span><span className="font-mono">{(simulationState.collisions || 0).toLocaleString()}</span></div>
-        </div>
-      </div>
-
-      <div className="space-y-5">
-        <div>
-          <label htmlFor="t15-walkers" className="mb-2 block text-sm font-medium">Live walkers: {config.walkers.toLocaleString()}</label>
-          <input id="t15-walkers" type="range" min="500" max="50000" step="500" value={config.walkers} onChange={(event) => update({ walkers: Number(event.target.value) })} className="w-full" />
-          <p className="mt-1 text-xs text-slate-500">Large paper ensembles are included as saved references.</p>
-        </div>
-        <div>
-          <label htmlFor="t15-seed" className="mb-2 block text-sm font-medium">Seed</label>
-          <input id="t15-seed" type="number" min="0" step="1" value={config.seed} onChange={(event) => update({ seed: Number(event.target.value) })} className="min-h-10 w-full rounded border border-slate-300 px-3 py-2 text-sm" />
-        </div>
-        {mode === "t15a" ? (
-          <>
-            <div>
-              <label htmlFor="t15a-ordering" className="mb-2 block text-sm font-medium">Bianchi ordering case</label>
-              <select id="t15a-ordering" value={config.ordering} onChange={(event) => update({ ordering: event.target.value as T15RunConfig["ordering"] })} className="min-h-10 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm">
-                <option value="reduced">Reduced Laplace–Beltrami · B = 0, a = 0</option>
-                <option value="derivative">Derivative-only · B = −3/2, a = 3/4</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="t15a-profile" className="mb-2 block text-sm font-medium">Initial profile</label>
-              <select id="t15a-profile" value={config.profile} onChange={(event) => update({ profile: event.target.value as T15RunConfig["profile"] })} className="min-h-10 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm">
-                <option value="centered">Centered single bump</option>
-                <option value="bimodal">Symmetric bimodal</option>
-                <option value="asymmetric">Asymmetric · J₀ = 0.4u₀</option>
-              </select>
-            </div>
-            <p className="rounded bg-blue-50 p-3 text-xs leading-5 text-blue-900">Clock α runs from 0 to 1. Direction flips are per walker; the β display window is not a physical boundary.</p>
-          </>
-        ) : (
-          <>
-            <div>
-              <label htmlFor="t15b-speed" className="mb-2 block text-sm font-medium">Speed v: {config.speed.toFixed(2)}</label>
-              <input id="t15b-speed" type="range" min="0.1" max="3" step="0.1" value={config.speed} onChange={(event) => update({ speed: Number(event.target.value) })} className="w-full" />
-            </div>
-            <div>
-              <label htmlFor="t15b-rate" className="mb-2 block text-sm font-medium">Reset rate λ: {config.resetRate.toFixed(2)}</label>
-              <input id="t15b-rate" type="range" min="0" max="5" step="0.1" value={config.resetRate} onChange={(event) => update({ resetRate: Number(event.target.value) })} className="w-full" />
-            </div>
-            <p className="rounded bg-blue-50 p-3 text-xs leading-5 text-blue-900">Walkers start at the origin with uniform headings. The reference run uses v = 1, λ = 1, seed 15026, and 250,000 walkers.</p>
-          </>
-        )}
-      </div>
-    </>
-  );
-}

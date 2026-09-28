@@ -158,7 +158,7 @@ function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnostics
   const strategyParameters: Record<string, string[]> = {
     levy: ['levyAlpha', 'levyScale'],
     fractional: ['fractionalBeta', 'fractionalWaitingScale', 'fractionalJumpLength'],
-    t15a: ['ordering'],
+    "kac-goldstein": ['kacGoldsteinOrdering'],
   };
   const sameStrategyParameters = configA.strategy !== configB.strategy
     || (strategyParameters[configA.strategy] ?? []).every((key) => {
@@ -177,7 +177,7 @@ function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnostics
 }
 
 function comparisonSpreadKind(snapshot: StrategyDiagnosticsSnapshot): 'msd' | 'medianR2' {
-  return snapshot.config.strategy === 'levy' ? 'medianR2' : 'msd';
+  return ['levy', 'levy-walk'].includes(snapshot.config.strategy) ? 'medianR2' : 'msd';
 }
 
 export function StrategyDiagnosticsPanel({ snapshot, comparison, onCaptureComparison, onClearComparison }: {
@@ -189,7 +189,7 @@ export function StrategyDiagnosticsPanel({ snapshot, comparison, onCaptureCompar
   const diagnostics = useMemo(() => {
     if (!snapshot) return null;
     const strategy = snapshot.config.strategy;
-    const isLevy = strategy === 'levy';
+    const isLevy = strategy === 'levy' || strategy === 'levy-walk';
     const spreadMetric = isLevy ? 'medianR2' : 'msd';
     const exponent = fitGrowthExponent(snapshot.spread, spreadMetric);
     const spreadName = isLevy ? 'Median squared radius' : 'Mean squared displacement';

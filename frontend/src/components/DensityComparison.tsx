@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppStore } from '../stores/appStore';
 import { useDensityVisualization } from '../hooks/useDensityVisualization';
-export const DensityComparison = ({ particles, particleCount, simulatorRef, gridLayoutParams, simulationState, particlesLoaded, }: any) => {
+export const DensityComparison = ({ particles, particleCount, simulatorRef, gridLayoutParams, simulationState, particlesLoaded, binSize = 20, }: any) => {
     const { randomWalkUIState, setRandomWalkUIState, useGPU } = useAppStore();
     // Stable empty particles array to avoid identity changes each render
     const EMPTY_PARTICLES = React.useRef([]).current;
@@ -26,7 +26,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         }
     }, [particles, simulatorRef, simulationState.status]);
     const liveCount = liveParticles.length;
-    const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(liveParticles, liveCount, undefined, gridLayoutParams.dimension, useGPU, particlesLoaded);
+    const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(liveParticles, liveCount, binSize, gridLayoutParams.dimension, useGPU, particlesLoaded);
     const [recordHistory, setRecordHistory] = useState(false);
     // Trigger an initial density draw once on mount
     useEffect(() => {
@@ -41,7 +41,9 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         });
     };
     // Calculate theoretical values
-    const diffusionCoefficient = gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate);
+    const diffusionCoefficient = gridLayoutParams.collisionRate > 0
+        ? gridLayoutParams.velocity ** 2 / (2 * gridLayoutParams.collisionRate)
+        : Number.POSITIVE_INFINITY;
     // Calculate effective values from density data
     const densityData = gridLayoutParams.dimension === '1D' ? densityData1D : densityData2D;
     const flatDensity = densityData?.density?.flat?.() ?? [];
@@ -75,7 +77,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
     return (<div className="bg-white border rounded-lg p-4 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h3 className="drag-handle text-lg font-semibold cursor-move">
-          Density Profile ρ(x,y,t)
+          {gridLayoutParams.dimension === '1D' ? 'Density Profile ρ(x,t)' : 'Density Profile ρ(x,y,t)'}
         </h3>
         <div className="flex gap-2">
           <button onClick={() => {
@@ -102,8 +104,8 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         <div className="w-48 text-xs space-y-2">
           <div className="bg-gray-100 p-2 rounded">
             <div className="font-semibold mb-1">Theoretical</div>
-            <div>D = {diffusionCoefficient.toFixed(3)}</div>
-            <div>τ = {(1 / gridLayoutParams.collisionRate).toFixed(3)}</div>
+            <div>D = {Number.isFinite(diffusionCoefficient) ? diffusionCoefficient.toFixed(3) : '∞'}</div>
+            <div>τ = {gridLayoutParams.collisionRate > 0 ? (1 / gridLayoutParams.collisionRate).toFixed(3) : '∞'}</div>
             <div>v = {gridLayoutParams.velocity.toFixed(2)}</div>
           </div>
 

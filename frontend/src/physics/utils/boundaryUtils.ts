@@ -69,3 +69,22 @@ export function applyAbsorbingBoundary(position: Position, boundaries: BoundaryC
     absorbed 
   };
 }
+
+/** Apply the selected shared boundary rule to a position and velocity. */
+export function applyBoundaryCondition(
+  position: Position,
+  velocity: Velocity,
+  boundaries: BoundaryConfig,
+): BoundaryResult {
+  switch (boundaries.type) {
+    case 'periodic':
+      return applyPeriodicBoundary(position, boundaries);
+    case 'reflective':
+      return applyReflectiveBoundary(position, velocity, boundaries);
+    case 'absorbing':
+      return applyAbsorbingBoundary(position, boundaries);
+    case 'unbounded':
+    default:
+      return { position };
+  }
+}

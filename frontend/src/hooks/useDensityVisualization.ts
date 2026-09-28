@@ -171,8 +171,8 @@ export const useDensityVisualization = (
   }, []);
 
   const updateDensity = useCallback(() => {
-    let actualParticles = particles;
-    let actualCount = particleCount;
+    let actualParticles = particles.filter((particle) => particle.isActive !== false);
+    let actualCount = actualParticles.length;
 
     // In GPU mode, extract particles from GPU manager
     if (useGPU && particlesLoaded) {

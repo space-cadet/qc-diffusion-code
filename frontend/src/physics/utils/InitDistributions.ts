@@ -1,6 +1,6 @@
 export type Dimension = '1D' | '2D';
 
-export type InitialDistType = 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+export type InitialDistType = 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric';
 
 export interface PositionSamplerParams {
   canvasWidth: number;
@@ -27,6 +27,10 @@ export function sampleCanvasPosition(
 
   if (params.dimension === '1D') {
     switch (params.initialDistType) {
+      case 'origin': return { x: cx, y: cy };
+      case 'centered': return { x: cx + sampleBump(random, 0, 0.7) * params.canvasWidth / 12, y: cy };
+      case 'bimodal': return { x: cx + sampleBump(random, random() < 0.5 ? -0.65 : 0.65, 0.35) * params.canvasWidth / 12, y: cy };
+      case 'asymmetric': return { x: cx + sampleBump(random, -0.2, 0.85) * params.canvasWidth / 12, y: cy };
       case 'gaussian': {
         const bm = () => boxMuller(random);
         const x = cx + bm() * params.distSigmaX;
@@ -52,6 +56,10 @@ export function sampleCanvasPosition(
   }
 
   switch (params.initialDistType) {
+    case 'origin': return { x: cx, y: cy };
+    case 'centered': return { x: cx, y: cy };
+    case 'bimodal': return { x: cx, y: cy };
+    case 'asymmetric': return { x: cx, y: cy };
     case 'gaussian': {
       const bm = () => boxMuller(random);
       const x = cx + bm() * params.distSigmaX;
@@ -89,6 +97,13 @@ export function sampleCanvasPosition(
     case 'uniform':
     default:
       return { x: random() * params.canvasWidth, y: random() * params.canvasHeight };
+  }
+}
+
+function sampleBump(random: () => number, center: number, width: number): number {
+  while (true) {
+    const z = random() * 2 - 1;
+    if (random() <= Math.exp(1 - 1 / (1 - z * z))) return center + width * z;
   }
 }
 

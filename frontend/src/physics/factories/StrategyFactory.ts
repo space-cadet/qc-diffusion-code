@@ -10,13 +10,16 @@ import { InterparticleCollisionStrategy1D } from '../strategies/InterparticleCol
 import { getNewEngineFlag } from '../config/flags';
 import { BallisticStrategy } from '../strategies/BallisticStrategy';
 import { LevyFlightStrategy } from '../strategies/LevyFlightStrategy';
+import { LevyWalkStrategy } from '../strategies/LevyWalkStrategy';
 import { FractionalDiffusionStrategy } from '../strategies/FractionalDiffusionStrategy';
+import { KacGoldsteinVelocityFlipStrategy } from '../strategies/KacGoldsteinStrategy';
+import { MasoliverLindenberghHeadingResetStrategy } from '../strategies/MasoliverLindenberghWalkStrategy';
 
 import { ParameterManager } from '../core/ParameterManager';
 
 interface SimulatorParams {
   dimension: '1D' | '2D';
-  strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  strategies?: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
 }
 
 export function createStrategies(parameterManager: ParameterManager, boundaryConfig: BoundaryConfig): PhysicsStrategy[] {
@@ -32,7 +35,7 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
   const physicsParams = parameterManager.getPhysicsParameters();
   const selectedStrategies = config.strategies || [];
   const motionStrategy = selectedStrategies.find((strategy) =>
-    ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy)
+    ['simple', 'ctrw', 'levy', 'levy-walk', 'fractional', 'kac-goldstein', 'masoliver-lindenbergh'].includes(strategy)
   ) ?? 'simple';
   const includeInterparticleCollisions = parameterManager.interparticleCollisions || selectedStrategies.includes('collisions');
 
@@ -56,8 +59,17 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       }));
     } else if (motionStrategy === 'levy') {
       oneDStrategies.push(new LevyFlightStrategy({ collisionRate: physicsParams.collisionRate, alpha: parameterManager.levyAlpha, scale: parameterManager.levyScale, dimension: '1D', boundaryConfig }));
+    } else if (motionStrategy === 'levy-walk') {
+      const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
+      oneDStrategies.push(new LevyWalkStrategy({ speed, alpha: parameterManager.levyAlpha, flightLengthScale: parameterManager.levyScale, dimension: '1D', boundaryConfig }));
     } else if (motionStrategy === 'fractional') {
       oneDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '1D', boundaryConfig }));
+    } else if (motionStrategy === 'kac-goldstein') {
+      const speed = physicsParams.velocity * Math.max(parameterManager.canvasWidth / 12, 1);
+      oneDStrategies.push(new KacGoldsteinVelocityFlipStrategy(speed, physicsParams.collisionRate, boundaryConfig));
+    } else if (motionStrategy === 'masoliver-lindenbergh') {
+      const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
+      oneDStrategies.push(new MasoliverLindenberghHeadingResetStrategy(speed, physicsParams.collisionRate, boundaryConfig));
     } else {
       oneDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
@@ -86,9 +98,17 @@ function createStrategiesInternal(parameterManager: ParameterManager, boundaryCo
       }));
     } else if (motionStrategy === 'levy') {
       twoDStrategies.push(new LevyFlightStrategy({ collisionRate: physicsParams.collisionRate, alpha: parameterManager.levyAlpha, scale: parameterManager.levyScale, dimension: '2D', boundaryConfig }));
+    } else if (motionStrategy === 'levy-walk') {
+      const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
+      twoDStrategies.push(new LevyWalkStrategy({ speed, alpha: parameterManager.levyAlpha, flightLengthScale: parameterManager.levyScale, dimension: '2D', boundaryConfig }));
     } else if (motionStrategy === 'fractional') {
       twoDStrategies.push(new FractionalDiffusionStrategy({ beta: parameterManager.fractionalBeta, waitingScale: parameterManager.fractionalWaitingScale, jumpLength: parameterManager.fractionalJumpLength, dimension: '2D', boundaryConfig }));
+    } else if (motionStrategy === 'masoliver-lindenbergh') {
+      const speed = physicsParams.velocity * Math.max(Math.min(parameterManager.canvasWidth, parameterManager.canvasHeight) / 6, 1);
+      twoDStrategies.push(new MasoliverLindenberghHeadingResetStrategy(speed, physicsParams.collisionRate, boundaryConfig));
     } else {
+      // Kac-Goldstein is one-dimensional; keep the selected process's dimension authoritative.
+
       twoDStrategies.push(new BallisticStrategy({ boundaryConfig, coordSystem }));
     }
 

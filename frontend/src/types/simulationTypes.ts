@@ -27,15 +27,16 @@ export interface RandomWalkParams {
   isPeriodic: boolean;
   showEdgeWeights: boolean;
   showAnimation: boolean;
-  strategies: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  strategies: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
   seed: number;
   levyAlpha: number;
   levyScale: number;
   fractionalBeta: number;
   fractionalWaitingScale: number;
   fractionalJumpLength: number;
+  kacGoldsteinOrdering?: "reduced" | "derivative";
   boundaryCondition: 'periodic' | 'reflective' | 'absorbing' | 'unbounded';
-  initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric';
   distSigmaX: number;
   distSigmaY: number;
   distR0: number;

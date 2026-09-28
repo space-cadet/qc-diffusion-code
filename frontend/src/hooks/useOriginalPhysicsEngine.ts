@@ -5,7 +5,6 @@ import { createPhysicsStrategies } from "../physics/factories/StrategyFactory";
 import { ParameterManager } from "../physics/core/ParameterManager";
 import { BoundaryConfig } from "../physics/types/BoundaryConfig";
 import type { Particle } from "../physics/types/Particle";
-import type { PhysicsStrategy } from "../physics/interfaces/PhysicsStrategy";
 import type { StrategyEvent } from "../physics/types/PhysicsContext";
 import { sampleCanvasPosition } from "../physics/utils/InitDistributions";
 import { SeededRandom } from "../physics/utils/SeededRandom";
@@ -24,7 +23,8 @@ export interface EngineParams {
   collisionRadius: number;
   initialDistType: string;
   strategyType?: string;
-  strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  kacGoldsteinOrdering?: "reduced" | "derivative";
+  strategies?: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
   distSigmaX?: number;
   distSigmaY?: number;
   distR0?: number;
@@ -39,11 +39,6 @@ export interface EngineParams {
   fractionalBeta: number;
   fractionalWaitingScale: number;
   fractionalJumpLength: number;
-}
-
-export interface PhysicsEngineRuntime {
-  createStrategies: (params: EngineParams, boundaries: BoundaryConfig) => PhysicsStrategy[];
-  initializeParticles: (params: EngineParams, random: () => number) => Particle[];
 }
 
 export interface SimpleParticle {
@@ -66,7 +61,13 @@ interface UseOriginalPhysicsEngineReturn {
 }
 
 function toVisibleSpeed(params: EngineParams): number {
-  return params.velocity * Math.max(Math.min(params.canvasWidth, params.canvasHeight) / 6, 1);
+  const selected = params.strategies?.find((strategy) =>
+    ['simple', 'ctrw', 'levy', 'levy-walk', 'fractional', 'kac-goldstein', 'masoliver-lindenbergh'].includes(strategy)
+  ) ?? params.strategyType;
+  const scale = selected === 'kac-goldstein'
+    ? params.canvasWidth / 12
+    : Math.min(params.canvasWidth, params.canvasHeight) / 6;
+  return params.velocity * Math.max(scale, 1);
 }
 
 function createBoundaryConfig(params: EngineParams): BoundaryConfig {
@@ -81,11 +82,11 @@ function createBoundaryConfig(params: EngineParams): BoundaryConfig {
 
 function createParameterManager(params: EngineParams): ParameterManager {
   // Determine strategies from params
-  let strategies: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  let strategies: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
   if (params.strategies && params.strategies.length > 0) {
     strategies = params.strategies;
   } else if (params.strategyType) {
-    strategies = [params.strategyType as 'ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions'];
+    strategies = [params.strategyType as 'ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh'];
   } else {
     // Fallback: use collisionRate to decide
     strategies = params.collisionRate > 0 ? ['ctrw'] : ['simple'];
@@ -108,7 +109,7 @@ function createParameterManager(params: EngineParams): ParameterManager {
     boundaryCondition: params.boundaryCondition,
     canvasWidth: params.canvasWidth,
     canvasHeight: params.canvasHeight,
-    initialDistType: params.initialDistType as 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid',
+    initialDistType: params.initialDistType as 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric',
     distSigmaX: params.distSigmaX,
     distSigmaY: params.distSigmaY,
     distR0: params.distR0,
@@ -136,8 +137,8 @@ function initializeDefaultParticles(params: EngineParams, random: () => number):
   const particles: Particle[] = [];
   const { particleCount, dimension, canvasWidth, canvasHeight } = params;
   const visibleSpeed = toVisibleSpeed(params);
-  const selected = params.strategies?.find((strategy) => ['simple', 'ctrw', 'levy', 'fractional'].includes(strategy))
-    ?? (params.strategyType as 'simple' | 'ctrw' | 'levy' | 'fractional' | undefined)
+  const selected = params.strategies?.find((strategy) => ['simple', 'ctrw', 'levy', 'levy-walk', 'fractional', 'kac-goldstein', 'masoliver-lindenbergh'].includes(strategy))
+    ?? (params.strategyType as 'simple' | 'ctrw' | 'levy' | 'levy-walk' | 'fractional' | 'kac-goldstein' | 'masoliver-lindenbergh' | undefined)
     ?? (params.collisionRate > 0 ? 'ctrw' : 'simple');
 
   for (let i = 0; i < particleCount; i++) {
@@ -145,7 +146,7 @@ function initializeDefaultParticles(params: EngineParams, random: () => number):
       canvasWidth,
       canvasHeight,
       dimension,
-      initialDistType: params.initialDistType as "uniform" | "gaussian" | "ring" | "stripe" | "grid",
+      initialDistType: params.initialDistType as "uniform" | "gaussian" | "ring" | "stripe" | "grid" | "origin" | "centered" | "bimodal" | "asymmetric",
       distSigmaX: params.distSigmaX ?? 80,
       distSigmaY: params.distSigmaY ?? 80,
       distR0: params.distR0 ?? 150,
@@ -155,7 +156,10 @@ function initializeDefaultParticles(params: EngineParams, random: () => number):
       distNy: params.distNy ?? 15,
       distJitter: params.distJitter ?? 4,
     }, random);
-    const angle = random() * 2 * Math.PI;
+    const isKacGoldstein = selected === 'kac-goldstein';
+    const angle = isKacGoldstein
+      ? (random() < (params.initialDistType === 'asymmetric' ? 0.7 : 0.5) ? 0 : Math.PI)
+      : random() * 2 * Math.PI;
     const speed = visibleSpeed;
     const uniform = Math.max(random(), Number.EPSILON);
     const nextCollisionTime = selected === 'fractional'
@@ -195,12 +199,10 @@ function initializeDefaultParticles(params: EngineParams, random: () => number):
 export function useOriginalPhysicsEngine({
   params,
   isRunning,
-  runtime,
   onStrategyEvent,
 }: {
   params: EngineParams;
   isRunning: boolean;
-  runtime?: PhysicsEngineRuntime;
   onStrategyEvent?: (event: StrategyEvent) => void;
 }): UseOriginalPhysicsEngineReturn {
   const engineRef = useRef<PhysicsEngine | null>(null);
@@ -214,9 +216,7 @@ export function useOriginalPhysicsEngine({
 
   useEffect(() => {
     const boundaryConfig = createBoundaryConfig(params);
-    const strategies = runtime
-      ? runtime.createStrategies(params, boundaryConfig)
-      : createStrategiesFromParams(params);
+    const strategies = createStrategiesFromParams(params);
 
     const config: PhysicsEngineConfig = {
       timeStep: params.dt,
@@ -230,9 +230,7 @@ export function useOriginalPhysicsEngine({
 
     engineRef.current = new PhysicsEngine(config);
     randomRef.current.reset(params.seed);
-    particlesRef.current = runtime
-      ? runtime.initializeParticles(params, () => randomRef.current.next())
-      : initializeDefaultParticles(params, () => randomRef.current.next());
+    particlesRef.current = initializeDefaultParticles(params, () => randomRef.current.next());
 
     console.log("[useOriginalPhysicsEngine] Engine created with", strategies.length, "strategies");
 
@@ -277,14 +275,12 @@ export function useOriginalPhysicsEngine({
       engineRef.current.reset();
       randomRef.current.reset(params.seed);
       accumulatorRef.current = 0;
-      particlesRef.current = runtime
-        ? runtime.initializeParticles(params, () => randomRef.current.next())
-        : initializeDefaultParticles(params, () => randomRef.current.next());
+      particlesRef.current = initializeDefaultParticles(params, () => randomRef.current.next());
       timeRef.current = 0;
       collisionCountRef.current = 0;
       interparticleCollisionCountRef.current = 0;
     }
-  }, [params, runtime]);
+  }, [params]);
 
   const updateParams = useCallback((newParams: Partial<EngineParams>) => {
     if (!engineRef.current) return;
@@ -293,9 +289,7 @@ export function useOriginalPhysicsEngine({
     const updatedParams = { ...previousParams, ...newParams };
 
     const boundaryConfig = createBoundaryConfig(updatedParams);
-    const strategies = runtime
-      ? runtime.createStrategies(updatedParams, boundaryConfig)
-      : createStrategiesFromParams(updatedParams);
+    const strategies = createStrategiesFromParams(updatedParams);
 
     engineRef.current.updateConfiguration({
       timeStep: updatedParams.dt,
@@ -309,7 +303,7 @@ export function useOriginalPhysicsEngine({
       'particleCount', 'dimension', 'seed', 'initialDistType', 'distSigmaX', 'distSigmaY',
       'distR0', 'distDR', 'distThickness', 'distNx', 'distNy', 'distJitter', 'strategies',
       'strategyType', 'collisionRate', 'velocity', 'levyAlpha', 'levyScale', 'fractionalBeta',
-      'fractionalWaitingScale', 'fractionalJumpLength',
+      'fractionalWaitingScale', 'fractionalJumpLength', 'kacGoldsteinOrdering',
     ];
     const shouldReinitialize = reinitializeKeys.some((key) =>
       newParams[key] !== undefined && newParams[key] !== previousParams[key]
@@ -317,16 +311,14 @@ export function useOriginalPhysicsEngine({
     appliedParamsRef.current = updatedParams;
     if (shouldReinitialize) {
       randomRef.current.reset(updatedParams.seed);
-      particlesRef.current = runtime
-        ? runtime.initializeParticles(updatedParams, () => randomRef.current.next())
-        : initializeDefaultParticles(updatedParams, () => randomRef.current.next());
+      particlesRef.current = initializeDefaultParticles(updatedParams, () => randomRef.current.next());
       timeRef.current = 0;
       accumulatorRef.current = 0;
       collisionCountRef.current = 0;
       interparticleCollisionCountRef.current = 0;
       engineRef.current.reset();
     }
-  }, [runtime]);
+  }, []);
 
   const getStats = useCallback(() => {
     return {
@@ -349,14 +341,17 @@ export function useOriginalPhysicsEngine({
 
 export function adaptParticles(
   particles: Particle[],
-  projectPosition?: (particle: Particle, index: number) => { x: number; y: number },
+  projectPosition?: (particle: Particle, index: number) => { x: number; y: number; color?: [number, number, number, number] },
 ): SimpleParticle[] {
-  return particles.map((p, index) => ({
-    id: index,
-    ...(projectPosition?.(p, index) ?? p.position),
-    vx: p.velocity.vx,
-    vy: p.velocity.vy,
-    radius: p.radius || 3,
-    color: [0.23, 0.51, 0.96, 0.8] as [number, number, number, number],
-  }));
+  return particles.filter((p) => p.isActive).map((p, index) => {
+    const projection = projectPosition?.(p, index);
+    return {
+      id: index,
+      ...(projection ?? p.position),
+      vx: p.velocity.vx,
+      vy: p.velocity.vy,
+      radius: p.radius || 3,
+      color: projection?.color ?? [0.23, 0.51, 0.96, 0.8] as [number, number, number, number],
+    };
+  });
 }

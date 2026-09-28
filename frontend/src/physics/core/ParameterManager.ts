@@ -11,11 +11,11 @@ export interface SimulatorParams {
   simulationType?: string;
   graphType?: string;
   graphSize?: number;
-  strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  strategies?: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
   boundaryCondition?: string;
   canvasWidth?: number;
   canvasHeight?: number;
-  initialDistType?: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  initialDistType?: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric';
   distSigmaX?: number;
   distSigmaY?: number;
   distR0?: number;
@@ -43,11 +43,11 @@ export class ParameterManager {
   public simulationType?: string;
   public graphType?: string;
   public graphSize?: number;
-  public strategies?: ('ctrw' | 'simple' | 'levy' | 'fractional' | 'collisions')[];
+  public strategies?: ('ctrw' | 'simple' | 'levy' | 'levy-walk' | 'fractional' | 'collisions' | 'kac-goldstein' | 'masoliver-lindenbergh')[];
   public boundaryCondition?: string;
   public canvasWidth: number;
   public canvasHeight: number;
-  public initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid';
+  public initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric';
   public distSigmaX: number;
   public distSigmaY: number;
   public distR0: number;

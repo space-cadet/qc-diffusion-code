@@ -1,10 +1,10 @@
-import type { T15Ordering, T15Profile } from "./t15RandomWalk";
+import type { PersistentWalkOrdering, PersistentWalkProfile } from "./persistentWalkRandomWalk";
 
 const DOMAIN: [number, number] = [-6, 6];
 const GRID_SIZE = 2048;
 const GRID_SPACING = (DOMAIN[1] - DOMAIN[0]) / GRID_SIZE;
 
-export interface T15aReferenceProfile {
+export interface KacGoldsteinReferenceProfile {
   density: number[];
   current: number[];
   domain: [number, number];
@@ -59,7 +59,7 @@ function bump(beta: number, center: number, width: number): number {
   return Math.exp(-1 / (1 - scaled * scaled));
 }
 
-function initialProfile(profile: T15Profile): { density: Float64Array; current: Float64Array } {
+function initialProfile(profile: PersistentWalkProfile): { density: Float64Array; current: Float64Array } {
   const density = new Float64Array(GRID_SIZE);
   const current = new Float64Array(GRID_SIZE);
   for (let i = 0; i < GRID_SIZE; i += 1) {
@@ -83,13 +83,13 @@ function initialProfile(profile: T15Profile): { density: Float64Array; current: 
   return { density, current };
 }
 
-/** Exact Fourier evolution of the T15a density/current system on the paper's 2048-cell box. */
-export function t15aSpectralReference(
-  profile: T15Profile,
-  ordering: T15Ordering,
+/** Exact Fourier evolution of the KacGoldstein density/current system on the paper's 2048-cell box. */
+export function kacGoldsteinSpectralReference(
+  profile: PersistentWalkProfile,
+  ordering: PersistentWalkOrdering,
   time: number,
   bins = 120,
-): T15aReferenceProfile {
+): KacGoldsteinReferenceProfile {
   const { density: initialDensity, current: initialCurrent } = initialProfile(profile);
   const densityReal = initialDensity.slice();
   const densityImaginary = new Float64Array(GRID_SIZE);
