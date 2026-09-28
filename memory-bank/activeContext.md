@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 12:30:24 IST*
+*Last Updated: 2026-09-28 12:54:37 IST*
 
 ## Current Focus
 **Task**: T41 - Random Walk strategy diagnostics and plots
-**Status**: 🔄 IN PROGRESS — diagnostics and two rounds of Codex review fixes are implemented; frontend production build passes. Live browser acceptance remains. T40 JSON file delivery is still unverified.
+**Status**: 🔄 IN PROGRESS — diagnostics and three rounds of Codex review fixes are implemented; frontend production build passes. Live browser acceptance remains. T40 JSON file delivery is still unverified.
 **Priority**: HIGH
 
-**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page. PR #20 findings are addressed for prior-parameter comparisons, exact CTRW in-step displacement and segment boundaries, normalized T15b reference binning with causal-front mass retained, strategy-specific comparison parameters, and forced terminal diagnostics publication. Live browser acceptance and T40 JSON file delivery remain open; T39 browser QA is separate.
+**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page. PR #20 findings are addressed for prior-parameter comparisons, exact CTRW in-step displacement and segment boundaries, normalized T15b reference binning with causal-front mass retained, strategy-specific comparison parameters, forced terminal diagnostics publication, and preserving the exact absorbing crossing after collision displacement. Live browser acceptance and T40 JSON file delivery remain open; T39 browser QA is separate.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel

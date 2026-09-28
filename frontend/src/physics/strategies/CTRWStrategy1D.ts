@@ -132,10 +132,12 @@ export class CTRWStrategy1D implements PhysicsStrategy {
     const path = this.stepPaths.get(particle);
     this.stepPaths.delete(particle);
     if (path) {
-      particle.position = {
-        x: path.position.x + particle.position.x - path.startPosition.x,
-        y: path.position.y + particle.position.y - path.startPosition.y,
-      };
+      particle.position = path.absorbed
+        ? path.position
+        : {
+            x: path.position.x + particle.position.x - path.startPosition.x,
+            y: path.position.y + particle.position.y - path.startPosition.y,
+          };
       if (path.absorbed) particle.isActive = false;
     } else if (particle.isActive) {
       particle.position.x += velocity.x * dt;
