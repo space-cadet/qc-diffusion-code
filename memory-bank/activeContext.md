@@ -1,14 +1,14 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 12:54:37 IST*
+*Last Updated: 2026-09-28 17:40:54 IST*
 
 ## Current Focus
-**Task**: T41 - Random Walk strategy diagnostics and plots
-**Status**: 🔄 IN PROGRESS — diagnostics and three rounds of Codex review fixes are implemented; frontend production build passes. Live browser acceptance remains. T40 JSON file delivery is still unverified.
+**Task**: T40 and T41 — persistent-walk integration and Random Walk diagnostics
+**Status**: 🔄 IN PROGRESS — `a390ed1` unifies Kac–Goldstein and Masoliver–Lindenbergh with shared controls and the existing engine; T41 diagnostics and three rounds of PR #20 fixes are implemented. TypeScript check passed at 2026-09-28 17:40:54 IST. Production build, full tests, live plot acceptance, and normal-browser JSON file delivery remain open for the latest refactor.
 **Priority**: HIGH
 
-**Context**: T40 integrated T15a/T15b as independent strategies in the existing engine and was committed/pushed on `codex/t40-t15-random-walk-page` as `679cf8d`. T41 adds strategy event telemetry and plots to that existing page. PR #20 findings are addressed for prior-parameter comparisons, exact CTRW in-step displacement and segment boundaries, normalized T15b reference binning with causal-front mass retained, strategy-specific comparison parameters, forced terminal diagnostics publication, and preserving the exact absorbing crossing after collision displacement. Live browser acceptance and T40 JSON file delivery remain open; T39 browser QA is separate.
+**Context**: Branch `codex/t40-t15-random-walk-page` is pushed at `a390ed1`. T40 integrates the two persistent walks as independent strategies with standard boundaries, collisions, density display, history, and export flow; the former alternate runtime/control path was removed. T41 retains exact CTRW event motion, boundary-segment handling, reference-density mass, comparison checks, and exact absorbed crossing positions. T27 remains complete; T39 browser QA is separate.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -59,7 +59,7 @@
 
 **Branch**: `codex/t40-t15-random-walk-page` (based on `cd9f2a7`)
 
-**Immediate Next Steps**: Push the latest PR #20 review fixes and request Codex re-review; complete live browser acceptance for T41 plots and comparison checks; confirm T40 JSON download delivery in a normal browser. T39 browser QA is separate. T27 is complete and does not own this plotting work.
+**Immediate Next Steps**: Run a production build and full relevant test suite for `a390ed1`; verify KG/ML motion, shared boundary handling, density display, and T41 plots in a browser; confirm T40 JSON download delivery in a normal browser. T39 browser QA is separate. T27 remains complete.
 
 ## T40 plan — 2026-09-27
 

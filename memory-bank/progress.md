@@ -1,6 +1,6 @@
 # Progress Tracking
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-05-09 07:27:00 IST*
+*Last Updated: 2026-09-28 17:40:54 IST*
 
 ## Project Overview
 **Project**: QC-Diffusion Code Implementation
@@ -45,15 +45,11 @@
 - ✅ Monorepo build pipeline optimization with TypeScript/JSX resolution
 - ✅ Vercel deployment error resolution and CI/CD stabilization
 
-## 2026-09-27 Random Walk Status
-- ✅ T27 clean rewrite confirmed complete; strategy diagnostic plots are outside its scope.
-- 🔄 T40 remains active: implement `qc-diffusion-T15a` and `qc-diffusion-T15b` as independent strategies in the existing engine and repeat model/page checks.
-- 📝 T41 planned: add strategy diagnostic plots to the existing Random Walk UI.
-- Current Random Walk engine changes include Lévy/Fractional strategies and controls, deterministic run setup/persistence, strategy-composition correction, and observable/UI fixes. Build, tests, and browser verification were not run for this follow-up.
-
-## 2026-09-28 Random Walk Diagnostics
-- ✅ T40 T15a/T15b engine integration committed and pushed as `679cf8d`; JSON download delivery remains unverified.
-- 🔄 T41 plots and strategy telemetry implemented on the existing Random Walk page. Frontend production build passes; browser acceptance is pending.
+## 2026-09-28 Random Walk Branch Status
+- ✅ T27 remains complete; the branch also removes obsolete JavaScript source duplicates while retaining configuration/tooling JavaScript.
+- 🔄 T40 persistent walks are integrated through the shared controls and engine in pushed commit `a390ed1`; saved references are present. Normal-browser JSON file delivery remains unverified.
+- 🔄 T41 diagnostics and CTRW review fixes are implemented on the existing Random Walk page.
+- TypeScript check passed for `a390ed1`. Production build, full tests, and browser plot acceptance have not been run for the final refactor.
 
 ## Current Focus Areas
 ### Active Development

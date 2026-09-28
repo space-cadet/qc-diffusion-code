@@ -1,22 +1,22 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-27 21:42:33 IST*
+*Last Updated: 2026-09-28 17:40:54 IST*
 
 ## Current Session
 
-**2026-09-27 Random Walk follow-up**: T27 clean rewrite is user-confirmed complete. This session added Lévy/Fractional strategies and controls, corrected strategy composition and persistence/seeding/timing, fixed observable registration/parser/display issues, added a safe Lévy alpha default, and removed repeated render logging. T40 remains active for integrating `qc-diffusion-T15a` and `qc-diffusion-T15b` as independent engine strategies and post-integration checks. New T41 is planned for strategy diagnostic plots in the existing Random Walk page. T29 date-parser fix remains recorded in its completed task. See T27, T40, T41 and `sessions/2026-09-27-afternoon.md`.
+**2026-09-28 T40/T41 branch closeout**: `a390ed1` is pushed on `codex/t40-t15-random-walk-page`. Kac–Goldstein and Masoliver–Lindenbergh are integrated into the shared Random Walk controls and engine; the finite-speed Lévy walk strategy was added. T41 diagnostics and CTRW review fixes remain in place. TypeScript check passes; production build, full tests, browser plot acceptance, and normal-browser JSON delivery remain unverified for the final refactor. T27 remains complete; T29 date-parser fix is already recorded.
 
-**Session**: 2026-09-27-afternoon.md
-**Started**: 2026-09-27 12:46:25 IST
-**Focus**: T40 - integrate `qc-diffusion-T15a` and `qc-diffusion-T15b` as engine strategies; T41 diagnostic plots planned
-**Status**: 🔄 IN PROGRESS — T40 engine-strategy integration remains; T41 diagnostics are planned
-**Branch**: `codex/t40-t15-random-walk-page` (base `cd9f2a7`)
+**Session**: T40/T41 branch closeout, 2026-09-28
+**Started**: 2026-09-28 17:16:24 IST
+**Focus**: T40 shared persistent-walk integration and T41 diagnostics
+**Status**: 🔄 IN PROGRESS — implementation pushed; runtime acceptance remains
+**Branch**: `codex/t40-t15-random-walk-page` at `a390ed1`
 
 ## Overview
 
 - Active: 18 | Paused: 0 | Completed: 24
-- Last Session: `sessions/2026-09-26-afternoon.md`
+- Last Session: 2026-09-28 T40/T41 branch closeout
 - Current Period: afternoon
 
 ## Session History (Last 5)
@@ -38,7 +38,7 @@
 - T39b: Spheroid walk numerical validation - ✅ COMPLETE
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
 - T40: T15 modes owned by `qc-diffusion-T15a` and `qc-diffusion-T15b` - 🔄 IN PROGRESS
-- T41: Random Walk Strategy Diagnostics and Plots - 📝 PLANNED
+- T41: Random Walk Strategy Diagnostics and Plots - 🔄 IN PROGRESS
 - T27: Clean Rewrite — Pure WebGL + Original Physics Engine - ✅ COMPLETED
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄
