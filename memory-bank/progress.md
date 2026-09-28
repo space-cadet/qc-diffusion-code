@@ -1,6 +1,6 @@
 # Progress Tracking
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 17:40:54 IST*
+*Last Updated: 2026-09-29 00:51:51 IST*
 
 ## Project Overview
 **Project**: QC-Diffusion Code Implementation
@@ -50,6 +50,12 @@
 - 🔄 T40 persistent walks are integrated through the shared controls and engine in pushed commit `a390ed1`; saved references are present. Normal-browser JSON file delivery remains unverified.
 - 🔄 T41 diagnostics and CTRW review fixes are implemented on the existing Random Walk page.
 - TypeScript check passed for `a390ed1`. Production build, full tests, and browser plot acceptance have not been run for the final refactor.
+
+## 2026-09-29 Main Status
+- `main`, `origin/main`, and `origin/codex/t40-t15-random-walk-page` point to `5c9f239`.
+- Frontend production build passed; the local Vitest run passed 16 test files and 62 tests. The `pnpm test` wrapper failed before the runner with `[ERROR] fetch failed`.
+- Browser checks confirmed the persistent-walk modes, populated diagnostics, comparison-mismatch pause, and no console errors. Normal-browser JSON file delivery remains unverified; the live Vercel deployment was not checked.
+- Uncommitted work includes a 2D CTRW single-step regression test, seeded Bianchi I/IX validation and tests, Vitest configuration separation, and Memory Bank backlog/history files.
 
 ## Current Focus Areas
 ### Active Development

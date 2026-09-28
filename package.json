@@ -5,7 +5,9 @@
 	"scripts": {
 		"build": "pnpm --filter ts-quantum build && pnpm --filter graph-core build && NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm --filter qc-diffusion-frontend build",
 		"clean": "pnpm --filter \"*\" --parallel exec rm -rf dist build .next .nuxt out",
-		"index": "node scripts/index-query.js"
+		"index": "node scripts/index-query.js",
+		"validate:bianchi-telegraph": "node scripts/bianchi-telegraph-validation.mjs",
+		"validate:bianchi-ix": "node scripts/bianchi-telegraph-validation.mjs --bianchi-ix"
 	},
 	"devDependencies": {
 		"playwright": "^1.59.1",

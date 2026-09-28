@@ -3,7 +3,10 @@ import { BallisticStrategy } from '../strategies/BallisticStrategy';
 import { CTRWStrategy2D } from '../strategies/CTRWStrategy2D';
 import { ParticleManager } from '../ParticleManager';
 import { CoordinateSystem } from '../core/CoordinateSystem';
+import { ParameterManager } from '../core/ParameterManager';
+import { createPhysicsStrategies } from '../factories/StrategyFactory';
 import type { BoundaryConfig } from '../types/BoundaryConfig';
+import type { TrajectoryPoint } from '../types/Particle';
 import { CircularBuffer } from '../utils/CircularBuffer';
 
 describe('Physics Engine Integration', () => {
@@ -91,5 +94,45 @@ describe('Physics Engine Integration', () => {
     // Verify position changed (using fixed time step of 0.016)
     expect(mockTsParticle.position.x).toBeCloseTo(initialPos.x + mockTsParticle.velocity.x * 0.016);
     expect(mockTsParticle.position.y).toBeCloseTo(initialPos.y + mockTsParticle.velocity.y * 0.016);
+  });
+
+  test('2D CTRW is the only motion strategy and advances once per step', () => {
+    const boundaries = { type: 'periodic' as const, xMin: -100, xMax: 100, yMin: -100, yMax: 100 };
+    const parameters = new ParameterManager({
+      collisionRate: 1,
+      jumpLength: 1,
+      velocity: 10,
+      particleCount: 1,
+      dimension: '2D',
+      interparticleCollisions: false,
+      strategies: ['ctrw'],
+      boundaryCondition: 'periodic',
+      canvasWidth: 200,
+      canvasHeight: 200,
+    });
+    const strategies = createPhysicsStrategies(parameters, boundaries);
+    const engine = new PhysicsEngine({
+      timeStep: 0.01,
+      boundaries,
+      canvasSize: { width: 200, height: 200 },
+      dimension: '2D',
+      strategies,
+    });
+    const particles = [{
+      id: 'ctrw',
+      position: { x: 0, y: 0 },
+      velocity: { vx: 10, vy: 0 },
+      isActive: true,
+      lastUpdate: 0,
+      lastCollisionTime: 0,
+      nextCollisionTime: Infinity,
+      collisionCount: 0,
+      waitingTime: 0,
+      trajectory: new CircularBuffer<TrajectoryPoint>(100),
+    }];
+
+    expect(strategies).toHaveLength(1);
+    engine.step(particles);
+    expect(particles[0].position.x).toBeCloseTo(0.1);
   });
 });

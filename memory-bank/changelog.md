@@ -1,12 +1,13 @@
 # Changelog
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 17:40:54 IST*
+*Last Updated: 2026-09-29 00:51:51 IST*
 
-## [Unreleased] - 2026-09-28
+## [Unreleased] - 2026-09-29
 
 ### Added
 - **Persistent Random Walk strategies**: Added Kac–Goldstein 1D and Masoliver–Lindenbergh 2D strategies on shared controls and the existing engine; added a finite-speed Lévy walk strategy and model-named reference data.
 - **Random Walk diagnostics**: Added bounded event telemetry and plots for spread, event distributions, radial density, event counts, velocity correlation, trajectories, and comparable saved runs.
+- **Bianchi validation tools**: Added seeded Bianchi I persistent-walk versus telegraph diagnostics and Bianchi IX Misner-potential field diagnostics with command-line entry points.
 
 ### Fixed
 - **Random Walk strategy composition**: Ensure 2D motion uses one selected motion strategy, with interparticle collisions composed separately.
@@ -14,6 +15,8 @@
 - **CTRW paths**: Preserve event-segment motion, apply boundaries between segments, and keep absorbed walkers at their exact crossing positions through integration.
 - **Memory Bank Viewer Dates**: Normalize and validate Markdown date metadata so timezone suffixes or malformed values cannot crash document rendering.
 - **Frontend source cleanup**: Remove obsolete JavaScript source duplicates while retaining configuration and tooling files.
+- **Physics regression coverage**: Added an integration check that 2D CTRW is the sole motion strategy and advances a particle once per engine step.
+- **Vitest configuration**: Moved test settings to `frontend/vitest.config.ts`, separate from the Vite production build configuration.
 
 ## [3.0.0] - 2026-01-11 - Build Pipeline Resolution & Quantum Walk Explorer
 

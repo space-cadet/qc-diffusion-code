@@ -38,7 +38,6 @@ Eliminates "popping" artifacts between detail levels:
 - **Temporal stability**: Consistent appearance across frames
 
 ## Recommended Approach: Tessellation-Based AMR
-=======
 
 **Phase 1: Tessellation Pipeline Conversion**
 Convert existing fragment shader solver to tessellation shader pipeline:

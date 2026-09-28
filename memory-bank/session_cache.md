@@ -1,31 +1,31 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 17:40:54 IST*
+*Last Updated: 2026-09-29 00:51:51 IST*
 
 ## Current Session
 
-**2026-09-28 T40/T41 branch closeout**: `a390ed1` is pushed on `codex/t40-t15-random-walk-page`. Kac–Goldstein and Masoliver–Lindenbergh are integrated into the shared Random Walk controls and engine; the finite-speed Lévy walk strategy was added. T41 diagnostics and CTRW review fixes remain in place. TypeScript check passes; production build, full tests, browser plot acceptance, and normal-browser JSON delivery remain unverified for the final refactor. T27 remains complete; T29 date-parser fix is already recorded.
+**2026-09-29 T40/T41 main closeout**: `main` and `origin/main` are at `5c9f239`. The frontend production build passed; local Vitest passed 16 files and 62 tests. Browser checks confirmed both persistent-walk modes, populated diagnostics, comparison-mismatch pause, and no console errors. Normal-browser JSON delivery and live Vercel deployment remain unverified. The working tree also contains uncommitted T27 CTRW regression coverage, T1 Bianchi validation, T23 Vitest configuration, and previously documented backlog/Memory Bank work.
 
-**Session**: T40/T41 branch closeout, 2026-09-28
-**Started**: 2026-09-28 17:16:24 IST
-**Focus**: T40 shared persistent-walk integration and T41 diagnostics
-**Status**: 🔄 IN PROGRESS — implementation pushed; runtime acceptance remains
-**Branch**: `codex/t40-t15-random-walk-page` at `a390ed1`
+**Session**: T40/T41 main closeout and local validation work, 2026-09-29
+**Started**: 2026-09-29 00:05:23 IST
+**Focus**: Record merged code, build/test/browser evidence, and remaining acceptance checks
+**Status**: 🔄 IN PROGRESS — code is pushed on main; JSON download and live deployment remain unverified
+**Branch**: `main` at `5c9f239`
 
 ## Overview
 
 - Active: 18 | Paused: 0 | Completed: 24
-- Last Session: 2026-09-28 T40/T41 branch closeout
-- Current Period: afternoon
+- Last Session: 2026-09-29 T40/T41 main closeout and local validation work
+- Current Period: early morning
 
 ## Session History (Last 5)
 
-1. `sessions/2026-09-27-afternoon.md` - T40 plan and implementation verification continuation
-2. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
-3. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential gate, T27 composition fix, and T38 planning
-4. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
-5. `sessions/2026-05-09-afternoon.md` - T27 V2 parity fixes, density restoration, and initial distribution wiring
+1. `sessions/2026-09-29-early.md` - T40/T41 main closeout, build/tests, browser checks, and local validation work
+2. `sessions/2026-09-27-afternoon.md` - T40 plan and implementation verification continuation
+3. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
+4. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential, T27 composition fix, and T38 planning
+5. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
 6. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
 7. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
 8. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
@@ -39,6 +39,7 @@
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
 - T40: T15 modes owned by `qc-diffusion-T15a` and `qc-diffusion-T15b` - 🔄 IN PROGRESS
 - T41: Random Walk Strategy Diagnostics and Plots - 🔄 IN PROGRESS
+- T38: Headless Random Walk Statistics Runner - 📝 PLANNED
 - T27: Clean Rewrite — Pure WebGL + Original Physics Engine - ✅ COMPLETED
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄

@@ -4,14 +4,14 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
 
 ## Metadata
 ```json
-{ "generated_at": "2026-09-27 12:56:04 IST", "version": "1" }
+{ "generated_at": "2026-09-29 00:51:51 IST", "version": "1" }
 ```
 
 ## Inverse Indexes (inline source of truth)
 ```json
 {
   "tag_index": {
-    "random-walk": ["1d-random-walk-sim-plan","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walks-diff-eq","t15a-t15b-random-walk-page-integration","quantum-walk-implementation"],
+    "random-walk": ["1d-random-walk-sim-plan","headless-random-walk-runner","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walks-diff-eq","t15a-t15b-random-walk-page-integration","quantum-walk-implementation"],
     "collisions": ["interparticle-collision-plan"],
     "gpu": ["gpu-amr-integration","visual-pde-gpu-solver-plan"],
     "amr": ["gpu-amr-integration"],
@@ -20,6 +20,9 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "ui": ["observer-design-plan","random-walk-ui-interface"],
     "observables": ["observer-design-plan"],
     "architecture": ["observer-design-plan","pde-bcs-final-plan","random-walk-class-redesign","pde-bcs-architecture-claude4","pde-bcs-architecture-deepseek","pde-bcs-architecture-gpt5"],
+    "frontend-maintenance": ["frontend-dead-code-inventory"],
+    "statistics": ["headless-random-walk-runner"],
+    "state-management": ["zustand-store-splitting-plan"],
     "deployment": ["vercel-deployment-plan"],
     "quantum": ["quantum-walk-implementation"]
   },
@@ -27,6 +30,9 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "T12": ["interparticle-collision-plan"],
     "T14": ["interparticle-collision-plan"],
     "T24": ["quantum-walk-implementation"],
+    "T25d": ["zustand-store-splitting-plan"],
+    "T34": ["frontend-dead-code-inventory"],
+    "T38": ["headless-random-walk-runner"],
     "T40": ["t15a-t15b-random-walk-page-integration"]
   }
 }
@@ -49,7 +55,10 @@ One JSON object per line. Fields: id, title, path, summary, tags, tasks?, update
 { "id":"random-walk-engine-plan", "title":"Random Walk Engine Implementation Plan", "path":"memory-bank/implementation-details/random-walk-engine-plan.md", "summary":"Replaces tsParticles motion with CTRW physics; phases include core collisions, strategy system, density comparison, and telegraph linkage.", "tags":["random-walk","strategy"], "updated":"2025-08-23 17:05:57 IST" }
 { "id":"random-walk-ui-interface", "title":"Random Walk UI Interface Design", "path":"memory-bank/implementation-details/random-walk-ui-interface.md", "summary":"Defines Random Walk page layout, parameter controls, run/pause/reset, status metrics, and density comparison UI; integrates with physics and history/export flows.", "tags":["random-walk","ui"], "updated":"2025-08-27 23:15:00 IST" }
 { "id":"t15a-t15b-random-walk-page-integration", "title":"Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page", "path":"memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md", "summary":"Documents Kac–Goldstein and Masoliver–Lindenbergh as independent strategies using the shared Random Walk controls and engine; normal-browser JSON delivery remains unverified.", "tags":["random-walk","research","ui"], "tasks":["T40"], "updated":"2026-09-28 17:40:54 IST" }
-{ "id":"random-walks-diff-eq", "title":"Random Walk Derivation of Telegraph Equation", "path":"memory-bank/implementation-details/random-walks-diff-eq.md", "summary":"Shows how telegraph equation emerges from CTRW; details physics engine, tsParticles integration, and component wiring via diagrams for implementation guidance.", "tags":["random-walk","pde","architecture"], "updated":"2025-08-20 23:50:59 IST" }
+{ "id":"random-walks-diff-eq", "title":"Random Walk Derivation of Telegraph Equation", "path":"memory-bank/implementation-details/random-walks-diff-eq.md", "summary":"Records the CTRW/telegraph relation, 2D CTRW single-motion composition, and Bianchi I/IX validation conventions and results.", "tags":["random-walk","pde","architecture"], "tasks":["T1","T27"], "updated":"2026-09-29 00:51:51 IST" }
+{ "id":"frontend-dead-code-inventory", "title":"Frontend Dead Code Inventory", "path":"memory-bank/implementation-details/frontend-dead-code-inventory.md", "summary":"Inventory of frontend source artifacts reviewed for cleanup under T34.", "tags":["frontend-maintenance"], "tasks":["T34"], "updated":"2026-05-11 11:31:20 IST" }
+{ "id":"headless-random-walk-runner", "title":"Headless Random Walk Statistics Runner", "path":"memory-bank/implementation-details/headless-random-walk-runner.md", "summary":"Plans a seeded Node runner for the production RandomWalkSimulator and PhysicsEngine, separate from the Bianchi validation model.", "tags":["random-walk","statistics"], "tasks":["T38"], "updated":"2026-07-21 15:36:00 IST" }
+{ "id":"zustand-store-splitting-plan", "title":"Zustand Store Splitting Plan", "path":"memory-bank/implementation-details/zustand-store-splitting-plan.md", "summary":"Records planned domain boundaries and migration steps for splitting the application Zustand store under T25d.", "tags":["state-management","architecture"], "tasks":["T25d"], "updated":"2026-05-11 11:31:20 IST" }
 { "id":"vercel-deployment-plan", "title":"Vercel Deployment Plan for QC-Diffusion Code Subproject", "path":"memory-bank/implementation-details/vercel-deployment-plan.md", "summary":"Monorepo deployment to Vercel with pnpm filters, frontend build settings, rewrites, cache headers; documents vercel.json and CI-friendly commands.", "tags":["deployment"], "updated":"2025-08-23 18:52:31 IST" }
 { "id":"visual-pde-gpu-solver-plan", "title":"VisualPDE GPU Solver Integration Plan", "path":"memory-bank/implementation-details/visual-pde-gpu-solver-plan.md", "summary":"Extracts VisualPDE WebGL solver components, texture management, and GLSL operators to integrate GPU PDE solving into React app for major speedups.", "tags":["gpu","pde","solvers"], "updated":"2025-08-25 12:54:55 IST" }
 { "id":"pde-bcs-architecture-claude4", "title":"QC-Diffusion Physics Engine Architecture (Claude 4)", "path":"memory-bank/implementation-details/boundary-conditions/pde-bcs-architecture-claude4.md", "summary":"Complex multi-pattern BC architecture (Strategy+Bridge+Factory) with per-equation/edge BCs; flexible but high complexity and consistency risk.", "tags":["pde","boundary-conditions","architecture"] }

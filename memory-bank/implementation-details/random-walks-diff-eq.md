@@ -6,6 +6,20 @@ _Created: 2025-08-20 23:50:59 IST_
 
 This document outlines the implementation steps for demonstrating how the telegraph equation emerges from discrete random walk processes in the appropriate continuum limits.
 
+## Validation Snapshot (2026-07-21 15:03:29 IST)
+
+The V2 2D CTRW path uses CTRW as the motion strategy. CTRW performs Poisson scattering and position integration; composing it with ballistic motion caused a second position update per engine step. Inter-particle collisions remain a separate optional strategy.
+
+The headless runner provides seeded ensemble runs, density-versus-PDE $L^1/L^2$ metrics, moments, finite-speed-front checks, and refinement studies. It uses $(\beta_+,\beta_-)$ for the Bianchi I coordinates, $\alpha$ for simulation time, the matched equation $u_{\alpha\alpha}+2\lambda u_\alpha=v^2\Delta_\beta u$, and $B=-2\lambda\le0$. The application's generic graph mode implements a graph walk and does not implement spin-network coarse-graining or a Bianchi minisuperspace model.
+
+The default matched calibration has zero finite-speed-front violations. Refinement errors are $L^1=(1.0337,0.9541,1.0215)$ and $L^2=(0.4431,0.4037,0.4423)$ for $(32^2,5000)$, $(64^2,20000)$, and $(96^2,45000)$.
+
+For Bianchi IX, `scripts/bianchi-telegraph-validation.mjs --bianchi-ix` implements the standard Misner $e^{4\alpha}V_{IX}(\beta_+,\beta_-)$ convention. The source coefficient $q=-e^{4\alpha}V_{IX}$ has both signs. Under the tested time-step refinements, the scalar field becomes negative; the runner reports `positiveFixedPopulation: false`, `positiveBranchingPopulation: false`, and a signed-weight representation. The runner uses this normalization; the manuscript expression uses $-24\pi^2e^{6\alpha}R$. No conversion between those normalizations is implemented here.
+
+## Current Implementation (2026-09-29)
+
+The T40 integration adds Lévy-flight and fractional-diffusion strategies to the original-engine V2 path.
+
 ### High-Level Component Structure
 
 ```mermaid

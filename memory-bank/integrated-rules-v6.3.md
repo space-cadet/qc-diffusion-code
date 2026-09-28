@@ -394,11 +394,10 @@ For precise, surgical modifications:
 ```
 <edit_block>
 <blockContent>File path here
-<<<<<<< SEARCH
+SEARCH:
 Original content to find
-=======
+REPLACE WITH:
 New content to replace with
->>>>>>> REPLACE
 </blockContent>
 </edit_block>
 ```

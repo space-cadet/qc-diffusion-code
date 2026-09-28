@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-28 17:40:54 IST*
+*Last Updated: 2026-09-29 00:51:51 IST*
 
 ## Active Tasks
 
@@ -93,15 +93,15 @@
 
 ### T40: Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page
 **Description**: Add the Kac–Goldstein 1D velocity-flip walk and Masoliver–Lindenbergh 2D heading-reset walk as reproducible strategies on the existing Random Walk page.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-28 17:16:24 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/physics/strategies/KacGoldsteinStrategy.ts`, `frontend/src/physics/strategies/MasoliverLindenberghWalkStrategy.ts`.
-**Notes**: T27 is complete. The persistent walks use the shared controls and engine. Browser JSON file delivery remains unverified; the latest refactor still needs a production build and browser acceptance. Scientific task owners remain `qc-diffusion-T15a` and `qc-diffusion-T15b` in the qc-diffusion repository.
+**Notes**: T27 is complete. The persistent walks use the shared controls and engine. Commit `5c9f239` is pushed to `main`; the production build and 16-file/62-test run passed, and browser checks confirmed the modes and populated diagnostics. Browser JSON file delivery remains unverified; live Vercel status was not checked. Scientific task owners remain `qc-diffusion-T15a` and `qc-diffusion-T15b` in the qc-diffusion repository.
 
 ### T41: Random Walk Strategy Diagnostics and Plots
 **Description**: Add strategy-specific diagnostic plots to the existing Random Walk page so users can distinguish motion rules over time.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-28 17:16:24 IST
-**Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters. Browser plot and comparison acceptance remains open.
-**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. PR #20 review fixes also preserve exact absorbing-boundary crossing positions in CTRW integration despite later collision displacement. Frontend production build passes; live browser acceptance remains. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
+**Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters. Browser plot and comparison checks have been performed; full task acceptance remains open.
+**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. PR #20 review fixes also preserve exact absorbing-boundary crossing positions in CTRW integration despite later collision displacement. Browser checks confirmed plot population and comparison-mismatch pause with no console errors. Production build passed; the local test run passed 16 files and 62 tests. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.
@@ -169,9 +169,9 @@
 ### T1: Numerical Simulations for QC-Diffusion Paper Concepts
 
 **Description**: Create comprehensive numerical simulations to illustrate key concepts from the Wheeler-DeWitt diffusion paper
-**Status**: 🔄 IN PROGRESS **Last**: 2026-07-21 15:03:29 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
 **Files**: `scripts/bianchi-telegraph-validation.mjs`, `frontend/src/physics/__tests__/BianchiTelegraphValidation.test.ts`, `package.json`
-**Notes**: Seeded headless Bianchi I persistent-walk versus telegraph comparison added in $(\beta_+,\beta_-;\alpha)$ with $B=-2\lambda\le0$, matched absorbing boundaries, density/moment/front metrics, and refinement output. The default refinement is non-monotone, so it is a calibration gate rather than convergence evidence.
+**Notes**: Seeded headless Bianchi I persistent-walk versus telegraph comparison added in $(\beta_+,\beta_-;\alpha)$ with $B=-2\lambda\le0$, matched absorbing boundaries, density/moment/front metrics, and refinement output. Bianchi IX potential diagnostics are also available through the validation script. The Bianchi validation tests passed in the local 16-file/62-test run.
 
 ### T2: PDE Simulation (Parent Task)
 **Description**: Complete WebGL GPU-based PDE simulation system with multiple solver methods and boundary conditions
@@ -369,9 +369,9 @@
 
 ### T23: Comprehensive Testing Framework Enhancement
 **Description**: Enhance the existing testing framework, including Vitest configuration, JSDOM environment setup, and refinement of physics engine test cases.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-05-11 11:31:20 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
 **Files**: `frontend/package.json`, `frontend/pnpm-lock.yaml`, `frontend/vite.config.ts`, `frontend/src/physics/__tests__/CTRWStrategy2D.test.ts`, `frontend/src/physics/__tests__/integration.test.ts`, `frontend/src/physics/__tests__/two-phase-engine.test.ts`
-**Notes**: Vitest config fixed: created `frontend/vitest.config.ts` with `globals: true` and `environment: 'jsdom'`. All 9 test suites now pass (40 tests). Legacy `jest.config.js` removed. Remaining: package-level tests and expanded physics test coverage.
+**Notes**: Vitest settings are in `frontend/vitest.config.ts`, separate from `frontend/vite.config.ts`. The local Vitest run passed 16 test files and 62 tests. The `pnpm test` wrapper failed before the runner with `[ERROR] fetch failed`. Package-level tests remain unverified.
 
 ### T24: Quantum Walk Explorer Implementation
 
