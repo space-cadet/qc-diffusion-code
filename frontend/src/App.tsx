@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
+import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense } from "react";
 import PdeParameterPanel from "./PdeParameterPanel";
 const PlotComponent = lazy(() => import("./PlotComponent"));
 const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
@@ -12,6 +12,7 @@ const MemoryBankPage = lazy(() => import("./memoryBank").then(module => ({ defau
 import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
+import { AppTab, getAppTabForLocation, navigateToAppTab, navigateToUrl, useUrlLocation } from "./navigation/urlNavigation";
 
 // ---- Tab definitions ----
 
@@ -30,6 +31,10 @@ const ALL_TABS = [
 // Bottom bar shows first 4 tabs + "More" button
 const BOTTOM_BAR_TABS = ALL_TABS.slice(0, 4);
 const OVERFLOW_TABS = ALL_TABS.slice(4);
+const URL_WALK_STRATEGIES = ['simple', 'ctrw', 'levy', 'levy-walk', 'fractional', 'kac-goldstein', 'masoliver-lindenbergh'] as const;
+type UrlWalkStrategy = (typeof URL_WALK_STRATEGIES)[number];
+const isUrlWalkStrategy = (value: string | null): value is UrlWalkStrategy =>
+  value !== null && URL_WALK_STRATEGIES.includes(value as UrlWalkStrategy);
 
 // ---- Mobile bottom nav + hamburger ----
 
@@ -116,11 +121,78 @@ function DesktopTabBar({ activeTab, setActiveTab }: { activeTab: string; setActi
 // ---- Main App ----
 
 export default function App() {
-    const { activeTab, simulationParams, setActiveTab, setSimulationParams, pdeState, setPdeState } = useAppStore();
+    const { activeTab: storedActiveTab, simulationParams, setActiveTab, setSimulationParams, gridLayoutParams, setGridLayoutParams, pdeState, setPdeState } = useAppStore();
+    const urlLocation = useUrlLocation();
+    const urlTab = getAppTabForLocation(urlLocation);
+    const activeTab = urlTab ?? storedActiveTab;
     const [currentFrame, setCurrentFrame] = useState(null);
     const canvasRef = useRef(null);
     const { initSolver, runAnimation, stop } = useWebGLSolver();
     const isWebGL = simulationParams.solver_type === 'webgl';
+    const url = new URL(urlLocation, window.location.origin);
+    const urlStrategy = url.searchParams.get("strategy");
+
+    useLayoutEffect(() => {
+      if (!urlTab) {
+        navigateToUrl('/simulation', true);
+        return;
+      }
+      if (urlTab !== storedActiveTab) setActiveTab(urlTab as AppTab);
+      if (urlTab === 'randomwalksim' && isUrlWalkStrategy(urlStrategy)) {
+        const currentStrategy = gridLayoutParams.strategies?.find(isUrlWalkStrategy) ?? 'simple';
+        const dimension = urlStrategy === 'kac-goldstein' ? '1D' : urlStrategy === 'masoliver-lindenbergh' ? '2D' : gridLayoutParams.dimension;
+        const initialDistType = urlStrategy === 'kac-goldstein' ? 'centered' : urlStrategy === 'masoliver-lindenbergh' ? 'origin' : gridLayoutParams.initialDistType;
+        if (currentStrategy !== urlStrategy || gridLayoutParams.dimension !== dimension || gridLayoutParams.initialDistType !== initialDistType) {
+          setGridLayoutParams({ ...gridLayoutParams, strategies: [urlStrategy], dimension, initialDistType });
+        }
+      }
+    }, [urlLocation, urlTab, urlStrategy, storedActiveTab, gridLayoutParams, setActiveTab, setGridLayoutParams]);
+
+    const handleNavigateTab = useCallback((tab: string) => {
+      if (!(tab in {
+        simulation: true, randomwalksim: true, quantumwalk: true, 'quantumwalk-refactored': true,
+        analysis: true, labdemo: true, simplicialgrowth: true, spheroidwalk: true, memorybank: true,
+      })) return;
+      setActiveTab(tab as AppTab);
+      navigateToAppTab(tab as AppTab);
+    }, [setActiveTab]);
+
+    useEffect(() => {
+      const currentUrl = new URL(urlLocation, window.location.origin);
+      if (currentUrl.hash.length < 2) return;
+      let anchor: string;
+      try {
+        anchor = decodeURIComponent(currentUrl.hash.slice(1));
+      } catch {
+        return;
+      }
+      let observer: MutationObserver | undefined;
+      let scrollTimer: number | undefined;
+      const timeout = window.setTimeout(() => observer?.disconnect(), 10000);
+      const scrollToAnchor = () => {
+        const target = document.getElementById(anchor);
+        if (target) {
+          scrollTimer = window.setTimeout(() => {
+            document.getElementById(anchor)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+          }, 350);
+          observer?.disconnect();
+          window.clearTimeout(timeout);
+          return true;
+        }
+        return false;
+      };
+      if (!scrollToAnchor()) {
+        observer = new MutationObserver(() => {
+          scrollToAnchor();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+      return () => {
+        observer?.disconnect();
+        window.clearTimeout(timeout);
+        if (scrollTimer !== undefined) window.clearTimeout(scrollTimer);
+      };
+    }, [urlLocation]);
 
     const initializeConditions = useCallback((params) => {
         console.log("Generating initial conditions with params:", params);
@@ -253,7 +325,7 @@ export default function App() {
     };
     return (<div className="h-screen flex flex-col">
       {/* Desktop Tab Navigation */}
-      <DesktopTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <DesktopTabBar activeTab={activeTab} setActiveTab={handleNavigateTab} />
 
       {/* Content - add bottom padding on mobile for the bottom nav */}
       <div className={`flex-1 pb-14 md:pb-0 ${activeTab === 'randomwalksim' || activeTab === 'spheroidwalk' ? 'overflow-auto' : 'overflow-hidden'}`}>
@@ -271,6 +343,6 @@ export default function App() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <MobileBottomNav activeTab={activeTab} setActiveTab={handleNavigateTab} />
     </div>);
 }

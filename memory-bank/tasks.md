@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-29 00:51:51 IST*
+*Last Updated: 2026-09-30 02:48:52 IST*
 
 ## Active Tasks
 
@@ -72,6 +72,7 @@
 | T33 | Boundary Growth: Panel Size, Symmetric Simplices, Boundary Conditions Fix | ✅ COMPLETED | HIGH | 2026-02-16 | T30, T30b | [Details](tasks/T33.md) |
 | T34 | Frontend Build Artifact Cleanup | 📝 PLANNED | HIGH | 2026-05-11 | - | [Details](tasks/T34.md) |
 | T35 | App Shell and Navigation Refactor | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T35.md) |
+| T35a | URL-Backed Navigation and Shareable Views | 🔄 IN PROGRESS | MEDIUM | 2026-09-29 | T35 | [Details](tasks/T35a.md) |
 | T36 | Monorepo Package Hygiene | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T36.md) |
 | T37 | Backend API Hardening | 📝 PLANNED | MEDIUM | 2026-05-11 | T32 | [Details](tasks/T37.md) |
 | T38 | Headless Random Walk Statistics Runner | 📝 PLANNED | HIGH | 2026-07-21 | T1, T15a, T27 | [Details](tasks/T38.md) |
@@ -81,8 +82,16 @@
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 | T40 | Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page | 🔄 IN PROGRESS | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
 | T41 | Random Walk Strategy Diagnostics and Plots | 🔄 IN PROGRESS | HIGH | 2026-09-27 | - | [Details](tasks/T41.md) |
+| T42 | Random Walk Panel Workspace and Viewport Controls | 📝 PLANNED | MEDIUM | 2026-09-30 | T27, T41 | [Details](tasks/T42.md) |
 
 ## Task Details
+
+### T35a: URL-Backed Navigation and Shareable Views
+**Description**: Make app pages and meaningful sections addressable by URL, preserving direct load, refresh, and browser history while keeping existing page interfaces and engines unified.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-30 02:48:52 IST
+**Parent**: T35 — App Shell and Navigation Refactor.
+**Files**: `memory-bank/tasks/T35a.md`, `memory-bank/implementation-details/url-backed-navigation.md`.
+**Notes**: Implemented stable URLs for all nine app pages, in-page tabs, PDE disclosures, Random Walk strategies and panel links, and Memory Bank folders/documents. Local TypeScript/build and browser checks pass; deployed nested-path and legacy `?data=` compatibility remain open. See the implementation plan.
 
 ### T39: Spheroid Geometry-Space Walk Experiment
 **Description**: Reproducible walks between intrinsic spheroid geometries, independently checked and rendered in 3D.
@@ -102,6 +111,12 @@
 **Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters. Browser plot and comparison checks have been performed; full task acceptance remains open.
 **Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. PR #20 review fixes also preserve exact absorbing-boundary crossing positions in CTRW integration despite later collision displacement. Browser checks confirmed plot population and comparison-mismatch pause with no console errors. Production build passed; the local test run passed 16 files and 62 tests. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
+
+### T42: Random Walk Panel Workspace and Viewport Controls
+**Description**: Make every Random Walk panel movable, resizable, collapsible, and persistent; add particle-view zoom and clear finite-boundary display; combine simulation transport controls.
+**Status**: 📝 PLANNED **Last**: 2026-09-30 02:48:52 IST
+**Files**: `memory-bank/tasks/T42.md`, `memory-bank/implementation-details/random-walk-panel-workspace.md`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/hooks/useRandomWalkPanels.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`.
+**Notes**: Plan reuses React Grid Layout, `FloatingPanel`/`react-rnd`, and existing Zustand persistence. No implementation changes have been made for T42. T41 owns strategy diagnostic comparisons; T38 owns the planned headless statistics runner.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.

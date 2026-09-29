@@ -4,7 +4,7 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
 
 ## Metadata
 ```json
-{ "generated_at": "2026-09-29 00:51:51 IST", "version": "1" }
+{ "generated_at": "2026-09-29 20:55:07 IST", "version": "1" }
 ```
 
 ## Inverse Indexes (inline source of truth)
@@ -24,7 +24,10 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "statistics": ["headless-random-walk-runner"],
     "state-management": ["zustand-store-splitting-plan"],
     "deployment": ["vercel-deployment-plan"],
-    "quantum": ["quantum-walk-implementation"]
+    "quantum": ["quantum-walk-implementation"],
+    "navigation": ["url-backed-navigation"],
+    "routing": ["url-backed-navigation"],
+    "deep-linking": ["url-backed-navigation"]
   },
   "task_index": {
     "T12": ["interparticle-collision-plan"],
@@ -33,7 +36,10 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "T25d": ["zustand-store-splitting-plan"],
     "T34": ["frontend-dead-code-inventory"],
     "T38": ["headless-random-walk-runner"],
-    "T40": ["t15a-t15b-random-walk-page-integration"]
+    "T40": ["t15a-t15b-random-walk-page-integration"],
+    "T42": ["random-walk-panel-workspace"],
+    "T35": ["url-backed-navigation"],
+    "T35a": ["url-backed-navigation"]
   }
 }
 ```
@@ -60,6 +66,8 @@ One JSON object per line. Fields: id, title, path, summary, tags, tasks?, update
 { "id":"headless-random-walk-runner", "title":"Headless Random Walk Statistics Runner", "path":"memory-bank/implementation-details/headless-random-walk-runner.md", "summary":"Plans a seeded Node runner for the production RandomWalkSimulator and PhysicsEngine, separate from the Bianchi validation model.", "tags":["random-walk","statistics"], "tasks":["T38"], "updated":"2026-07-21 15:36:00 IST" }
 { "id":"zustand-store-splitting-plan", "title":"Zustand Store Splitting Plan", "path":"memory-bank/implementation-details/zustand-store-splitting-plan.md", "summary":"Records planned domain boundaries and migration steps for splitting the application Zustand store under T25d.", "tags":["state-management","architecture"], "tasks":["T25d"], "updated":"2026-05-11 11:31:20 IST" }
 { "id":"vercel-deployment-plan", "title":"Vercel Deployment Plan for QC-Diffusion Code Subproject", "path":"memory-bank/implementation-details/vercel-deployment-plan.md", "summary":"Monorepo deployment to Vercel with pnpm filters, frontend build settings, rewrites, cache headers; documents vercel.json and CI-friendly commands.", "tags":["deployment"], "updated":"2025-08-23 18:52:31 IST" }
+{ "id":"url-backed-navigation", "title":"URL-Backed Navigation and Shareable Views", "path":"memory-bank/implementation-details/url-backed-navigation.md", "summary":"Implements stable page routes and deep links for navigable subsections; URL state wins over persisted navigation, Random Walk modes stay in the shared UI and engine, and local browser acceptance passes.", "tags":["navigation","routing","deep-linking","architecture"], "tasks":["T35","T35a"], "updated":"2026-09-29 20:55:07 IST" }
+{ "id":"random-walk-panel-workspace", "title":"Random Walk Panel Workspace and Viewport Controls", "path":"memory-bank/implementation-details/random-walk-panel-workspace.md", "summary":"Plans persistent draggable, resizable, collapsible Random Walk panels, particle viewport zoom and boundary visibility, and a unified Start/Pause/Resume control using existing UI patterns.", "tags":["random-walk","ui","panels","viewport"], "tasks":["T42"], "updated":"2026-09-30 02:48:52 IST" }
 { "id":"visual-pde-gpu-solver-plan", "title":"VisualPDE GPU Solver Integration Plan", "path":"memory-bank/implementation-details/visual-pde-gpu-solver-plan.md", "summary":"Extracts VisualPDE WebGL solver components, texture management, and GLSL operators to integrate GPU PDE solving into React app for major speedups.", "tags":["gpu","pde","solvers"], "updated":"2025-08-25 12:54:55 IST" }
 { "id":"pde-bcs-architecture-claude4", "title":"QC-Diffusion Physics Engine Architecture (Claude 4)", "path":"memory-bank/implementation-details/boundary-conditions/pde-bcs-architecture-claude4.md", "summary":"Complex multi-pattern BC architecture (Strategy+Bridge+Factory) with per-equation/edge BCs; flexible but high complexity and consistency risk.", "tags":["pde","boundary-conditions","architecture"] }
 { "id":"pde-bcs-architecture-deepseek", "title":"Boundary Condition Architecture Comparison (DeepSeek)", "path":"memory-bank/implementation-details/boundary-conditions/pde-bcs-architecture-deepseek.md", "summary":"Recommends shader-only BC helpers with simple adapter; emphasizes simplicity, consistency, phased extensibility, and performance.", "tags":["pde","boundary-conditions","architecture"] }

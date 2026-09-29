@@ -319,7 +319,7 @@ export default function RandomWalkSimV2() {
           containerPadding={[0, 0]}
           draggableHandle=".drag-handle"
         >
-          <div key="parameters">
+          <div key="parameters" id="random-walk-parameters">
             <RandomWalkParameterPanelV2
               gridLayoutParams={gridLayoutParams}
               setGridLayoutParams={setGridLayoutParams}
@@ -330,7 +330,7 @@ export default function RandomWalkSimV2() {
               handleInitialize={handleInitialize}
             />
           </div>
-          <div key="canvas">
+          <div key="canvas" id="random-walk-canvas">
             <ParticleCanvasV2
               key={`walk-${gridLayoutParams.dimension}`}
               params={engineParams}
@@ -344,7 +344,7 @@ export default function RandomWalkSimV2() {
               onStrategyEvent={handleStrategyEvent}
             />
           </div>
-          <div key="density">
+          <div key="density" id="density">
             <DensityComparison
               particles={liveParticlesRef.current}
               particleCount={liveParticlesRef.current.length}
@@ -353,11 +353,11 @@ export default function RandomWalkSimV2() {
               binSize={isKacGoldstein ? 800 / 120 : isMasoliverLindenbergh ? 5 : undefined}
             />
           </div>
-          <div key="history">
+          <div key="history" id="history">
             <HistoryPanel simulationState={randomWalkSimulationState} />
             {walkMode && <PersistentWalkDiagnosticsPanel mode={walkMode} config={walkConfig} diagnostics={walkDiagnostics} />}
           </div>
-          <div key="export">
+          <div key="export" id="export">
             <ExportPanel
               simulationState={randomWalkSimulationState}
               onExport={() => console.log("Export")}
@@ -367,12 +367,14 @@ export default function RandomWalkSimV2() {
           </div>
         </ReactGridLayout>
 
-        <StrategyDiagnosticsPanel
-          snapshot={strategyDiagnostics}
-          comparison={diagnosticComparison}
-          onCaptureComparison={() => strategyDiagnostics && setDiagnosticComparison(strategyDiagnostics)}
-          onClearComparison={() => setDiagnosticComparison(null)}
-        />
+        <div id="diagnostics">
+          <StrategyDiagnosticsPanel
+            snapshot={strategyDiagnostics}
+            comparison={diagnosticComparison}
+            onCaptureComparison={() => strategyDiagnostics && setDiagnosticComparison(strategyDiagnostics)}
+            onClearComparison={() => setDiagnosticComparison(null)}
+          />
+        </div>
 
         <FloatingPanel
           title="Observables"

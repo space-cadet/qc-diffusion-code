@@ -6,6 +6,7 @@ import { ParameterPanel } from './lab/components/ParameterPanel';
 import { AnalysisTable } from './lab/components/AnalysisTable';
 import { MetricsTable } from './lab/components/MetricsTable';
 import { TabNavigation } from './lab/components/TabNavigation';
+import { navigateToUrl, useUrlLocation } from './navigation/urlNavigation';
 import { SimplicialVisualization } from './lab/components/SimplicialVisualization';
 import { SimplicialVisualization3D } from './lab/components/SimplicialVisualization3D';
 import { PachnerMoveTester } from './lab/components/PachnerMoveTester';
@@ -535,7 +536,21 @@ const TABS = [
 ];
 
 export const SimplicialGrowthPage: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('boundary');
+  const urlLocation = useUrlLocation();
+  const url = new URL(urlLocation, window.location.origin);
+  const pathname = url.pathname.replace(/\/$/, '');
+  const activeTab = pathname === '/simplicial-growth/interior' ? 'interior' : 'boundary';
+  useEffect(() => {
+    if (pathname !== '/simplicial-growth' && pathname !== '/simplicial-growth/boundary' && pathname !== '/simplicial-growth/interior') {
+      url.pathname = '/simplicial-growth';
+      navigateToUrl(url, true);
+    }
+  }, [urlLocation, pathname]);
+  const setActiveTab = (tab: string) => {
+    const url = new URL(window.location.href);
+    url.pathname = tab === 'interior' ? '/simplicial-growth/interior' : '/simplicial-growth';
+    navigateToUrl(url);
+  };
   console.debug('[SimplicialGrowthPage] Render, activeTab:', activeTab);
 
   return (

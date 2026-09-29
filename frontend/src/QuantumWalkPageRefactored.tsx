@@ -10,6 +10,7 @@ import { ExportService } from './lab/services/ExportService';
 import { ParameterPanel } from './lab/components/ParameterPanel';
 import { AnalysisTable } from './lab/components/AnalysisTable';
 import { TabNavigation } from './lab/components/TabNavigation';
+import { setUrlSearchParam, useUrlLocation } from './navigation/urlNavigation';
 
 const ANIMATION_DELAY = 100;
 
@@ -17,7 +18,10 @@ export const QuantumWalkPageRefactored: React.FC = () => {
   const { activeTab } = useAppStore();
 
   // UI State
-  const [currentView, setCurrentView] = useState('visualization');
+  const urlLocation = useUrlLocation();
+  const requestedView = new URL(urlLocation, window.location.origin).searchParams.get('view');
+  const currentView = requestedView === 'analysis' ? 'analysis' : 'visualization';
+  const setCurrentView = (view: string) => setUrlSearchParam('view', view === 'visualization' ? null : view);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Simulation Parameters

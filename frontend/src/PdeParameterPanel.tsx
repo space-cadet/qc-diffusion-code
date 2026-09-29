@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from './stores/appStore';
+import { setUrlHash, useUrlLocation } from './navigation/urlNavigation';
 export default function Controls({ params, onChange }) {
     const { pdeUIState, setPdeUIState } = useAppStore();
     const [solverOpen, setSolverOpen] = useState(false);
+    const urlLocation = useUrlLocation();
+    useEffect(() => {
+        const anchor = new URL(urlLocation, window.location.origin).hash.slice(1);
+        if (anchor === 'solver') setSolverOpen(true);
+        else if (anchor === 'equations') setPdeUIState({ equationsOpen: true });
+        else if (anchor === 'telegraph') setPdeUIState({ equationsOpen: true, telegraphOpen: true });
+        else if (anchor === 'diffusion') setPdeUIState({ equationsOpen: true, diffusionOpen: true });
+        else if (anchor === 'initial-conditions') setPdeUIState({ initialConditionsOpen: true });
+        else if (anchor === 'simulation-settings') setPdeUIState({ simulationSettingsOpen: true });
+    }, [urlLocation, setPdeUIState]);
     // Local string states to allow negative typing and intermediate values
     const [centerStr, setCenterStr] = useState(String(params.dist_center ?? 0));
     const [dgCenter1Str, setDgCenter1Str] = useState(String(params.dg_center1 ?? -1));
@@ -35,7 +46,7 @@ export default function Controls({ params, onChange }) {
 
       {/* Solver Selection (foldable) */}
       <div className="mb-6">
-        <button type="button" onClick={() => setSolverOpen(!solverOpen)} className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50">
+        <button id="solver" type="button" onClick={() => { const next = !solverOpen; setSolverOpen(next); setUrlHash(next ? 'solver' : ''); }} className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50">
           <span className="text-sm font-semibold text-gray-700">Solver</span>
           <span className="text-xs text-gray-500">{solverOpen ? 'Hide' : 'Show'}</span>
         </button>
@@ -55,7 +66,7 @@ export default function Controls({ params, onChange }) {
       
       {/* Equations Panel (foldable + scrollable) */}
       <div className="mb-6">
-        <button type="button" onClick={() => setPdeUIState({ equationsOpen: !pdeUIState.equationsOpen })} className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50">
+        <button id="equations" type="button" onClick={() => { const next = !pdeUIState.equationsOpen; setPdeUIState({ equationsOpen: next }); setUrlHash(next ? 'equations' : ''); }} className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50">
           <span className="text-sm font-semibold text-gray-700">Equations</span>
           <span className="text-xs text-gray-500">{pdeUIState.equationsOpen ? 'Hide' : 'Show'}</span>
         </button>
@@ -67,7 +78,7 @@ export default function Controls({ params, onChange }) {
                   <input type="checkbox" checked={selectedEquations.includes('telegraph')} onChange={() => handleEquationToggle('telegraph')} className="mr-2"/>
                   <span className="text-sm font-medium">Telegraph Equation</span>
                 </label>
-                <button type="button" onClick={() => setPdeUIState({ telegraphOpen: !pdeUIState.telegraphOpen })} className="text-xs text-gray-600 hover:text-gray-800">
+                <button id="telegraph" type="button" onClick={() => { const next = !pdeUIState.telegraphOpen; setPdeUIState({ telegraphOpen: next }); setUrlHash(next ? 'telegraph' : 'equations'); }} className="text-xs text-gray-600 hover:text-gray-800">
                   {pdeUIState.telegraphOpen ? 'Collapse' : 'Expand'}
                 </button>
               </div>
@@ -103,7 +114,7 @@ export default function Controls({ params, onChange }) {
                   <input type="checkbox" checked={selectedEquations.includes('diffusion')} onChange={() => handleEquationToggle('diffusion')} className="mr-2"/>
                   <span className="text-sm font-medium">Diffusion Equation</span>
                 </label>
-                <button type="button" onClick={() => setPdeUIState({ diffusionOpen: !pdeUIState.diffusionOpen })} className="text-xs text-gray-600 hover:text-gray-800">
+                <button id="diffusion" type="button" onClick={() => { const next = !pdeUIState.diffusionOpen; setPdeUIState({ diffusionOpen: next }); setUrlHash(next ? 'diffusion' : 'equations'); }} className="text-xs text-gray-600 hover:text-gray-800">
                   {pdeUIState.diffusionOpen ? 'Collapse' : 'Expand'}
                 </button>
               </div>
@@ -194,7 +205,7 @@ export default function Controls({ params, onChange }) {
 
       {/* Initial Conditions (foldable) */}
       <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
-        <button type="button" onClick={() => setPdeUIState({ initialConditionsOpen: !pdeUIState.initialConditionsOpen })} className="w-full flex items-center justify-between text-left">
+        <button id="initial-conditions" type="button" onClick={() => { const next = !pdeUIState.initialConditionsOpen; setPdeUIState({ initialConditionsOpen: next }); setUrlHash(next ? 'initial-conditions' : ''); }} className="w-full flex items-center justify-between text-left">
           <h3 className="text-sm font-semibold mb-3 text-gray-700">Initial Conditions</h3>
           <span className="text-xs text-gray-500">{pdeUIState.initialConditionsOpen ? 'Hide' : 'Show'}</span>
         </button>
@@ -316,7 +327,7 @@ export default function Controls({ params, onChange }) {
 
       {/* Simulation Settings (foldable) */}
       <div className="mb-6 p-3 bg-white rounded-lg border border-gray-200">
-        <button type="button" onClick={() => setPdeUIState({ simulationSettingsOpen: !pdeUIState.simulationSettingsOpen })} className="w-full flex items-center justify-between text-left">
+        <button id="simulation-settings" type="button" onClick={() => { const next = !pdeUIState.simulationSettingsOpen; setPdeUIState({ simulationSettingsOpen: next }); setUrlHash(next ? 'simulation-settings' : ''); }} className="w-full flex items-center justify-between text-left">
           <h3 className="text-sm font-semibold mb-3 text-gray-700">Simulation Settings</h3>
           <span className="text-xs text-gray-500">{pdeUIState.simulationSettingsOpen ? 'Hide' : 'Show'}</span>
         </button>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Plot from 'react-plotly.js';
 import { useAppStore } from './stores/appStore';
+import { setUrlSearchParam, useUrlLocation } from './navigation/urlNavigation';
 import * as math from 'mathjs';
 import { StateVector, MatrixOperator, SparseOperator, createSparseMatrix, setSparseEntry, } from 'ts-quantum';
 // --- Constants ---
@@ -10,7 +11,10 @@ const ANIMATION_DELAY = 100;
 const QuantumWalkPage = () => {
     const { activeTab } = useAppStore();
     // UI State
-    const [currentView, setCurrentView] = useState('visualization');
+    const urlLocation = useUrlLocation();
+    const requestedView = new URL(urlLocation, window.location.origin).searchParams.get('view');
+    const currentView = ['visualization', 'analysis', 'education'].includes(requestedView || '') ? requestedView! : 'visualization';
+    const setCurrentView = (view: string) => setUrlSearchParam('view', view === 'visualization' ? null : view);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
     // Simulation Parameters

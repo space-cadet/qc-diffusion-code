@@ -14,6 +14,7 @@ import { Viewer } from "../components/Viewer";
 import { FileGridView } from "../components/FileGridView";
 import { FileListView } from "../components/FileListView";
 import type { DocSelection } from "../types";
+import { setUrlSearchParam, useUrlLocation } from "../../navigation/urlNavigation";
 
 /* ── Icon components ──────────────────────────────────── */
 
@@ -101,13 +102,21 @@ export function ViewModeToggle({
 /* ── Main page ────────────────────────────────────────── */
 
 export function MemoryBankPage() {
-  const [selectedDoc, setSelectedDoc] = usePersistedState<DocSelection | null>("memory-bank.selectedDoc", null);
+  const [, setSelectedDoc] = usePersistedState<DocSelection | null>("memory-bank.selectedDoc", null);
   const [isCollapsed, setIsCollapsed] = usePersistedState("memory-bank.sidebarCollapsed", false);
   const [sidebarWidth, setSidebarWidth] = usePersistedState("memory-bank.sidebarWidth", 256);
   const [viewMode, setViewMode] = usePersistedState<"tree" | "grid" | "list">("memory-bank.viewMode", "tree");
 
-  // Slide-over panel state for grid/list file preview
-  const [slideOverDoc, setSlideOverDoc] = useState<DocSelection | null>(null);
+  const urlLocation = useUrlLocation();
+  const documentPath = new URL(urlLocation, window.location.origin).searchParams.get("doc");
+  const selectedDoc = documentPath ? (() => {
+    const parts = documentPath.split("/");
+    if (parts.some((part) => part === ".." || part === "")) return null;
+    return parts.length === 1
+      ? { category: "root", file: parts[0] }
+      : { category: parts[0], file: parts.slice(1).join("/") };
+  })() : null;
+  const slideOverDoc = viewMode === "tree" ? null : selectedDoc;
 
   // Detect mobile (<768 px)
   const [isMobile, setIsMobile] = useState(false);
@@ -131,6 +140,7 @@ export function MemoryBankPage() {
     (filePath: string) => {
       console.log("[MemoryBank] select doc:", filePath);
       setSelectedDoc(toDocSelection(filePath));
+      setUrlSearchParam("doc", filePath);
       // Auto-collapse sidebar on mobile
       if (isMobile) {
         console.log("[MemoryBank] auto-collapsing sidebar (mobile)");
@@ -144,9 +154,9 @@ export function MemoryBankPage() {
   const handleGridListFileSelect = useCallback(
     (filePath: string) => {
       console.log("[MemoryBank] slide-over open:", filePath);
-      setSlideOverDoc(toDocSelection(filePath));
+      setUrlSearchParam("doc", filePath);
     },
-    [toDocSelection],
+    [],
   );
 
   const handleSearchResult = useCallback(
@@ -277,7 +287,7 @@ export function MemoryBankPage() {
               {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-20 z-10"
-                onClick={() => { console.log("[MemoryBank] slide-over close"); setSlideOverDoc(null); }}
+                onClick={() => { console.log("[MemoryBank] slide-over close"); setUrlSearchParam("doc", null); }}
               />
               {/* Panel */}
               <div className="absolute right-0 top-0 bottom-0 w-full md:w-2/3 lg:w-1/2 bg-white border-l border-gray-200 shadow-2xl z-20 flex flex-col">
@@ -286,7 +296,7 @@ export function MemoryBankPage() {
                     {slideOverDoc.category === "root" ? slideOverDoc.file : `${slideOverDoc.category}/${slideOverDoc.file}`}
                   </span>
                   <button
-                    onClick={() => setSlideOverDoc(null)}
+                    onClick={() => setUrlSearchParam("doc", null)}
                     className="p-1 rounded hover:bg-gray-200 transition-colors"
                     title="Close"
                   >

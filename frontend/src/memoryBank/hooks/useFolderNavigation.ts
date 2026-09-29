@@ -4,9 +4,10 @@
  * Supports hierarchical folder traversal with breadcrumb trail
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMemoryBankDocs } from "./useMemoryBankDocs";
 import { IndexCategory, IndexFile } from "./useMemoryBankDocs";
+import { setUrlSearchParams, useUrlLocation } from "../../navigation/urlNavigation";
 
 export interface BreadcrumbItem {
   name: string;
@@ -20,8 +21,15 @@ export interface FolderContent {
 }
 
 export function useFolderNavigation(initialPath: string = "root") {
-  const [currentPath, setCurrentPath] = useState(initialPath);
+  const urlLocation = useUrlLocation();
+  const urlFolder = new URL(urlLocation, window.location.origin).searchParams.get("folder");
+  const safeUrlFolder = urlFolder && !urlFolder.split("/").some((part) => part === "..") ? urlFolder : null;
+  const [currentPath, setCurrentPath] = useState(safeUrlFolder || initialPath);
   const { categories } = useMemoryBankDocs();
+
+  useEffect(() => {
+    setCurrentPath(safeUrlFolder || initialPath);
+  }, [urlLocation, safeUrlFolder, initialPath]);
 
   console.log("[useFolderNavigation] initialized with path:", initialPath);
 
@@ -93,11 +101,13 @@ export function useFolderNavigation(initialPath: string = "root") {
   const navigateToFolder = (folderPath: string) => {
     console.log("[useFolderNavigation] navigating to:", folderPath);
     setCurrentPath(folderPath);
+    setUrlSearchParams({ folder: folderPath === "root" ? null : folderPath, doc: null });
   };
 
   const navigateToBreadcrumb = (path: string) => {
     console.log("[useFolderNavigation] breadcrumb navigation to:", path);
     setCurrentPath(path);
+    setUrlSearchParams({ folder: path === "root" ? null : path, doc: null });
   };
 
   return {

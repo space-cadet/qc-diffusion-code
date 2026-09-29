@@ -1,7 +1,53 @@
 # Edit History
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-29 00:51:51 IST*
+*Last Updated: 2026-09-30 02:54:43 IST*
+
+#### 02:54:43 IST - T42: Record Random Walk panel workspace plan
+- Created `memory-bank/tasks/T42.md` - Planned persistent movable, resizable, collapsible panels, viewport zoom and boundary display, and one Start/Pause/Resume control.
+- Created `memory-bank/implementation-details/random-walk-panel-workspace.md` - Recorded existing UI patterns, scope, constraints, and acceptance criteria.
+- Updated `memory-bank/tasks/T35a.md` - Clarified that local checks pass and deployed nested-path plus legacy `?data=` checks remain open.
+- Updated `memory-bank/tasks/T35.md` - Recorded the current T35a acceptance status.
+- Updated `memory-bank/tasks.md` - Registered T42 and refreshed the T35a and registry status notes.
+- Updated `memory-bank/implementation-details/index.md` - Indexed the T42 implementation plan.
+- Updated `memory-bank/activeContext.md` - Linked T42 as a planned follow-up while preserving T35a as the current implementation focus.
+- Updated `memory-bank/session_cache.md` - Recorded the current planning session and T42 status.
+- Created `memory-bank/sessions/2026-09-30-early.md` - Recorded this session's plan and source-code scope.
+
+#### 21:00:37 IST - T35a: Verify Memory Bank document deep links
+- Verified local browser loading of `/memory-bank?doc=tasks%2FT35a.md` - The requested task title and acceptance section rendered from the shared URL.
+- Updated `memory-bank/tasks/T35a.md`, `memory-bank/implementation-details/url-backed-navigation.md`, `memory-bank/activeContext.md`, `memory-bank/session_cache.md`, and `memory-bank/sessions/2026-09-29-early.md` - Added Memory Bank deep-link evidence; deployed nested-path and legacy-share verification remain open.
+- Created `memory-bank/edits/2026-09-29/210037-T35a-memory-bank-deep-link-check.md` - Recorded the local Memory Bank deep-link acceptance evidence.
+
+#### 20:55:07 IST - T35a: Verify local URL navigation and fragment restoration
+- Modified `frontend/src/App.tsx` - Made fragment restoration wait for the page layout to settle before scrolling, so direct links and browser Back restore anchors inside the Random Walk scroll container.
+- Verified local browser navigation - Confirmed `/random-walk?strategy=kac-goldstein#history` restores the Kac-Goldstein strategy and History section on direct load, refresh, and browser Back; Forward restored Analysis.
+- Verified nested views - Confirmed `/simulation#telegraph` opens the Telegraph disclosure and `/simplicial-growth/interior` loads directly and after refresh.
+- Updated `memory-bank/tasks/T35a.md` and `memory-bank/tasks/T35.md` - Marked local browser acceptance complete and retained deployed-path verification as open.
+- Updated `memory-bank/implementation-details/url-backed-navigation.md`, `memory-bank/activeContext.md`, `memory-bank/session_cache.md`, and `memory-bank/sessions/2026-09-29-early.md` - Recorded local browser evidence and deployment limitations.
+- Created `memory-bank/edits/2026-09-29/205507-T35a-url-navigation-browser-acceptance.md` - Recorded the local browser checks and fragment-restoration correction with source provenance.
+
+#### 20:40:54 IST - T35a: Implement URL-backed navigation and shareable app views
+- Created `frontend/src/navigation/urlNavigation.ts` - Added stable app paths, History API navigation, URL subscriptions, and query/hash helpers.
+- Modified `frontend/src/App.tsx` - Synced desktop/mobile page selection and URL state, restored strategy selection, and supported fragment scrolling.
+- Modified `frontend/src/PdeParameterPanel.tsx` - Linked PDE disclosures and nested equation sections to URL fragments.
+- Modified `frontend/src/QuantumWalkPage.tsx` and `frontend/src/QuantumWalkPageRefactored.tsx` - Synced view tabs with query parameters.
+- Modified `frontend/src/SimplicialGrowthPage.tsx` - Linked Boundary and Interior views to paths.
+- Modified `frontend/src/RandomWalkSimV2.tsx` and `frontend/src/components/RandomWalkParameterPanelV2.tsx` - Linked Random Walk strategy selection and panel anchors while keeping the shared engine and UI.
+- Modified `frontend/src/memoryBank/hooks/useFolderNavigation.ts` and `frontend/src/memoryBank/pages/MemoryBankPage.tsx` - Linked folders and selected documents to query state.
+- Modified `frontend/src/spheroid/SpheroidWalkPage.tsx` - Added fragment targets for the geometry and live-control sections.
+- Updated `memory-bank/tasks/T35.md`, `memory-bank/tasks/T35a.md`, and `memory-bank/tasks.md` - Recorded implementation status and outstanding browser acceptance.
+- Updated `memory-bank/implementation-details/url-backed-navigation.md` and `memory-bank/implementation-details/index.md` - Added the implemented page/subsection inventory and verification evidence.
+- Updated `memory-bank/activeContext.md`, `memory-bank/session_cache.md`, and `memory-bank/sessions/2026-09-29-early.md` - Recorded T35a as current work and noted browser acceptance remains.
+- Created `memory-bank/edits/2026-09-29/204054-T35a-url-backed-navigation-implementation.md` - Recorded this implementation update with source provenance.
+
+#### 19:49:57 IST - T35a: Plan URL-backed navigation and shareable views
+- Created `memory-bank/tasks/T35a.md` - Defined page and subsection deep links while keeping Random Walk strategies in the unified parameter panel and engine.
+- Created `memory-bank/implementation-details/url-backed-navigation.md` - Recorded the URL plan, state precedence, existing export-link compatibility, and acceptance checks.
+- Updated `memory-bank/tasks/T35.md` and `memory-bank/tasks.md` - Linked the new T35a subtask and added its registry entry.
+- Updated `memory-bank/implementation-details/index.md` - Indexed the URL navigation plan under T35 and T35a.
+- Created `memory-bank/edits/2026-09-29/194957-T35a-url-backed-navigation.md` - Recorded this Memory Bank update with source provenance.
+- Updated `memory-bank/edit_history.md` - Refreshed the generated view from the new edit chunk.
 
 #### 00:51:51 IST - T40, T41: Record main closeout and local verification
 - Updated `memory-bank/activeContext.md`, `memory-bank/session_cache.md`, `memory-bank/progress.md`, and `memory-bank/changelog.md` - Recorded main commit, production build, local test, browser evidence, and remaining JSON-download/deployment checks.

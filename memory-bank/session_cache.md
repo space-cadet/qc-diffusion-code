@@ -1,31 +1,31 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-29 00:51:51 IST*
+*Last Updated: 2026-09-30 02:48:52 IST*
 
 ## Current Session
 
-**2026-09-29 T40/T41 main closeout**: `main` and `origin/main` are at `5c9f239`. The frontend production build passed; local Vitest passed 16 files and 62 tests. Browser checks confirmed both persistent-walk modes, populated diagnostics, comparison-mismatch pause, and no console errors. Normal-browser JSON delivery and live Vercel deployment remain unverified. The working tree also contains uncommitted T27 CTRW regression coverage, T1 Bianchi validation, T23 Vitest configuration, and previously documented backlog/Memory Bank work.
+**2026-09-30 T42 Random Walk UI plan and T35a record closeout**: Added the planned persistent draggable/resizable/collapsible Random Walk workspace, viewport zoom/boundary display, and unified transport control to T42. No T42 implementation changes were made. T35a's local URL and deep-link checks remain passed; deployed nested-path and legacy `?data=` checks remain open. Existing T35a source changes are recorded in the 2026-09-29 implementation and acceptance chunks.
 
-**Session**: T40/T41 main closeout and local validation work, 2026-09-29
-**Started**: 2026-09-29 00:05:23 IST
-**Focus**: Record merged code, build/test/browser evidence, and remaining acceptance checks
-**Status**: 🔄 IN PROGRESS — code is pushed on main; JSON download and live deployment remain unverified
-**Branch**: `main` at `5c9f239`
+**Session**: T42 Random Walk UI plan and T35a Memory Bank closeout, 2026-09-30
+**Started**: 2026-09-30 02:48:52 IST
+**Focus**: Record the approved Random Walk panel/viewport plan and clarify T35a's remaining deployment checks
+**Status**: 📝 PLAN RECORDED — T42 implementation has not started; T35a deployed checks remain
+**Branch**: `main` at `906b99e`
 
 ## Overview
 
-- Active: 18 | Paused: 0 | Completed: 24
+- Active: 19 | Paused: 0 | Completed: 24
 - Last Session: 2026-09-29 T40/T41 main closeout and local validation work
 - Current Period: early morning
 
 ## Session History (Last 5)
 
-1. `sessions/2026-09-29-early.md` - T40/T41 main closeout, build/tests, browser checks, and local validation work
-2. `sessions/2026-09-27-afternoon.md` - T40 plan and implementation verification continuation
-3. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
-4. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential, T27 composition fix, and T38 planning
-5. `sessions/2026-05-11-morning.md` - T27f restoration, 2D CTRW motion correction, and UI verification
+1. `sessions/2026-09-30-early.md` - T42 Random Walk UI plan and T35a Memory Bank closeout
+2. `sessions/2026-09-29-early.md` - T40/T41 main closeout, T35a URL implementation, and local validation
+3. `sessions/2026-09-27-afternoon.md` - T40 plan and implementation verification continuation
+4. `sessions/2026-09-26-afternoon.md` - T39 spheroid model, numerics, and 3D page planning
+5. `sessions/2026-07-21-afternoon.md` - T1 calibration, Bianchi IX potential, T27 composition fix, and T38 planning
 6. `sessions/2026-05-09-morning.md` - T26 WebGL + tsParticles Visualization Rewrite planning
 7. `sessions/2026-05-09-early.md` - T25 Screenshot Verification and Critical Bug Fixes
 8. `sessions/2026-02-09-evening.md` - Python Backend Environment Setup and Documentation
@@ -39,6 +39,8 @@
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
 - T40: T15 modes owned by `qc-diffusion-T15a` and `qc-diffusion-T15b` - 🔄 IN PROGRESS
 - T41: Random Walk Strategy Diagnostics and Plots - 🔄 IN PROGRESS
+- T42: Random Walk Panel Workspace and Viewport Controls - 📝 PLANNED
+- T35a: URL-Backed Navigation and Shareable Views - 🔄 IN PROGRESS
 - T38: Headless Random Walk Statistics Runner - 📝 PLANNED
 - T27: Clean Rewrite — Pure WebGL + Original Physics Engine - ✅ COMPLETED
 - T0: Memory Bank Initialization - ✅

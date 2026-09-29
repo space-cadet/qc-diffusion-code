@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { setUrlSearchParam } from "../navigation/urlNavigation";
 
 export const RandomWalkParameterPanelV2 = ({
   gridLayoutParams,
@@ -39,6 +40,7 @@ export const RandomWalkParameterPanelV2 = ({
             const currentInitial = gridLayoutParams.initialDistType;
             const initialDistType = strategy === 'kac-goldstein' ? 'centered' : strategy === 'masoliver-lindenbergh' ? 'origin' : ['origin', 'centered', 'bimodal', 'asymmetric'].includes(currentInitial) ? 'uniform' : currentInitial;
             setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy], dimension, initialDistType });
+            setUrlSearchParam('strategy', strategy);
           }}
           className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
         >
