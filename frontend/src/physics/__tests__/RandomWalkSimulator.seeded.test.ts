@@ -38,7 +38,9 @@ function runSeeded(seed: number) {
 }
 
 describe("RandomWalkSimulator seeded headless execution", () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   test("repeats initialization and engine steps for the same random source", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
