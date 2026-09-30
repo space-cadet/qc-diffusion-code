@@ -37,6 +37,7 @@ export interface RandomWalkParams {
   kacGoldsteinOrdering?: "reduced" | "derivative";
   boundaryCondition: 'periodic' | 'reflective' | 'absorbing' | 'unbounded';
   initialDistType: 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric';
+  initialDistByDimension?: Partial<Record<'1D' | '2D', 'uniform' | 'gaussian' | 'ring' | 'stripe' | 'grid' | 'origin' | 'centered' | 'bimodal' | 'asymmetric'>>;
   distSigmaX: number;
   distSigmaY: number;
   distR0: number;

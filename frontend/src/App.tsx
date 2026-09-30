@@ -14,6 +14,7 @@ import { useWebGLSolver } from "./hooks/useWebGLSolver";
 import { generateInitialConditions } from "./utils/initialConditions";
 import { useAppStore } from "./stores/appStore";
 import { AppTab, getAppTabForLocation, navigateToAppTab, navigateToUrl, useUrlLocation } from "./navigation/urlNavigation";
+import { getInitialDistributionForDimension, rememberInitialDistribution } from "./utils/initialDistributionOptions";
 
 // ---- Tab definitions ----
 
@@ -158,10 +159,16 @@ export default function App() {
         const currentStrategy = gridLayoutParams.strategies?.find(isUrlWalkStrategy) ?? 'simple';
         const dimension = urlStrategy === 'kac-goldstein' ? '1D' : urlStrategy === 'masoliver-lindenbergh' ? '2D' : gridLayoutParams.dimension;
         if (currentStrategy !== urlStrategy || gridLayoutParams.dimension !== dimension) {
-          const initialDistType = currentStrategy !== urlStrategy
-            ? urlStrategy === 'kac-goldstein' ? 'centered' : urlStrategy === 'masoliver-lindenbergh' ? 'origin' : gridLayoutParams.initialDistType
-            : gridLayoutParams.initialDistType;
-          setGridLayoutParams({ ...gridLayoutParams, strategies: [urlStrategy], dimension, initialDistType });
+          const previousDimension = gridLayoutParams.dimension as '1D' | '2D';
+          const remembered = rememberInitialDistribution(gridLayoutParams.initialDistByDimension, previousDimension, gridLayoutParams.initialDistType);
+          const initialDistType = getInitialDistributionForDimension(dimension, gridLayoutParams.initialDistType, remembered);
+          setGridLayoutParams({
+            ...gridLayoutParams,
+            strategies: [urlStrategy],
+            dimension,
+            initialDistType,
+            initialDistByDimension: rememberInitialDistribution(remembered, dimension, initialDistType),
+          });
         }
       }
     }, [urlLocation, urlTab, urlStrategy, storedActiveTab, gridLayoutParams, setActiveTab, setGridLayoutParams]);

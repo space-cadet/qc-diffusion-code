@@ -29,7 +29,14 @@ export interface RadialDensitySnapshot {
 export interface TrailPoint {
   x: number;
   y: number;
+  time?: number;
   event?: 'turn' | 'jump' | 'wait';
+}
+
+export interface SpaceTimeDensitySnapshot {
+  positionMin: number;
+  positionMax: number;
+  rows: Array<{ time: number; counts: number[] }>;
 }
 
 export interface StrategyDiagnosticsSnapshot {
@@ -42,6 +49,7 @@ export interface StrategyDiagnosticsSnapshot {
   waitSamples: number[];
   jumpSamples: number[];
   trails: Array<{ id: string; points: TrailPoint[] }>;
+  spaceTimeDensity?: SpaceTimeDensitySnapshot | null;
 }
 
 export function comparableSetups(a: StrategyDiagnosticsSnapshot, b: StrategyDiagnosticsSnapshot): boolean {
@@ -78,6 +86,9 @@ const TRAIL_PARTICLE_COUNT = 8;
 const TRAIL_POINT_LIMIT = 500;
 const RADIAL_BINS = 36;
 const MAX_RADIAL_SNAPSHOTS = 8;
+const SPACE_TIME_POSITION_BINS = 96;
+const SPACE_TIME_ROW_LIMIT = 240;
+const SPACE_TIME_SAMPLE_INTERVAL = 0.25;
 
 function reservoirAdd(samples: number[], value: number, seen: number): void {
   if (!(value > 0) || !Number.isFinite(value)) return;
@@ -118,6 +129,10 @@ export class StrategyDiagnosticsRecorder {
   private activeParticles = 0;
   private lastPublishAt = 0;
   private hasUnpublishedData = false;
+  private spaceTimeRows: Array<{ time: number; counts: number[] }> = [];
+  private spaceTimePositionMin: number | null = null;
+  private spaceTimePositionMax: number | null = null;
+  private nextSpaceTimeSample = 0;
 
   constructor(readonly config: DiagnosticsConfig) {}
 
@@ -139,6 +154,14 @@ export class StrategyDiagnosticsRecorder {
     this.activeParticles = 0;
     this.lastPublishAt = 0;
     this.hasUnpublishedData = false;
+    this.clearSpaceTimeDensity();
+  }
+
+  clearSpaceTimeDensity(): void {
+    this.spaceTimeRows = [];
+    this.spaceTimePositionMin = null;
+    this.spaceTimePositionMax = null;
+    this.nextSpaceTimeSample = 0;
   }
 
   recordEvent(event: StrategyEvent): void {
@@ -153,13 +176,16 @@ export class StrategyDiagnosticsRecorder {
     }
     if (!this.selectedIds?.has(event.particleId)) return;
     const points = this.trails.get(event.particleId) ?? [];
-    if (event.waitPosition && event.waitTime > 0) points.push({ ...event.waitPosition, event: 'wait' });
-    points.push({ ...event.position, event: event.kind });
+    if (event.waitPosition && event.waitTime > 0) {
+      points.push({ ...event.waitPosition, time: event.time - event.waitTime });
+      points.push({ ...event.waitPosition, time: event.time, event: 'wait' });
+    }
+    points.push({ ...event.position, time: event.time, event: event.kind });
     if (points.length > TRAIL_POINT_LIMIT) points.splice(0, points.length - TRAIL_POINT_LIMIT);
     this.trails.set(event.particleId, points);
   }
 
-  recordFrame(particles: Particle[], time: number, force = false): boolean {
+  recordFrame(particles: Particle[], time: number, force = false, includeSpaceTimeDensity = false): boolean {
     if (!Number.isFinite(time)) return false;
     if (!force && time + 1e-9 < this.nextSampleTime) return false;
     if (force && this.spread.length > 0 && time <= this.currentTime + 1e-9) return false;
@@ -180,7 +206,12 @@ export class StrategyDiagnosticsRecorder {
     let squaredTotal = 0;
     let velocityCorrelation = 0;
     let velocityCount = 0;
+    const captureSpaceTimeRow = includeSpaceTimeDensity
+      && this.config.dimension === '1D'
+      && time + 1e-9 >= this.nextSpaceTimeSample;
+    const spaceTimePositions = captureSpaceTimeRow ? [] : null;
     for (const particle of particles) {
+      if (spaceTimePositions && particle.isActive) spaceTimePositions.push(particle.position.x);
       const initial = particle.initial;
       const dx = particle.position.x - (initial?.position.x ?? 0);
       const dy = this.config.dimension === '2D'
@@ -201,7 +232,7 @@ export class StrategyDiagnosticsRecorder {
         const points = this.trails.get(particle.id) ?? [];
         const last = points[points.length - 1];
         if (!last || last.x !== particle.position.x || last.y !== particle.position.y) {
-          points.push({ ...particle.position });
+          points.push({ ...particle.position, time });
           if (points.length > TRAIL_POINT_LIMIT) points.splice(0, points.length - TRAIL_POINT_LIMIT);
         }
         this.trails.set(particle.id, points);
@@ -236,6 +267,10 @@ export class StrategyDiagnosticsRecorder {
       this.nextDensityTime = Math.max(time + this.densityInterval, this.nextDensityTime + this.densityInterval);
       this.densityInterval = Math.min(this.densityInterval * 1.35, 8);
     }
+    if (spaceTimePositions) {
+      this.recordSpaceTimeRow(spaceTimePositions, time);
+      this.nextSpaceTimeSample = time + SPACE_TIME_SAMPLE_INTERVAL;
+    }
     return true;
   }
 
@@ -258,7 +293,78 @@ export class StrategyDiagnosticsRecorder {
       waitSamples: [...this.waitSamples],
       jumpSamples: [...this.jumpSamples],
       trails: [...this.trails].map(([id, points]) => ({ id, points: points.map((point) => ({ ...point })) })),
+      spaceTimeDensity: this.spaceTimePositionMin === null || this.spaceTimePositionMax === null
+        ? null
+        : {
+          positionMin: this.spaceTimePositionMin,
+          positionMax: this.spaceTimePositionMax,
+          rows: this.spaceTimeRows.map((row) => ({ time: row.time, counts: [...row.counts] })),
+        },
     };
+  }
+
+  private recordSpaceTimeRow(positions: number[], time: number): void {
+    if (!positions.length) {
+      if (this.spaceTimePositionMin !== null) {
+        this.spaceTimeRows.push({ time, counts: new Array<number>(SPACE_TIME_POSITION_BINS).fill(0) });
+        if (this.spaceTimeRows.length > SPACE_TIME_ROW_LIMIT) this.spaceTimeRows.shift();
+      }
+      return;
+    }
+
+    let observedMin = positions[0];
+    let observedMax = positions[0];
+    for (let index = 1; index < positions.length; index++) {
+      observedMin = Math.min(observedMin, positions[index]);
+      observedMax = Math.max(observedMax, positions[index]);
+    }
+
+    this.expandSpaceTimeRange(observedMin, observedMax);
+    const positionMin = this.spaceTimePositionMin!;
+    const positionMax = this.spaceTimePositionMax!;
+    const range = positionMax - positionMin;
+    const counts = new Array<number>(SPACE_TIME_POSITION_BINS).fill(0);
+    for (const position of positions) {
+      const bin = Math.max(0, Math.min(SPACE_TIME_POSITION_BINS - 1,
+        Math.floor(((position - positionMin) / range) * SPACE_TIME_POSITION_BINS)));
+      counts[bin]++;
+    }
+    this.spaceTimeRows.push({ time, counts });
+    if (this.spaceTimeRows.length > SPACE_TIME_ROW_LIMIT) this.spaceTimeRows.shift();
+  }
+
+  private expandSpaceTimeRange(observedMin: number, observedMax: number): void {
+    if (this.spaceTimePositionMin === null || this.spaceTimePositionMax === null) {
+      const center = (observedMin + observedMax) / 2;
+      const halfRange = Math.max((observedMax - observedMin) * 0.55, Math.max(1, Math.abs(center) * 0.001));
+      this.spaceTimePositionMin = center - halfRange;
+      this.spaceTimePositionMax = center + halfRange;
+      return;
+    }
+    if (observedMin >= this.spaceTimePositionMin && observedMax <= this.spaceTimePositionMax) return;
+
+    const oldMin = this.spaceTimePositionMin;
+    const oldMax = this.spaceTimePositionMax;
+    const center = (oldMin + oldMax) / 2;
+    let halfRange = (oldMax - oldMin) / 2;
+    while (observedMin < center - halfRange || observedMax > center + halfRange) halfRange *= 2;
+    const newMin = center - halfRange;
+    const newMax = center + halfRange;
+    const oldRange = oldMax - oldMin;
+    const newRange = newMax - newMin;
+    this.spaceTimeRows = this.spaceTimeRows.map((row) => {
+      const counts = new Array<number>(SPACE_TIME_POSITION_BINS).fill(0);
+      row.counts.forEach((count, oldBin) => {
+        if (!count) return;
+        const oldPosition = oldMin + ((oldBin + 0.5) / SPACE_TIME_POSITION_BINS) * oldRange;
+        const newBin = Math.max(0, Math.min(SPACE_TIME_POSITION_BINS - 1,
+          Math.floor(((oldPosition - newMin) / newRange) * SPACE_TIME_POSITION_BINS)));
+        counts[newBin] += count;
+      });
+      return { time: row.time, counts };
+    });
+    this.spaceTimePositionMin = newMin;
+    this.spaceTimePositionMax = newMax;
   }
 
   private buildRadialDensity(particles: Particle[], time: number): RadialDensitySnapshot {

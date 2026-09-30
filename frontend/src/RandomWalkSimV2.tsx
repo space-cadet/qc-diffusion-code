@@ -113,6 +113,7 @@ export default function RandomWalkSimV2() {
   const [telegraphModeHistory, setTelegraphModeHistory] = useState<TelegraphModeSnapshot[]>([]);
   const telegraphModeHistoryRef = useRef<TelegraphModeSnapshot[]>([]);
   const diagnosticsRecorderRef = useRef<StrategyDiagnosticsRecorder | null>(null);
+  const spaceTimeDensityEnabledRef = useRef(false);
   const [strategyDiagnostics, setStrategyDiagnostics] = useState<StrategyDiagnosticsSnapshot | null>(null);
   const [diagnosticComparison, setDiagnosticComparison] = useState<StrategyDiagnosticsSnapshot | null>(null);
   const lastWalkDiagnosticsTimeRef = useRef(0);
@@ -231,6 +232,14 @@ export default function RandomWalkSimV2() {
     if (strategyDiagnostics) setDiagnosticComparison(strategyDiagnostics);
   }, [strategyDiagnostics]);
 
+  const handleSpaceTimeDensityChange = useCallback((enabled: boolean) => {
+    if (spaceTimeDensityEnabledRef.current === enabled) return;
+    spaceTimeDensityEnabledRef.current = enabled;
+    const recorder = diagnosticsRecorderRef.current;
+    recorder?.clearSpaceTimeDensity();
+    setStrategyDiagnostics(recorder?.snapshot() ?? null);
+  }, []);
+
   const projectWalkPosition = useCallback((
     particle: Particle,
     _index: number,
@@ -336,7 +345,7 @@ export default function RandomWalkSimV2() {
     const recorder = diagnosticsRecorderRef.current;
     const forcePublish = !isRunning;
     if (strategyDiagnosticsUpdatesEnabled) {
-      recorder?.recordFrame(particles, stats.time, forcePublish);
+      recorder?.recordFrame(particles, stats.time, forcePublish, spaceTimeDensityEnabledRef.current);
       if (recorder?.shouldPublish(performance.now(), forcePublish)) setStrategyDiagnostics(recorder.snapshot());
     }
     if (!walkMode) return;
@@ -506,6 +515,7 @@ export default function RandomWalkSimV2() {
                 comparison={diagnosticComparison}
                 onCaptureComparison={handleCaptureDiagnosticComparison}
                 onClearComparison={() => setDiagnosticComparison(null)}
+                onSpaceTimeDensityChange={handleSpaceTimeDensityChange}
               />
             </DockedPanel>
           </div>

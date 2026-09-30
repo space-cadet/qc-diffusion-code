@@ -263,6 +263,7 @@ export const useAppStore = create<AppState>()(
         solverType: 'gpu_explicit',
         solverParams: { substeps: 1, cnTheta: 0.5, tolerance: 1e-4, maxIter: 50 },
         initialDistType: 'uniform',
+        initialDistByDimension: { '1D': 'uniform', '2D': 'uniform' },
         distSigmaX: 80,
         distSigmaY: 80,
         distR0: 150,

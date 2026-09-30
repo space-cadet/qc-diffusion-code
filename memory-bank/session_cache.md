@@ -1,19 +1,21 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-30 09:35:52 IST*
+*Last Updated: 2026-09-30 12:11:00 IST*
 
 ## Current Session
 
-**2026-09-30 T38/T40/T41/T42 Random Walk implementation**: Added the seeded headless runner; expanded persistent-walk absolute-density and continuum diagnostics; added comparison plots and continuum mockups; implemented persisted panel workspace, zoom/boundaries, unified transport, and per-panel collapse update gates. Targeted TypeScript and `git diff --check` pass; browser review and the seeded Vitest suite remain open.
+**2026-09-30 T38/T40/T41/T42 Random Walk implementation**: Added the seeded headless runner; expanded persistent-walk absolute-density and continuum diagnostics; added comparison plots and continuum mockups; implemented persisted panel workspace, zoom/boundaries, unified transport, and per-panel collapse update gates. Latest T41 follow-up adds selectable diagnostics, 1D time-position trajectories, and opt-in bounded space-time density. Frontend TypeScript and root production builds pass; browser review remains open.
 
 **Session**: T42 Random Walk UI implementation, 2026-09-30
 **Started**: 2026-09-30 02:48:52 IST
-**Focus**: Implement persistent Random Walk panel workspace and viewport controls
-**Status**: 🔄 IMPLEMENTATION IN PROGRESS — TypeScript passes; browser interaction review remains
-**Branch**: `main` at `058caf5` (session changes uncommitted)
+**Focus**: Random Walk diagnostics readability, plot selection, and panel controls
+**Status**: 🔄 IMPLEMENTATION IN PROGRESS — TypeScript and root production build pass; browser interaction review remains
+**Branch**: `main` at `d4ddd90` (current changes uncommitted)
 
 **2026-09-30 T38 continuation**: Added seeded engine RNG wiring and a direct JSON/CSV runner. Local TypeScript check passed; repeated 2D output matched all 11 samples, and 1D Kac–Goldstein JSON/CSV output completed. Vitest was not run; native Firefox inspection is unavailable while the Mac is locked.
+
+**2026-09-30 T41 continuation (12:11 IST)**: Added a plot checklist with spread and representative trajectories enabled by default; selected plots render under the shared Strategy Diagnostics Auto switch. 1D trajectories use time-position axes, while 2D remains x–y. Added a 96-position-bin, 240-row maximum 1D heatmap, captured only while selected. TypeScript and root production builds pass; browser interaction remains.
 
 ## Overview
 

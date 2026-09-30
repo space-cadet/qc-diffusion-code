@@ -1,6 +1,6 @@
 # Random Walk Strategy Diagnostics
 
-*Last Updated: 2026-09-30 09:35:52 IST*
+*Last Updated: 2026-09-30 12:11:00 IST*
 
 T41 adds live diagnostics below the existing Random Walk page. It reuses the current simulation and renderer; it does not add a route or a second model runner.
 
@@ -8,7 +8,7 @@ T41 adds live diagnostics below the existing Random Walk page. It reuses the cur
 
 `PhysicsContext` carries an optional `onStrategyEvent` callback. CTRW, Lévy, fractional, T15a, and T15b strategies emit exact scheduled event times, event positions, wait intervals, and strategy-defined flight/jump lengths. The page's `StrategyDiagnosticsRecorder` consumes those events plus sampled particle frames. Telemetry does not consume the physics random stream.
 
-The recorder samples ensemble frames at increasing simulation-time intervals, retains up to 1,200 spread points, keeps a deterministic reservoir of up to 24,000 positive wait/jump lengths, stores up to eight radial-density snapshots, and tracks eight representative trajectories. These limits keep long runs' chart state bounded.
+The recorder samples ensemble frames at increasing simulation-time intervals, retains up to 1,200 spread points, keeps a deterministic reservoir of up to 24,000 positive wait/jump lengths, stores up to eight radial-density snapshots, and tracks eight representative trajectories. These limits keep long runs' chart state bounded. When the 1D position–time density plot is selected, it also samples a 96-bin position histogram every 0.25 simulation-time units and retains at most 240 rows. The position range expands as walkers move outward; prior rows are rebinned when it expands. This capture is skipped while the heatmap is unchecked.
 
 ## Plot meanings
 
@@ -17,7 +17,14 @@ The recorder samples ensemble frames at increasing simulation-time intervals, re
 - Event counts are stochastic turns, resets, and jumps divided by the original ensemble size. Interparticle collisions are not included.
 - Velocity correlation is each walker's current velocity projected onto its initial velocity and normalized by initial speed squared. It is hidden as not-defined for pure jump/wait Lévy and fractional processes.
 - The waiting-time CCDF uses sampled inter-event durations. Persistent-walk length means speed multiplied by wait duration; discrete jump strategies report their generated jump lengths. The Lévy curve uses the sampled Pareto draw before boundary effects.
-- Trajectory lines are sampled for eight walkers. Circles show turns/resets, squares show discrete jumps, and amber triangles mark the end of a fractional wait where its jump starts.
+- Trajectory lines are sampled for eight walkers. In 1D, the chart plots position x against simulation time; in 2D it remains an x–y path. Circles show turns/resets, squares show discrete jumps, and amber triangles mark the end of a fractional wait where its jump starts. Wait intervals retain both their start and end times.
+- The optional 1D position–time heatmap shows per-bin walker counts, with time increasing left to right and position increasing bottom to top.
+
+## Plot selection and refresh behavior
+
+The panel offers a checklist of strategy-appropriate plots. Ensemble spread and representative trajectories are selected by default; unchecked charts are not mounted, and chart-specific calculations such as radial series and CCDFs are deferred until selected. The checklist controls visibility only. One Auto switch on the enclosing panel controls recording and refresh for every selected chart; collapsing the panel also pauses its display updates. There are no per-chart Auto switches or timers.
+
+The heatmap is available only for 1D runs and is opt-in. Its fixed-size histogram and rolling row limit bound memory and canvas rendering work. Selecting it clears old heatmap samples and starts a continuous capture; unselecting it stops that capture.
 
 ## Run comparison and limits
 
@@ -35,4 +42,4 @@ These views compare finite-ensemble measurements with saved or approximate refer
 
 Finite boundary modes can reflect, wrap, or absorb walkers. The panel identifies the active boundary and warns that finite domains transform paths or truncate tails; the raw generated Lévy jump length is kept distinct from the boundary-transformed displacement.
 
-The frontend production build and 16-file/62-test run passed for the 2026-09-29 state. For the 2026-09-30 comparison additions, the targeted TypeScript check and `git diff --check` passed; the focused tests and browser interaction were not run in this closeout.
+The frontend production build and 16-file/62-test run passed for the 2026-09-29 state. For the 2026-09-30 comparison additions, the targeted TypeScript check and `git diff --check` passed; the focused tests and browser interaction were not run in that closeout. The plot-selection and 1D time-view changes pass the frontend TypeScript build and root production build. Browser interaction review of the new checklist, time axes, heatmap, and shared Auto behavior remains open.

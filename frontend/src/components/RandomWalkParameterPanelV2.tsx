@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { setUrlSearchParam } from "../navigation/urlNavigation";
+import { getInitialDistributionForDimension, INITIAL_DISTRIBUTIONS_BY_DIMENSION, rememberInitialDistribution } from "../utils/initialDistributionOptions";
 
 export const RandomWalkParameterPanelV2 = ({
   gridLayoutParams,
@@ -38,10 +39,17 @@ export const RandomWalkParameterPanelV2 = ({
           value={selectedStrategy}
           onChange={(event) => {
             const strategy = event.target.value;
-            const dimension = strategy === 'kac-goldstein' ? '1D' : strategy === 'masoliver-lindenbergh' ? '2D' : gridLayoutParams.dimension;
-            const currentInitial = gridLayoutParams.initialDistType;
-            const initialDistType = strategy === 'kac-goldstein' ? 'centered' : strategy === 'masoliver-lindenbergh' ? 'origin' : ['origin', 'centered', 'bimodal', 'asymmetric'].includes(currentInitial) ? 'uniform' : currentInitial;
-            setGridLayoutParams({ ...gridLayoutParams, strategies: [strategy], dimension, initialDistType });
+            const previousDimension = gridLayoutParams.dimension as '1D' | '2D';
+            const dimension = strategy === 'kac-goldstein' ? '1D' : strategy === 'masoliver-lindenbergh' ? '2D' : previousDimension;
+            const remembered = rememberInitialDistribution(gridLayoutParams.initialDistByDimension, previousDimension, gridLayoutParams.initialDistType);
+            const initialDistType = getInitialDistributionForDimension(dimension, gridLayoutParams.initialDistType, remembered);
+            setGridLayoutParams({
+              ...gridLayoutParams,
+              strategies: [strategy],
+              dimension,
+              initialDistType,
+              initialDistByDimension: rememberInitialDistribution(remembered, dimension, initialDistType),
+            });
             setUrlSearchParam('strategy', strategy);
           }}
           className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
@@ -127,11 +135,19 @@ export const RandomWalkParameterPanelV2 = ({
               <label className="block text-sm font-medium mb-2">Dimension:</label>
               <div className="flex gap-4">
                 <label className="flex items-center">
-                  <input type="radio" name="dimension" value="1D" checked={gridLayoutParams.dimension === "1D"} disabled={isMasoliverLindenbergh} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, dimension: event.target.value })} className="mr-2" />
+                  <input type="radio" name="dimension" value="1D" checked={gridLayoutParams.dimension === "1D"} disabled={isMasoliverLindenbergh} onChange={() => {
+                    const remembered = rememberInitialDistribution(gridLayoutParams.initialDistByDimension, gridLayoutParams.dimension, gridLayoutParams.initialDistType);
+                    const initialDistType = getInitialDistributionForDimension('1D', gridLayoutParams.initialDistType, remembered);
+                    setGridLayoutParams({ ...gridLayoutParams, dimension: '1D', initialDistType, initialDistByDimension: rememberInitialDistribution(remembered, '1D', initialDistType) });
+                  }} className="mr-2" />
                   1D
                 </label>
                 <label className="flex items-center">
-                  <input type="radio" name="dimension" value="2D" checked={gridLayoutParams.dimension === "2D"} disabled={isKacGoldstein} onChange={(event) => setGridLayoutParams({ ...gridLayoutParams, dimension: event.target.value })} className="mr-2" />
+                  <input type="radio" name="dimension" value="2D" checked={gridLayoutParams.dimension === "2D"} disabled={isKacGoldstein} onChange={() => {
+                    const remembered = rememberInitialDistribution(gridLayoutParams.initialDistByDimension, gridLayoutParams.dimension, gridLayoutParams.initialDistType);
+                    const initialDistType = getInitialDistributionForDimension('2D', gridLayoutParams.initialDistType, remembered);
+                    setGridLayoutParams({ ...gridLayoutParams, dimension: '2D', initialDistType, initialDistByDimension: rememberInitialDistribution(remembered, '2D', initialDistType) });
+                  }} className="mr-2" />
                   2D
                 </label>
               </div>
@@ -273,16 +289,19 @@ export const RandomWalkParameterPanelV2 = ({
           <label className="block text-sm font-medium mb-2">Initial Distribution:</label>
           <select
             value={gridLayoutParams.initialDistType || "uniform"}
-            onChange={(e) => setGridLayoutParams({ ...gridLayoutParams, initialDistType: e.target.value })}
+            onChange={(e) => {
+              const initialDistType = e.target.value as typeof gridLayoutParams.initialDistType;
+              setGridLayoutParams({
+                ...gridLayoutParams,
+                initialDistType,
+                initialDistByDimension: rememberInitialDistribution(gridLayoutParams.initialDistByDimension, gridLayoutParams.dimension, initialDistType),
+              });
+            }}
             className="w-full border rounded px-2 py-1 text-sm"
           >
-            {isMasoliverLindenbergh && <option value="origin">Point source at origin</option>}
-            {isKacGoldstein && <><option value="centered">Centered single bump</option><option value="bimodal">Symmetric bimodal</option><option value="asymmetric">Asymmetric initial profile</option></>}
-            <option value="uniform">Uniform</option>
-            <option value="gaussian">Gaussian</option>
-            <option value="ring">Ring</option>
-            <option value="stripe">Stripe</option>
-            <option value="grid">Grid</option>
+            {INITIAL_DISTRIBUTIONS_BY_DIMENSION[gridLayoutParams.dimension as '1D' | '2D'].map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
           </select>
         </div>
 
