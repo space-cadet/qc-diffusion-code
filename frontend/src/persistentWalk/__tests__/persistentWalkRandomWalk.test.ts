@@ -24,6 +24,7 @@ const config: PersistentWalkRunConfig = {
   distNx: 20,
   distNy: 15,
   distJitter: 4,
+  interparticleCollisions: false,
 };
 
 function particle(x: number, y: number, vx: number, vy: number): Particle {
@@ -66,5 +67,30 @@ describe("Persistent walk diagnostics", () => {
     expect(decoded.config).toMatchObject({ seed: 15026, walkers: 2, speed: 1, resetRate: 1 });
     expect(decoded.diagnostics.meanSquareDisplacement).toBe(0);
     expect(decoded.scientificNote).toContain("position-heading reset process");
+  });
+
+  test("computes displacement statistics relative to each walker's initial position", () => {
+    const first = particle(11, 20, 1, 0);
+    first.initial = { position: { x: 10, y: 20 }, velocity: { vx: 1, vy: 0 }, timestamp: 0 };
+    const second = particle(8, 24, 0, 1);
+    second.initial = { position: { x: 10, y: 20 }, velocity: { vx: 0, vy: 1 }, timestamp: 0 };
+
+    const diagnostics = calculatePersistentWalkDiagnostics("masoliver-lindenbergh", config, 1, [first, second]);
+
+    expect(diagnostics.meanSquareDisplacement).toBe(10.5);
+    expect(diagnostics.covarianceXX).toBe(2.25);
+    expect(diagnostics.covarianceYY).toBe(4);
+    expect(diagnostics.telegraphModes).toBeDefined();
+    expect(diagnostics.telegraphModes?.modes).toHaveLength(3);
+    expect(diagnostics.telegraphModes?.modes.every((mode) => Number.isFinite(mode.telegraph))).toBe(true);
+  });
+
+  test("omits the fluid-limit comparison when boundaries alter the process", () => {
+    const diagnostics = calculatePersistentWalkDiagnostics("masoliver-lindenbergh", {
+      ...config,
+      boundaryCondition: "reflective",
+    }, 1, [particle(0.1, 0, 1, 0)]);
+
+    expect(diagnostics.telegraphModes).toBeUndefined();
   });
 });

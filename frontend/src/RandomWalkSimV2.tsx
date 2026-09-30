@@ -19,6 +19,7 @@ import {
   type PersistentWalkDiagnostics,
   type PersistentWalkMode,
   type PersistentWalkRunConfig,
+  type TelegraphModeSnapshot,
 } from "./persistentWalk/persistentWalkRandomWalk";
 import { PersistentWalkDiagnosticsPanel } from "./persistentWalk/PersistentWalkRandomWalkMode";
 import { StrategyDiagnosticsPanel } from "./components/StrategyDiagnosticsPanel";
@@ -37,6 +38,30 @@ const CANVAS_HEIGHT = 600;
 const WALK_STRATEGIES = ["kac-goldstein", "masoliver-lindenbergh"] as const;
 type WalkStrategy = typeof WALK_STRATEGIES[number];
 
+function DockedPanel({ title, collapsed, onToggleCollapse, autoUpdate, onToggleAutoUpdate, children }: {
+  title: string;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+  autoUpdate?: boolean;
+  onToggleAutoUpdate?: () => void;
+  children: React.ReactNode;
+}) {
+  return <section className="h-full min-h-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <header className="drag-handle flex h-10 cursor-move select-none items-center justify-between border-b border-slate-200 bg-slate-50 px-3 text-sm font-semibold">
+      <span>{title}</span>
+      <div className="flex items-center gap-2">
+        {onToggleAutoUpdate && <button type="button" aria-pressed={autoUpdate} className={`cursor-pointer rounded border px-2 py-0.5 text-xs ${autoUpdate ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-100"}`} onMouseDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onToggleAutoUpdate(); }}>
+          Auto {autoUpdate ? "ON" : "OFF"}
+        </button>}
+        <button type="button" className="cursor-pointer rounded border border-slate-300 bg-white px-2 py-0.5 text-xs hover:bg-slate-100" onMouseDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onToggleCollapse(); }}>
+          {collapsed ? "Expand" : "Collapse"}
+        </button>
+      </div>
+    </header>
+    <div hidden={collapsed} className="h-[calc(100%-2.5rem)] overflow-auto p-2">{children}</div>
+  </section>;
+}
+
 function isWalkStrategy(strategy: string): strategy is WalkStrategy {
   return WALK_STRATEGIES.includes(strategy as WalkStrategy);
 }
@@ -47,10 +72,27 @@ export default function RandomWalkSimV2() {
     setGridLayoutParams,
     randomWalkSimLayouts,
     setRandomWalkSimLayouts,
+    randomWalkSimCollapsed,
+    setRandomWalkSimCollapsed,
+    randomWalkViewportZoom,
+    setRandomWalkViewportZoom,
     randomWalkSimulationState,
     setRandomWalkSimulationState,
     updateSimulationMetrics,
+    randomWalkUIState,
+    setRandomWalkUIState,
   } = useAppStore();
+
+  const particleViewAutoUpdate = randomWalkUIState.particleViewAutoUpdate ?? true;
+  const persistentDiagnosticsAutoUpdate = randomWalkUIState.persistentDiagnosticsAutoUpdate ?? true;
+  const strategyDiagnosticsAutoUpdate = randomWalkUIState.strategyDiagnosticsAutoUpdate ?? true;
+  const particleViewCollapsed = Boolean(randomWalkSimCollapsed.canvas);
+  const densityCollapsed = Boolean(randomWalkSimCollapsed.density);
+  const persistentDiagnosticsCollapsed = Boolean(randomWalkSimCollapsed.persistentDiagnostics);
+  const strategyDiagnosticsCollapsed = Boolean(randomWalkSimCollapsed.diagnostics);
+  const particleViewUpdatesEnabled = particleViewAutoUpdate && !particleViewCollapsed;
+  const persistentDiagnosticsUpdatesEnabled = persistentDiagnosticsAutoUpdate && !persistentDiagnosticsCollapsed;
+  const strategyDiagnosticsUpdatesEnabled = strategyDiagnosticsAutoUpdate && !strategyDiagnosticsCollapsed;
 
   const isRunning = randomWalkSimulationState.isRunning;
   const strategy = gridLayoutParams.strategies?.find((value) =>
@@ -66,6 +108,10 @@ export default function RandomWalkSimV2() {
   const [resetVersion, setResetVersion] = useState(0);
   const [simReady] = useState(true);
   const [walkDiagnostics, setWalkDiagnostics] = useState<PersistentWalkDiagnostics | null>(null);
+  const [particleViewWalkDiagnostics, setParticleViewWalkDiagnostics] = useState<PersistentWalkDiagnostics | null>(null);
+  const walkDiagnosticsRef = useRef<PersistentWalkDiagnostics | null>(null);
+  const [telegraphModeHistory, setTelegraphModeHistory] = useState<TelegraphModeSnapshot[]>([]);
+  const telegraphModeHistoryRef = useRef<TelegraphModeSnapshot[]>([]);
   const diagnosticsRecorderRef = useRef<StrategyDiagnosticsRecorder | null>(null);
   const [strategyDiagnostics, setStrategyDiagnostics] = useState<StrategyDiagnosticsSnapshot | null>(null);
   const [diagnosticComparison, setDiagnosticComparison] = useState<StrategyDiagnosticsSnapshot | null>(null);
@@ -123,6 +169,7 @@ export default function RandomWalkSimV2() {
     distNx: gridLayoutParams.distNx,
     distNy: gridLayoutParams.distNy,
     distJitter: gridLayoutParams.distJitter,
+    interparticleCollisions: gridLayoutParams.interparticleCollisions,
   }), [gridLayoutParams]);
 
   const diagnosticsConfig = useMemo<DiagnosticsConfig>(() => ({
@@ -147,17 +194,38 @@ export default function RandomWalkSimV2() {
 
   useEffect(() => {
     diagnosticsRecorderRef.current = new StrategyDiagnosticsRecorder(diagnosticsConfig);
-    setStrategyDiagnostics(diagnosticsRecorderRef.current.snapshot());
   }, [diagnosticsConfig]);
+
+  useEffect(() => {
+    if (strategyDiagnosticsAutoUpdate && !strategyDiagnosticsCollapsed) {
+      setStrategyDiagnostics(diagnosticsRecorderRef.current?.snapshot() ?? null);
+    }
+  }, [diagnosticsConfig, strategyDiagnosticsAutoUpdate, strategyDiagnosticsCollapsed]);
+
+  useEffect(() => {
+    if (!persistentDiagnosticsAutoUpdate || persistentDiagnosticsCollapsed) return;
+    setWalkDiagnostics(walkDiagnosticsRef.current);
+    setTelegraphModeHistory(telegraphModeHistoryRef.current);
+  }, [persistentDiagnosticsAutoUpdate, persistentDiagnosticsCollapsed]);
+
+  useEffect(() => {
+    telegraphModeHistoryRef.current = [];
+    walkDiagnosticsRef.current = null;
+    setTelegraphModeHistory([]);
+    setWalkDiagnostics(null);
+    setParticleViewWalkDiagnostics(null);
+  }, [walkConfig]);
 
   const resetStrategyDiagnostics = useCallback(() => {
     diagnosticsRecorderRef.current?.reset();
-    setStrategyDiagnostics(diagnosticsRecorderRef.current?.snapshot() ?? null);
-  }, []);
+    if (strategyDiagnosticsAutoUpdate && !strategyDiagnosticsCollapsed) {
+      setStrategyDiagnostics(diagnosticsRecorderRef.current?.snapshot() ?? null);
+    }
+  }, [strategyDiagnosticsAutoUpdate, strategyDiagnosticsCollapsed]);
 
   const handleStrategyEvent = useCallback((event: StrategyEvent) => {
-    diagnosticsRecorderRef.current?.recordEvent(event);
-  }, []);
+    if (strategyDiagnosticsUpdatesEnabled) diagnosticsRecorderRef.current?.recordEvent(event);
+  }, [strategyDiagnosticsUpdatesEnabled]);
 
   const handleCaptureDiagnosticComparison = useCallback(() => {
     if (strategyDiagnostics) setDiagnosticComparison(strategyDiagnostics);
@@ -190,7 +258,10 @@ export default function RandomWalkSimV2() {
       const scale = Math.min(size.width, size.height) / (2 * radius * 1.08);
       return { x: size.width / 2 + (x / unitScale) * scale, y: size.height / 2 - (y / unitScale) * scale };
     }
-    return { x: particle.position.x, y: particle.position.y };
+    return {
+      x: particle.position.x * size.width / CANVAS_WIDTH,
+      y: particle.position.y * size.height / CANVAS_HEIGHT,
+    };
   }, [gridLayoutParams.boundaryCondition, gridLayoutParams.velocity, isKacGoldstein, isMasoliverLindenbergh]);
 
   const walkOverlay = useMemo(() => {
@@ -204,20 +275,20 @@ export default function RandomWalkSimV2() {
     }
     if (isMasoliverLindenbergh) {
       const displayRadius = Math.max(
-        gridLayoutParams.velocity * (walkDiagnostics?.time ?? 0),
+        gridLayoutParams.velocity * (particleViewWalkDiagnostics?.time ?? 0),
         0.5,
         ...liveParticlesRef.current.map((particle) => Math.hypot(particle.position.x - CANVAS_WIDTH / 2, particle.position.y - CANVAS_HEIGHT / 2) / Math.max(Math.min(CANVAS_WIDTH, CANVAS_HEIGHT) / 6, 1)),
       );
-      const circleRadius = Math.min(46, ((walkDiagnostics?.frontRadius ?? 0) / displayRadius) * 46);
+      const circleRadius = Math.min(46, ((particleViewWalkDiagnostics?.frontRadius ?? 0) / displayRadius) * 46);
       return <>
         <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full">
           {gridLayoutParams.initialDistType === "origin" && <circle cx="50" cy="50" r={circleRadius} fill="none" stroke="#f97316" strokeDasharray="5 4" />}
         </svg>
-        <span className="absolute left-2 top-2 rounded bg-white/80 px-1 text-xs text-slate-700">{gridLayoutParams.initialDistType === "origin" ? `Causal front r = vt = ${(walkDiagnostics?.frontRadius ?? 0).toFixed(2)}` : "Distributed initial condition"}</span>
+        <span className="absolute left-2 top-2 rounded bg-white/80 px-1 text-xs text-slate-700">{gridLayoutParams.initialDistType === "origin" ? `Causal front r = vt = ${(particleViewWalkDiagnostics?.frontRadius ?? 0).toFixed(2)}` : "Distributed initial condition"}</span>
       </>;
     }
     return null;
-  }, [gridLayoutParams.initialDistType, gridLayoutParams.velocity, isKacGoldstein, isMasoliverLindenbergh, walkDiagnostics?.frontRadius, walkDiagnostics?.time]);
+  }, [gridLayoutParams.initialDistType, gridLayoutParams.velocity, isKacGoldstein, isMasoliverLindenbergh, particleViewWalkDiagnostics?.frontRadius, particleViewWalkDiagnostics?.time]);
 
   const handleStart = () => setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: true, status: "Running" });
   const handlePause = () => setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, status: "Paused" });
@@ -225,6 +296,10 @@ export default function RandomWalkSimV2() {
   const handleReset = () => {
     resetStrategyDiagnostics();
     setWalkDiagnostics(null);
+    walkDiagnosticsRef.current = null;
+    setParticleViewWalkDiagnostics(null);
+    telegraphModeHistoryRef.current = [];
+    setTelegraphModeHistory([]);
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, status: "Stopped" });
     timeRef.current = 0;
     updateSimulationMetrics(0, 0, "Stopped", 0);
@@ -234,6 +309,10 @@ export default function RandomWalkSimV2() {
   const handleInitialize = () => {
     resetStrategyDiagnostics();
     setWalkDiagnostics(null);
+    walkDiagnosticsRef.current = null;
+    setParticleViewWalkDiagnostics(null);
+    telegraphModeHistoryRef.current = [];
+    setTelegraphModeHistory([]);
     setRandomWalkSimulationState({ ...randomWalkSimulationState, isRunning: false, time: 0, collisions: 0, status: "Initialized" });
     timeRef.current = 0;
     lastWalkDiagnosticsTimeRef.current = 0;
@@ -256,9 +335,12 @@ export default function RandomWalkSimV2() {
     );
     const recorder = diagnosticsRecorderRef.current;
     const forcePublish = !isRunning;
-    recorder?.recordFrame(particles, stats.time, forcePublish);
-    if (recorder?.shouldPublish(performance.now(), forcePublish)) setStrategyDiagnostics(recorder.snapshot());
+    if (strategyDiagnosticsUpdatesEnabled) {
+      recorder?.recordFrame(particles, stats.time, forcePublish);
+      if (recorder?.shouldPublish(performance.now(), forcePublish)) setStrategyDiagnostics(recorder.snapshot());
+    }
     if (!walkMode) return;
+    if (!persistentDiagnosticsUpdatesEnabled && !particleViewUpdatesEnabled) return;
 
     const now = performance.now();
     if (now - lastWalkDiagnosticsTimeRef.current < 200 && stats.time !== 0) return;
@@ -268,13 +350,30 @@ export default function RandomWalkSimV2() {
       position: walkMode === "kac-goldstein"
         ? { x: (particle.position.x - CANVAS_WIDTH / 2) * 12 / CANVAS_WIDTH, y: 0 }
         : { x: (particle.position.x - CANVAS_WIDTH / 2) / unitScale, y: (CANVAS_HEIGHT / 2 - particle.position.y) / unitScale },
+      initial: particle.initial ? {
+        ...particle.initial,
+        position: walkMode === "kac-goldstein"
+          ? { x: (particle.initial.position.x - CANVAS_WIDTH / 2) * 12 / CANVAS_WIDTH, y: 0 }
+          : { x: (particle.initial.position.x - CANVAS_WIDTH / 2) / unitScale, y: (CANVAS_HEIGHT / 2 - particle.initial.position.y) / unitScale },
+      } : undefined,
       velocity: walkMode === "kac-goldstein"
         ? { ...particle.velocity, vx: Math.sign(particle.velocity.vx) }
         : { vx: particle.velocity.vx / unitScale, vy: particle.velocity.vy / unitScale },
     }));
-    setWalkDiagnostics(calculatePersistentWalkDiagnostics(walkMode, walkConfig, stats.time, modelParticles));
+    const nextWalkDiagnostics = calculatePersistentWalkDiagnostics(walkMode, walkConfig, stats.time, modelParticles);
+    walkDiagnosticsRef.current = nextWalkDiagnostics;
+    if (persistentDiagnosticsUpdatesEnabled) setWalkDiagnostics(nextWalkDiagnostics);
+    if (particleViewUpdatesEnabled) setParticleViewWalkDiagnostics(nextWalkDiagnostics);
+    if (nextWalkDiagnostics.telegraphModes) {
+      const previous = telegraphModeHistoryRef.current;
+      if (!previous.length || nextWalkDiagnostics.time - previous[previous.length - 1].time >= 0.05) {
+        const next = [...previous, nextWalkDiagnostics.telegraphModes].slice(-240);
+        telegraphModeHistoryRef.current = next;
+        if (persistentDiagnosticsUpdatesEnabled) setTelegraphModeHistory(next);
+      }
+    }
     lastWalkDiagnosticsTimeRef.current = now;
-  }, [isRunning, randomWalkSimulationState.status, updateSimulationMetrics, walkConfig, walkMode]);
+  }, [isRunning, particleViewUpdatesEnabled, persistentDiagnosticsUpdatesEnabled, randomWalkSimulationState.status, strategyDiagnosticsUpdatesEnabled, updateSimulationMetrics, walkConfig, walkMode]);
 
   const observableManagerRef = useRef(
     new ObservableManager({ width: engineParams.canvasWidth, height: engineParams.canvasHeight }),
@@ -301,7 +400,32 @@ export default function RandomWalkSimV2() {
     handleCustomObservablesToggleCollapse,
   } = useRandomWalkPanels();
 
-  const onLayoutChange = (layout: any) => setRandomWalkSimLayouts(layout);
+  const defaultPanelLayouts = useMemo(() => [
+    { i: "parameters", x: 0, y: 0, w: 3, h: 8, minW: 3, minH: 6 },
+    { i: "canvas", x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 },
+    { i: "density", x: 0, y: 8, w: 8, h: 5, minW: 6, minH: 3 },
+    { i: "history", x: 8, y: 8, w: 4, h: 5, minW: 3, minH: 3 },
+    { i: "persistentDiagnostics", x: 0, y: 13, w: 6, h: 5, minW: 4, minH: 3 },
+    { i: "diagnostics", x: 6, y: 13, w: 6, h: 5, minW: 4, minH: 3 },
+    { i: "export", x: 0, y: 18, w: 12, h: 3, minW: 4, minH: 2 },
+  ], []);
+  const savedLayouts = useMemo(() => defaultPanelLayouts.map((defaultLayout) => ({
+    ...defaultLayout,
+    ...randomWalkSimLayouts.find((item) => item.i === defaultLayout.i),
+  })), [defaultPanelLayouts, randomWalkSimLayouts]);
+  const renderedLayouts = useMemo(() => savedLayouts.map((item) => ({
+    ...item,
+    h: randomWalkSimCollapsed[item.i] ? 1 : item.h,
+  })), [savedLayouts, randomWalkSimCollapsed]);
+  const onLayoutChange = useCallback((layout: any[]) => {
+    setRandomWalkSimLayouts(layout.map((item) => {
+      const saved = savedLayouts.find((candidate) => candidate.i === item.i);
+      return randomWalkSimCollapsed[item.i] ? { ...item, h: saved?.h ?? item.h } : item;
+    }));
+  }, [randomWalkSimCollapsed, savedLayouts, setRandomWalkSimLayouts]);
+  const togglePanel = useCallback((panel: string) => {
+    setRandomWalkSimCollapsed(panel, !randomWalkSimCollapsed[panel]);
+  }, [randomWalkSimCollapsed, setRandomWalkSimCollapsed]);
 
   return (
     <div className="min-h-full flex flex-col bg-gray-50">
@@ -309,7 +433,7 @@ export default function RandomWalkSimV2() {
       <div className="flex-1 p-4 relative">
         <ReactGridLayout
           className="layout"
-          layout={randomWalkSimLayouts}
+          layout={renderedLayouts}
           onLayoutChange={onLayoutChange}
           cols={12}
           rowHeight={50}
@@ -320,6 +444,7 @@ export default function RandomWalkSimV2() {
           draggableHandle=".drag-handle"
         >
           <div key="parameters" id="random-walk-parameters">
+            <DockedPanel title="Parameters" collapsed={Boolean(randomWalkSimCollapsed.parameters)} onToggleCollapse={() => togglePanel("parameters")}>
             <RandomWalkParameterPanelV2
               gridLayoutParams={gridLayoutParams}
               setGridLayoutParams={setGridLayoutParams}
@@ -328,13 +453,19 @@ export default function RandomWalkSimV2() {
               handlePause={handlePause}
               handleReset={handleReset}
               handleInitialize={handleInitialize}
+              viewportZoom={randomWalkViewportZoom}
+              onViewportZoomChange={setRandomWalkViewportZoom}
             />
+            </DockedPanel>
           </div>
           <div key="canvas" id="random-walk-canvas">
+            <DockedPanel title="Particle View" collapsed={Boolean(randomWalkSimCollapsed.canvas)} onToggleCollapse={() => togglePanel("canvas")} autoUpdate={particleViewAutoUpdate} onToggleAutoUpdate={() => setRandomWalkUIState({ particleViewAutoUpdate: !particleViewAutoUpdate })}>
             <ParticleCanvasV2
               key={`walk-${gridLayoutParams.dimension}`}
               params={engineParams}
+              autoRender={particleViewAutoUpdate && !particleViewCollapsed}
               projectPosition={projectWalkPosition}
+              viewportZoom={randomWalkViewportZoom}
               overlay={walkOverlay}
               isRunning={isRunning}
               initializeVersion={initializeVersion}
@@ -343,38 +474,52 @@ export default function RandomWalkSimV2() {
               onEngineFrame={handleEngineFrame}
               onStrategyEvent={handleStrategyEvent}
             />
+            </DockedPanel>
           </div>
           <div key="density" id="density">
+            <DockedPanel title="Density" collapsed={Boolean(randomWalkSimCollapsed.density)} onToggleCollapse={() => togglePanel("density")}>
             <DensityComparison
               particles={liveParticlesRef.current}
+              particlesRef={liveParticlesRef}
               particleCount={liveParticlesRef.current.length}
               gridLayoutParams={gridLayoutParams}
               simulationState={randomWalkSimulationState}
+              updatesEnabled={!densityCollapsed}
               binSize={isKacGoldstein ? 800 / 120 : isMasoliverLindenbergh ? 5 : undefined}
             />
+            </DockedPanel>
           </div>
           <div key="history" id="history">
+            <DockedPanel title="History" collapsed={Boolean(randomWalkSimCollapsed.history)} onToggleCollapse={() => togglePanel("history")}>
             <HistoryPanel simulationState={randomWalkSimulationState} />
-            {walkMode && <PersistentWalkDiagnosticsPanel mode={walkMode} config={walkConfig} diagnostics={walkDiagnostics} />}
+            </DockedPanel>
+          </div>
+          <div key="persistentDiagnostics" id="persistent-diagnostics">
+            <DockedPanel title="Persistent Walk Diagnostics" collapsed={Boolean(randomWalkSimCollapsed.persistentDiagnostics)} onToggleCollapse={() => togglePanel("persistentDiagnostics")} autoUpdate={persistentDiagnosticsAutoUpdate} onToggleAutoUpdate={() => setRandomWalkUIState({ persistentDiagnosticsAutoUpdate: !persistentDiagnosticsAutoUpdate })}>
+              {walkMode ? <PersistentWalkDiagnosticsPanel mode={walkMode} config={walkConfig} diagnostics={walkDiagnostics} telegraphModeHistory={telegraphModeHistory} /> : <p className="text-sm text-slate-500">Select Kac–Goldstein or Masoliver-Lindenbergh to view walk diagnostics.</p>}
+            </DockedPanel>
+          </div>
+          <div key="diagnostics" id="diagnostics">
+            <DockedPanel title="Strategy Diagnostics" collapsed={Boolean(randomWalkSimCollapsed.diagnostics)} onToggleCollapse={() => togglePanel("diagnostics")} autoUpdate={strategyDiagnosticsAutoUpdate} onToggleAutoUpdate={() => setRandomWalkUIState({ strategyDiagnosticsAutoUpdate: !strategyDiagnosticsAutoUpdate })}>
+              <StrategyDiagnosticsPanel
+                snapshot={strategyDiagnostics}
+                comparison={diagnosticComparison}
+                onCaptureComparison={handleCaptureDiagnosticComparison}
+                onClearComparison={() => setDiagnosticComparison(null)}
+              />
+            </DockedPanel>
           </div>
           <div key="export" id="export">
+            <DockedPanel title="Export" collapsed={Boolean(randomWalkSimCollapsed.export)} onToggleCollapse={() => togglePanel("export")}>
             <ExportPanel
               simulationState={randomWalkSimulationState}
               onExport={() => console.log("Export")}
               onCopy={() => console.log("Copy")}
               onShare={() => console.log("Share")}
             />
+            </DockedPanel>
           </div>
         </ReactGridLayout>
-
-        <div id="diagnostics">
-          <StrategyDiagnosticsPanel
-            snapshot={strategyDiagnostics}
-            comparison={diagnosticComparison}
-            onCaptureComparison={() => strategyDiagnostics && setDiagnosticComparison(strategyDiagnostics)}
-            onClearComparison={() => setDiagnosticComparison(null)}
-          />
-        </div>
 
         <FloatingPanel
           title="Observables"

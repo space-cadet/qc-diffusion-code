@@ -9,6 +9,8 @@ export const RandomWalkParameterPanelV2 = ({
   handlePause,
   handleReset,
   handleInitialize,
+  viewportZoom = 1,
+  onViewportZoomChange,
 }: any) => {
   const minP = useMemo(() => gridLayoutParams.minParticles ?? 0, [gridLayoutParams.minParticles]);
   const maxP = useMemo(() => gridLayoutParams.maxParticles ?? 2000, [gridLayoutParams.maxParticles]);
@@ -64,22 +66,12 @@ export const RandomWalkParameterPanelV2 = ({
           Initialize
         </button>
 
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={handleStart}
-            disabled={simulationState.isRunning}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors disabled:bg-gray-400"
-          >
-            Start
-          </button>
-
-          <button
-            onClick={handlePause}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md transition-colors"
-          >
-            {simulationState.isRunning ? 'Pause' : 'Resume'}
-          </button>
-        </div>
+        <button
+          onClick={simulationState.isRunning ? handlePause : handleStart}
+          className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${simulationState.isRunning ? 'bg-amber-600 hover:bg-amber-700' : 'bg-green-600 hover:bg-green-700'}`}
+        >
+          {simulationState.isRunning ? 'Pause' : simulationState.status === 'Paused' ? 'Resume' : 'Start'}
+        </button>
 
         <button
           onClick={handleReset}
@@ -93,7 +85,7 @@ export const RandomWalkParameterPanelV2 = ({
           <div className="flex justify-between items-center">
             <span className="font-medium">Status:</span>
             <span className={`font-medium ${simulationState.isRunning ? 'text-green-600' : 'text-gray-500'}`}>
-              {simulationState.isRunning ? 'Running' : 'Stopped'}
+              {simulationState.status}
             </span>
           </div>
           <div className="flex justify-between">
@@ -108,6 +100,14 @@ export const RandomWalkParameterPanelV2 = ({
             <span>Collisions:</span>
             <span className="font-mono">{(simulationState.interparticleCollisions || 0).toLocaleString()}</span>
           </div>
+        </div>
+
+        <div className="rounded-lg border bg-slate-50 p-3">
+          <label htmlFor="random-walk-viewport-zoom" className="flex justify-between text-sm font-medium">
+            <span>Particle view zoom</span><span>{Number(viewportZoom).toFixed(1)}×</span>
+          </label>
+          <input id="random-walk-viewport-zoom" type="range" min="0.5" max="3" step="0.1" value={viewportZoom} onChange={(event) => onViewportZoomChange?.(Number(event.target.value))} className="mt-2 w-full" />
+          <p className="mt-1 text-xs text-slate-500">Changes the view only; simulation coordinates stay the same.</p>
         </div>
       </div>
 

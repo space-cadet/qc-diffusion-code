@@ -8,6 +8,7 @@
     "build": "node scripts/copy-memory-bank.js && tsc -b && vite build",
     "preview": "vite preview",
     "dev:full": "concurrently \"cd ../backend && conda run -n qc-diff python main.py\" \"pnpm dev\"",
+    "random-walk:headless": "node scripts/run-random-walk-headless.mjs",
     "test": "pnpm exec vitest run",
     "test:watch": "vitest --watch",
     "clean": "rm -rf node_modules dist"

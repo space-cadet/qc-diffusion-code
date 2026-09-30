@@ -7,7 +7,9 @@ import type { StrategyEvent } from "../physics/types/PhysicsContext";
 
 interface ParticleCanvasV2Props {
   params: EngineParams;
+  viewportZoom?: number;
   isRunning: boolean;
+  autoRender?: boolean;
   initializeVersion?: number;
   resetVersion?: number;
   stopAtTime?: number;
@@ -21,7 +23,9 @@ interface ParticleCanvasV2Props {
 
 export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
   params,
+  viewportZoom = 1,
   isRunning,
+  autoRender = true,
   initializeVersion = 0,
   resetVersion = 0,
   stopAtTime,
@@ -85,18 +89,25 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
         step(dt, stopAtTime);
       }
 
-      // Always render
+      // Rendering can be paused independently from the physics engine.
       const particles = particlesRef.current;
       const stats = getStats();
       if (liveParticlesRef) {
         liveParticlesRef.current = particles;
       }
-      if (particles.length > 0) {
+      if (autoRender && particles.length > 0) {
         const rect = canvasRef.current?.getBoundingClientRect();
         const size = { width: rect?.width ?? params.canvasWidth, height: rect?.height ?? params.canvasHeight };
-        render(adaptParticles(particles, projectPosition
-          ? (particle, index) => projectPosition(particle, index, size, stats?.time ?? 0)
-          : undefined));
+        render(adaptParticles(particles, (particle, index) => {
+          const projected = projectPosition
+            ? projectPosition(particle, index, size, stats?.time ?? 0)
+            : { x: particle.position.x, y: particle.position.y };
+          return {
+            ...projected,
+            x: size.width / 2 + (projected.x - size.width / 2) * viewportZoom,
+            y: size.height / 2 + (projected.y - size.height / 2) * viewportZoom,
+          };
+        }));
       }
 
       // Report stats
@@ -111,7 +122,7 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
     return () => {
       cancelAnimationFrame(animFrameId);
     };
-  }, [isRunning, render, step, stopAtTime, engineRef, getStats, liveParticlesRef, onEngineFrame, onStatsUpdate, params.canvasWidth, params.canvasHeight, projectPosition]);
+  }, [autoRender, isRunning, render, step, stopAtTime, engineRef, getStats, liveParticlesRef, onEngineFrame, onStatsUpdate, params.canvasWidth, params.canvasHeight, projectPosition, viewportZoom]);
 
   // Handle resize
   useEffect(() => {
@@ -142,6 +153,8 @@ export const ParticleCanvasV2: React.FC<ParticleCanvasV2Props> = ({
         ref={canvasRef}
         style={{ width: "100%", height: "100%", display: "block" }}
       />
+      {params.boundaryCondition !== "unbounded" && <div className="pointer-events-none absolute inset-[8px] border-2 border-slate-500/80" style={{ transform: `scale(${viewportZoom})`, transformOrigin: "center" }} />}
+      {params.boundaryCondition === "unbounded" && <span className="pointer-events-none absolute right-2 top-2 rounded bg-white/85 px-2 py-1 text-xs font-medium text-slate-600">Unbounded domain</span>}
       {overlay && <div className="pointer-events-none absolute inset-0">{overlay}</div>}
     </div>
   );

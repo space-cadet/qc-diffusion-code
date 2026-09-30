@@ -1,17 +1,19 @@
 # Session Cache
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-30 02:48:52 IST*
+*Last Updated: 2026-09-30 09:35:52 IST*
 
 ## Current Session
 
-**2026-09-30 T42 Random Walk UI plan and T35a record closeout**: Added the planned persistent draggable/resizable/collapsible Random Walk workspace, viewport zoom/boundary display, and unified transport control to T42. No T42 implementation changes were made. T35a's local URL and deep-link checks remain passed; deployed nested-path and legacy `?data=` checks remain open. Existing T35a source changes are recorded in the 2026-09-29 implementation and acceptance chunks.
+**2026-09-30 T38/T40/T41/T42 Random Walk implementation**: Added the seeded headless runner; expanded persistent-walk absolute-density and continuum diagnostics; added comparison plots and continuum mockups; implemented persisted panel workspace, zoom/boundaries, unified transport, and per-panel collapse update gates. Targeted TypeScript and `git diff --check` pass; browser review and the seeded Vitest suite remain open.
 
-**Session**: T42 Random Walk UI plan and T35a Memory Bank closeout, 2026-09-30
+**Session**: T42 Random Walk UI implementation, 2026-09-30
 **Started**: 2026-09-30 02:48:52 IST
-**Focus**: Record the approved Random Walk panel/viewport plan and clarify T35a's remaining deployment checks
-**Status**: 📝 PLAN RECORDED — T42 implementation has not started; T35a deployed checks remain
-**Branch**: `main` at `906b99e`
+**Focus**: Implement persistent Random Walk panel workspace and viewport controls
+**Status**: 🔄 IMPLEMENTATION IN PROGRESS — TypeScript passes; browser interaction review remains
+**Branch**: `main` at `058caf5` (session changes uncommitted)
+
+**2026-09-30 T38 continuation**: Added seeded engine RNG wiring and a direct JSON/CSV runner. Local TypeScript check passed; repeated 2D output matched all 11 samples, and 1D Kac–Goldstein JSON/CSV output completed. Vitest was not run; native Firefox inspection is unavailable while the Mac is locked.
 
 ## Overview
 
@@ -39,9 +41,9 @@
 - T39c: Interactive 3D spheroid-walk page - 🔄 IN PROGRESS
 - T40: T15 modes owned by `qc-diffusion-T15a` and `qc-diffusion-T15b` - 🔄 IN PROGRESS
 - T41: Random Walk Strategy Diagnostics and Plots - 🔄 IN PROGRESS
-- T42: Random Walk Panel Workspace and Viewport Controls - 📝 PLANNED
+- T42: Random Walk Panel Workspace and Viewport Controls - 🔄 IN PROGRESS
 - T35a: URL-Backed Navigation and Shareable Views - 🔄 IN PROGRESS
-- T38: Headless Random Walk Statistics Runner - 📝 PLANNED
+- T38: Headless Random Walk Statistics Runner - 🔄 IN PROGRESS
 - T27: Clean Rewrite — Pure WebGL + Original Physics Engine - ✅ COMPLETED
 - T0: Memory Bank Initialization - ✅
 - T1: Numerical Simulations - 🔄

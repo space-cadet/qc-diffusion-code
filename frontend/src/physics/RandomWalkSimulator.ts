@@ -28,15 +28,19 @@ export class RandomWalkSimulator {
   private simulationRunner: SimulationRunner | undefined;
   private parameterManager: ParameterManager;
   private readonly useNewEngine: boolean;
+  private readonly random: () => number;
+  private readonly initialVelocityMode: 'thermal' | 'strategy';
   private densityHistory: Array<{
     time: number;
     density: number[][];
     bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
   }> = [];
 
-  constructor(config: SimulatorParams & { useNewEngine?: boolean, useStreamingObservables?: boolean }) {
+  constructor(config: SimulatorParams & { useNewEngine?: boolean, useStreamingObservables?: boolean; random?: () => number; initialVelocityMode?: 'thermal' | 'strategy' }) {
     this.useNewEngine = config.useNewEngine ?? USE_NEW_ENGINE === true;
     this.useStreamingObservables = config.useStreamingObservables ?? false;
+    this.random = config.random ?? Math.random;
+    this.initialVelocityMode = config.initialVelocityMode ?? 'thermal';
     this.parameterManager = new ParameterManager(config);
     // DIAG: Log effective boundary configuration and canvas size at initialization
     try {
@@ -92,9 +96,9 @@ export class RandomWalkSimulator {
     const coordinateSystem = new CoordinateSystem(
       { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
       boundaryConfig,
-      this.parameterManager.dimension
+      this.parameterManager.dimension,
     );
-    this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem);
+    this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem, this.random);
   }
 
   private setupSimulationRunner(): void {
@@ -110,6 +114,7 @@ export class RandomWalkSimulator {
           canvasSize: { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight },
           dimension: this.parameterManager.dimension,
           strategies: physicsStrategies,
+          random: this.random,
         });
         this.simulationRunner = new EngineSimulationRunner(this.physicsEngine, this.particleManager);
         console.log('[RWS] Using EngineSimulationRunner with direct PhysicsStrategies');
@@ -139,25 +144,25 @@ export class RandomWalkSimulator {
       distNx: this.parameterManager.distNx,
       distNy: this.parameterManager.distNy,
       distJitter: this.parameterManager.distJitter,
-    });
+    }, this.random);
   }
 
   private initializeParticles(): void {
     console.log('[RWS] initializeParticles START', { count: this.parameterManager.particleCount });
     this.particleManager.clearAllParticles();
     console.log('[RWS] after clear, particles:', this.particleManager.getAllParticles().length);
-    const thermalVelocities = this.generateThermalVelocities(this.parameterManager.particleCount, this.parameterManager.dimension);
+    const initialVelocities = this.generateInitialVelocities(this.parameterManager.particleCount, this.parameterManager.dimension);
     const positions: {x: number, y: number}[] = [];
     
     for (let i = 0; i < this.parameterManager.particleCount; i++) {
       const pos = this.sampleCanvasPosition(i);
       positions.push(pos);
-      const thermalVelocity = thermalVelocities[i];
+      const initialVelocity = initialVelocities[i];
       
       if (i < 3) {
         console.log('[RWS] init particle', i, {
           position: pos,
-          velocity: thermalVelocity,
+          velocity: initialVelocity,
           canvasSize: { width: this.parameterManager.canvasWidth, height: this.parameterManager.canvasHeight }
         });
       }
@@ -165,16 +170,54 @@ export class RandomWalkSimulator {
       const tsParticle = {
         id: `p${i}`,
         position: pos,
-        velocity: thermalVelocity
+        velocity: initialVelocity,
+        nextCollisionTime: this.getInitialEventTime(),
       };
       this.particleManager.initializeParticle(tsParticle);
     }
     console.log('[RWS] initializeParticles END, particles:', this.particleManager.getAllParticles().length);
   }
 
-  private generateThermalVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
-    const velocities: Array<{vx: number, vy: number}> = genThermalUtil(count, dimension, this.parameterManager.temperature);
-    return velocities;
+  private generateInitialVelocities(count: number, dimension: '1D' | '2D'): Array<{vx: number, vy: number}> {
+    const mode = this.parameterManager.strategies?.find((strategy) => strategy !== 'collisions')
+      ?? (this.parameterManager.collisionRate > 0 ? 'ctrw' : 'simple');
+    // The strategy mode matches fixed-speed process initialization. Thermal
+    // initialization remains available to legacy callers.
+    if (this.initialVelocityMode === 'strategy') {
+      const speed = this.getStrategySpeed(mode);
+      return Array.from({ length: count }, () => {
+        const angle = mode === 'kac-goldstein'
+          ? (this.random() < (this.parameterManager.initialDistType === 'asymmetric' ? 0.7 : 0.5) ? 0 : Math.PI)
+          : dimension === '1D' ? (this.random() < 0.5 ? 0 : Math.PI) : this.random() * 2 * Math.PI;
+        return {
+          vx: speed * Math.cos(angle),
+          vy: dimension === '1D' ? 0 : speed * Math.sin(angle),
+        };
+      });
+    }
+    return genThermalUtil(count, dimension, this.parameterManager.temperature, this.random);
+  }
+
+  private getStrategySpeed(strategy: string): number {
+    const { velocity, canvasWidth, canvasHeight } = this.parameterManager;
+    if (strategy === 'kac-goldstein') return velocity * Math.max(canvasWidth / 12, 1);
+    if (strategy === 'masoliver-lindenbergh' || strategy === 'levy-walk') {
+      return velocity * Math.max(Math.min(canvasWidth, canvasHeight) / 6, 1);
+    }
+    return velocity;
+  }
+
+  private getInitialEventTime(): number {
+    const mode = this.parameterManager.strategies?.find((strategy) => strategy !== 'collisions')
+      ?? (this.parameterManager.collisionRate > 0 ? 'ctrw' : 'simple');
+    if (mode === 'simple') return Infinity;
+    const uniform = Math.max(this.random(), Number.EPSILON);
+    if (mode === 'fractional') {
+      return this.time + this.parameterManager.fractionalWaitingScale / Math.pow(uniform, 1 / this.parameterManager.fractionalBeta);
+    }
+    return this.parameterManager.collisionRate > 0
+      ? this.time - Math.log(uniform) / this.parameterManager.collisionRate
+      : Infinity;
   }
 
   step(dt: number): void {
@@ -228,7 +271,7 @@ export class RandomWalkSimulator {
         currentBoundaryConfig,
         this.parameterManager.dimension
       );
-      this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem);
+      this.particleManager = new ParticleManager(this.currentStrategy, this.parameterManager.dimension, coordinateSystem, this.random);
       
       // CRITICAL: Always reinitialize particles when ParticleManager is recreated,
       // otherwise particles are wiped and never restored

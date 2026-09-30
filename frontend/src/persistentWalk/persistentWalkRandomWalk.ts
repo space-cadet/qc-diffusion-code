@@ -25,6 +25,21 @@ export interface PersistentWalkRunConfig {
   distNx: number;
   distNy: number;
   distJitter: number;
+  interparticleCollisions: boolean;
+}
+
+export interface TelegraphModeResult {
+  scaledWavenumber: number;
+  empirical: number;
+  standardError: number;
+  telegraph: number;
+  absoluteDifference: number;
+}
+
+export interface TelegraphModeSnapshot {
+  time: number;
+  lambdaTime: number;
+  modes: TelegraphModeResult[];
 }
 
 export interface PersistentWalkDiagnostics {
@@ -46,6 +61,34 @@ export interface PersistentWalkDiagnostics {
   density: number[];
   current?: number[];
   domain: [number, number];
+  telegraphModes?: TelegraphModeSnapshot;
+}
+
+const TELEGRAPH_SCALED_WAVENUMBERS = [0.5, 1, 1.5] as const;
+
+function masoliverLindenberghTelegraphMode(
+  scaledWavenumber: number,
+  time: number,
+  speed: number,
+  resetRate: number,
+): number {
+  const diffusion = (speed * speed) / (2 * resetRate);
+  const wavenumber = scaledWavenumber / Math.sqrt(diffusion * time);
+  const dampingHalf = resetRate / 4;
+  const frequencySquared = (speed * wavenumber / 2) ** 2 - dampingHalf ** 2;
+  if (Math.abs(frequencySquared) < 1e-12) {
+    return Math.exp(-dampingHalf * time) * (1 + dampingHalf * time);
+  }
+  if (frequencySquared > 0) {
+    const frequency = Math.sqrt(frequencySquared);
+    return Math.exp(-dampingHalf * time) * (
+      Math.cos(frequency * time) + (dampingHalf / frequency) * Math.sin(frequency * time)
+    );
+  }
+  const growth = Math.sqrt(-frequencySquared);
+  return Math.exp(-dampingHalf * time) * (
+    Math.cosh(growth * time) + (dampingHalf / growth) * Math.sinh(growth * time)
+  );
 }
 
 export function createPersistentWalkRunExport(
@@ -127,9 +170,11 @@ export function calculatePersistentWalkDiagnostics(
   let sumXX = 0;
   let sumYY = 0;
   let sumXY = 0;
+  const displacements: Array<{ x: number; y: number }> = [];
   for (const particle of liveParticles) {
-    const x = particle.position.x;
-    const y = particle.position.y;
+    const x = particle.position.x - (particle.initial?.position.x ?? 0);
+    const y = particle.position.y - (particle.initial?.position.y ?? 0);
+    displacements.push({ x, y });
     const radiusSquared = x * x + y * y;
     sumX += x;
     sumY += y;
@@ -142,6 +187,35 @@ export function calculatePersistentWalkDiagnostics(
   }
   const meanX = sumX / count;
   const meanY = sumY / count;
+  const telegraphModes = time > 0 && config.resetRate > 0
+    && config.boundaryCondition === "unbounded"
+    && !config.interparticleCollisions
+    ? {
+      time,
+      lambdaTime: config.resetRate * time,
+      modes: TELEGRAPH_SCALED_WAVENUMBERS.map((scaledWavenumber) => {
+        const diffusion = (config.speed * config.speed) / (2 * config.resetRate);
+        const wavenumber = scaledWavenumber / Math.sqrt(diffusion * time);
+        const samples = displacements.map((displacement) => Math.cos(wavenumber * displacement.x));
+        const empirical = samples.reduce((sum, value) => sum + value, 0) / Math.max(1, samples.length);
+        const variance = samples.reduce((sum, value) => sum + (value - empirical) ** 2, 0)
+          / Math.max(1, samples.length - 1);
+        const telegraph = masoliverLindenberghTelegraphMode(
+          scaledWavenumber,
+          time,
+          config.speed,
+          config.resetRate,
+        );
+        return {
+          scaledWavenumber,
+          empirical,
+          standardError: Math.sqrt(variance / Math.max(1, samples.length)),
+          telegraph,
+          absoluteDifference: Math.abs(empirical - telegraph),
+        };
+      }),
+    }
+    : undefined;
   return {
     mode,
     time,
@@ -158,5 +232,6 @@ export function calculatePersistentWalkDiagnostics(
     radii: Array.from({ length: HISTOGRAM_BINS }, (_, i) => (i + 0.5) * dr),
     density: Array.from(radialCounts, (n) => n / (count * dr)),
     domain: [0, maxRadius],
+    telegraphModes,
   };
 }

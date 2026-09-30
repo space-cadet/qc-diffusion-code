@@ -4,24 +4,26 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
 
 ## Metadata
 ```json
-{ "generated_at": "2026-09-29 20:55:07 IST", "version": "1" }
+{ "generated_at": "2026-09-30 09:35:52 IST", "version": "1" }
 ```
 
 ## Inverse Indexes (inline source of truth)
 ```json
 {
   "tag_index": {
-    "random-walk": ["1d-random-walk-sim-plan","headless-random-walk-runner","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walks-diff-eq","t15a-t15b-random-walk-page-integration","quantum-walk-implementation"],
+    "random-walk": ["1d-random-walk-sim-plan","headless-random-walk-runner","interparticle-collision-plan","random-walk-class-redesign","random-walk-engine-plan","random-walk-ui-interface","random-walk-strategy-diagnostics","random-walks-diff-eq","t15a-t15b-random-walk-page-integration","quantum-walk-implementation","random-walk-continuum-comparison-mockups"],
     "collisions": ["interparticle-collision-plan"],
     "gpu": ["gpu-amr-integration","visual-pde-gpu-solver-plan"],
     "amr": ["gpu-amr-integration"],
     "pde": ["pde-bcs-equations-stability","gpu-amr-integration","pde-bcs-final-plan","pde-bcs-implementation","pde-solver-choice-plan","visual-pde-gpu-solver-plan","random-walks-diff-eq","pde-bcs-architecture-claude4","pde-bcs-architecture-deepseek","pde-bcs-architecture-gpt5","pde-bcs-3way-comparison-claude4","pde-bcs-3way-comparison-deepseek","pde-bcs-3way-comparison-gpt5"],
     "boundary-conditions": ["pde-bcs-equations-stability","pde-bcs-final-plan","pde-bcs-implementation","pde-bcs-architecture-claude4","pde-bcs-architecture-deepseek","pde-bcs-architecture-gpt5","pde-bcs-3way-comparison-claude4","pde-bcs-3way-comparison-deepseek","pde-bcs-3way-comparison-gpt5"],
-    "ui": ["observer-design-plan","random-walk-ui-interface"],
+    "ui": ["observer-design-plan","random-walk-ui-interface","random-walk-continuum-comparison-mockups"],
+    "continuum": ["random-walk-continuum-comparison-mockups","random-walk-strategy-diagnostics"],
+    "mockups": ["random-walk-continuum-comparison-mockups"],
     "observables": ["observer-design-plan"],
     "architecture": ["observer-design-plan","pde-bcs-final-plan","random-walk-class-redesign","pde-bcs-architecture-claude4","pde-bcs-architecture-deepseek","pde-bcs-architecture-gpt5"],
     "frontend-maintenance": ["frontend-dead-code-inventory"],
-    "statistics": ["headless-random-walk-runner"],
+    "statistics": ["headless-random-walk-runner","random-walk-strategy-diagnostics"],
     "state-management": ["zustand-store-splitting-plan"],
     "deployment": ["vercel-deployment-plan"],
     "quantum": ["quantum-walk-implementation"],
@@ -37,6 +39,7 @@ Purpose: Fast AI/human lookup of implementation docs via compact, parseable entr
     "T34": ["frontend-dead-code-inventory"],
     "T38": ["headless-random-walk-runner"],
     "T40": ["t15a-t15b-random-walk-page-integration"],
+    "T41": ["random-walk-strategy-diagnostics"],
     "T42": ["random-walk-panel-workspace"],
     "T35": ["url-backed-navigation"],
     "T35a": ["url-backed-navigation"]
@@ -63,11 +66,13 @@ One JSON object per line. Fields: id, title, path, summary, tags, tasks?, update
 { "id":"t15a-t15b-random-walk-page-integration", "title":"Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page", "path":"memory-bank/implementation-details/t15a-t15b-random-walk-page-integration.md", "summary":"Documents Kac–Goldstein and Masoliver–Lindenbergh as independent strategies using the shared Random Walk controls and engine; normal-browser JSON delivery remains unverified.", "tags":["random-walk","research","ui"], "tasks":["T40"], "updated":"2026-09-28 17:40:54 IST" }
 { "id":"random-walks-diff-eq", "title":"Random Walk Derivation of Telegraph Equation", "path":"memory-bank/implementation-details/random-walks-diff-eq.md", "summary":"Records the CTRW/telegraph relation, 2D CTRW single-motion composition, and Bianchi I/IX validation conventions and results.", "tags":["random-walk","pde","architecture"], "tasks":["T1","T27"], "updated":"2026-09-29 00:51:51 IST" }
 { "id":"frontend-dead-code-inventory", "title":"Frontend Dead Code Inventory", "path":"memory-bank/implementation-details/frontend-dead-code-inventory.md", "summary":"Inventory of frontend source artifacts reviewed for cleanup under T34.", "tags":["frontend-maintenance"], "tasks":["T34"], "updated":"2026-05-11 11:31:20 IST" }
-{ "id":"headless-random-walk-runner", "title":"Headless Random Walk Statistics Runner", "path":"memory-bank/implementation-details/headless-random-walk-runner.md", "summary":"Plans a seeded Node runner for the production RandomWalkSimulator and PhysicsEngine, separate from the Bianchi validation model.", "tags":["random-walk","statistics"], "tasks":["T38"], "updated":"2026-07-21 15:36:00 IST" }
+{ "id":"headless-random-walk-runner", "title":"Headless Random Walk Statistics Runner", "path":"memory-bank/implementation-details/headless-random-walk-runner.md", "summary":"Runs the production RandomWalkSimulator and PhysicsEngine with seeded JSON/CSV output, documented configuration, and deterministic regression coverage; test-suite and browser checks remain open.", "tags":["random-walk","statistics"], "tasks":["T38"], "updated":"2026-09-30 07:59:00 IST" }
 { "id":"zustand-store-splitting-plan", "title":"Zustand Store Splitting Plan", "path":"memory-bank/implementation-details/zustand-store-splitting-plan.md", "summary":"Records planned domain boundaries and migration steps for splitting the application Zustand store under T25d.", "tags":["state-management","architecture"], "tasks":["T25d"], "updated":"2026-05-11 11:31:20 IST" }
 { "id":"vercel-deployment-plan", "title":"Vercel Deployment Plan for QC-Diffusion Code Subproject", "path":"memory-bank/implementation-details/vercel-deployment-plan.md", "summary":"Monorepo deployment to Vercel with pnpm filters, frontend build settings, rewrites, cache headers; documents vercel.json and CI-friendly commands.", "tags":["deployment"], "updated":"2025-08-23 18:52:31 IST" }
 { "id":"url-backed-navigation", "title":"URL-Backed Navigation and Shareable Views", "path":"memory-bank/implementation-details/url-backed-navigation.md", "summary":"Implements stable page routes and deep links for navigable subsections; URL state wins over persisted navigation, Random Walk modes stay in the shared UI and engine, and local browser acceptance passes.", "tags":["navigation","routing","deep-linking","architecture"], "tasks":["T35","T35a"], "updated":"2026-09-29 20:55:07 IST" }
-{ "id":"random-walk-panel-workspace", "title":"Random Walk Panel Workspace and Viewport Controls", "path":"memory-bank/implementation-details/random-walk-panel-workspace.md", "summary":"Plans persistent draggable, resizable, collapsible Random Walk panels, particle viewport zoom and boundary visibility, and a unified Start/Pause/Resume control using existing UI patterns.", "tags":["random-walk","ui","panels","viewport"], "tasks":["T42"], "updated":"2026-09-30 02:48:52 IST" }
+{ "id":"random-walk-panel-workspace", "title":"Random Walk Panel Workspace and Viewport Controls", "path":"memory-bank/implementation-details/random-walk-panel-workspace.md", "summary":"Implements persistent docked panels, viewport zoom/boundaries and unified transport; per-panel collapse pauses display updates while preserving Auto state. Browser interaction review remains open.", "tags":["random-walk","ui","panels","viewport"], "tasks":["T42"], "updated":"2026-09-30 09:35:52 IST" }
+{ "id":"random-walk-strategy-diagnostics", "title":"Random Walk Strategy Diagnostics", "path":"memory-bank/implementation-details/random-walk-strategy-diagnostics.md", "summary":"Documents live strategy plots, run-compatibility checks, Kac–Goldstein ensemble refinement, and Masoliver telegraph Fourier-mode comparisons with setup limits.", "tags":["random-walk","statistics","continuum"], "tasks":["T41"], "updated":"2026-09-30 09:35:52 IST" }
+{ "id":"random-walk-continuum-comparison-mockups", "title":"Random Walk Continuum Comparison Mockups", "path":"memory-bank/implementation-details/random-walk-continuum-comparison-mockups.md", "summary":"UI concepts for 1D telegraph and 2D kinetic-versus-telegraph comparisons; records that 2D radial views apply only to isotropic point-source initial conditions.", "tags":["random-walk","ui","continuum","mockups"], "updated":"2026-09-30 06:01:00 IST" }
 { "id":"visual-pde-gpu-solver-plan", "title":"VisualPDE GPU Solver Integration Plan", "path":"memory-bank/implementation-details/visual-pde-gpu-solver-plan.md", "summary":"Extracts VisualPDE WebGL solver components, texture management, and GLSL operators to integrate GPU PDE solving into React app for major speedups.", "tags":["gpu","pde","solvers"], "updated":"2025-08-25 12:54:55 IST" }
 { "id":"pde-bcs-architecture-claude4", "title":"QC-Diffusion Physics Engine Architecture (Claude 4)", "path":"memory-bank/implementation-details/boundary-conditions/pde-bcs-architecture-claude4.md", "summary":"Complex multi-pattern BC architecture (Strategy+Bridge+Factory) with per-equation/edge BCs; flexible but high complexity and consistency risk.", "tags":["pde","boundary-conditions","architecture"] }
 { "id":"pde-bcs-architecture-deepseek", "title":"Boundary Condition Architecture Comparison (DeepSeek)", "path":"memory-bank/implementation-details/boundary-conditions/pde-bcs-architecture-deepseek.md", "summary":"Recommends shader-only BC helpers with simple adapter; emphasizes simplicity, consistency, phased extensibility, and performance.", "tags":["pde","boundary-conditions","architecture"] }

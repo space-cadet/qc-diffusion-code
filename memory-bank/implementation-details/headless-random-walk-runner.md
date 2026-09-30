@@ -1,35 +1,51 @@
 # Headless Random Walk Statistics Runner
 
-## Objective
+## Purpose
 
-Run the production `RandomWalkSimulator` and `PhysicsEngine` directly from Node, with no React, renderer, tsParticles container, or Playwright browser. The runner must reproduce a declared configuration exactly and write analysis-ready statistics.
+Run the production `RandomWalkSimulator` and `PhysicsEngine` from Node for repeatable random-walk statistics. The runner does not load React, the canvas, or browser automation.
 
-## Current State
+## Run
 
-- `RandomWalkSimulator` already owns particle initialization, strategies, stepping, density profiles, collision statistics, and simulation time.
-- `PhysicsEngine` owns phase ordering and the fixed simulation clock.
-- Current randomness enters through ambient `Math.random()`, so a run cannot be reproduced by seed.
-- `scripts/run-random-walk.ts` launches a headless browser and clicks UI controls; it does not expose engine statistics as a stable data product.
-- `scripts/bianchi-telegraph-validation.mjs` is headless and seeded, but deliberately implements a separate event-driven model.
+From `frontend/`:
 
-## Design
+```bash
+pnpm random-walk:headless -- \
+  --config scripts/examples/random-walk-headless.json \
+  --format both \
+  --out /tmp/random-walk-run.json
+```
 
-1. Add a small RNG interface to the simulator configuration and pass it to initial distributions, thermal velocities, and stochastic motion strategies.
-2. Extract a Node-safe runner module that accepts a JSON configuration, creates `RandomWalkSimulator` with `useNewEngine: true`, and advances exactly `steps` engine ticks.
-3. Sample statistics at a declared cadence: time, particle count, collision counters, density grid, mean position, covariance/MSD, radial moments, and finite-speed front.
-4. Write a compact summary plus optional time-series JSON and CSV. Include seed, git revision, strategy list, dimensions, domain, boundaries, and all numerical settings in every output.
-5. Add tests proving byte-for-byte repeatability for a seed and matching one-step behavior against direct engine invocation.
+The format may be `json`, `csv`, or `both`. The output path may end in `.json` or `.csv`; the runner writes both files beside that path when `both` is selected. It rejects output paths that would overwrite the input configuration.
 
-## Constraints
+The example config records the seed, fixed time step, step count, sample cadence, density resolution, model parameters, initial profile, dimension, boundary, and selected strategy. The runner normalizes defaults into the configuration stored in each output.
 
-- Do not import React hooks, canvas code, DOM APIs, or the UI store.
-- Keep Bianchi-specific coordinates and PDE comparison in their separate validation module.
-- Preserve current UI choices; this task changes engine plumbing and CLI access only.
-- A headless result can be compared with component-engine behavior when its seeded RNG path is verified.
+## Seeded engine path
 
-## Deliverables
+`RandomWalkSimulator` accepts an optional random function. The runner supplies a seeded Mulberry32 source to initial position sampling, thermal or strategy velocity sampling, initial event times, `ParticleManager`, and `PhysicsEngine` strategy contexts. Existing callers that omit it retain `Math.random` behavior.
 
-- `scripts/run-random-walk-headless.mjs` (or an equivalent Node entry point)
-- A documented package script and JSON configuration example
-- Seeded regression tests
-- JSON/CSV result schema and one checked-in small example output or fixture
+The runner defaults `initialVelocityMode` to `strategy` so fixed-speed strategies use the same model speed used by `StrategyFactory`. Set it to `thermal` to generate initial velocities from the temperature parameter. Kac–Goldstein uses two velocity directions; the asymmetric 1D profile biases the positive direction to 0.7, matching the Random Walk initializer.
+
+Exactly one motion strategy is required; `collisions` may be included in addition. Kac–Goldstein requires 1D and Masoliver–Lindenbergh requires 2D. Boundary options are `periodic`, `reflective`, `absorbing`, and `unbounded`.
+
+## Output
+
+JSON contains schema version, seed, normalized configuration, source revision, dirty-source flag, and sampled time series. CSV has one row per density bin and sample time.
+
+Each sample includes:
+
+- time, total and active particle counts, and surviving mass fraction;
+- mean displacement, covariance, and mean-square displacement over active walkers;
+- strategy and interparticle event counts;
+- finite-speed front and front ratio where those quantities are defined;
+- a 1D density array or 2D x-y density grid and its bounds.
+
+Density weights are normalized by the original walker count, so their integral reflects mass loss at absorbing boundaries. Moments are calculated over active walkers. The finite-speed front is omitted for Lévy flights, time-fractional jumps, or interparticle collisions. Distances use the engine's spatial units, including the strategy-specific speed scale.
+
+## Current verification
+
+- Direct TypeScript check passed with `frontend/node_modules/.bin/tsc --noEmit`.
+- The example 2D Masoliver–Lindenbergh run completed twice with seed 42; all 11 samples matched exactly. The final front ratio was 1.000000000000005.
+- A 1D Kac–Goldstein run produced JSON and CSV, five samples, and a final front ratio of 1.0000000000000056.
+- `frontend/src/physics/__tests__/RandomWalkSimulator.seeded.test.ts` contains same-seed and different-seed regression tests. The Vitest suite was not run in this session.
+
+Source outputs include the Git revision and mark whether the checkout is dirty. For a clean provenance record, run from a committed checkout.

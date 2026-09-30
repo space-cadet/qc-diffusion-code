@@ -1,7 +1,7 @@
 # Task Registry
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-30 02:48:52 IST*
+*Last Updated: 2026-09-30 09:35:52 IST*
 
 ## Active Tasks
 
@@ -75,14 +75,14 @@
 | T35a | URL-Backed Navigation and Shareable Views | 🔄 IN PROGRESS | MEDIUM | 2026-09-29 | T35 | [Details](tasks/T35a.md) |
 | T36 | Monorepo Package Hygiene | 📝 PLANNED | MEDIUM | 2026-05-11 | - | [Details](tasks/T36.md) |
 | T37 | Backend API Hardening | 📝 PLANNED | MEDIUM | 2026-05-11 | T32 | [Details](tasks/T37.md) |
-| T38 | Headless Random Walk Statistics Runner | 📝 PLANNED | HIGH | 2026-07-21 | T1, T15a, T27 | [Details](tasks/T38.md) |
+| T38 | Headless Random Walk Statistics Runner | 🔄 IN PROGRESS | HIGH | 2026-07-21 | T1, T15a, T27 | [Details](tasks/T38.md) |
 | T39 | Spheroid Geometry-Space Walk Experiment | 🔄 IN PROGRESS | HIGH | 2026-09-26 | - | [Details](tasks/T39.md) |
 | T39a | Seeded Spheroid Geometry and Walk Engine | ✅ COMPLETED | HIGH | 2026-09-26 | T39 | [Details](tasks/T39a.md) |
 | T39b | Spheroid Walk Numerical Validation | ✅ COMPLETED | HIGH | 2026-09-26 | T39a | [Details](tasks/T39b.md) |
 | T39c | Interactive 3D Spheroid-Walk Page | 🔄 IN PROGRESS | MEDIUM | 2026-09-26 | T39a, T39b | [Details](tasks/T39c.md) |
 | T40 | Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page | 🔄 IN PROGRESS | HIGH | 2026-09-27 | T27 | [Details](tasks/T40.md) |
 | T41 | Random Walk Strategy Diagnostics and Plots | 🔄 IN PROGRESS | HIGH | 2026-09-27 | - | [Details](tasks/T41.md) |
-| T42 | Random Walk Panel Workspace and Viewport Controls | 📝 PLANNED | MEDIUM | 2026-09-30 | T27, T41 | [Details](tasks/T42.md) |
+| T42 | Random Walk Panel Workspace and Viewport Controls | 🔄 IN PROGRESS | MEDIUM | 2026-09-30 | T27, T41 | [Details](tasks/T42.md) |
 
 ## Task Details
 
@@ -102,27 +102,27 @@
 
 ### T40: Kac–Goldstein and Masoliver–Lindenbergh Walks in the Existing Random Walk Page
 **Description**: Add the Kac–Goldstein 1D velocity-flip walk and Masoliver–Lindenbergh 2D heading-reset walk as reproducible strategies on the existing Random Walk page.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-30 09:35:52 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`, `frontend/src/hooks/useOriginalPhysicsEngine.ts`, `frontend/src/physics/strategies/KacGoldsteinStrategy.ts`, `frontend/src/physics/strategies/MasoliverLindenberghWalkStrategy.ts`.
-**Notes**: T27 is complete. The persistent walks use the shared controls and engine. Commit `5c9f239` is pushed to `main`; the production build and 16-file/62-test run passed, and browser checks confirmed the modes and populated diagnostics. Browser JSON file delivery remains unverified; live Vercel status was not checked. Scientific task owners remain `qc-diffusion-T15a` and `qc-diffusion-T15b` in the qc-diffusion repository.
+**Notes**: T27 is complete. The persistent walks use the shared controls and engine. Masoliver displacement diagnostics are measured from each walker's initial position; the Density Profile panel shows absolute x–y positions. Focused tests were added but not run in this closeout. Browser JSON file delivery remains unverified; live Vercel status was not checked. Scientific task owners remain `qc-diffusion-T15a` and `qc-diffusion-T15b` in the qc-diffusion repository.
 
 ### T41: Random Walk Strategy Diagnostics and Plots
 **Description**: Add strategy-specific diagnostic plots to the existing Random Walk page so users can distinguish motion rules over time.
-**Status**: 🔄 IN PROGRESS **Last**: 2026-09-29 00:51:51 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-30 09:35:52 IST
 **Files**: `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/physics/diagnostics/strategyDiagnostics.ts`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, strategy telemetry adapters. Browser plot and comparison checks have been performed; full task acceptance remains open.
-**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, and event-marked sample trails. PR #20 review fixes also preserve exact absorbing-boundary crossing positions in CTRW integration despite later collision displacement. Browser checks confirmed plot population and comparison-mismatch pause with no console errors. Production build passed; the local test run passed 16 files and 62 tests. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
+**Notes**: Implemented log-log spread/exponent, robust Lévy median-r², strategy-specific jump and wait CCDFs, radial displacement density snapshots, events per particle, initial-velocity correlation, event-marked sample trails, a Kac–Goldstein ensemble-refinement chart, and Masoliver telegraph Fourier-mode comparisons. Targeted TypeScript and diff checks pass for current additions; tests and browser interaction were not run in this closeout. See `memory-bank/implementation-details/random-walk-strategy-diagnostics.md`.
 
 ### T42: Random Walk Panel Workspace and Viewport Controls
 **Description**: Make every Random Walk panel movable, resizable, collapsible, and persistent; add particle-view zoom and clear finite-boundary display; combine simulation transport controls.
-**Status**: 📝 PLANNED **Last**: 2026-09-30 02:48:52 IST
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-30 09:35:52 IST
 **Files**: `memory-bank/tasks/T42.md`, `memory-bank/implementation-details/random-walk-panel-workspace.md`, `frontend/src/RandomWalkSimV2.tsx`, `frontend/src/components/ParticleCanvasV2.tsx`, `frontend/src/components/StrategyDiagnosticsPanel.tsx`, `frontend/src/components/common/FloatingPanel.tsx`, `frontend/src/hooks/useRandomWalkPanels.ts`, `frontend/src/stores/appStore.ts`, `frontend/src/components/RandomWalkParameterPanelV2.tsx`.
-**Notes**: Plan reuses React Grid Layout, `FloatingPanel`/`react-rnd`, and existing Zustand persistence. No implementation changes have been made for T42. T41 owns strategy diagnostic comparisons; T38 owns the planned headless statistics runner.
+**Notes**: Implementation reuses React Grid Layout, `FloatingPanel`/`react-rnd`, and existing Zustand persistence. Collapsed panels pause their own display updates and retain their Auto state; the simulation continues under Parameters controls. Targeted TypeScript and diff checks pass; browser interaction and persistence review remain open. T41 owns strategy diagnostic comparisons; T38 owns the seeded headless statistics runner.
 
 ### T38: Headless Random Walk Statistics Runner
 **Description**: Add a seeded, direct-engine CLI for reproducible random-walk statistics without UI or browser automation.
-**Status**: 📝 PLANNED **Last**: 2026-07-21 15:36:00 IST
-**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/core/PhysicsEngine.ts`, `memory-bank/implementation-details/headless-random-walk-runner.md`
-**Notes**: The current component engine is UI-independent but uses ambient randomness; the new runner must inject a seed and emit analysis-ready JSON/CSV.
+**Status**: 🔄 IN PROGRESS **Last**: 2026-09-30 07:59:00 IST
+**Files**: `frontend/src/physics/RandomWalkSimulator.ts`, `frontend/src/physics/core/PhysicsEngine.ts`, `frontend/scripts/run-random-walk-headless.mjs`, `memory-bank/implementation-details/headless-random-walk-runner.md`
+**Notes**: Seed injection, JSON/CSV output, example configuration, and deterministic regression coverage are implemented. TypeScript and repeated-run CLI checks passed; the Vitest suite was not run.
 
 ### T27: Clean Rewrite — Pure WebGL + Original Physics Engine
 **Description**: Replace the random-walk tsParticles path with a pure WebGL renderer while preserving the original physics engine and restoring functional parity on the active V2 page.

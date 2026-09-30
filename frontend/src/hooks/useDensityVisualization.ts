@@ -21,7 +21,8 @@ export const useDensityVisualization = (
   binSize?: number,
   dimension: '1D' | '2D' = '2D',
   useGPU: boolean = false,
-  particlesLoaded?: any
+  particlesLoaded?: any,
+  getLatestParticles?: () => Particle[],
 ) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [densityData2D, setDensityData2D] = useState<DensityData2D | null>(null);
@@ -171,7 +172,8 @@ export const useDensityVisualization = (
   }, []);
 
   const updateDensity = useCallback(() => {
-    let actualParticles = particles.filter((particle) => particle.isActive !== false);
+    const currentParticles = getLatestParticles?.() ?? particles;
+    let actualParticles = currentParticles.filter((particle) => particle.isActive !== false);
     let actualCount = actualParticles.length;
 
     // In GPU mode, extract particles from GPU manager
@@ -210,24 +212,16 @@ export const useDensityVisualization = (
       setDensityData2D(data);
       drawDensityHeatmap(data);
     }
-  }, [particles, particleCount, dimension, binSize, useGPU, particlesLoaded, drawDensity1D, drawDensityHeatmap]);
+  }, [particles, particleCount, dimension, binSize, useGPU, particlesLoaded, getLatestParticles, drawDensity1D, drawDensityHeatmap]);
 
-  useEffect(() => {
-    updateDensity();
-    
-    // Cleanup function to prevent memory leaks
-    return () => {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          // Clear canvas and reset context
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.reset?.(); // Reset context if available (modern browsers)
-        }
-      }
-    };
-  }, [binSize, dimension, particleCount, particles, updateDensity]);
+  useEffect(() => () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (canvas && ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.reset?.();
+    }
+  }, []);
 
   return {
     canvasRef,

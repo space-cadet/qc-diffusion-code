@@ -141,8 +141,10 @@ export default function App() {
       if (urlTab === 'randomwalksim' && isUrlWalkStrategy(urlStrategy)) {
         const currentStrategy = gridLayoutParams.strategies?.find(isUrlWalkStrategy) ?? 'simple';
         const dimension = urlStrategy === 'kac-goldstein' ? '1D' : urlStrategy === 'masoliver-lindenbergh' ? '2D' : gridLayoutParams.dimension;
-        const initialDistType = urlStrategy === 'kac-goldstein' ? 'centered' : urlStrategy === 'masoliver-lindenbergh' ? 'origin' : gridLayoutParams.initialDistType;
-        if (currentStrategy !== urlStrategy || gridLayoutParams.dimension !== dimension || gridLayoutParams.initialDistType !== initialDistType) {
+        if (currentStrategy !== urlStrategy || gridLayoutParams.dimension !== dimension) {
+          const initialDistType = currentStrategy !== urlStrategy
+            ? urlStrategy === 'kac-goldstein' ? 'centered' : urlStrategy === 'masoliver-lindenbergh' ? 'origin' : gridLayoutParams.initialDistType
+            : gridLayoutParams.initialDistType;
           setGridLayoutParams({ ...gridLayoutParams, strategies: [urlStrategy], dimension, initialDistType });
         }
       }

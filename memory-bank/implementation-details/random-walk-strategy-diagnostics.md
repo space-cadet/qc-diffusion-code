@@ -1,5 +1,7 @@
 # Random Walk Strategy Diagnostics
 
+*Last Updated: 2026-09-30 09:35:52 IST*
+
 T41 adds live diagnostics below the existing Random Walk page. It reuses the current simulation and renderer; it does not add a route or a second model runner.
 
 ## Data path
@@ -23,6 +25,14 @@ Users can save the current run as a reference, change strategy, and overlay comp
 
 When both runs use the same Lévy or fractional strategy, the overlay check also requires its distribution parameters to match (`levyAlpha`/`levyScale`, or `fractionalBeta`/waiting scale/jump length). Cross-strategy comparisons remain available when the shared setup matches.
 
+## Persistent-walk continuum comparisons
+
+The Kac–Goldstein panel includes a saved-ensemble refinement view of final-time relative density $L^1$ error by walker count, with an $N^{-1/2}$ reference guide. The 320,000-walker benchmark uses eight seeds; smaller levels use one run, so those points are not confidence intervals.
+
+For Masoliver–Lindenbergh, the panel compares empirical displacement Fourier modes with the telegraph approximation at scaled wavenumbers $\kappa=k\sqrt{Dt}$, and plots absolute mode error against $\lambda t$. Empirical standard errors are shown for the current run. The fluid-limit values are available only for unbounded motion with positive reset rate and no interparticle collisions. Displacements are measured from each walker's own initial position, so the comparison supports the selected initial position profile; the shared Density Profile panel shows absolute spatial positions.
+
+These views compare finite-ensemble measurements with saved or approximate references. The telegraph model is a long-scale approximation to the kinetic position-heading process.
+
 Finite boundary modes can reflect, wrap, or absorb walkers. The panel identifies the active boundary and warns that finite domains transform paths or truncate tails; the raw generated Lévy jump length is kept distinct from the boundary-transformed displacement.
 
-The frontend production build passes. Live browser acceptance remains necessary to confirm that the plots populate during a run and that comparison setup checks behave as intended.
+The frontend production build and 16-file/62-test run passed for the 2026-09-29 state. For the 2026-09-30 comparison additions, the targeted TypeScript check and `git diff --check` passed; the focused tests and browser interaction were not run in this closeout.

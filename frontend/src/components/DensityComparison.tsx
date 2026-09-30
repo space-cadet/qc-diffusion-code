@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppStore } from '../stores/appStore';
 import { useDensityVisualization } from '../hooks/useDensityVisualization';
-export const DensityComparison = ({ particles, particleCount, simulatorRef, gridLayoutParams, simulationState, particlesLoaded, binSize = 20, }: any) => {
+export const DensityComparison = ({ particles, particleCount, particlesRef, simulatorRef, gridLayoutParams, simulationState, particlesLoaded, updatesEnabled = true, binSize = 20, }: any) => {
     const { randomWalkUIState, setRandomWalkUIState, useGPU } = useAppStore();
     // Stable empty particles array to avoid identity changes each render
     const EMPTY_PARTICLES = React.useRef([]).current;
@@ -16,7 +16,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
             //   hasParticleManager: !!simulatorRef.current?.getParticleManager?.(),
             //   simulationState: simulationState.status
             // });
-            return (particles ??
+            return (particlesRef?.current ?? particles ??
                 particlesFromSim ??
                 EMPTY_PARTICLES);
         }
@@ -24,15 +24,32 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
             // console.error('[DensityComparison] Error getting particles:', error);
             return EMPTY_PARTICLES;
         }
-    }, [particles, simulatorRef, simulationState.status]);
-    const liveCount = liveParticles.length;
-    const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(liveParticles, liveCount, binSize, gridLayoutParams.dimension, useGPU, particlesLoaded);
+    }, [particles, particlesRef, simulatorRef, simulationState.status]);
+    const getLatestParticles = React.useCallback(() => particlesRef?.current ?? liveParticles, [liveParticles, particlesRef]);
+    const liveCount = updatesEnabled
+        ? getLatestParticles().filter((particle: any) => particle.isActive !== false).length
+        : 0;
+    const { canvasRef, densityData1D, densityData2D, updateDensity } = useDensityVisualization(liveParticles, liveCount, binSize, gridLayoutParams.dimension, useGPU, particlesLoaded, getLatestParticles);
     const [recordHistory, setRecordHistory] = useState(false);
-    // Trigger an initial density draw once on mount
-    useEffect(() => {
+    const [densitySample, setDensitySample] = useState<{ time: number; particleCount: number } | null>(null);
+    const hasInitialSampleRef = React.useRef(false);
+    const simulationTimeRef = React.useRef(simulationState.time || 0);
+    simulationTimeRef.current = simulationState.time || 0;
+    const refreshDensity = React.useCallback(() => {
+        if (!updatesEnabled) return;
+        const currentParticles = getLatestParticles();
         updateDensity();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        setDensitySample({
+            time: simulationTimeRef.current,
+            particleCount: currentParticles.filter((particle: any) => particle.isActive !== false).length,
+        });
+    }, [getLatestParticles, updateDensity, updatesEnabled]);
+    // Take one initial sample when first visible; later samples follow Auto.
+    useEffect(() => {
+        if (!updatesEnabled || hasInitialSampleRef.current) return;
+        hasInitialSampleRef.current = true;
+        refreshDensity();
+    }, [refreshDensity, updatesEnabled]);
     // Helper function to update persistent autoUpdate state
     const setAutoUpdate = (autoUpdate) => {
         setRandomWalkUIState({
@@ -46,6 +63,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         : Number.POSITIVE_INFINITY;
     // Calculate effective values from density data
     const densityData = gridLayoutParams.dimension === '1D' ? densityData1D : densityData2D;
+    const isMasoliver = gridLayoutParams.strategies?.includes('masoliver-lindenbergh');
     const flatDensity = densityData?.density?.flat?.() ?? [];
     const maxDensity = flatDensity.length > 0 ? Math.max(...flatDensity) : 0;
     const totalBins = densityData ? (gridLayoutParams.dimension === '1D' ? (densityData.density as any[]).length : (densityData.density as any[]).length * ((densityData.density as any[])[0]?.length || 0)) : 0;
@@ -53,7 +71,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
     const spreadRatio = totalBins > 0 ? occupiedBins / totalBins : 0;
     // Auto-update density when simulation is running
     useEffect(() => {
-        if (!randomWalkUIState.densityAutoUpdate || simulationState.status !== 'Running') {
+        if (!updatesEnabled || !randomWalkUIState.densityAutoUpdate || simulationState.status !== 'Running') {
             // console.log('[DensityComparison] Auto-update disabled or simulation not running:', {
             //   autoUpdateEnabled: randomWalkUIState.densityAutoUpdate,
             //   simulationStatus: simulationState.status
@@ -63,17 +81,17 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         // console.log('[DensityComparison] Starting auto-update interval');
         const interval = setInterval(() => {
             // console.log('[DensityComparison] Auto-update tick, updating density');
-            updateDensity();
+            refreshDensity();
         }, 100);
         return () => {
             // console.log('[DensityComparison] Clearing auto-update interval');
             clearInterval(interval);
         };
-    }, [randomWalkUIState.densityAutoUpdate, simulationState.status, updateDensity]);
-    // Redraw when dimension changes
+    }, [updatesEnabled, randomWalkUIState.densityAutoUpdate, simulationState.status, refreshDensity]);
+    // Refresh after the dimensional or initial-position configuration changes.
     useEffect(() => {
-        updateDensity();
-    }, [gridLayoutParams.dimension]);
+        if (updatesEnabled && randomWalkUIState.densityAutoUpdate) refreshDensity();
+    }, [gridLayoutParams.dimension, gridLayoutParams.initialDistType, randomWalkUIState.densityAutoUpdate, refreshDensity, updatesEnabled]);
     return (<div className="bg-white border rounded-lg p-4 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h3 className="drag-handle text-lg font-semibold cursor-move">
@@ -82,7 +100,7 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
         <div className="flex gap-2">
           <button onClick={() => {
             console.log('[Density] Manual update', { particleCount: liveCount });
-            updateDensity();
+            refreshDensity();
         }} className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600">
             Update
           </button>
@@ -93,11 +111,18 @@ export const DensityComparison = ({ particles, particleCount, simulatorRef, grid
           </button>
         </div>
       </div>
+
+      {isMasoliver && <p className="-mt-2 mb-3 text-xs text-slate-600">
+        Live Masoliver particle positions · {gridLayoutParams.initialDistType} initial state · {densitySample ? `${densitySample.particleCount.toLocaleString()} walkers at t=${densitySample.time.toFixed(2)}` : 'waiting for first sample'}. This map uses absolute positions.
+      </p>}
       
       <div className="flex-1 flex gap-4">
         {/* Heatmap visualization */}
         <div className="flex-1 border rounded-lg bg-gray-50 p-2">
-          <canvas ref={canvasRef} width={280} height={200} className="w-full h-full border rounded" style={{ imageRendering: 'pixelated' }}/>
+          <canvas ref={canvasRef} width={280} height={200} role="img" aria-label={isMasoliver ? 'Current two-dimensional Masoliver walk particle density heat map' : 'Current particle density heat map'} className="w-full h-full border rounded" style={{ imageRendering: 'pixelated' }}/>
+          {gridLayoutParams.dimension === '2D' && <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-600" aria-label="Heat map intensity scale">
+            <span>Lower</span><div className="h-2 flex-1 rounded" style={{ background: 'linear-gradient(to right, rgb(0, 0, 255), rgb(255, 0, 0))' }} /><span>Higher density</span>
+          </div>}
         </div>
         
         {/* Statistics panel */}

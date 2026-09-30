@@ -23,6 +23,9 @@ export interface RandomWalkUIState {
   showMSD: boolean
   // Density Profile Panel
   densityAutoUpdate: boolean
+  particleViewAutoUpdate: boolean
+  persistentDiagnosticsAutoUpdate: boolean
+  strategyDiagnosticsAutoUpdate: boolean
 }
 
 export type SpheroidConstraint = 'volume' | 'area'
@@ -114,6 +117,8 @@ interface AppState {
   simulationParams: SimulationParams
   gridLayoutParams: RandomWalkParams
   randomWalkSimLayouts: Layout[]
+  randomWalkSimCollapsed: Record<string, boolean>
+  randomWalkViewportZoom: number
   randomWalkUIState: RandomWalkUIState
   spheroidWalkUIState: SpheroidWalkUIState
   randomWalkSimulationState: RandomWalkSimulationState
@@ -147,6 +152,8 @@ interface AppState {
   setSimulationParams: (params: SimulationParams) => void
   setGridLayoutParams: (params: RandomWalkParams) => void
   setRandomWalkSimLayouts: (layouts: Layout[]) => void
+  setRandomWalkSimCollapsed: (key: string, collapsed: boolean) => void
+  setRandomWalkViewportZoom: (zoom: number) => void
   setRandomWalkUIState: (state: Partial<RandomWalkUIState>) => void
   setSpheroidWalkUIState: (state: Partial<SpheroidWalkUIState>) => void
   setRandomWalkSimulationState: (state: RandomWalkSimulationState) => void
@@ -268,12 +275,14 @@ export const useAppStore = create<AppState>()(
       randomWalkSimLayouts: [
         { i: "parameters", x: 0, y: 0, w: 3, h: 8, minW: 3, minH: 6 },
         { i: "canvas", x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 },
-        { i: "observables", x: 0, y: 8, w: 4, h: 4, minW: 3, minH: 3 },
-        { i: "density", x: 4, y: 8, w: 8, h: 4, minW: 8, minH: 3 },
-        { i: "history", x: 0, y: 12, w: 12, h: 4, minW: 6, minH: 2 },
-        { i: "replay", x: 0, y: 16, w: 8, h: 3, minW: 6, minH: 2 },
-        { i: "export", x: 8, y: 16, w: 4, h: 3, minW: 4, minH: 2 },
+        { i: "density", x: 0, y: 8, w: 8, h: 5, minW: 6, minH: 3 },
+        { i: "history", x: 8, y: 8, w: 4, h: 5, minW: 3, minH: 3 },
+        { i: "persistentDiagnostics", x: 0, y: 13, w: 6, h: 5, minW: 4, minH: 3 },
+        { i: "diagnostics", x: 6, y: 13, w: 6, h: 5, minW: 4, minH: 3 },
+        { i: "export", x: 0, y: 18, w: 12, h: 3, minW: 4, minH: 2 },
       ],
+      randomWalkSimCollapsed: {},
+      randomWalkViewportZoom: 1,
       randomWalkUIState: {
         isStrategyOpen: false,
         isBoundaryOpen: false,
@@ -291,6 +300,9 @@ export const useAppStore = create<AppState>()(
         showMSD: false,
         // Density Profile Panel
         densityAutoUpdate: false,
+        particleViewAutoUpdate: true,
+        persistentDiagnosticsAutoUpdate: true,
+        strategyDiagnosticsAutoUpdate: true,
       },
       randomWalkSimulationState: {
         isRunning: false,
@@ -352,6 +364,10 @@ export const useAppStore = create<AppState>()(
         };
       }),
       setRandomWalkSimLayouts: (layouts) => set({ randomWalkSimLayouts: layouts }),
+      setRandomWalkSimCollapsed: (key, collapsed) => set((state) => ({
+        randomWalkSimCollapsed: { ...state.randomWalkSimCollapsed, [key]: collapsed },
+      })),
+      setRandomWalkViewportZoom: (zoom) => set({ randomWalkViewportZoom: Math.min(3, Math.max(0.5, zoom)) }),
       setRandomWalkUIState: (partial) => set((state) => ({ randomWalkUIState: { ...state.randomWalkUIState, ...partial } })),
       setRandomWalkSimulationState: (state) => set({ randomWalkSimulationState: state }),
       setSelectedHistoryIndex: (index) => set((state) => ({
@@ -420,9 +436,21 @@ export const useAppStore = create<AppState>()(
       merge: (persistedState, currentState) => {
         const persisted = (persistedState ?? {}) as Partial<AppState>
         const savedGridParams = persisted.gridLayoutParams as Partial<RandomWalkParams> | undefined
+        const persistedLayouts = persisted.randomWalkSimLayouts ?? []
+        const newPanelRow = persistedLayouts.reduce((bottom, layout) => Math.max(bottom, layout.y + layout.h), 0) + 1
         return {
           ...currentState,
           ...persisted,
+          randomWalkSimLayouts: currentState.randomWalkSimLayouts.map((defaultLayout) => {
+            const savedLayout = persistedLayouts.find((layout) => layout.i === defaultLayout.i)
+            if (savedLayout) return savedLayout
+            if (persistedLayouts.length && (defaultLayout.i === 'persistentDiagnostics' || defaultLayout.i === 'diagnostics')) {
+              return { ...defaultLayout, y: newPanelRow }
+            }
+            return defaultLayout
+          }),
+          randomWalkSimCollapsed: persisted.randomWalkSimCollapsed ?? {},
+          randomWalkViewportZoom: persisted.randomWalkViewportZoom ?? 1,
           gridLayoutParams: {
             ...currentState.gridLayoutParams,
             ...savedGridParams,
@@ -481,6 +509,8 @@ export const useAppStore = create<AppState>()(
         pdeUIState: state.pdeUIState,
         gridLayoutParams: state.gridLayoutParams,
         randomWalkSimLayouts: state.randomWalkSimLayouts,
+        randomWalkSimCollapsed: state.randomWalkSimCollapsed,
+        randomWalkViewportZoom: state.randomWalkViewportZoom,
         randomWalkUIState: state.randomWalkUIState,
         spheroidWalkUIState: state.spheroidWalkUIState,
         randomWalkSimulationState: state.randomWalkSimulationState,

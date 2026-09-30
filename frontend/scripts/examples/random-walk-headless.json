@@ -1,0 +1,22 @@
+{
+  "seed": 42,
+  "steps": 200,
+  "sampleEvery": 20,
+  "densityBins": 24,
+  "dt": 0.01,
+  "simulator": {
+    "collisionRate": 1,
+    "jumpLength": 1,
+    "velocity": 1,
+    "particleCount": 2000,
+    "dimension": "2D",
+    "interparticleCollisions": false,
+    "initialVelocityMode": "strategy",
+    "strategies": ["masoliver-lindenbergh"],
+    "boundaryCondition": "unbounded",
+    "initialDistType": "origin",
+    "temperature": 1,
+    "canvasWidth": 800,
+    "canvasHeight": 600
+  }
+}

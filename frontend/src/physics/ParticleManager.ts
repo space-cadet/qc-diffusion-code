@@ -12,13 +12,15 @@ export class ParticleManager {
   private particles: Map<string, Particle> = new Map();
   private diagCounter: number = 0;
   private coordSystem: CoordinateSystem;
+  private random: () => number;
 
   private timeManager: TimeManager;
 
-  constructor(strategy: PhysicsStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem) {
+  constructor(strategy: PhysicsStrategy, dimension: '1D' | '2D', coordSystem: CoordinateSystem, random: () => number = Math.random) {
     this.strategy = strategy;
     this.dimension = dimension;
     this.coordSystem = coordSystem;
+    this.random = random;
     this.timeManager = new TimeManager();
   }
 
@@ -83,7 +85,7 @@ export class ParticleManager {
         timestamp: currentTime,
       },
       lastCollisionTime: currentTime,
-      nextCollisionTime: currentTime + Math.random() * 0.5,
+      nextCollisionTime: tsParticle.nextCollisionTime ?? currentTime + this.random() * 0.5,
       collisionCount: 0,
       trajectory: new CircularBuffer<TrajectoryPoint>(100),
       waitingTime: 0,
@@ -127,7 +129,7 @@ export class ParticleManager {
       coordinateSystem: this.coordSystem,
       currentTime: simTime(),
       dt,
-      random: Math.random,
+      random: this.random,
     };
 
     for (const particle of allParticles) {

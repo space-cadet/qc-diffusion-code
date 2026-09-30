@@ -1,5 +1,6 @@
 # Random Walk Panel Workspace and Viewport Controls
 *Created: 2026-09-30 02:48:52 IST*
+*Last Updated: 2026-09-30 09:35:52 IST*
 *Last Updated: 2026-09-30 02:48:52 IST*
 
 **Task:** T42
@@ -45,3 +46,12 @@ Make the Random Walk page panels movable, resizable, collapsible, and persistent
 - Finite boundaries are visibly distinct from the viewport edge; unbounded mode has no physical-boundary outline.
 - A single control correctly starts, pauses, and resumes the simulation.
 - The existing shared Random Walk route and engine remain in use.
+
+## Implementation Progress — 2026-09-30
+
+- Docked panels now have draggable headers and collapse controls; Strategy Diagnostics and persistent-walk diagnostics are separate grid panels.
+- Docked layout, collapse state, and viewport zoom use persisted Zustand state. Older layouts receive defaults for the new diagnostics panels.
+- Particle zoom transforms rendered coordinates around the viewport center. The finite domain receives an inset outline; unbounded mode receives a label and no boundary outline.
+- The parameter panel now has one Start/Pause/Resume button.
+- Particle View, Density, persistent-walk diagnostics, and strategy diagnostics pause their display refreshes when individually collapsed. Their Auto settings remain unchanged and govern refresh again after expansion; collapsing a panel does not pause the physics engine. Simulation transport remains in Parameters.
+- TypeScript check passes. Browser review of dragging, resize, collapse/reload, zoom, and strategy-specific boundary appearance remains open.

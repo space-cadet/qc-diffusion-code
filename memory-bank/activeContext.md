@@ -1,16 +1,16 @@
 # Active Context
 
 *Created: 2025-08-20 08:31:32 IST*
-*Last Updated: 2026-09-30 02:48:52 IST*
+*Last Updated: 2026-09-30 09:35:52 IST*
 
 ## Current Focus
-**Task**: T35a — URL-backed navigation and shareable views
-**Status**: 🔄 IN PROGRESS — URL paths and in-page selections are implemented across all nine app pages. TypeScript, the production build, and local direct-link/history checks pass. Deployed nested-path and legacy share-link checks remain.
+**Task**: T42 — Random Walk panel workspace and viewport controls
+**Status**: 🔄 IN PROGRESS — Docked panel layout, persisted viewport zoom/collapse state, boundary display, and unified transport are implemented. Each panel's collapse state pauses its own display updates and preserves Auto; simulation transport remains in Parameters. Targeted TypeScript and diff checks pass; browser interaction and persistence review remain.
 **Priority**: MEDIUM
 
-**Context**: T35a uses a small History API adapter without a new dependency. App paths, Quantum Walk views, Simplicial Growth tabs, PDE disclosures, Random Walk strategies/panel anchors, and Memory Bank folders/documents have URL state. Random Walk modes remain strategies in the unified parameter panel and engine. Existing `?data=` links at the site root continue to select Random Walk. See `memory-bank/implementation-details/url-backed-navigation.md`.
+**Context**: T42 extends the existing Random Walk grid, Zustand persistence, canvas renderer, and parameter panel. All walk strategies remain in the shared page and engine. See `memory-bank/implementation-details/random-walk-panel-workspace.md`.
 
-**Planned follow-up**: T42 records the Random Walk panel workspace, particle viewport zoom/boundary display, and unified transport control plan. Reuse the existing React Grid Layout, `FloatingPanel`, renderer, and Zustand persistence patterns; no T42 code has been changed. See `memory-bank/implementation-details/random-walk-panel-workspace.md`.
+**Other open work**: T38 headless-runner Vitest verification remains. T41 comparison charts have not received browser review. T35a deployed nested-path/legacy `?data=` checks, T40 JSON delivery, and T39c browser QA remain tracked separately.
 
 1. **Frozen particles** ✅ — `nextCollisionTime` no longer starts at `Infinity`
 2. **Missing walk strategies** ✅ — strategy selector restored to the V2 panel
@@ -59,9 +59,9 @@
 - Distributions: ✅ `uniform`, `gaussian`, `ring`, `stripe`, and `grid` now reinitialize correctly
 - Strategies: ✅ `simple`, `ctrw`, `collisions`, `levy`, and `fractional` use the existing engine path
 
-**Branch**: `main` at `906b99ee46f57b5b156bdc68cf552ac7ccddb881`
+**Branch**: `main` at `058caf5822b4086d83c2d5edf13311fe5a5ef883` (session changes uncommitted)
 
-**Immediate Next Steps**: Verify deployed nested Vercel paths and deployed legacy `?data=` links for T35a. T40 JSON file delivery and live deployment, and T39 browser QA, remain separate open work.
+**Immediate Next Steps**: Browser-review T42 panel/Auto restoration, layout persistence, zoom, and boundaries; review T41 comparison charts. Run the T38 seeded regression suite when verification is requested. T35a deployed URLs, T40 JSON delivery, and T39c browser QA remain separate open work.
 
 ## T40 plan — 2026-09-27
 
