@@ -41,7 +41,7 @@ export default function Controls({ params, onChange }) {
         onChange({ ...params, solver_config: newConfig });
     };
     const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
-    return (<div className="p-4 bg-gray-50 border-r border-gray-200">
+    return (<div className="h-full min-h-0 overflow-y-auto p-4 bg-gray-50 border-r border-gray-200">
       <h2 className="text-lg font-semibold mb-6">Parameters</h2>
 
       {/* Solver Selection (foldable) */}

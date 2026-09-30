@@ -27,12 +27,26 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
     const plotRef = useRef(null);
     const plotInitialized = useRef(false);
     const conservationMonitor = useRef(new ConservationMonitor());
+    const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
     const { pdeState, setPdeState } = useAppStore();
     const [conservationData, setConservationData] = useState({
         currentQuantities: null,
         errors: null,
         isStable: true
     });
+    useEffect(() => {
+        const updateViewportSize = () => setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+        window.addEventListener('resize', updateViewportSize);
+        return () => window.removeEventListener('resize', updateViewportSize);
+    }, []);
+    const plotHeight = viewportSize.width < 768
+        ? Math.max(260, Math.min(420, Math.round(viewportSize.height * 0.42)))
+        : 500;
+    const isNarrowViewport = viewportSize.width < 768;
+    const plotLegend = isNarrowViewport
+        ? { x: 0.5, y: -0.28, xanchor: 'center', orientation: 'h', font: { size: 10 } }
+        : { x: 1.02, y: 1, xanchor: 'left' };
+    const plotMargin = isNarrowViewport ? { l: 48, r: 12, t: 58, b: 86 } : { r: 200 };
     const selectedEquations = params.selectedEquations || ['telegraph', 'diffusion'];
     useEffect(() => {
         if (!plotRef.current)
@@ -59,9 +73,9 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
                     ? { title: "Amplitude (u)", autorange: true }
                     : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
                 showlegend: true,
-                legend: { x: 1.02, y: 1, xanchor: 'left' },
-                margin: { r: 200 },
-                height: 500,
+                legend: plotLegend,
+                margin: plotMargin,
+                height: plotHeight,
                 annotations: [
                     {
                         x: 0.02,
@@ -101,7 +115,7 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
             Plotly.newPlot(plotElement, [], layout, config);
             plotInitialized.current = true;
         }
-    }, [selectedEquations]);
+    }, [selectedEquations, plotHeight]);
     // Persist plot ranges on zoom/pan (disabled when autoscale is on)
     useEffect(() => {
         if (!plotRef.current)
@@ -204,9 +218,9 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
                 ? { title: "Amplitude (u)", autorange: true }
                 : { title: "Amplitude (u)", range: pdeState.plot.yRange ?? [-0.5, 1.2] },
             showlegend: true,
-            legend: { x: 1.02, y: 1, xanchor: 'left' },
-            margin: { r: 200 },
-            height: 500,
+            legend: plotLegend,
+            margin: plotMargin,
+            height: plotHeight,
             annotations: [
                 {
                     x: 0.02,
@@ -236,12 +250,12 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
         };
         // @ts-expect-error - Plotly layout annotation types are overly strict
         Plotly.react(plotElement, traces, layout);
-    }, [data, selectedEquations, params]);
-    return (<div className="flex-1 p-4 flex flex-col">
+    }, [data, selectedEquations, params, plotHeight]);
+    return (<div className="flex-1 min-h-0 min-w-0 p-2 sm:p-4 flex flex-col overflow-y-auto md:overflow-visible">
       {isRunning && (<div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded">
           Running...
         </div>)}
-      <div ref={plotRef} className="w-full flex-1"/>
+      <div ref={plotRef} className="w-full min-w-0 flex-none md:flex-1"/>
 
       <div className="mt-2 text-sm text-gray-600 mb-3">
         {selectedEquations.includes('telegraph') && (<p>
@@ -254,9 +268,9 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
 
       {/* Bottom Controls */}
       <div className="border-t border-gray-200 pt-3">
-        <div className="flex gap-6 items-center justify-center flex-wrap">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch md:items-center justify-center flex-wrap">
           {/* Plot Options */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-sm font-semibold text-gray-700">Plot</h3>
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={!!pdeState.plot.autoscale} onChange={(e) => {
@@ -270,7 +284,7 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
           </div>
 
           {/* Animation Speed */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-sm font-semibold text-gray-700">Speed</h3>
             <label className="flex items-center gap-2">
               <span className="text-xs">{(params.animationSpeed || 1.0).toFixed(1)}x</span>
@@ -279,7 +293,7 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
           </div>
 
           {/* Solver Type */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <h3 className="text-sm font-semibold text-gray-700">Solver Type</h3>
             <div className="flex gap-4">
               <label className="flex items-center">
@@ -294,16 +308,16 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
           </div>
 
           {/* Simulation Control */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <h3 className="text-sm font-semibold text-gray-700">Simulation Control</h3>
-            <div className="flex gap-2">
-              <button onClick={onStart} disabled={isRunning} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 text-sm font-medium">
+            <div className="grid grid-cols-2 sm:flex gap-2">
+              <button onClick={onStart} disabled={isRunning} className="min-h-11 px-3 sm:px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 text-sm font-medium">
                 Start
               </button>
-              <button onClick={onPause} className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm font-medium">
+              <button onClick={onPause} className="min-h-11 px-3 sm:px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm font-medium">
                 {isRunning ? "Pause" : "Resume"}
               </button>
-              <button onClick={onStop} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-medium">
+              <button onClick={onStop} className="min-h-11 px-3 sm:px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-medium">
                 Stop
               </button>
               <button onClick={() => {
@@ -314,7 +328,7 @@ export default function PlotComponent({ frame: data, isRunning, params, onChange
                 isStable: true
             });
             onReset();
-        }} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium">
+              }} className="min-h-11 px-3 sm:px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium">
                 Reset
               </button>
             </div>

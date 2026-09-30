@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense } from "react";
 import PdeParameterPanel from "./PdeParameterPanel";
 const PlotComponent = lazy(() => import("./PlotComponent"));
+const GeneralPDE2D = lazy(() => import("./components/GeneralPDE2D"));
 const RandomWalkSim = lazy(() => import("./RandomWalkSimV2"));
 const QuantumWalkPage = lazy(() => import("./QuantumWalkPage"));
 const QuantumWalkPageRefactored = lazy(() => import("./QuantumWalkPageRefactored"));
@@ -126,11 +127,26 @@ export default function App() {
     const urlTab = getAppTabForLocation(urlLocation);
     const activeTab = urlTab ?? storedActiveTab;
     const [currentFrame, setCurrentFrame] = useState(null);
+    const [mobilePdeControlsOpen, setMobilePdeControlsOpen] = useState(false);
+    const [pdeMode, setPdeMode] = useState<'built-in' | 'general-2d'>('built-in');
     const canvasRef = useRef(null);
     const { initSolver, runAnimation, stop } = useWebGLSolver();
     const isWebGL = simulationParams.solver_type === 'webgl';
     const url = new URL(urlLocation, window.location.origin);
     const urlStrategy = url.searchParams.get("strategy");
+
+    useEffect(() => {
+      setMobilePdeControlsOpen(false);
+    }, [activeTab]);
+
+    useEffect(() => {
+      if (!mobilePdeControlsOpen) return;
+      const closeOnEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') setMobilePdeControlsOpen(false);
+      };
+      window.addEventListener('keydown', closeOnEscape);
+      return () => window.removeEventListener('keydown', closeOnEscape);
+    }, [mobilePdeControlsOpen]);
 
     useLayoutEffect(() => {
       if (!urlTab) {
@@ -331,15 +347,39 @@ export default function App() {
 
       {/* Content - add bottom padding on mobile for the bottom nav */}
       <div className={`flex-1 pb-14 md:pb-0 ${activeTab === 'randomwalksim' || activeTab === 'spheroidwalk' ? 'overflow-auto' : 'overflow-hidden'}`}>
-        {activeTab === 'spheroidwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><SpheroidWalkPage /></Suspense>) : activeTab === 'simulation' ? (<div className="h-full flex">
-            <div className="w-80 hidden md:block">
-              <PdeParameterPanel params={simulationParams} onChange={setSimulationParams}/>
+        {activeTab === 'spheroidwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><SpheroidWalkPage /></Suspense>) : activeTab === 'simulation' ? (<div className="h-full min-h-0 flex flex-col relative">
+            <div className="flex min-h-14 items-center gap-2 border-b border-gray-200 bg-white px-3 sm:px-4">
+              <button type="button" onClick={() => { setPdeMode('built-in'); setMobilePdeControlsOpen(false); }} aria-pressed={pdeMode === 'built-in'} className={`min-h-11 rounded-lg px-3 text-sm font-medium ${pdeMode === 'built-in' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}>Built-in equations</button>
+              <button type="button" onClick={() => { handleStop(); setPdeMode('general-2d'); setMobilePdeControlsOpen(false); }} aria-pressed={pdeMode === 'general-2d'} className={`min-h-11 rounded-lg px-3 text-sm font-medium ${pdeMode === 'general-2d' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}>General 2D solver</button>
             </div>
-            <div className="flex-1 relative">
+            <div className="min-h-0 flex-1 relative">
+              {pdeMode === 'general-2d' ? (
+                <Suspense fallback={<div className="flex h-full items-center justify-center">Loading solver...</div>}><GeneralPDE2D /></Suspense>
+              ) : (
+                <div className="h-full min-h-0 flex flex-col md:flex-row relative">
+            <div id="mobile-pde-controls" className={`${mobilePdeControlsOpen ? 'fixed inset-y-0 left-0 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col shadow-xl' : 'hidden'} md:static md:z-auto md:flex md:w-80 md:flex-none md:shadow-none h-full min-h-0 bg-white`} role={mobilePdeControlsOpen ? 'dialog' : undefined} aria-modal={mobilePdeControlsOpen ? true : undefined} aria-labelledby={mobilePdeControlsOpen ? 'mobile-pde-controls-title' : undefined}>
+              {mobilePdeControlsOpen && (
+                <header className="flex min-h-14 items-center justify-between border-b border-gray-200 px-4 md:hidden">
+                  <h2 id="mobile-pde-controls-title" className="font-semibold text-gray-900">PDE Parameters</h2>
+                  <button type="button" onClick={() => setMobilePdeControlsOpen(false)} aria-label="Close parameter panel" className="min-h-11 min-w-11 rounded-lg text-2xl text-gray-600 hover:bg-gray-100">×</button>
+                </header>
+              )}
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <PdeParameterPanel params={simulationParams} onChange={setSimulationParams}/>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0 min-h-0 relative flex flex-col">
+              <div className="md:hidden px-3 py-2 border-b border-gray-200 bg-white">
+                <button type="button" onClick={() => setMobilePdeControlsOpen(true)} aria-haspopup="dialog" aria-expanded={mobilePdeControlsOpen} aria-controls="mobile-pde-controls" className="min-h-11 px-4 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700">Parameters</button>
+              </div>
               <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
                 <PlotComponent frame={pdeState.lastFrame ?? currentFrame} isRunning={pdeState.isRunning} params={simulationParams} onChange={setSimulationParams} onStart={handleStart} onStop={handleStop} onPause={handlePause} onReset={handleReset}/>
               </Suspense>
               {isWebGL && (<canvas ref={canvasRef} width={simulationParams.mesh_size} height={1} style={{ display: 'none' }}/>)}
+            </div>
+            {mobilePdeControlsOpen && <button type="button" aria-label="Close parameter panel" onClick={() => setMobilePdeControlsOpen(false)} className="md:hidden fixed inset-0 z-40 bg-black/40" />}
+                </div>
+              )}
             </div>
           </div>) : activeTab === 'randomwalksim' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><RandomWalkSim /></Suspense>) : activeTab === 'quantumwalk' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPage /></Suspense>) : activeTab === 'quantumwalk-refactored' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><QuantumWalkPageRefactored /></Suspense>) : activeTab === 'analysis' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><AnalysisPage /></Suspense>) : activeTab === 'labdemo' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><LabDemoPage /></Suspense>) : activeTab === 'memorybank' ? (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><MemoryBankPage /></Suspense>) : (<Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}><SimplicialGrowthPage /></Suspense>)}
       </div>
